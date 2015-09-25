@@ -12,7 +12,7 @@ class Region(models.Model):
     region_field = models.CharField(max_length=20, verbose_name=_('region'))
 
     def __unicode__(self):
-        return self.region
+        return self.region_field
 
 
 
@@ -39,14 +39,16 @@ class Avatar(models.Model):
     )
 
 
-class PostPhoto(models.Model):
+"""
+class PostPhotos(models.Model):
     class Meta:
         db_table = 'post_photo'
         verbose_name = _('post photo')
         verbose_name_plural = _('post photos')
 
-    post_photo = models.ImageField(upload_to='/uploads/post_photos/', verbose_name=_('post photo'))
-
+    post_photos = models.ImageField(upload_to='/uploads/post_photos/', verbose_name=_('post photos'))
+"""
+"""
 class AnnouncementPhoto(models.Model):
     class Meta:
         db_table = 'announcement_photo'
@@ -55,7 +57,7 @@ class AnnouncementPhoto(models.Model):
 
     announcement_photo = models.ImageField(upload_to='/uploads/announcement_photos/', verbose_name=_('announcement photo'))
 
-
+"""
 class UserInformation(models.Model):
     class Meta:
         db_table = "user_information"
@@ -65,7 +67,7 @@ class UserInformation(models.Model):
     profile = models.ForeignKey(User)
     avatar = models.ManyToManyField(Avatar, blank=True)
     location = models.ManyToManyField(Region)
-    birth_date = models.DateField(verbose_name=_('birth date'))
+    birth_date = models.DateField(verbose_name=_('birth date'), blank=True)
     about = models.TextField(verbose_name=_('about you'), blank=True)
     breed = models.TextField(verbose_name=_('pigeons breed'), blank=True)
 
@@ -83,7 +85,7 @@ class Post(models.Model):
     title = models.CharField(max_length=150, verbose_name=_('title'))
     date = models.DateTimeField(verbose_name=_('date'))
     text = models.TextField(verbose_name=_('text'))
-    photo = models.ManyToManyField(PostPhoto, verbose_name=_('post photo'))
+    #post_photo = models.ManyToManyField(PostPhotos, verbose_name=_('post photos'))
 
     def __unicode__(self):
         return self.title
@@ -98,7 +100,7 @@ class Announcement(models.Model):
     author = models.ForeignKey(User)
     title = models.CharField(max_length=150, verbose_name=_('announcement title'))
     date = models.DateTimeField(verbose_name=_('date'))
-    photo = models.ManyToManyField(AnnouncementPhoto)
+    #photo = models.ManyToManyField(AnnouncementPhoto, verbose_name=_('announcement photo'))
     text = models.TextField(verbose_name=_('announcement text'))
 
     def __unicode__(self):
