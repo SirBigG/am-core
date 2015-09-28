@@ -39,16 +39,16 @@ class Avatar(models.Model):
     )
 
 
-"""
-class PostPhotos(models.Model):
+
+class PostPhoto(models.Model):
     class Meta:
         db_table = 'post_photo'
         verbose_name = _('post photo')
         verbose_name_plural = _('post photos')
 
-    post_photos = models.ImageField(upload_to='/uploads/post_photos/', verbose_name=_('post photos'))
-"""
-"""
+    post_photo_field = models.ImageField(upload_to='/uploads/post_photos/', verbose_name=_('post photo'))
+
+
 class AnnouncementPhoto(models.Model):
     class Meta:
         db_table = 'announcement_photo'
@@ -57,7 +57,7 @@ class AnnouncementPhoto(models.Model):
 
     announcement_photo = models.ImageField(upload_to='/uploads/announcement_photos/', verbose_name=_('announcement photo'))
 
-"""
+
 class UserInformation(models.Model):
     class Meta:
         db_table = "user_information"
@@ -85,7 +85,7 @@ class Post(models.Model):
     title = models.CharField(max_length=150, verbose_name=_('title'))
     date = models.DateTimeField(verbose_name=_('date'))
     text = models.TextField(verbose_name=_('text'))
-    #post_photo = models.ManyToManyField(PostPhotos, verbose_name=_('post photos'))
+    post_images = models.ManyToManyField(PostPhoto, verbose_name=_('post images'))
 
     def __unicode__(self):
         return self.title
@@ -100,7 +100,7 @@ class Announcement(models.Model):
     author = models.ForeignKey(User)
     title = models.CharField(max_length=150, verbose_name=_('announcement title'))
     date = models.DateTimeField(verbose_name=_('date'))
-    #photo = models.ManyToManyField(AnnouncementPhoto, verbose_name=_('announcement photo'))
+    ann_photo = models.ManyToManyField(AnnouncementPhoto, verbose_name=_('announcements photo'))
     text = models.TextField(verbose_name=_('announcement text'))
 
     def __unicode__(self):
