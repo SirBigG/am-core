@@ -22,7 +22,9 @@ class Category(models.Model):
         verbose_name = _('category')
         verbose_name_plural = _('categories')
 
-    category_field = models.CharField(max_length=20, verbose_name=_('category'))
+    category_field = models.CharField(
+        max_length=20, verbose_name=_('category')
+    )
 
     def __unicode__(self):
         return self.category
@@ -46,7 +48,9 @@ class PostPhoto(models.Model):
         verbose_name = _('post photo')
         verbose_name_plural = _('post photos')
 
-    post_photo_field = models.ImageField(upload_to='/uploads/post_photos/', verbose_name=_('post photo'))
+    post_photo_field = models.ImageField(
+        upload_to='/uploads/post_photos/', verbose_name=_('post photo')
+    )
 
 
 class AnnouncementPhoto(models.Model):
@@ -55,7 +59,9 @@ class AnnouncementPhoto(models.Model):
         verbose_name = _('announcement photo')
         verbose_name_plural = _('announcement photos')
 
-    announcement_photo = models.ImageField(upload_to='/uploads/announcement_photos/', verbose_name=_('announcement photo'))
+    announcement_photo = models.ImageField(
+        upload_to='/uploads/announcement_photos/', verbose_name=_('announcement photo')
+    )
 
 
 class UserInformation(models.Model):
