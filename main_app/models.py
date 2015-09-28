@@ -27,7 +27,7 @@ class Category(models.Model):
     )
 
     def __unicode__(self):
-        return self.category
+        return self.category_field
 
 
 class Avatar(models.Model):
@@ -37,7 +37,7 @@ class Avatar(models.Model):
         verbose_name_plural = _('avatars')
 
     avatar_field = models.ImageField(
-        upload_to='/uploads/avatars/', verbose_name=_('avatar')
+        upload_to='uploads/avatars/', verbose_name=_('avatar')
     )
 
 
@@ -49,7 +49,7 @@ class PostPhoto(models.Model):
         verbose_name_plural = _('post photos')
 
     post_photo_field = models.ImageField(
-        upload_to='/uploads/post_photos/', verbose_name=_('post photo')
+        upload_to='uploads/post_photos/', verbose_name=_('post photo')
     )
 
 
@@ -60,7 +60,7 @@ class AnnouncementPhoto(models.Model):
         verbose_name_plural = _('announcement photos')
 
     announcement_photo = models.ImageField(
-        upload_to='/uploads/announcement_photos/', verbose_name=_('announcement photo')
+        upload_to='uploads/announcement_photos/', verbose_name=_('announcement photo')
     )
 
 
