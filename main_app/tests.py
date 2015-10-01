@@ -50,14 +50,13 @@ class PostTestCase(TestCase):
         Post.objects.create(title=u'породи', date=timezone.now(), text=u'текст про породи')
 
     def test_post(self):
-        cat = Category.objects.get(id = 1)
+        cat = Category.objects.get(id=1)
         post = Post.objects.get(id = 1)
-
-        post.post_category.add(cat)
+        post.post_category=cat
 
         self.assertEqual(post.title, u'породи')
         self.assertEqual(post.text, u'текст про породи')
-        self.assertEqual(post.post_category.get().category_field, 'Post pigeons')
+        self.assertEqual(post.post_category.category_field, 'Post pigeons')
 
 
 class AnnouncementTestCase(TestCase):
