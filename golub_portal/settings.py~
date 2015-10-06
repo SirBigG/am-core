@@ -29,6 +29,11 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+INTERNAL_APPS = (
+    # Тут список наших приложений
+    'apps.extuser',
+    # А тут его продолжение
+)
 
 INSTALLED_APPS = (
     'django.contrib.admin',
@@ -37,9 +42,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    #Our apps
-    'main_app',
+    'apps.main_app',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -110,5 +113,5 @@ STATIC_URL = '/static/'
 
 
 # Media files (uploads)
-MEDIA_URL = '/uploads/'
+MEDIA_URL = '/'
 MEDIA_ROOT = BASE_DIR

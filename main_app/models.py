@@ -72,7 +72,7 @@ class UserInformation(models.Model):
         verbose_name = _('user information')
         verbose_name_plural = _('user information')
 
-    profile = models.ForeignKey(User)
+    profile = models.ForeignKey(User, unique=True)
     avatar = models.ManyToManyField(Avatar, blank=True)
     location = models.ManyToManyField(Region)
     birth_date = models.DateField(verbose_name=_('birth date'), blank=True)
