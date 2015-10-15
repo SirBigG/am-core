@@ -60,12 +60,17 @@ class UserInformation(models.Model):
         verbose_name_plural = _('user information')
 
     profile = models.ForeignKey(User, unique=True)
+<<<<<<< HEAD
     avatar = models.ImageField(
         upload_to='uploads/avatars/', verbose_name=_('avatar'),
         blank=True
     )
     location = models.ForeignKey(Region, verbose_name=_('location'),default=2)
     phone = models.IntegerField(unique=True,verbose_name=_('phone'), blank=True)
+=======
+    avatar = models.ManyToManyField(Avatar, blank=True)
+    location = models.ManyToManyField(Region)
+>>>>>>> 765dfde8a84f90b3a1f299f7508731481807064b
     birth_date = models.DateField(verbose_name=_('birth date'), blank=True)
     about = models.TextField(verbose_name=_('about you'), blank=True)
     breed = models.TextField(verbose_name=_('pigeons breed'), blank=True)
