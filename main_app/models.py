@@ -17,7 +17,6 @@ class Region(models.Model):
         return self.region_field
 
 
-
 class Category(models.Model):
     class Meta:
         db_table = 'category'
@@ -30,18 +29,6 @@ class Category(models.Model):
 
     def __unicode__(self):
         return self.category_field
-
-
-class Avatar(models.Model):
-    class Meta:
-        db_table = 'avatar'
-        verbose_name = _('avatar')
-        verbose_name_plural = _('avatars')
-
-    avatar_field = models.ImageField(
-        upload_to='uploads/avatars/', verbose_name=_('avatar')
-    )
-
 
 
 class PostPhoto(models.Model):
@@ -73,8 +60,12 @@ class UserInformation(models.Model):
         verbose_name_plural = _('user information')
 
     profile = models.ForeignKey(User, unique=True)
-    avatar = models.ManyToManyField(Avatar, blank=True)
-    location = models.ManyToManyField(Region)
+    avatar = models.ImageField(
+        upload_to='uploads/avatars/', verbose_name=_('avatar'),
+        blank=True
+    )
+    location = models.ForeignKey(Region, verbose_name=_('location'),default=2)
+    phone = models.IntegerField(unique=True,verbose_name=_('phone'), blank=True)
     birth_date = models.DateField(verbose_name=_('birth date'), blank=True)
     about = models.TextField(verbose_name=_('about you'), blank=True)
     breed = models.TextField(verbose_name=_('pigeons breed'), blank=True)
