@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 from django.db import models
 from django.contrib.auth.models import User
@@ -52,26 +52,6 @@ class AnnouncementPhoto(models.Model):
         upload_to='uploads/announcement_photos/', verbose_name=_('announcement photo')
     )
 
-
-class UserInformation(models.Model):
-    class Meta:
-        db_table = "user_information"
-        verbose_name = _('user information')
-        verbose_name_plural = _('user information')
-
-    profile = models.ForeignKey(User, unique=True)
-    avatar = models.ImageField(
-        upload_to='uploads/avatars/', verbose_name=_('avatar'),
-        blank=True
-    )
-    location = models.ForeignKey(Region, verbose_name=_('location'),default=2)
-    phone = models.IntegerField(unique=True,verbose_name=_('phone'), blank=True)
-    birth_date = models.DateField(verbose_name=_('birth date'), blank=True)
-    about = models.TextField(verbose_name=_('about you'), blank=True)
-    breed = models.TextField(verbose_name=_('pigeons breed'), blank=True)
-
-    def __unicode__(self):
-        return self.about
 
 
 class Post(models.Model):
