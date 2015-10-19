@@ -12,18 +12,36 @@ class UserRegistrationForm(forms.ModelForm):
     email and password.
     """
 
-    email = forms.EmailField(label=_("E-mail"))
+    email = forms.EmailField(label=_("E-mail"),required=True,widget=forms.EmailInput(
+        attrs={'class': 'form-control', 'placeholder': 'example@example.com'}))
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
+        'username_exist': _("The username already exists. Please try another one.")
     }
     password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput)
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label=_("Password confirmation"),
-        widget=forms.PasswordInput)
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
         fields = ['username']
+        widgets ={
+            'username': forms.TextInput(
+                attrs={'class':"form-control",
+                       'placeholder':'Name'}
+            ),
+        }
+
+    def clean_username(self):
+        try:
+            user = User.objects.get(username=self.cleaned_data['username'])
+        except User.DoesNotExist:
+            return self.cleaned_data['username']
+        raise forms.ValidationError(
+            self.error_messages['username_exist'],
+            code='username_exist',
+        )
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
