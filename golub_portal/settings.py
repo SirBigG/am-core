@@ -81,9 +81,9 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': "sitedb",
         'USER': 'admin',
-        'PASSWORD':'787898',
-        'HOST':'127.0.0.1',
-        'PORT':'',
+        'PASSWORD': '787898',
+        'HOST': '127.0.0.1',
+        'PORT': '',
     }
 }
 
