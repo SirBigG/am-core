@@ -4,6 +4,9 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from django_any import any_model
+from django_any.contrib.auth import any_user
+
 from apps.main_app.models import Region
 
 from .models import UserInformation
@@ -14,26 +17,24 @@ class UserInformationTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username='bro', email='bro@example.com', password='787898')
         User.objects.create_user(username='chick', email='chick@example.com', password='foo')
-        Region.objects.create(region_field='Ternopil')
-        Region.objects.create(region_field='Kyiv')
-
 
     def test_UserInformation(self):
+        ter = any_model(Region, region_field='Ternopil')
+        kyi = any_model(Region, region_field='Kyiv')
+
         bro = User.objects.get(username='bro')
         chick = User.objects.get(username='chick')
-        ter = Region.objects.get(id=1)
-        kyi = Region.objects.get(id=2)
+        ter = Region.objects.get(pk=ter.pk)
+        kyi = Region.objects.get(pk=kyi.pk)
 
-        inf_bro = UserInformation(
-            profile=bro, birth_date= timezone.now(),  about ='cool man', breed=u'армавір',
-            phone='0991787345', location=ter
-        )
+        inf_bro = any_model(UserInformation,
+                            profile=bro, birth_date=timezone.now(),
+                            about='cool man', breed=u'армавір', location=ter)
         inf_bro.save()
 
-        inf_chick = UserInformation(
-            profile=chick, birth_date=timezone.now(), about='nice chick', breed=u'домінікан',
-            phone='0991223456', location=kyi
-        )
+        inf_chick = any_model(UserInformation,
+                              profile=chick, birth_date=timezone.now(),
+                              about='nice chick', breed=u'домінікан', location=kyi)
         inf_chick.save()
 
         self.assertEqual(inf_bro.location.region_field, 'Ternopil')
