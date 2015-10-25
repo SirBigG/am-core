@@ -55,5 +55,6 @@ class UserRegistrationFormTestCase(TestCase):
         form = UserRegistrationForm(post,files)
         self.assertFalse(form.is_valid())
         self.assertRaisesMessage('password_mismatch',"The two password fields didn't match.")
-        form1 = UserRegistrationForm(user= 'Antoni', email='aa@aa.com', password1='1234', password2='1234')
+        form_data={'username': 'Antoni', 'email': 'aa@aa.com', 'password1': '1234', 'password2': '1234'}
+        form1 = UserRegistrationForm(data=form_data)
         self.assertTrue(form1.is_valid())
