@@ -6,10 +6,12 @@ from django.utils import timezone
 
 from django_any import any_model
 from django_any.contrib.auth import any_user
+from django_any.forms import any_form
 
 from apps.main_app.models import Region
 
 from .models import UserInformation
+from .forms import UserRegistrationForm
 # Create your tests here.
 
 
@@ -46,3 +48,12 @@ class UserInformationTestCase(TestCase):
         self.assertEqual(inf_chick.profile.email, 'chick@example.com')
         self.assertEqual(chick.email, 'chick@example.com')
         self.assertEqual(inf_chick.breed, u'домінікан')
+
+class UserRegistrationFormTestCase(TestCase):
+    def test_form_validation(self):
+        post, files = any_form(UserRegistrationForm)
+        form = UserRegistrationForm(post,files)
+        self.assertFalse(form.is_valid())
+        self.assertRaisesMessage('password_mismatch',"The two password fields didn't match.")
+        form1 = UserRegistrationForm(user= 'Antoni', email='aa@aa.com', password1='1234', password2='1234')
+        self.assertTrue(form1.is_valid())
