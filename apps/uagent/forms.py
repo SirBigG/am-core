@@ -16,7 +16,8 @@ class UserRegistrationForm(forms.ModelForm):
         attrs={'class': 'form-control', 'placeholder': 'example@example.com'}))
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
-        'username_exist': _("The username already exists. Please try another one.")
+        'username_exist': _("The username already exists. Please try another one."),
+        'email_exist': _("The email already exists. Please try another one.")
     }
     password1 = forms.CharField(label=_("Password"),
         widget=forms.PasswordInput(attrs={'class': 'form-control'}))
@@ -41,6 +42,16 @@ class UserRegistrationForm(forms.ModelForm):
         raise forms.ValidationError(
             self.error_messages['username_exist'],
             code='username_exist',
+        )
+
+    def clean_email(self):
+        try:
+            user = User.objects.get(email=self.cleaned_data['email'])
+        except User.DoesNotExist:
+            return self.cleaned_data['email']
+        raise forms.ValidationError(
+            self.error_messages['email_exist'],
+            code='email_exist',
         )
 
     def clean_password2(self):

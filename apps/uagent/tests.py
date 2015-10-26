@@ -3,6 +3,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from django_any import any_model
 from django_any.contrib.auth import any_user
@@ -50,11 +51,24 @@ class UserInformationTestCase(TestCase):
         self.assertEqual(inf_chick.breed, u'домінікан')
 
 class UserRegistrationFormTestCase(TestCase):
+    def setUp(self):
+        User.objects.create_user(username='admin', email='bro@example.com', password='787898')
     def test_form_validation(self):
         post, files = any_form(UserRegistrationForm)
         form = UserRegistrationForm(post,files)
         self.assertFalse(form.is_valid())
-        self.assertRaisesMessage('password_mismatch',"The two password fields didn't match.")
-        form_data={'username': 'Antoni', 'email': 'aa@aa.com', 'password1': '1234', 'password2': '1234'}
-        form1 = UserRegistrationForm(data=form_data)
+        self.assertRaisesMessage('password_mismatch', _("The two password fields didn't match."))
+
+        form_data1={'username': 'Antoni', 'email': 'aa@aa.com', 'password1': '1234', 'password2': '1234'}
+        form1 = UserRegistrationForm(data=form_data1)
         self.assertTrue(form1.is_valid())
+
+        form_data2={'username':'admin','email':'ex@ex.ua', 'password1':'1234','password2':'1234'}
+        form2=UserRegistrationForm(data=form_data2)
+        self.assertFalse(form2.is_valid())
+        self.assertRaisesMessage('username_exist', _("The username already exists. Please try another one."))
+
+        form_data2={'username': 'user','email': 'bro@example.com', 'password1': '1234','password2': '1234'}
+        form2=UserRegistrationForm(data=form_data2)
+        self.assertFalse(form2.is_valid())
+        self.assertRaisesMessage('email_exist',_("The email already exists. Please try another one."))
