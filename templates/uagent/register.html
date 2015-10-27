@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <form method="post" action="/register/" class="form-horizontal">
+    <form method="post" action="/user/register/" class="form-horizontal">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">
