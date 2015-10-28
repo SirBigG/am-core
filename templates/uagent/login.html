@@ -1,0 +1,21 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<div class="container">
+    <form method="post" action="/user/login/" class="form-horizontal">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <label class="col-sm-2 control-label">{{ field.label }}:</label>
+                <div class="col-sm-6">
+                    {{ field }} {{ field.help_text }}
+                </div>
+                <div class="danger">
+                    <p class="bg-danger">{{ field.errors }}</p>
+                </div>
+            </div>
+        {% endfor %}
+        <input type="submit">
+    </form>
+</div>
+{% endblock %}
