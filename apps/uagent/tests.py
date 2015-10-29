@@ -1,6 +1,6 @@
 #-*- coding: utf-8 -*-
 
-from django.test import TestCase
+from django.test import TestCase, Client
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +14,7 @@ from apps.main_app.models import Region
 from .models import UserInformation
 from .forms import UserRegistrationForm
 # Create your tests here.
-
+client=Client()
 
 class UserInformationTestCase(TestCase):
     def setUp(self):
@@ -72,3 +72,8 @@ class UserRegistrationFormTestCase(TestCase):
         form2=UserRegistrationForm(data=form_data2)
         self.assertFalse(form2.is_valid())
         self.assertRaisesMessage('email_exist',_("The email already exists. Please try another one."))
+
+
+    def test_form_view(self):
+        responce=client.get('/user/register/')
+        self.assertEqual(responce.status_code, 200)
