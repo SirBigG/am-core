@@ -13,7 +13,8 @@ from apps.main_app.models import Region
 
 from .models import UserInformation
 from .forms import UserRegistrationForm
-# Create your tests here.
+
+
 client=Client()
 
 class UserInformationTestCase(TestCase):
@@ -53,6 +54,7 @@ class UserInformationTestCase(TestCase):
 class UserRegistrationFormTestCase(TestCase):
     def setUp(self):
         User.objects.create_user(username='admin', email='bro@example.com', password='787898')
+
     def test_form_validation(self):
         post, files = any_form(UserRegistrationForm)
         form = UserRegistrationForm(post,files)
@@ -77,3 +79,9 @@ class UserRegistrationFormTestCase(TestCase):
     def test_form_view(self):
         responce=client.get('/user/register/')
         self.assertEqual(responce.status_code, 200)
+
+    def test_auth_form_view(self):
+        responce=client.get('/user/login/')
+        self.assertEqual(responce.status_code, 200)
+        user = client.login(username='admin', password='787898')
+        self.assertTrue(user)
