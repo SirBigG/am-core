@@ -3,6 +3,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -66,8 +67,14 @@ class UserRegistrationForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
-        user = super(UserCreationForm, self).save(commit=False)
+        user = super(UserRegistrationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
+        return user
+
+    def get_user(self):
+        username = self.cleaned_data.get('username')
+        password = self.cleaned_data.get('password1')
+        user = authenticate(username=username, password=password)
         return user

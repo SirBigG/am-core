@@ -59,29 +59,43 @@ class UserRegistrationFormTestCase(TestCase):
         post, files = any_form(UserRegistrationForm)
         form = UserRegistrationForm(post,files)
         self.assertFalse(form.is_valid())
-        self.assertRaisesMessage('password_mismatch', _("The two password fields didn't match."))
+        self.assertRaisesMessage('password_mismatch',
+                                 _("The two password fields didn't match."))
 
-        form_data1={'username': 'Antoni', 'email': 'aa@aa.com', 'password1': '1234', 'password2': '1234'}
+        form_data1={'username': 'Antoni',
+                    'email': 'aa@aa.com','password1': '1234', 'password2': '1234'}
         form1 = UserRegistrationForm(data=form_data1)
         self.assertTrue(form1.is_valid())
 
-        form_data2={'username':'admin','email':'ex@ex.ua', 'password1':'1234','password2':'1234'}
+        form_data2={'username':'admin',
+                    'email':'ex@ex.ua','password1':'1234','password2':'1234'}
         form2=UserRegistrationForm(data=form_data2)
         self.assertFalse(form2.is_valid())
-        self.assertRaisesMessage('username_exist', _("The username already exists. Please try another one."))
+        self.assertRaisesMessage('username_exist',
+                                 _("The username already exists. Please try another one."))
 
-        form_data2={'username': 'user','email': 'bro@example.com', 'password1': '1234','password2': '1234'}
+        form_data2={'username': 'user',
+                    'email': 'bro@example.com','password1': '1234','password2': '1234'}
         form2=UserRegistrationForm(data=form_data2)
         self.assertFalse(form2.is_valid())
-        self.assertRaisesMessage('email_exist',_("The email already exists. Please try another one."))
+        self.assertRaisesMessage('email_exist',
+                                 _("The email already exists. Please try another one."))
 
-
-    def test_form_view(self):
+    def test_register_form_view(self):
         responce=client.get('/user/register/')
         self.assertEqual(responce.status_code, 200)
 
-    def test_auth_form_view(self):
+    def test_login_form_view(self):
+        is_login = client.login(username='admin', password='787898')
+        self.assertTrue(is_login)
         responce=client.get('/user/login/')
         self.assertEqual(responce.status_code, 200)
         user = client.login(username='admin', password='787898')
         self.assertTrue(user)
+
+    def test_logout_view(self):
+        is_login = client.login(username='admin', password='787898')
+        self.assertTrue(is_login)
+        is_logout = client.get('/user/logout/')
+        self.assertEqual(is_logout.status_code, 200)
+        self.assertEqual(is_login.is_authenticated(), False)
