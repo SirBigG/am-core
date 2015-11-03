@@ -6,6 +6,7 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate
 from django.utils.translation import ugettext_lazy as _
 
+from .models import UserInformation
 
 
 class UserRegistrationForm(forms.ModelForm):
@@ -78,3 +79,9 @@ class UserRegistrationForm(forms.ModelForm):
         password = self.cleaned_data.get('password1')
         user = authenticate(username=username, password=password)
         return user
+
+
+class UserExtendForm(forms.ModelForm):
+    class Meta:
+        model = UserInformation
+        fields = '__all__'

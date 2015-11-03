@@ -31,7 +31,7 @@ class LoginFormView(FormView):
 
 
 class LogoutView(RedirectView):
-    success_url = '/'
+    url = '/'
 
     def get(self, request, *args, **kwargs):
         logout(request)

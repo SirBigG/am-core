@@ -84,18 +84,26 @@ class UserRegistrationFormTestCase(TestCase):
     def test_register_form_view(self):
         responce=client.get('/user/register/')
         self.assertEqual(responce.status_code, 200)
+        form_data2={'username':'admin',
+                    'email':'ex@ex.ua','password1':'1234','password2':'1234'}
+        responce1 = client.post('/user/register/', data=form_data2)
+        self.assertEqual(responce1.status_code,200)
+        user = User.objects.get(username= 'admin')
+        self.assertIsNotNone(user)
+        self.assertEqual(user.is_authenticated(), True)
 
     def test_login_form_view(self):
         is_login = client.login(username='admin', password='787898')
         self.assertTrue(is_login)
         responce=client.get('/user/login/')
         self.assertEqual(responce.status_code, 200)
-        user = client.login(username='admin', password='787898')
-        self.assertTrue(user)
+        user = User.objects.get(username= 'admin')
+        self.assertEqual(user.is_authenticated(), True)
 
     def test_logout_view(self):
         is_login = client.login(username='admin', password='787898')
         self.assertTrue(is_login)
         is_logout = client.get('/user/logout/')
-        self.assertEqual(is_logout.status_code, 200)
-        self.assertEqual(is_login.is_authenticated(), False)
+        self.assertEqual(is_logout.status_code, 301)
+        user = User.objects.get(username= 'admin')
+        self.assertEqual(user.is_authenticated(), False)
