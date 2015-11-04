@@ -28,7 +28,7 @@ ALLOWED_HOSTS = []
 
 # Application definition
 
-INSTALLED_APPS = [
+INSTALLED_APPS = (
     #standart django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -40,11 +40,12 @@ INSTALLED_APPS = [
     #project apps
     'apps.main_app',
     'apps.uagent',
+    'apps.posts',
 
     #additional apps
     #app for testing filling data in models
     'django_any',
-]
+)
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',

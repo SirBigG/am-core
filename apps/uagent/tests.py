@@ -9,9 +9,7 @@ from django_any import any_model
 from django_any.contrib.auth import any_user
 from django_any.forms import any_form
 
-from apps.main_app.models import Region
-
-from .models import UserInformation
+from .models import UserInformation, Region
 from .forms import UserRegistrationForm
 
 

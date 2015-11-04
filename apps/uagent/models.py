@@ -1,9 +1,22 @@
+# -*- coding: utf-8 -*-
+
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
-from apps.main_app.models import Region
-# Create your models here.
+
+class Region(models.Model):
+    class Meta:
+        db_table = "region"
+        verbose_name = _('region')
+        verbose_name_plural = _('regions')
+
+    region_field = models.CharField(max_length=20, verbose_name=_('region'))
+
+    def __unicode__(self):
+        return self.region_field
+
+
 class UserInformation(models.Model):
     class Meta:
         db_table = "user_information"

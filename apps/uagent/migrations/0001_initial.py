@@ -9,10 +9,21 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('main_app', '0006_auto_20151016_1221'),
     ]
 
     operations = [
+        migrations.CreateModel(
+            name='Region',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('region_field', models.CharField(max_length=20, verbose_name='region')),
+            ],
+            options={
+                'db_table': 'region',
+                'verbose_name': 'region',
+                'verbose_name_plural': 'regions',
+            },
+        ),
         migrations.CreateModel(
             name='UserInformation',
             fields=[
@@ -22,7 +33,7 @@ class Migration(migrations.Migration):
                 ('birth_date', models.DateField(verbose_name='birth date', blank=True)),
                 ('about', models.TextField(verbose_name='about you', blank=True)),
                 ('breed', models.TextField(verbose_name='pigeons breed', blank=True)),
-                ('location', models.ForeignKey(default=2, verbose_name='location', to='main_app.Region')),
+                ('location', models.ForeignKey(default=2, verbose_name='location', to='uagent.Region')),
                 ('profile', models.OneToOneField(to=settings.AUTH_USER_MODEL)),
             ],
             options={
