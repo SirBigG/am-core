@@ -14,6 +14,7 @@ class Category(models.Model):
     category_field = models.CharField(
         max_length=20, verbose_name=_('category')
     )
+    translit = models.CharField(max_length=20, verbose_name=_('category translit'))
 
     def __unicode__(self):
         return self.category_field
