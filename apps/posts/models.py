@@ -6,15 +6,16 @@ import datetime
 
 
 class Category(models.Model):
+    title = models.CharField(
+        max_length=20, verbose_name=_('category')
+    )
+    slug = models.SlugField(max_length=20, verbose_name=_('category slug'), unique=True)
+    description = models.TextField(verbose_name=_('description'))
+
     class Meta:
         db_table = 'category'
         verbose_name = _('category')
         verbose_name_plural = _('categories')
-
-    category_field = models.CharField(
-        max_length=20, verbose_name=_('category')
-    )
-    translit = models.CharField(max_length=20, verbose_name=_('category translit'))
 
     def __unicode__(self):
         return self.category_field
@@ -37,7 +38,7 @@ class Post(models.Model):
         verbose_name = _('post')
         verbose_name_plural = _('posts')
 
-    post_category = models.ForeignKey(Category, verbose_name=_('category'))
+    post_category = models.ManyToManyField(Category, verbose_name=_('category'))
     title = models.CharField(max_length=150, verbose_name=_('title'))
     date = models.DateTimeField(verbose_name=_('date'), default=datetime.datetime.now)
     text = models.TextField(verbose_name=_('text'))
