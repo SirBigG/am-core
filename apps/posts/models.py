@@ -33,32 +33,32 @@ class PostPhoto(models.Model):
 
 
 class Post(models.Model):
-    class Meta:
-        db_table = 'post'
-        verbose_name = _('post')
-        verbose_name_plural = _('posts')
-
-    post_category = models.ManyToManyField(Category, verbose_name=_('category'))
     title = models.CharField(max_length=150, verbose_name=_('title'))
+    post_category = models.ForeignKey(Category, verbose_name=_('category'))
     date = models.DateTimeField(verbose_name=_('date'), default=datetime.datetime.now)
     text = models.TextField(verbose_name=_('text'))
     post_images = models.ManyToManyField(PostPhoto, verbose_name=_('post images'))
     publisher = models.ForeignKey(User, verbose_name=_('post publisher'))
     author = models.CharField(max_length=100, verbose_name=_('post author'), blank=True)
 
+    class Meta:
+        db_table = 'post'
+        verbose_name = _('post')
+        verbose_name_plural = _('posts')
+
     def __unicode__(self):
         return self.title
 
 class Comments(models.Model):
-    class Meta:
-        db_table = 'post_comments'
-        verbose_name = _('comment')
-        verbose_name_plural = _('comments')
-
     post = models.ForeignKey(Post)
     text = models.TextField(verbose_name=_('comment text'))
     author = models.ForeignKey(User, verbose_name=_('comment author'))
     publish_date = models.DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        db_table = 'post_comments'
+        verbose_name = _('comment')
+        verbose_name_plural = _('comments')
 
     def __unicode__(self):
         return self.text
