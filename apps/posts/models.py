@@ -19,8 +19,11 @@ class Category(models.Model):
         verbose_name = _('category')
         verbose_name_plural = _('categories')
 
+    def get_absolute_url(self):
+        return '/posts/%s/' % self.slug
+
     def __unicode__(self):
-        return self.category_field
+        return self.title
 
 
 class PostPhoto(models.Model):
@@ -47,6 +50,9 @@ class Post(models.Model):
         db_table = 'post'
         verbose_name = _('post')
         verbose_name_plural = _('posts')
+
+    def get_absolute_url(self):
+        return '/posts/%s/%i/' % (self.post_category.slug, self.id)
 
     def __unicode__(self):
         return self.title

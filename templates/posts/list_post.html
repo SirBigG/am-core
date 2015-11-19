@@ -1,0 +1,8 @@
+{% extends 'main.html' %}
+
+{% block content %}
+    {% for post in object_list %}
+        <p>{{ post.title }}</p>
+        <a href="{{ post.get_absolute_url }}">DDDD</a>
+    {% endfor %}
+{% endblock %}
