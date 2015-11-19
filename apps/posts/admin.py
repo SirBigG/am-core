@@ -11,6 +11,10 @@ class PostAdmin(admin.ModelAdmin):
                     'publisher', 'date')
 
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('title', 'level', 'parent')
+
+
 admin.site.register(Post, PostAdmin)
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(PostPhoto)
