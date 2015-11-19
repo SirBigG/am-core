@@ -7,10 +7,12 @@ import datetime
 
 class Category(models.Model):
     title = models.CharField(
-        max_length=20, verbose_name=_('category')
+        max_length=50, verbose_name=_('category')
     )
     slug = models.SlugField(max_length=20, verbose_name=_('category slug'), unique=True)
-    description = models.TextField(verbose_name=_('description'))
+    level = models.IntegerField(verbose_name=_('level'))
+    parent = models.CharField(max_length=20, default='root', verbose_name=_('category parent'))
+    description = models.TextField(verbose_name=_('description'), blank=True)
 
     class Meta:
         db_table = 'category'
