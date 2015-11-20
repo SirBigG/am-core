@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Post, PostPhoto
+from .models import Category, Post, PostPhoto, Comments
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -18,3 +18,4 @@ class CategoryAdmin(admin.ModelAdmin):
 admin.site.register(Post, PostAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(PostPhoto)
+admin.site.register(Comments)

@@ -3,4 +3,8 @@
 {% block content %}
     <p>{{ object.title }}</p>
     <p>{{ object.text }}</p>
+
+    {% for comment in comments %}
+        <h3>{{comment.text}}</h3>
+    {% endfor %}
 {% endblock %}
