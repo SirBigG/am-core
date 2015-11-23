@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views.generic import ListView, DetailView
 
 from .models import Post, Comments
+from .forms import CommentsForm
 
 
 class ListPostView(ListView):
@@ -17,4 +18,5 @@ class PostView(DetailView):
     def get_context_data(self,**kwargs):
         context = super(PostView, self).get_context_data(**kwargs)
         context['comments'] = Comments.objects.filter(post=self.object).order_by('-publish_date')
+        context['comments_form'] = CommentsForm
         return context

@@ -7,4 +7,11 @@
     {% for comment in comments %}
         <h3>{{comment.text}}</h3>
     {% endfor %}
+
+    <form>
+        {% csrf_token %}
+        {{comments_form}}
+        <input type="button" value="Check comment">
+        <input type="hidden" value="{{object.id}}">
+    </form>
 {% endblock %}
