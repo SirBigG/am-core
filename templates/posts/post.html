@@ -8,10 +8,10 @@
         <h3>{{comment.text}}</h3>
     {% endfor %}
 
-    <form>
+    <form action="/posts/{{ object.post_category }}/{{ object.pk }}/" method="post">
         {% csrf_token %}
         {{comments_form}}
-        <input type="button" value="Check comment">
-        <input type="hidden" value="{{object.id}}">
+        {{comments_form.error}}
+        <input type="submit" value="Check comment">
     </form>
 {% endblock %}
