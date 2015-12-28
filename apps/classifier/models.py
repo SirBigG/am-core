@@ -8,7 +8,7 @@ class Category(models.Model):
     )
     slug = models.SlugField(max_length=20, verbose_name=_('category slug'), unique=True)
     level = models.IntegerField(verbose_name=_('level'))
-    parent = models.CharField(max_length=20, default='root', verbose_name=_('category parent'))
+    parent = models.ForeignKey('self', blank=True, verbose_name=_('category parent'))
     description = models.TextField(verbose_name=_('description'), blank=True)
 
     class Meta:
@@ -16,8 +16,11 @@ class Category(models.Model):
         verbose_name = _('category')
         verbose_name_plural = _('categories')
 
-    def get_absolute_url(self):
-        return '/posts/%s/' % self.slug
+    def get_parent(self):
+        """
+        :return: category parent
+        """
+        return self.parent
 
     def __unicode__(self):
         return self.title
