@@ -25,11 +25,11 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
+WSGI_APPLICATION = 'golub_portal.wsgi.application'
 # Application definition
 
-INSTALLED_APPS = (
-    #standart django apps
+INSTALLED_APPS = [
+    # standart django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -37,15 +37,17 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    #project apps
+    # project apps
     'apps.main_app',
     'apps.uagent',
     'apps.posts',
+    'apps.comment',
+    'apps.classifier',
 
-    #additional apps
-    #app for testing filling data in models
-    'django_any',
-)
+    # additional apps
+    # app for testing filling data in models
+    #'django_any',
+]
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -63,7 +65,7 @@ ROOT_URLCONF = 'golub_portal.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR,'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -76,7 +78,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'golub_portal.wsgi.application'
+
 
 
 # Database
@@ -85,7 +87,7 @@ WSGI_APPLICATION = 'golub_portal.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "sitedb",
+        'NAME': "superdb",
         'USER': 'admin',
         'PASSWORD': '787898',
         'HOST': '127.0.0.1',

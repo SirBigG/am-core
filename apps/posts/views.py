@@ -1,10 +1,9 @@
-from django.shortcuts import render, redirect
 from django.views.generic import ListView, DetailView, FormView, View
 from django.views.generic.detail import SingleObjectMixin
-from django.http import HttpResponseForbidden
 
-from .models import Post, Comments
-from .forms import CommentsForm
+from .models import Post
+from apps.comment.models import Comments
+from apps.comment.forms import CommentsForm
 
 
 class ListPostView(ListView):
@@ -27,20 +26,14 @@ class PostDisplay(DetailView):
 class CommentFormView(SingleObjectMixin, FormView):
     form_class = CommentsForm
     model = Comments
-    # TODO: create template for form
-    template_name = 'posts/post.html'
 
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated():
-            return HttpResponseForbidden()
-        self.object = self.get_object()
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            form.save()
-        return super(CommentFormView, self).post(request, *args, **kwargs)
-    # FIXME: Dont work success url. Do it for POST.
+    def form_valid(self, form):
+        self.object = form.cleaned_data['post']
+        form.save()
+        return super(CommentFormView, self).form_valid(form)
+
     def get_success_url(self):
-        return self.object.post.get_absolute_url()
+        return self.object.get_absolute_url()
 
 
 class PostDetailView(View):

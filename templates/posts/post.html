@@ -8,6 +8,8 @@
         <h3>{{comment.text}}</h3>
     {% endfor %}
 
+    {{ image }}
+
     <form action="/posts/{{ object.post_category }}/{{ object.pk }}/" method="post">
         {% csrf_token %}
         {{comments_form}}

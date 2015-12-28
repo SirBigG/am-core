@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Category, Post, PostPhoto, Comments
+from .models import Post, PostPhoto
 
 
 class PostAdmin(admin.ModelAdmin):
@@ -11,11 +11,9 @@ class PostAdmin(admin.ModelAdmin):
                     'publisher', 'date')
 
 
-class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'level', 'parent')
+#class CategoryAdmin(admin.ModelAdmin):
+#    list_display = ('title', 'level', 'parent')
 
 
 admin.site.register(Post, PostAdmin)
-admin.site.register(Category, CategoryAdmin)
 admin.site.register(PostPhoto)
-admin.site.register(Comments)
