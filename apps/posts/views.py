@@ -21,27 +21,3 @@ class PostDisplay(DetailView):
         context['comments'] = Comments.objects.filter(post=self.object).order_by('-publish_date')
         context['comments_form'] = CommentsForm
         return context
-
-
-class CommentFormView(SingleObjectMixin, FormView):
-    form_class = CommentsForm
-    model = Comments
-
-    def form_valid(self, form):
-        self.object = form.cleaned_data['post']
-        form.save()
-        return super(CommentFormView, self).form_valid(form)
-
-    def get_success_url(self):
-        return self.object.get_absolute_url()
-
-
-class PostDetailView(View):
-
-    def get(self, request, *args, **kwargs):
-        view = PostDisplay.as_view()
-        return view(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        view = CommentFormView.as_view()
-        return view(request, *args, **kwargs)

@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'^user/', include("apps.uagent.urls")),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^posts/', include("apps.posts.urls")),
+    url(r'^comment/', include('apps.comment.urls')),
 ]
