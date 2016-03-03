@@ -29,6 +29,9 @@ WSGI_APPLICATION = 'agro_portal.wsgi.application'
 # Application definition
 
 INSTALLED_APPS = [
+    # Autocomplete field. https://github.com/yourlabs/django-autocomplete-light.
+    'dal',
+    'dal_select2',
     # standart django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,10 +41,16 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # project apps
+    'appl.classifier',
+    'appl.pro_auth',
+
+    # third part packages
+    # Package for model data translation https://github.com/ecometrica/django-vinaigrette.
+    'vinaigrette',
 
     # additional apps
     # app for testing filling data in models
-    #'django_any',
+    'factory',
 ]
 
 MIDDLEWARE_CLASSES = (
@@ -57,10 +66,22 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'agro_portal.urls'
 
+# Project using Jinja2 templatetags.
 TEMPLATES = [
     {
+        'BACKEND': 'django.template.backends.jinja2.Jinja2',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'environment': 'jinja2_env.environment',
+        },
+    },
+    # Backend for admin site.
+    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -72,8 +93,6 @@ TEMPLATES = [
         },
     },
 ]
-
-
 
 
 # Database
@@ -90,6 +109,11 @@ DATABASES = {
     }
 }
 
+
+# Project authentication model
+AUTH_USER_MODEL = 'pro_auth.User'
+
+AUTHENTICATION_BACKENDS = ['appl.pro_auth.backends.AuthBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
