@@ -14,8 +14,7 @@ class UserRegistrationForm(forms.ModelForm):
     A form that creates a user, with no privileges, from the given username,
     email and password.
     """
-
-    email = forms.EmailField(label=_("E-mail"),required=True,widget=forms.EmailInput(
+    email = forms.EmailField(label=_("E-mail"),required=True, widget=forms.EmailInput(
         attrs={'class': 'form-control', 'placeholder': 'example@example.com'}))
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
@@ -23,9 +22,9 @@ class UserRegistrationForm(forms.ModelForm):
         'email_exist': _("The email already exists. Please try another one.")
     }
     password1 = forms.CharField(label=_("Password"),
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label=_("Password confirmation"),
-        widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
 
     class Meta:
         model = User
