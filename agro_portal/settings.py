@@ -38,10 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # project apps
-    'apps.main_app',
-    'apps.uagent',
     'apps.posts',
-    'apps.comment',
 
     # additional apps
     # app for testing filling data in models
