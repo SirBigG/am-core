@@ -38,7 +38,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # project apps
-    'apps.posts',
 
     # additional apps
     # app for testing filling data in models
