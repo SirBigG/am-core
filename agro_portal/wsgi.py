@@ -15,6 +15,6 @@ from django.core.wsgi import get_wsgi_application
 
 django.setup()
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "golub_portal.settings"
+os.environ["DJANGO_SETTINGS_MODULE"] = "agro_portal.settings"
 
 application = get_wsgi_application()

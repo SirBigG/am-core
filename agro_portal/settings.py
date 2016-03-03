@@ -25,7 +25,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-WSGI_APPLICATION = 'golub_portal.wsgi.application'
+WSGI_APPLICATION = 'agro_portal.wsgi.application'
 # Application definition
 
 INSTALLED_APPS = [
@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'apps.uagent',
     'apps.posts',
     'apps.comment',
-    'apps.classifier',
 
     # additional apps
     # app for testing filling data in models
@@ -60,7 +59,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.security.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'golub_portal.urls'
+ROOT_URLCONF = 'agro_portal.urls'
 
 TEMPLATES = [
     {
@@ -87,11 +86,11 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "superdb",
+        'NAME': "agrodb",
         'USER': 'admin',
         'PASSWORD': '787898',
         'HOST': '127.0.0.1',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 

@@ -1,4 +1,4 @@
 *.pyc
-manage.py
 /uploads/*
-*.*~
+.idea/
+env/
