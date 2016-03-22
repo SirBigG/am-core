@@ -4,11 +4,12 @@ Django==1.9.3
 django-autocomplete-light==3.1.4
 django-phonenumber-field==1.0.0
 django-vinaigrette==1.0.0
-django-whatever==0.2.3
 factory-boy==2.6.1
 fake-factory==0.5.5
 flake8==2.5.4
 ipaddress==1.0.16
+Jinja2==2.8
+MarkupSafe==0.23
 mccabe==0.4.0
 pep8==1.7.0
 phonenumbers==7.2.7
