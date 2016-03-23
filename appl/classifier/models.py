@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-import vinaigrette
+from mptt.models import MPTTModel, TreeForeignKey
 
 
 class Country(models.Model):
@@ -73,8 +73,20 @@ class Location(models.Model):
     def __unicode__(self):
         return self.value
 
-# For translating model value field.
-vinaigrette.register(Country, ['value'])
-vinaigrette.register(Region, ['value'])
-vinaigrette.register(Area, ['value'])
-vinaigrette.register(Location, ['value'])
+
+class Category(MPTTModel):
+    """
+    Model realize tree structure for categories.
+    """
+    slug = models.CharField(max_length=250, unique=True, verbose_name=_('transliteration value'))
+    value = models.CharField(max_length=250, verbose_name=_('category value'))
+    icon = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('category icon'))
+    parent = TreeForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
+                            verbose_name=_('category parent'))
+
+    class MPTTMeta:
+        order_insertion_by = ['slug']
+        verbose_name_plural = _('Categories')
+
+    def __unicode__(self):
+        return self.value

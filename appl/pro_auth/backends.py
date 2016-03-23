@@ -1,19 +1,19 @@
 # -*- coding: utf-8 -*-
 
 from appl.pro_auth.models import User
+
 from django.contrib.auth.models import Permission
 
 
 class AuthBackend(object):
-    # TODO: really light backend need to update.
-    # TODO: update authentication method
     # TODO: add tests for permission methods
     def authenticate(self, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(User.USERNAME_FIELD)
         try:
             user = User.objects.get(email=username)
-            return user
+            if user.check_password(password):
+                return user
         except User.DoesNotExist:
             return None
 

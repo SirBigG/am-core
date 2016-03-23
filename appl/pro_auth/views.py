@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from django.views.generic import FormView, TemplateView, \
-    View
+from django.views.generic import FormView, View
 from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect
 from django.contrib.auth.forms import AuthenticationForm
@@ -45,8 +44,3 @@ class Logout(View):
     def get(self, request):
         logout(request)
         return HttpResponseRedirect(self.url)
-
-
-class Main(TemplateView):
-    # TODO: delete after testing or creatung real main page
-    template_name = 'pro_auth/main.html'

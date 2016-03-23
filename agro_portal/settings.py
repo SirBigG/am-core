@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from django.utils.translation import ugettext_lazy as _
+
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -32,7 +34,10 @@ INSTALLED_APPS = [
     # Autocomplete field. https://github.com/yourlabs/django-autocomplete-light.
     'dal',
     'dal_select2',
-    # standart django apps
+    # Package for model fields translation
+    # http://django-modeltranslation.readthedocs.org/en/latest/installation.html
+    'modeltranslation',
+    # Standard django apps
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,13 +48,18 @@ INSTALLED_APPS = [
     # project apps
     'appl.classifier',
     'appl.pro_auth',
+    'appl.posts',
 
-    # third part packages
-    # Package for model data translation https://github.com/ecometrica/django-vinaigrette.
-    'vinaigrette',
+    # Third part packages
+    # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
+    'rosetta',
+    # Package for category tree realization https://github.com/django-mptt/django-mptt
+    'mptt',
+    # For nice working with text https://github.com/django-ckeditor/django-ckeditor
+    'ckeditor',
 
     # additional apps
-    # app for testing filling data in models
+    # Package for testing falling data in models https://github.com/rbarrois/factory_boy
     'factory',
 ]
 
@@ -66,22 +76,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'agro_portal.urls'
 
-# Project using Jinja2 templatetags.
+
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.jinja2.Jinja2',
-        'DIRS': [
-            os.path.join(BASE_DIR, 'templates'),
-        ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'environment': 'jinja2_env.environment',
-        },
-    },
-    # Backend for admin site.
-    {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -109,16 +108,36 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
 
 # Project authentication model
 AUTH_USER_MODEL = 'pro_auth.User'
 
+# Project authentication backend
 AUTHENTICATION_BACKENDS = ['appl.pro_auth.backends.AuthBackend']
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 
 LANGUAGE_CODE = 'uk-Uk'
+
+LANGUAGES = [
+    ('uk', _('Ukrainian')),
+    ('en', _('English')),
+]
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'uk'
+
+MODELTRANSLATION_TRANSLATION_FILES = (
+    'appl.classifier.translation',
+    'appl.posts.translation',
+)
+
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 
 TIME_ZONE = 'UTC'
 
@@ -134,7 +153,13 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static')
+]
 
 # Media files (uploads)
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = BASE_DIR
+
+
+CKEDITOR_UPLOAD_PATH = '/uploads/ckeditor/'

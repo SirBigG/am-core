@@ -2,9 +2,20 @@
 
 from django.contrib import admin
 
-from appl.classifier.models import Location, Country, Region, Area
+from mptt.admin import DraggableMPTTAdmin
 
-admin.site.register(Location)
-admin.site.register(Country)
-admin.site.register(Region)
-admin.site.register(Area)
+from appl.classifier.models import Location, Country, Region, Area, \
+    Category
+
+from modeltranslation.admin import TranslationAdmin
+
+
+class CategoryAdmin(DraggableMPTTAdmin, TranslationAdmin):
+    pass
+
+
+admin.site.register(Location, TranslationAdmin)
+admin.site.register(Country, TranslationAdmin)
+admin.site.register(Region, TranslationAdmin)
+admin.site.register(Area, TranslationAdmin)
+admin.site.register(Category, CategoryAdmin)

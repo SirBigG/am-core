@@ -1,0 +1,339 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-02 10:39+0000\n"
+"PO-Revision-Date: 2016-04-02 11:08+0000\n"
+"Last-Translator:   <gots@a.com>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: \n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"X-Translated-Using: django-rosetta 0.7.11\n"
+
+#: agro_portal/settings.py:129
+msgid "Ukrainian"
+msgstr "Українська мова"
+
+#: agro_portal/settings.py:130
+msgid "English"
+msgstr "Англійська мова"
+
+#: appl/classifier/models.py:13 appl/classifier/models.py:30
+#: appl/classifier/models.py:46 appl/classifier/models.py:62
+#: appl/classifier/models.py:81 appl/posts/models.py:27
+msgid "transliteration value"
+msgstr "транслітераційне значення"
+
+#: appl/classifier/models.py:14
+msgid "short slug"
+msgstr "коротка мітка"
+
+#: appl/classifier/models.py:15
+msgid "country value"
+msgstr "назва країни"
+
+#: appl/classifier/models.py:19 appl/classifier/models.py:64
+msgid "country"
+msgstr "країна"
+
+#: appl/classifier/models.py:20
+msgid "countries"
+msgstr "країни"
+
+#: appl/classifier/models.py:31
+msgid "region value"
+msgstr "назва області"
+
+#: appl/classifier/models.py:35 appl/classifier/models.py:36
+#: appl/classifier/models.py:65
+msgid "region"
+msgstr "область"
+
+#: appl/classifier/models.py:47
+msgid "area value"
+msgstr "назва району"
+
+#: appl/classifier/models.py:51 appl/classifier/models.py:52
+#: appl/classifier/models.py:66
+msgid "area"
+msgstr "район"
+
+#: appl/classifier/models.py:63
+msgid "location value"
+msgstr "назва локації (місто, село)"
+
+#: appl/classifier/models.py:70
+msgid "location"
+msgstr "локація"
+
+#: appl/classifier/models.py:71
+msgid "locations"
+msgstr "локації"
+
+#: appl/classifier/models.py:82
+msgid "category value"
+msgstr "назва категорії"
+
+#: appl/classifier/models.py:83
+msgid "category icon"
+msgstr "іконка категорії"
+
+#: appl/classifier/models.py:85
+msgid "category parent"
+msgstr "предок категорії"
+
+#: appl/classifier/models.py:89
+msgid "Categories"
+msgstr "Категорії"
+
+#: appl/posts/models.py:16
+msgid "Translate"
+msgstr "Переклад"
+
+#: appl/posts/models.py:17
+msgid "Publish"
+msgstr "Публікація"
+
+#: appl/posts/models.py:25
+msgid "post title"
+msgstr "заголовок публікації"
+
+#: appl/posts/models.py:26
+msgid "post text"
+msgstr "текст публікації"
+
+#: appl/posts/models.py:30
+msgid "status of author work"
+msgstr "статус роботи"
+
+#: appl/posts/models.py:31
+msgid "post author"
+msgstr "автор публікації"
+
+#: appl/posts/models.py:32
+msgid "post source"
+msgstr "джерело публікації"
+
+#: appl/posts/models.py:34
+msgid "post publisher"
+msgstr "видавець"
+
+#: appl/posts/models.py:35
+msgid "date of publish"
+msgstr "дата публікації"
+
+#: appl/posts/models.py:37
+msgid "count of views"
+msgstr "кількість переглядів"
+
+#: appl/posts/models.py:39
+msgid "post status"
+msgstr "статус публікації"
+
+#: appl/posts/models.py:41
+msgid "post category"
+msgstr "рубрика публікації"
+
+#: appl/posts/models.py:45
+msgid "Post"
+msgstr "Публікація"
+
+#: appl/posts/models.py:46
+msgid "Posts"
+msgstr "Публікації"
+
+#: appl/posts/models.py:65
+msgid "image"
+msgstr "зображення"
+
+#: appl/posts/models.py:66
+msgid "photo describing"
+msgstr "опис фотографії"
+
+#: appl/posts/models.py:67
+msgid "post of photo"
+msgstr "публікація фотографії"
+
+#: appl/posts/models.py:68
+msgid "author of photo"
+msgstr "автор фото"
+
+#: appl/posts/models.py:69
+msgid "photo source"
+msgstr "джерело фото"
+
+#: appl/posts/models.py:73
+msgid "Photo"
+msgstr "Фотографія"
+
+#: appl/posts/models.py:74
+msgid "Photos"
+msgstr "Фотографії"
+
+#: appl/posts/models.py:96
+msgid "post of comment"
+msgstr "коментарій публіуації"
+
+#: appl/posts/models.py:97
+msgid "comment text"
+msgstr "текст коментаря"
+
+#: appl/posts/models.py:98
+msgid "comment date"
+msgstr "дата коментаря"
+
+#: appl/posts/models.py:99
+msgid "comment owner"
+msgstr "власник коментаря"
+
+#: appl/posts/models.py:103
+msgid "Comment"
+msgstr "Коментар"
+
+#: appl/posts/models.py:104
+msgid "Comments"
+msgstr "Коментарі"
+
+#: appl/pro_auth/admin.py:22
+msgid "Phones"
+msgstr "Телефони"
+
+#: appl/pro_auth/admin.py:23
+msgid "Personal info"
+msgstr "Персональна інформація"
+
+#: appl/pro_auth/admin.py:25
+msgid "Permissions"
+msgstr "Доступи"
+
+#: appl/pro_auth/forms.py:22
+msgid "The two password fields didn't match."
+msgstr "Два поля паролів не співпадають."
+
+#: appl/pro_auth/forms.py:24 appl/pro_auth/forms.py:64
+msgid "Password"
+msgstr "Пароль"
+
+#: appl/pro_auth/forms.py:26
+msgid "Password confirmation"
+msgstr "Підтвердження пароля"
+
+#: appl/pro_auth/forms.py:28
+msgid "Enter the same password as before, for verification."
+msgstr "Введіть такий самий пароль як в попередньому для підтвердження."
+
+#: appl/pro_auth/forms.py:29 appl/pro_auth/forms.py:65
+msgid "Phone 1"
+msgstr "Телефон 1"
+
+#: appl/pro_auth/forms.py:30
+msgid ""
+"Enter phone in International format. Example: '+380991234567'.This field is "
+"required."
+msgstr ""
+"Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'. Це "
+"поле обов’язкове."
+
+#: appl/pro_auth/forms.py:33 appl/pro_auth/forms.py:68
+msgid "Phone 2"
+msgstr "Телефон 2"
+
+#: appl/pro_auth/forms.py:34 appl/pro_auth/forms.py:37
+#: appl/pro_auth/forms.py:66 appl/pro_auth/forms.py:69
+#: appl/pro_auth/forms.py:72
+msgid "Enter phone in International format. Example: '+380991234567'"
+msgstr ""
+"Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'."
+
+#: appl/pro_auth/forms.py:36 appl/pro_auth/forms.py:71
+msgid "Phone 3"
+msgstr "Телефон 3"
+
+#: appl/pro_auth/forms.py:40 appl/pro_auth/forms.py:75
+msgid "Please select city from list."
+msgstr "Будь-ласка виберіть місто із списку."
+
+#: appl/pro_auth/forms.py:41 appl/pro_auth/forms.py:76
+msgid "City"
+msgstr "Місто"
+
+#: appl/pro_auth/models.py:56
+msgid "Required. You use it at every entrance to the site."
+msgstr "Обов’язковий. Ви будете використовувати це при кожному вході на сайт."
+
+#: appl/pro_auth/models.py:58
+msgid "A user with that email already exists."
+msgstr "Користувач з таким email вже існує."
+
+#: appl/pro_auth/models.py:60
+msgid "user email"
+msgstr "email користувача"
+
+#: appl/pro_auth/models.py:61
+msgid "first name"
+msgstr "ім’я"
+
+#: appl/pro_auth/models.py:62
+msgid "last name"
+msgstr "прізвище"
+
+#: appl/pro_auth/models.py:64
+msgid "main phone"
+msgstr "головний телефон"
+
+#: appl/pro_auth/models.py:66 appl/pro_auth/models.py:68
+msgid "extra phone"
+msgstr "додатковий телефон"
+
+#: appl/pro_auth/models.py:71
+msgid "user location"
+msgstr "місцезнаходження користувача"
+
+#: appl/pro_auth/models.py:73
+msgid "date of birth"
+msgstr "дата народження"
+
+#: appl/pro_auth/models.py:76
+msgid "staff status"
+msgstr "статус персоналу"
+
+#: appl/pro_auth/models.py:78
+msgid "Designates whether the user can log into this admin site."
+msgstr "Визначає, чи може цей користувач увійти на адміністративний сайт."
+
+#: appl/pro_auth/models.py:81
+msgid "active"
+msgstr "активний"
+
+#: appl/pro_auth/models.py:84
+msgid ""
+"Designates whether this user should be treated as active. Unselect this "
+"instead of deleting accounts."
+msgstr ""
+"Визначає, чи повинен цей користувач розглядатись як активний. Скасуйте це "
+"замість того, щоб видаляти обліковий запис."
+
+#: appl/pro_auth/models.py:88
+msgid "date joined"
+msgstr "дата приєднання"
+
+#: appl/pro_auth/models.py:91
+msgid "avatar"
+msgstr "аватар"
+
+#: appl/pro_auth/models.py:100
+msgid "custom user"
+msgstr ""
+
+#: appl/pro_auth/models.py:101
+msgid "custom users"
+msgstr ""

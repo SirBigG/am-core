@@ -5,8 +5,9 @@ ROOT=$(pwd)
 if [ -z "$1" ]
   then
     $ROOT/manage.py test --settings=agro_portal.settings
-    flake8 --exclude '*migrations*' appl
 else
 	$ROOT/manage.py test $1 --settings=agro_portal.settings
-	flake8 --exclude '*migrations*' appl
 fi
+
+flake8 --exclude '*migrations*' appl
+flake8 --exclude '*migrations*' utils

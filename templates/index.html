@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% load post_extras %}
+
+{% block content %}
+    <div class="col-md-8">
+        {% posts_list 10 %}
+    </div>
+{% endblock %}

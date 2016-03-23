@@ -3,7 +3,7 @@
 from django.test import TestCase
 
 from utils.tests.factories import LocationFactory, CountryFactory, \
-    RegionFactory, AreaFactory
+    RegionFactory, AreaFactory, CategoryFactory
 
 from appl.classifier.models import Location
 
@@ -65,3 +65,12 @@ class AreaTests(TestCase):
     def test_fields_exist(self):
         self.assertTrue(hasattr(self.area, 'slug'))
         self.assertTrue(hasattr(self.area, 'value'))
+
+
+class CategoryTests(TestCase):
+
+    def setUp(self):
+        self.category = CategoryFactory()
+
+    def test_str_representation(self):
+        self.assertEqual(unicode(self.category), u'Категорія')
