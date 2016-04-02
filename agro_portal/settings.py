@@ -23,9 +23,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'v$rhqt_l$w55_wg4yz6yz&$#g@7$7_im0=r&$*dcx=8ei#)%yq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['agromega.in.ua', ]
 
 WSGI_APPLICATION = 'agro_portal.wsgi.application'
 # Application definition
@@ -102,7 +102,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': "agrodb",
         'USER': 'admin',
-        'PASSWORD': '787898',
+        'PASSWORD': 'gthijrkfcsyf',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -152,6 +152,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+
+STATIC_ROOT = BASE_DIR + '/static/build/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static')
