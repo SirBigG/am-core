@@ -13,8 +13,10 @@ import django
 from django.core.wsgi import get_wsgi_application
 
 
+os.environ["DJANGO_SETTINGS_MODULE"] = "agro_portal.settings"
+application = get_wsgi_application()
 django.setup()
 
-os.environ["DJANGO_SETTINGS_MODULE"] = "agro_portal.settings"
 
-application = get_wsgi_application()
+
+
