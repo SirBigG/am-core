@@ -14,6 +14,14 @@ class PostList(ListView):
     template_name = 'posts/list.html'
     ordering = '-publish_date'
 
+    def get_context_data(self, **kwargs):
+        """
+        Get extra context for classifier to view.
+        """
+        context = super(PostList, self).get_context_data(**kwargs)
+        context['menu_items'] = Category.objects.get(slug=self.kwargs['parent']).get_children()
+        return context
+
     def get_queryset(self):
         queryset = None
         if 'child' in self.kwargs:

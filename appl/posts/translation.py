@@ -11,4 +11,3 @@ class PostTranslation(TranslationOptions):
 @register(Photo)
 class PhotoTranslation(TranslationOptions):
     fields = ('description', 'author', 'source',)
-

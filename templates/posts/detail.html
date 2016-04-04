@@ -1,5 +1,36 @@
 {% extends "base.html" %}
 
+{% load static post_extras %}
+
+{% block extra_meta %}
+    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.text }}" property="og:description">
+    <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
+    <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
+    <script src="{% static 'js/jquery.bxslider.min.js' %}"></script>
+    <link href="{% static 'css/jquery.bxslider.css' %}" rel="stylesheet" />
+{% endblock extra_meta %}
+
 {% block content %}
-    {{ object.title }}
+    <div class="col-md-8">
+    <h1>{{ object.title }}</h1>
+    <div class="col-md-10">
+        <ul class="bxslider">
+            {% for photo in object.photo.all %}
+                <li><img src="{{ photo.image.url }}" /></li>
+            {% endfor %}
+        </ul>
+    </div>
+    {{ object.text|safe }}
+    <p>{{ object.author }}</p>
+    </div>
+
 {% endblock content %}
+
+{% block extra_body %}
+    <script>
+        $(document).ready(function(){
+            $('.bxslider').bxSlider();
+        });
+    </script>
+{% endblock extra_body %}

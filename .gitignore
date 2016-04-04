@@ -6,4 +6,9 @@ env/
 /htmlcov/*
 *.mo
 /agro_portal/tmp/*
-/static/build/*
+/static/*
+*~
+*.*~
+/node_modules/*
+/assets/bundles/*
+webpack-stats.json

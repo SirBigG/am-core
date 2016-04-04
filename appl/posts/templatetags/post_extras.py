@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django import template
+from django.conf import settings
 
 from appl.posts.models import Post
 from appl.classifier.models import Category
@@ -28,3 +29,13 @@ def main_menu():
     """
     roots = Category.objects.filter(level=0)
     return {'roots': roots}
+
+
+@register.simple_tag
+def full_url(url):
+    """
+    Create full url with hostname.
+    :param: absolute url
+    :return: full url
+    """
+    return settings.HOST + url

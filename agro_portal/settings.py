@@ -25,6 +25,8 @@ SECRET_KEY = 'v$rhqt_l$w55_wg4yz6yz&$#g@7$7_im0=r&$*dcx=8ei#)%yq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+HOST = 'http://agromega.in.ua'
+
 ALLOWED_HOSTS = ['agromega.in.ua', ]
 
 WSGI_APPLICATION = 'agro_portal.wsgi.application'
@@ -57,6 +59,8 @@ INSTALLED_APPS = [
     'mptt',
     # For nice working with text https://github.com/django-ckeditor/django-ckeditor
     'ckeditor',
+    # For integration django and webpack https://github.com/owais/django-webpack-loader
+    'webpack_loader',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -153,11 +157,18 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR + '/static/build/'
+STATIC_ROOT = BASE_DIR + '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static')
+    os.path.join(BASE_DIR, 'assets')
 ]
+
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
 
 # Media files (uploads)
 MEDIA_URL = '/uploads/'

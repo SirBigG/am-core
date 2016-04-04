@@ -1,25 +1,32 @@
+{%  load render_bundle from webpack_loader %}
+{% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>{% block title %}{% endblock title %}Site Name</title>
+        <title>{% block title %}{% endblock title %}Agro Mega</title>
 
-        <meta http-equiv="X-UA-Compatible" content="chrome=IE7" />
-
-        <meta name="viewport" content="initial-scale=1.0, width=device-width"/>
-        <meta name="apple-mobile-web-app-capable" content="yes"/>
-        <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+        <!-- For extra meta tags -->
+        {% block extra_meta %}
+            <meta content="{% trans 'Текст головного мета тега.' %}" property="og:title">
+            <meta content="{% trans 'Текст головного мета тега.' %}" property="og:description">
+        {% endblock extra_meta %}
 
         <!-- For bootstrap css connection -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
               integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+         <!-- Include jQuery to project. -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 
         <!-- For React using. -->
         <script src="https://fb.me/react-0.14.7.js"></script>
         <script src="https://fb.me/react-dom-0.14.7.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 
-        {% block extra_head %}{% endblock extra_head %}
+        <!-- For extra scripts inclusion -->
+        {% block extra_script %}{% endblock extra_script %}
+
     </head>
     <body id="{% block body_id %}{% endblock %}" class="{% block body_class %}{% endblock %}">
 
@@ -31,8 +38,10 @@
             {% block content %}{% endblock content %}
         </div>
 
-        <!-- Include jQuery to project. -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+        {% block extra_body %}{% endblock extra_body %}
+
+        <!-- For webpack loader inclusion scripts and scripts. -->
+        {% render_bundle 'main' %}
 
         <!-- Include bootstrap js. -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"

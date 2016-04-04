@@ -1,0 +1,27 @@
+{
+  "name": "packages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SirBigG/golub_portal.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SirBigG/golub_portal/issues"
+  },
+  "homepage": "https://github.com/SirBigG/golub_portal#readme",
+  "devDependencies": {
+    "babel": "^6.5.2",
+    "babel-core": "^6.7.4",
+    "babel-loader": "^6.2.4",
+    "react": "^0.14.8",
+    "webpack": "^1.12.14",
+    "webpack-bundle-tracker": "0.0.93"
+  }
+}

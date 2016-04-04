@@ -1,5 +1,0 @@
-#!/bin/bash
-
-ROOT=$(pwd)
-
-$ROOT/manage.py makemessages -l uk --ignore=env/*
