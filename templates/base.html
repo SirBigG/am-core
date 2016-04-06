@@ -1,4 +1,4 @@
-{%  load render_bundle from webpack_loader %}
+
 {% load i18n %}
 <!DOCTYPE html>
 <html lang="en">
@@ -41,7 +41,7 @@
         {% block extra_body %}{% endblock extra_body %}
 
         <!-- For webpack loader inclusion scripts and scripts. -->
-        {% render_bundle 'main' %}
+
 
         <!-- Include bootstrap js. -->
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
