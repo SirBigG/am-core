@@ -1,8 +1,10 @@
 {% extends "base.html" %}
 
 {% load static post_extras %}
+{% load post_extras %}
 
 {% block extra_meta %}
+    {% load post_extras %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="{{ object.text }}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
@@ -17,7 +19,7 @@
     <div class="col-md-10">
         <ul class="bxslider">
             {% for photo in object.photo.all %}
-                <li><img src="{{ photo.image.url }}" /></li>
+                <img src="{{ photo.image.url }}" class="img-rounded" />
             {% endfor %}
         </ul>
     </div>
@@ -26,11 +28,3 @@
     </div>
 
 {% endblock content %}
-
-{% block extra_body %}
-    <script>
-        $(document).ready(function(){
-            $('.bxslider').bxSlider();
-        });
-    </script>
-{% endblock extra_body %}
