@@ -33,7 +33,6 @@ class PostList(ListView):
         return queryset
 
 
-# TODO: need tests
 class PostDetail(DetailView):
     model = Post
     template_name = 'posts/detail.html'

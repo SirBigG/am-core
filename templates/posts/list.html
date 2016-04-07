@@ -3,7 +3,7 @@
 {% block content %}
     <ul class="nav nav-pills">
         {% for item in menu_items %}
-            <li role="presentation" class="btn btn-default"><a href="#">{{ item.value }}</a></li>
+            <li role="presentation" class="btn btn-default"><a href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a></li>
         {% endfor %}
     </ul>
 

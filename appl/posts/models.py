@@ -48,12 +48,11 @@ class Post(models.Model):
     def __unicode__(self):
         return self.title
 
-    # TODO: need tests
     def get_absolute_url(self):
         anc = self.rubric.get_family()[1:]
         s = ''
         for a in anc:
-            s = s + '/' + a.slug
+            s += '/' + a.slug
         url = s + '/' + self.slug + '-' + str(self.pk) + '.html'
         return url
 

@@ -2,7 +2,8 @@
 
 from django.test import TestCase
 
-from utils.tests.factories import PostFactory, PhotoFactory, CommentFactory
+from utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
+    CategoryFactory
 
 
 class PostTests(TestCase):
@@ -12,6 +13,13 @@ class PostTests(TestCase):
 
     def test_str_representation(self):
         self.assertEqual(unicode(self.post), u'Заголовок')
+
+    def test_get_absolute_url(self):
+        parent = CategoryFactory(slug='aaa')
+        child = CategoryFactory(parent=parent, slug='bbb')
+        child2 = CategoryFactory(parent=child, slug='ccc')
+        post = PostFactory(rubric=child2, slug='ddd', id='12')
+        self.assertEqual(post.get_absolute_url(), '/bbb/ccc/ddd-12.html')
 
 
 class PhotoTests(TestCase):

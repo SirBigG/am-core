@@ -1,7 +1,7 @@
 MANAGE=manage.py
 SETTINGS=agro_portal.settings
 
-deploy: migrate collectstatic compilemessages
+deploy: test migrate collectstatic compilemessages
 
 update:
 	pip install -r requirements.txt
@@ -9,8 +9,7 @@ update:
 
 test:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test
-	flake8 --exclude '*migrations*' appl
-	flake8 --exclude '*migrations*' utils
+	flake8 --exclude '*migrations*' appl utils
 
 migrate:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) migrate
@@ -30,3 +29,6 @@ runserver:
 nodejs:
 	yum install nodejs
 	npm install --save-dev react webpack webpack-bundle-tracker babel babel-loader
+
+dev:
+	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver --settings=agro_portal.dev
