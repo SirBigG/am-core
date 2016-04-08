@@ -29,7 +29,7 @@ class PhotoTests(TestCase):
 
     def tearDown(self):
         import os
-        os.remove('uploads/example.jpg')
+        os.remove('media/images/example.jpg')
 
     def test_str_representation(self):
         self.assertEqual(unicode(self.photo), unicode(self.photo.id))

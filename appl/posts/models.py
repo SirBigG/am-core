@@ -61,7 +61,7 @@ class Photo(models.Model):
     """
     Post photos model.
     """
-    image = models.ImageField(upload_to='uploads', verbose_name=_('image'))
+    image = models.ImageField(upload_to='images', verbose_name=_('image'))
     description = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('photo describing'))
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('post of photo'), related_name='photo')
     author = models.CharField(max_length=150, blank=True, null=True, verbose_name=_('author of photo'))
