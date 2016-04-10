@@ -1,11 +1,10 @@
 MANAGE=manage.py
 SETTINGS=agro_portal.settings
 
-deploy: test migrate collectstatic compilemessages
+deploy: test update migrate collectstatic compilemessages
 
 update:
 	pip install -r requirements.txt
-	./node_modules/.bin/webpack --config webpack.config.js
 
 test:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test

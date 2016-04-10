@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase, Client
-from django.contrib.auth.forms import AuthenticationForm
+# from django.test import TestCase, Client
+# from django.contrib.auth.forms import AuthenticationForm
 
-from utils.tests.factories import UserFactory, LocationFactory
+# from utils.tests.factories import UserFactory, LocationFactory
 
-from appl.pro_auth.forms import UserCreationForm
-from appl.pro_auth.models import User
+# from appl.pro_auth.forms import UserCreationForm
+# from appl.pro_auth.models import User
 
-client = Client()
+# client = Client()
 
-
+"""
 class AuthTests(TestCase):
 
     def setUp(self):
@@ -60,3 +60,4 @@ class AuthTests(TestCase):
         self.assertEqual(response.status_code, 302)
         user = User.objects.get(email='test@test.com')
         self.assertTrue(user.is_authenticated())
+"""

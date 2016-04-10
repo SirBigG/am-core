@@ -1,19 +1,18 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <ul class="nav nav-pills">
-        {% for item in menu_items %}
-            <li role="presentation" class="btn btn-default"><a href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a></li>
-        {% endfor %}
-    </ul>
-
-    {% for obj in object_list %}
-        <div class="col-md-6">
-            <img src="{{obj.photo.first.image.url}}" width="300" height="200" class="img-rounded">
-            <h1>{{ obj.title }}</h1>
-            {{ obj.text|safe|truncatechars:300 }}
-            {{ obj.publish_date|date }}
-            <a href="{{ obj.get_absolute_url }}">Читати</a>
-        </div>
+    {% for item in menu_items %}
+        <li role="presentation" class="btn btn-default"><a href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a></li>
     {% endfor %}
+    <div class="col-md-8">
+        {% for obj in object_list %}
+            <div class="col-md-6">
+                <img src="{{obj.photo.first.image.url}}" width="300" height="200" class="img-rounded">
+                <a href="{{ obj.get_absolute_url }}"><h1>{{ obj.title }}</h1></a>
+                <p class="text-justify">{{ obj.text|safe|truncatechars:300 }}</p>
+                {{ obj.publish_date|date }}
+                <a href="{{ obj.get_absolute_url }}">Читати</a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock content %}

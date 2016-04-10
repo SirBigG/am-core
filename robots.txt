@@ -1,0 +1,4 @@
+User: *
+
+Disallow: /admin/
+Disallow: /rosetta/

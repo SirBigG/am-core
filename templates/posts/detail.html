@@ -5,7 +5,7 @@
 {% block extra_meta %}
     {% load post_extras %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
-    <meta content="{{ object.text }}" property="og:description">
+    <meta content="{{ object.text|safe }}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
     <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
 {% endblock extra_meta %}
@@ -13,16 +13,46 @@
 {% block content %}
     <div class="col-md-8">
     <h1>{{ object.title }}</h1>
-    <div class="col-md-4">
-        <ul class="bxslider">
-            {% for photo in object.photo.all %}
-                <img src="{{ photo.image.url }}" class="img-rounded" />
-            {% endfor %}
-        </ul>
+    <div class="col-md-8">
+        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+
+            <div class="carousel-inner" role="listbox">
+                <div class="item active">
+                        <img src="{{ object.photo.first.image.url }}" class="img-rounded" />
+                        <div class="carousel-caption">
+                            {% if object.photo.first.description %}<p>{{ photo.description }}</p>{% endif %}
+                        </div>
+                </div>
+                <!--Little hack for slice need to fix-->
+                {% for photo in object.photo.all|slice:":2" %}
+                <div class="item">
+                        <img src="{{ photo.image.url }}" class="img-rounded" />
+                        <div class="carousel-caption">
+                            {% if photo.description %}<p>{{ photo.description }}</p>{% endif %}
+                        </div>
+                </div>
+                {% endfor %}
+            </div>
+              <!-- Controls -->
+             <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+             </a>
+             <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+             </a>
+        </div>
     </div>
-    {{ object.text|safe }}
-    <h4>{% if object.author %}{{ object.author }}{% endif %}</h4>
-    <h4>{% if object.source %}{% trans 'Source ' %}{{ object.source }}{% endif %}</h4>
+        <!-- Need off internal -->
+        <script type="text/javascript">
+            $('.carousel').carousel({
+            interval: false
+            })
+        </script>
+    <p class="text-justify">{{ object.text|safe }}</p>
+    <h5>{% if object.author %}{% trans 'Author ' %}{{ object.author }}{% endif %}</h5>
+    <h5>{% if object.source %}{% trans 'Source ' %}{{ object.source }}{% endif %}</h5>
     </div>
 
 {% endblock content %}
