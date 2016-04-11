@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-02 10:39+0000\n"
-"PO-Revision-Date: 2016-04-02 11:08+0000\n"
-"Last-Translator:   <gots@a.com>\n"
+"POT-Creation-Date: 2016-04-11 10:03+0000\n"
+"PO-Revision-Date: 2016-04-11 10:05+0000\n"
+"Last-Translator:   <gots@test.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Translated-Using: django-rosetta 0.7.11\n"
 
-#: agro_portal/settings.py:129
+#: agro_portal/settings.py:133
 msgid "Ukrainian"
 msgstr "Українська мова"
 
-#: agro_portal/settings.py:130
+#: agro_portal/settings.py:134
 msgid "English"
 msgstr "Англійська мова"
 
@@ -151,55 +151,55 @@ msgstr "Публікація"
 msgid "Posts"
 msgstr "Публікації"
 
-#: appl/posts/models.py:65
+#: appl/posts/models.py:64
 msgid "image"
 msgstr "зображення"
 
-#: appl/posts/models.py:66
+#: appl/posts/models.py:65
 msgid "photo describing"
 msgstr "опис фотографії"
 
-#: appl/posts/models.py:67
+#: appl/posts/models.py:66
 msgid "post of photo"
 msgstr "публікація фотографії"
 
-#: appl/posts/models.py:68
+#: appl/posts/models.py:67
 msgid "author of photo"
 msgstr "автор фото"
 
-#: appl/posts/models.py:69
+#: appl/posts/models.py:68
 msgid "photo source"
 msgstr "джерело фото"
 
-#: appl/posts/models.py:73
+#: appl/posts/models.py:72
 msgid "Photo"
 msgstr "Фотографія"
 
-#: appl/posts/models.py:74
+#: appl/posts/models.py:73
 msgid "Photos"
 msgstr "Фотографії"
 
-#: appl/posts/models.py:96
+#: appl/posts/models.py:95
 msgid "post of comment"
 msgstr "коментарій публіуації"
 
-#: appl/posts/models.py:97
+#: appl/posts/models.py:96
 msgid "comment text"
 msgstr "текст коментаря"
 
-#: appl/posts/models.py:98
+#: appl/posts/models.py:97
 msgid "comment date"
 msgstr "дата коментаря"
 
-#: appl/posts/models.py:99
+#: appl/posts/models.py:98
 msgid "comment owner"
 msgstr "власник коментаря"
 
-#: appl/posts/models.py:103
+#: appl/posts/models.py:102
 msgid "Comment"
 msgstr "Коментар"
 
-#: appl/posts/models.py:104
+#: appl/posts/models.py:103
 msgid "Comments"
 msgstr "Коментарі"
 
@@ -337,3 +337,27 @@ msgstr ""
 #: appl/pro_auth/models.py:101
 msgid "custom users"
 msgstr ""
+
+#: templates/base.html:11 templates/base.html.py:12
+msgid "Текст головного мета тега."
+msgstr "Текст головного мета тега."
+
+#: templates/posts/detail.html:56
+msgid "Author "
+msgstr "Автор"
+
+#: templates/posts/detail.html:57
+msgid "Source "
+msgstr "Джерело"
+
+#: templates/posts/detail.html:58
+msgid "Share with friends "
+msgstr "Поділитись із друзями"
+
+#: templates/posts/detail.html:59
+msgid "Share-in-vk"
+msgstr "Поділитись в vk"
+
+#: templates/posts/detail.html:60
+msgid "Share-in-facebook"
+msgstr "Поділитись в facebook"
