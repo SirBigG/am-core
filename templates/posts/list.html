@@ -9,7 +9,9 @@
             <div class="col-md-6">
                 <img src="{{obj.photo.first.image.url}}" width="300" height="200" class="img-rounded">
                 <a href="{{ obj.get_absolute_url }}"><h1>{{ obj.title }}</h1></a>
-                <p class="text-justify">{{ obj.text|safe|truncatechars:300 }}</p>
+                <div class="text-justify">
+                    {{ obj.text|safe|truncatechars:300 }}
+                </div>
                 {{ obj.publish_date|date }}
                 <a href="{{ obj.get_absolute_url }}">Читати</a>
             </div>
