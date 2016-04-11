@@ -14,7 +14,7 @@
     <div class="col-md-8">
     <h1>{{ object.title }}</h1>
     <div class="col-md-8">
-        <div id="carousel-example-generic" class="carousel slide" data-ride="carousel">
+        <div id="carousel-example-generic" class="carousel" data-ride="carousel">
 
             <div class="carousel-inner" role="listbox">
                 <div class="item active">
@@ -50,9 +50,15 @@
             interval: false
             })
         </script>
-    <p class="text-justify">{{ object.text|safe }}</p>
+    <div class="text-justify">
+        {{ object.text|safe }}
+    </div>
     <h5>{% if object.author %}{% trans 'Author ' %}{{ object.author }}{% endif %}</h5>
     <h5>{% if object.source %}{% trans 'Source ' %}{{ object.source }}{% endif %}</h5>
+    <h4 class="text-center">{% trans 'Share with friends ' %}
+        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-vk' %}, 'width=400, height=200'); return false" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}"><i class="fa fa-vk fa-2x"></i>     </a>
+        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-facebook' %}, 'width=400, height=200'); return false" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"><i class="fa fa-facebook fa-2x"></i></a>
+    </h4>
     </div>
 
 {% endblock content %}
