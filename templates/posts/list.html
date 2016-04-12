@@ -2,10 +2,11 @@
 
 {% load post_extras %}
 
+{% block second_menu %}
+    {% include 'posts/second_menu.html' %}
+{% endblock second_menu %}
+
 {% block content %}
-    {% for item in menu_items %}
-        <li role="presentation" class="btn btn-default"><a href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a></li>
-    {% endfor %}
     <div class="col-md-8">
         {% for group in object_list|group_by:2 %}
             <div class="row">
