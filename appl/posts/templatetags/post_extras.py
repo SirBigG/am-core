@@ -39,3 +39,22 @@ def full_url(url):
     :return: full url
     """
     return settings.HOST + url
+
+
+# ####################    Filters    ################### #
+
+def grouped(l, n):
+    # Yield successive n-sized chunks from l.
+    for i in xrange(0, len(l), n):
+        yield l[i:i+n]
+
+
+@register.filter
+def group_by(value, arg):
+    """
+    For grouping iterable items in groups by arg size.
+    :param value: iterable,
+    :param arg: int
+    :return iterator
+    """
+    return grouped(value, arg)

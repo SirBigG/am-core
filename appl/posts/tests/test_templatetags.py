@@ -5,7 +5,7 @@ from django.test import TestCase
 from utils.tests.factories import PostFactory, CategoryFactory
 
 from appl.posts.templatetags.post_extras import posts_list, main_menu, \
-    full_url
+    full_url, group_by, grouped
 
 
 class PostExtrasTests(TestCase):
@@ -22,3 +22,21 @@ class PostExtrasTests(TestCase):
     def test_full_url(self):
         url = '/foo/asd.html'
         self.assertEqual(full_url(url), 'http://agromega.in.ua/foo/asd.html')
+
+    def test_grouped(self):
+        l = [1, 2, 3, 4]
+        group = grouped(l, 2)
+        self.assertEqual(group.next(), [1, 2])
+        self.assertEqual(group.next(), [3, 4])
+
+    def test_group_by_filter(self):
+        value = [1, 2, 3]
+        groups = group_by(value, 2)
+        i = 0
+        for group in groups:
+            i += 1
+        self.assertEqual(i, 2)
+        groups = group_by(value, 3)
+        for group in groups:
+            i += 1
+        self.assertEqual(i, 3)
