@@ -31,3 +31,7 @@ nodejs:
 
 dev:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver --settings=agro_portal.dev
+
+coverage:
+	coverage run manage.py test
+	coverage report -m --include=appl/*,utils/*

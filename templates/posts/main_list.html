@@ -4,7 +4,7 @@
     <div class="row">
         {% for post in group %}
             <div class="col-md-6">
-                <img src="{{post.photo.first.image.url}}" width="300" height="200" class="img-rounded">
+                <img src="{{post.photo.first.image.url}}" width="340" height="230" class="img-rounded">
                 <a href="{{ post.get_absolute_url }}"><h1>{{ post.title }}</h1></a>
                 <div class="text-justify">
                     {{ post.text|safe|truncatechars:300 }}

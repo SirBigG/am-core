@@ -50,3 +50,4 @@ class PostDetailTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/detail.html')
         self.assertIn('object', response.context)
+        self.assertEqual(len(response.context['menu_items']), 1)

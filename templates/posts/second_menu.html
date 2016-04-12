@@ -1,0 +1,11 @@
+<div class="navbar navbar-default">
+    <div class="container">
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-2">
+            <ul class="nav navbar-nav">
+                {% for item in menu_items %}
+                    <li><a href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
