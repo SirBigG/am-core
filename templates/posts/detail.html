@@ -10,6 +10,10 @@
     <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
 {% endblock extra_meta %}
 
+{% block second_menu %}
+    {% include 'posts/second_menu.html' %}
+{% endblock second_menu %}
+
 {% block content %}
     <div class="col-md-8">
     <h1>{{ object.title }}</h1>
@@ -53,10 +57,10 @@
     <div class="text-justify">
         {{ object.text|safe }}
     </div>
-    <h5>{% if object.author %}{% trans 'Author ' %}{{ object.author }}{% endif %}</h5>
+    <h5>{% if object.author %}{{ object.author }}{% endif %}</h5>
     <h5>{% if object.source %}{% trans 'Source ' %}{{ object.source }}{% endif %}</h5>
-    <h4 class="text-center">{% trans 'Share with friends ' %}
-        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-vk' %}, 'width=400, height=200'); return false" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}"><i class="fa fa-vk fa-2x"></i>     </a>
+    <h4 class="text-center">{% trans 'Share with friends: ' %}
+        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-vk' %}, 'width=400, height=200'); return false" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}"><i class="fa fa-vk fa-2x"></i></a>
         <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-facebook' %}, 'width=400, height=200'); return false" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"><i class="fa fa-facebook fa-2x"></i></a>
     </h4>
     </div>

@@ -8,9 +8,6 @@ from appl.classifier.models import Category
 
 class PostList(ListView):
     paginate_by = 20
-    # TODO: create posts/list.html
-    # TODO: create second menu
-    # TODO: test pagination
     template_name = 'posts/list.html'
     ordering = '-publish_date'
 
@@ -36,3 +33,8 @@ class PostList(ListView):
 class PostDetail(DetailView):
     model = Post
     template_name = 'posts/detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(PostDetail, self).get_context_data(**kwargs)
+        context['menu_items'] = Category.objects.get(slug=self.kwargs['parent']).get_children()
+        return context
