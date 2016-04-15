@@ -51,3 +51,15 @@ class PostDetailTests(TestCase):
         self.assertTemplateUsed(response, 'posts/detail.html')
         self.assertIn('object', response.context)
         self.assertEqual(len(response.context['menu_items']), 1)
+
+
+class SiteMapTests(TestCase):
+    def setUp(self):
+        PostFactory.create_batch(5)
+
+    def test_return_context(self):
+        response = client.get('/sitemap.xml/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['base'], 'http://agromega.in.ua/')
+        self.assertEqual(len(response.context['urls']), 5)
+        self.assertTemplateUsed(response, 'sitemap.xml')
