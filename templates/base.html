@@ -10,6 +10,9 @@
         {% block extra_meta %}
             <meta content="{% trans 'Текст головного мета тега.' %}" property="og:title">
             <meta content="{% trans 'Текст головного мета тега.' %}" property="og:description">
+            <meta content="" property="og:image">
+            <meta content="http://agromega.in.ua" property="og:url">
+            <meta content="AgroMega.in.ua" property="og:site_name">
         {% endblock extra_meta %}
 
         <!-- For bootstrap css connection -->
@@ -19,11 +22,6 @@
          <!-- Include jQuery to project. -->
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
 
-        <!-- For React using. -->
-        <script src="https://fb.me/react-0.14.7.js"></script>
-        <script src="https://fb.me/react-dom-0.14.7.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
-
         <!-- Include fa fa icons -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
@@ -31,7 +29,7 @@
         {% block extra_script %}{% endblock extra_script %}
 
     </head>
-    <body id="{% block body_id %}{% endblock %}" class="{% block body_class %}{% endblock %}">
+    <body>
 
         {% block header %}
             {% include 'header.html' %}
@@ -58,6 +56,7 @@
                 crossorigin="anonymous">
         </script>
         <link href="{% static 'css/footer.css' %}" rel="stylesheet"/>
+        <link href="{% static 'css/posts/list.css' %}" rel="stylesheet"/>
 
         <!-- Yandex.Metrika counter -->
         <script type="text/javascript">

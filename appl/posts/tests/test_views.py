@@ -16,23 +16,23 @@ class PostListTests(TestCase):
         self.post = PostFactory(rubric=self.category)
 
     def test_parent_list(self):
-        response = client.get('/' + self.parent.slug + '/')
+        response = client.get('/post/' + self.parent.slug + '/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/' + self.parent.slug + '/')
+        response = client.get('/post/' + self.parent.slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
 
     def test_child_list(self):
         slug = self.post.rubric.slug
-        response = client.get('/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/post/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/post/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(len(response.context['menu_items']), 1)
 
@@ -63,3 +63,14 @@ class SiteMapTests(TestCase):
         self.assertEqual(response.context['base'], 'http://agromega.in.ua/')
         self.assertEqual(len(response.context['urls']), 5)
         self.assertTemplateUsed(response, 'sitemap.xml')
+
+
+class ErrorsHandlerTests(TestCase):
+
+    def test_404_handler_using(self):
+        response = client.get('/sdg/sdg/dfdg')
+        self.assertTemplateUsed(response, '404.html')
+        self.assertTemplateUsed(response, 'header.html')
+        self.assertTemplateUsed(response, 'footer.html')
+
+    # TODO: create test for 500 handler

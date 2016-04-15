@@ -27,7 +27,7 @@ DEBUG = False
 
 HOST = 'http://agromega.in.ua'
 
-ALLOWED_HOSTS = ['agromega.in.ua', ]
+ALLOWED_HOSTS = ['agromega.in.ua']
 
 WSGI_APPLICATION = 'agro_portal.wsgi.application'
 # Application definition
@@ -60,7 +60,7 @@ INSTALLED_APPS = [
     # For nice working with text https://github.com/django-ckeditor/django-ckeditor
     'ckeditor',
     # For integration django and webpack https://github.com/owais/django-webpack-loader
-   # 'webpack_loader',
+    # 'webpack_loader',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy

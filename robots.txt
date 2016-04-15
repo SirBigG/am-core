@@ -1,4 +1,4 @@
-User: *
+User-agent: *
 
 Disallow: /admin/
 Disallow: /rosetta/

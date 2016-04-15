@@ -30,10 +30,14 @@ urlpatterns = [
     url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
     url(r'^', include('appl.classifier.urls')),
     url(r'^', include('appl.pro_auth.urls')),
-    # TODO: add posts prefix for all posts url. Change all urls in templates
-    url(r'^', include('appl.posts.urls')),
+    url(r'^post/', include('appl.posts.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
+
 ]
+
+# For returning errors pages. Need to be the last.
+handler404 = "django.views.defaults.page_not_found"
+handler500 = "django.views.defaults.server_error"
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()

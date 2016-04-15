@@ -7,6 +7,8 @@
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="{{ object.text|truncatechars:300|striptags }}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
+    <meta content="{% full_url object.get_absolute_url %}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
     <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
 {% endblock extra_meta %}
 
@@ -21,20 +23,17 @@
         <div id="carousel-example-generic" class="carousel" data-ride="carousel">
 
             <div class="carousel-inner" role="listbox">
-                <div class="item active">
-                        <img src="{{ object.photo.first.image.url }}" class="img-rounded" />
-                        <div class="carousel-caption">
-                            {% if object.photo.first.description %}<p>{{ photo.description }}</p>{% endif %}
-                        </div>
-                </div>
-                <!--Little hack for slice need to fix-->
-                {% for photo in object.photo.all|slice:":2" %}
-                <div class="item">
-                        <img src="{{ photo.image.url }}" class="img-rounded" />
+                {% for photo in object.photo.all%}
+                    {% if photo == object.photo.first %}
+                        <div class="item active">
+                    {% else %}
+                        <div class="item">
+                    {% endif %}
+                        <img alt="{{ photo.description }}" src="{{ photo.image.url }}" class="img-rounded" />
                         <div class="carousel-caption">
                             {% if photo.description %}<p>{{ photo.description }}</p>{% endif %}
                         </div>
-                </div>
+                    </div>
                 {% endfor %}
             </div>
               <!-- Controls -->

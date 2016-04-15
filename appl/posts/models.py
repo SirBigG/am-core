@@ -50,7 +50,8 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         anc = self.rubric.get_family()[1:]
-        s = ''
+        # TODO: need to reverse use
+        s = '/post'
         for a in anc:
             s += '/' + a.slug
         url = s + '/' + self.slug + '-' + str(self.pk) + '.html'
