@@ -2,6 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>{{ base }}</url>
     {% for url in urls %}
-        <url>{{ url }}</url>
+        <url>
+            <loc>{{ url }}</loc>
+        </url>
     {% endfor %}
 </urlset>
