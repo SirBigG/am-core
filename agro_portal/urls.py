@@ -20,13 +20,17 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
+from appl.posts.views import SiteMap
+
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
+    url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
     url(r'^', include('appl.classifier.urls')),
     url(r'^', include('appl.pro_auth.urls')),
+    # TODO: add posts prefix for all posts url. Change all urls in templates
     url(r'^', include('appl.posts.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 ]
