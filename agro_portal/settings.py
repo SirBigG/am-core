@@ -27,7 +27,7 @@ DEBUG = False
 
 HOST = 'http://agromega.in.ua'
 
-ALLOWED_HOSTS = ['agromega.in.ua']
+ALLOWED_HOSTS = ['agromega.in.ua', 'www.agromega.in.ua', ]
 
 WSGI_APPLICATION = 'agro_portal.wsgi.application'
 # Application definition
