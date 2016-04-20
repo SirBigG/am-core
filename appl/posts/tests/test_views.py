@@ -16,23 +16,23 @@ class PostListTests(TestCase):
         self.post = PostFactory(rubric=self.category)
 
     def test_parent_list(self):
-        response = client.get('/post/' + self.parent.slug + '/')
+        response = client.get('/' + self.parent.slug + '/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/post/' + self.parent.slug + '/')
+        response = client.get('/' + self.parent.slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
 
     def test_child_list(self):
         slug = self.post.rubric.slug
-        response = client.get('/post/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/post/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(len(response.context['menu_items']), 1)
 

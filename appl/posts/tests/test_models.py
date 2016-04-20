@@ -19,7 +19,7 @@ class PostTests(TestCase):
         child = CategoryFactory(parent=parent, slug='bbb')
         child2 = CategoryFactory(parent=child, slug='ccc')
         post = PostFactory(rubric=child2, slug='ddd', id='12')
-        self.assertEqual(post.get_absolute_url(), '/post/bbb/ccc/ddd-12.html')
+        self.assertEqual(post.get_absolute_url(), '/bbb/ccc/ddd-12.html')
 
 
 class PhotoTests(TestCase):

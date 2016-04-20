@@ -4,7 +4,7 @@
               {{ root.value }}<span class="caret"></span></a>
         <ul class="dropdown-menu">
             {% for child in root.get_children %}
-                <li><a href="/post/{{ child.slug }}/">{{ child.value }}</a></li>
+                <li><a href="/{{ child.slug }}/">{{ child.value }}</a></li>
             {% endfor %}
         </ul>
     </li>

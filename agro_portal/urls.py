@@ -30,7 +30,7 @@ urlpatterns = [
     url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
     url(r'^', include('appl.classifier.urls')),
     url(r'^', include('appl.pro_auth.urls')),
-    url(r'^post/', include('appl.posts.urls')),
+    url(r'^', include('appl.posts.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
 
 ]
