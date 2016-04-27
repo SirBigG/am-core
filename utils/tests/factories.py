@@ -6,6 +6,7 @@ from appl.pro_auth.models import User
 from appl.classifier.models import Location, Country, Region, \
     Area, Category
 from appl.posts.models import Post, Photo, Comment
+from appl.services.models import Feedback
 
 from django.contrib.auth.hashers import make_password
 
@@ -149,3 +150,18 @@ class CommentFactory(BaseFactory):
     post = factory.SubFactory(PostFactory)
     text = u'Коментарій'
     user = factory.SubFactory(UserFactory)
+
+
+# ##################   Feedback factories     ####################### #
+
+
+class FeedbackFactory(BaseFactory):
+    """
+    Creation feedbacks.
+    """
+    class Meta:
+        model = Feedback
+
+    title = 'Feedback topic'
+    email = 'test@test.com'
+    text = 'Feedback text'

@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'appl.classifier',
     'appl.pro_auth',
     'appl.posts',
+    'appl.services',
 
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
