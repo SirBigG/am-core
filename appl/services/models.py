@@ -12,7 +12,7 @@ class Feedback(models.Model):
     class Meta:
         db_table = 'feedback'
         verbose_name = 'Feedback'
-        verbose_name_plural = 'Feedbacks'
+        verbose_name_plural = 'Feedback'
 
     def __unicode__(self):
         return self.title
