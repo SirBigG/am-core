@@ -28,11 +28,11 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
+    url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'^service/', include('appl.services.urls')),
     url(r'^', include('appl.classifier.urls')),
     url(r'^', include('appl.pro_auth.urls')),
     url(r'^', include('appl.posts.urls')),
-    url(r'^i18n/', include('django.conf.urls.i18n')),
-
 ]
 
 # For returning errors pages. Need to be the last.
