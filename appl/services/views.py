@@ -1,5 +1,6 @@
 from django.views.generic import FormView
 from django.http import HttpResponse
+from django.template.loader import render_to_string
 
 from appl.services.forms import FeedbackForm
 
@@ -10,4 +11,5 @@ class FeedbackView(FormView):
 
     def form_valid(self, form):
         form.save()
-        return HttpResponse('Ok')
+        render = render_to_string('services/success.html')
+        return HttpResponse(render)

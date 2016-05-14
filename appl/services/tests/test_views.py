@@ -14,4 +14,4 @@ class FeedbackViewTests(TestCase):
         response = client.post('/service/feedback/', {'title': 'feed title', 'email': 'test@test.com',
                                                       'text': 'feed text'})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, 'Ok')
+        self.assertTemplateUsed(response, 'services/success.html')

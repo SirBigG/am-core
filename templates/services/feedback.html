@@ -1,5 +1,37 @@
-<!-- TODO: need to styling -->
+{% load i18n %}
+
+<div class="modal-header">
+    <h2 class="text-center">{% trans 'Зв’яжіться з нами' %}</h2>
+</div>
 <form method="post">
-    {{ form }}
-    <input type="submit">
+    {% csrf_token %}
+    <div class="modal-body">
+    {% for field in form %}
+    <div class="form-group">
+        <p class="text-left">{{ field.label }}</p>
+        <p class="text-danger">{{field.errors}}</p>
+        {{ field }}
+    </div>
+    {% endfor %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
+        <button type="submit" class="btn btn-primary" id="f-btn">{% trans 'Відправити' %}</button>
+    </div>
 </form>
+<script type="text/javascript">
+        $('#f-btn').click(function(){
+        $.ajax({
+        type: 'POST',
+        url:'/service/feedback/',
+        data: $('form').serialize(),
+        success: function(a){
+            $('#feedback-modal').html(a);
+        },
+        error: function(a){
+            $('#feedback-modal').html(a);
+        }
+        });
+        return false;
+    });
+</script>
