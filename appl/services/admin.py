@@ -7,4 +7,4 @@ class FeedbackAdmin(admin.ModelAdmin):
     model = Feedback
     list_display = ('title', 'email')
 
-admin.register(Feedback, FeedbackAdmin)
+admin.site.register(Feedback, FeedbackAdmin)
