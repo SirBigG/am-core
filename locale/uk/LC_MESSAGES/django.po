@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-18 13:09+0000\n"
-"PO-Revision-Date: 2016-04-18 13:12+0000\n"
-"Last-Translator:   <gotsandriy@gmail.com>\n"
+"POT-Creation-Date: 2016-05-14 20:05+0000\n"
+"PO-Revision-Date: 2016-05-14 20:07+0000\n"
+"Last-Translator:   <gots@test.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Translated-Using: django-rosetta 0.7.11\n"
 
-#: agro_portal/settings.py:133
+#: agro_portal/settings.py:134
 msgid "Ukrainian"
 msgstr "Українська мова"
 
-#: agro_portal/settings.py:134
+#: agro_portal/settings.py:135
 msgid "English"
 msgstr "Англійська мова"
 
@@ -151,55 +151,55 @@ msgstr "Публікація"
 msgid "Posts"
 msgstr "Публікації"
 
-#: appl/posts/models.py:64
+#: appl/posts/models.py:65
 msgid "image"
 msgstr "зображення"
 
-#: appl/posts/models.py:65
+#: appl/posts/models.py:66
 msgid "photo describing"
 msgstr "опис фотографії"
 
-#: appl/posts/models.py:66
+#: appl/posts/models.py:67
 msgid "post of photo"
 msgstr "публікація фотографії"
 
-#: appl/posts/models.py:67
+#: appl/posts/models.py:68
 msgid "author of photo"
 msgstr "автор фото"
 
-#: appl/posts/models.py:68
+#: appl/posts/models.py:69
 msgid "photo source"
 msgstr "джерело фото"
 
-#: appl/posts/models.py:72
+#: appl/posts/models.py:73
 msgid "Photo"
 msgstr "Фотографія"
 
-#: appl/posts/models.py:73
+#: appl/posts/models.py:74
 msgid "Photos"
 msgstr "Фотографії"
 
-#: appl/posts/models.py:95
+#: appl/posts/models.py:96
 msgid "post of comment"
 msgstr "коментарій публіуації"
 
-#: appl/posts/models.py:96
+#: appl/posts/models.py:97
 msgid "comment text"
 msgstr "текст коментаря"
 
-#: appl/posts/models.py:97
+#: appl/posts/models.py:98
 msgid "comment date"
 msgstr "дата коментаря"
 
-#: appl/posts/models.py:98
+#: appl/posts/models.py:99
 msgid "comment owner"
 msgstr "власник коментаря"
 
-#: appl/posts/models.py:102
+#: appl/posts/models.py:103
 msgid "Comment"
 msgstr "Коментар"
 
-#: appl/posts/models.py:103
+#: appl/posts/models.py:104
 msgid "Comments"
 msgstr "Коментарі"
 
@@ -338,26 +338,86 @@ msgstr "Кастомний користувач"
 msgid "custom users"
 msgstr "Кастомні користувачі"
 
+#: appl/services/models.py:8
+msgid "feedback topic"
+msgstr "заголовок"
+
+#: appl/services/models.py:9
+msgid "feedback email"
+msgstr "email"
+
+#: appl/services/models.py:10
+msgid "feedback body"
+msgstr "текст"
+
+#: templates/404.html:7
+msgid "Такої сторінки не існує."
+msgstr ""
+
+#: templates/500.html:7
+msgid ""
+"Упс. Сталась помилка або сторінка в розробці. Вибачте за незручності. Ми "
+"працюємо на цією проблемою."
+msgstr ""
+
 #: templates/base.html:11 templates/base.html.py:12
 msgid "Текст головного мета тега."
 msgstr "Текст головного мета тега."
 
-#: templates/posts/detail.html:58
+#: templates/footer.html:7
+msgid "Зворотній зв’язок"
+msgstr ""
+
+#: templates/posts/detail.html:57
 msgid "Source "
 msgstr "Джерело"
 
-#: templates/posts/detail.html:59
-#| msgid "Share with friends "
+#: templates/posts/detail.html:58
 msgid "Share with friends: "
 msgstr "Поділитись із друзями:"
 
-#: templates/posts/detail.html:60
-msgid "Share-in-vk"
-msgstr "Поділитись в vk"
+#: templates/services/feedback.html:3
+msgid "Зв’яжіться з нами"
+msgstr ""
 
-#: templates/posts/detail.html:61
-msgid "Share-in-facebook"
-msgstr "Поділитись в facebook"
+#: templates/services/feedback.html:17
+msgid "Закрити"
+msgstr ""
+
+#: templates/services/feedback.html:18
+msgid "Відправити"
+msgstr ""
+
+#: templates/services/success.html:3
+msgid "Повідомлення відправлено! Дякуємо!"
+msgstr ""
+
+#~ msgid "Syndication"
+#~ msgstr "локація"
+
+#~ msgid "%(model_name)s with this %(field_labels)s already exists."
+#~ msgstr "Користувач з таким email вже існує."
+
+#~ msgid "%(model_name)s with this %(field_label)s already exists."
+#~ msgstr "Користувач з таким email вже існує."
+
+#~ msgid "Duration"
+#~ msgstr "місцезнаходження користувача"
+
+#~ msgid "Image"
+#~ msgstr "зображення"
+
+#~ msgid "Phone number"
+#~ msgstr "Телефон 1"
+
+#~ msgid "Incorrect comment."
+#~ msgstr "коментарій публіуації"
+
+#~ msgid "Share-in-vk"
+#~ msgstr "Поділитись в vk"
+
+#~ msgid "Share-in-facebook"
+#~ msgstr "Поділитись в facebook"
 
 #~ msgid "Author "
 #~ msgstr "Автор"

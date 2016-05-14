@@ -20,7 +20,7 @@
     <div class="col-md-8">
     <h1>{{ object.title }}</h1>
     <div class="col-md-8">
-        <div id="carousel-example-generic" class="carousel" data-ride="carousel">
+        <div id="post-carousel" class="carousel" data-ride="carousel">
 
             <div class="carousel-inner" role="listbox">
                 {% for photo in object.photo.all%}
@@ -31,36 +31,41 @@
                     {% endif %}
                         <img alt="{{ photo.description }}" src="{{ photo.image.url }}" class="img-rounded" />
                         <div class="carousel-caption">
-                            {% if photo.description %}<p>{{ photo.description }}</p>{% endif %}
+                            {% if photo.description %}<h3>{{ photo.description }}</h3>{% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
               <!-- Controls -->
-             <a class="left carousel-control" href="#carousel-example-generic" role="button" data-slide="prev">
+             <a class="left carousel-control" href="#post-carousel" role="button" data-slide="prev">
                     <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
              </a>
-             <a class="right carousel-control" href="#carousel-example-generic" role="button" data-slide="next">
+             <a class="right carousel-control" href="#post-carousel" role="button" data-slide="next">
                     <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
              </a>
         </div>
-    </div>
-        <!-- Need off internal -->
         <script type="text/javascript">
-            $('.carousel').carousel({
-            interval: false
-            })
+            $(document).ready($('.carousel').carousel({interval: false}))
         </script>
+    </div>
     <div class="text-justify">
         {{ object.text|safe }}
     </div>
     <h5>{% if object.author %}{{ object.author }}{% endif %}</h5>
     <h5>{% if object.source %}{% trans 'Source ' %}{{ object.source }}{% endif %}</h5>
     <h4 class="text-center">{% trans 'Share with friends: ' %}
-        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-vk' %}, 'width=400, height=200'); return false" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}"><i class="fa fa-vk fa-2x"></i></a>
-        <a tabindex="-1" onclick="window.open(this.href, {% trans 'Share-in-facebook' %}, 'width=400, height=200'); return false" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"><i class="fa fa-facebook fa-2x"></i></a>
+        <a tabindex="-1" target="Share-in-vk"
+           onclick="window.open(this.href, 'Share-in-vk' , 'width=400, height=200'); return false;"
+           href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}">
+            <i class="fa fa-vk fa-2x"></i>
+        </a>
+        <a tabindex="-1" target="Share-in-facebook"
+           onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+           href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+            <i class="fa fa-facebook fa-2x"></i>
+        </a>
     </h4>
     </div>
 

@@ -24,6 +24,10 @@ class PostListTests(TestCase):
         response = client.get('/' + self.parent.slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
 
+    def test_parent_list_404(self):
+        response = client.get('/unknown/')
+        self.assertEqual(response.status_code, 404)
+
     def test_child_list(self):
         slug = self.post.rubric.slug
         response = client.get('/' + self.parent.slug + '/' + slug + '/')
@@ -35,6 +39,10 @@ class PostListTests(TestCase):
         response = client.get('/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(len(response.context['menu_items']), 1)
+
+    def test_child_list_404(self):
+        response = client.get('/' + self.parent.slug + '/unknown/')
+        self.assertEqual(response.status_code, 404)
 
 
 class PostDetailTests(TestCase):
