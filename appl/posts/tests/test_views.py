@@ -1,11 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from django.test import TestCase, Client
+from django.test import TestCase, Client, RequestFactory
+from django.core.cache import cache
+from django.utils.cache import get_cache_key
 
 from utils.tests.factories import PostFactory, CategoryFactory
 
 
 client = Client()
+
+request = RequestFactory()
 
 
 class PostListTests(TestCase):
@@ -59,6 +63,13 @@ class PostDetailTests(TestCase):
         self.assertTemplateUsed(response, 'posts/detail.html')
         self.assertIn('object', response.context)
         self.assertEqual(len(response.context['menu_items']), 1)
+
+    def test_detail_caching(self):
+        req = request.get(self.post.get_absolute_url())
+        response = client.get(self.post.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        key = get_cache_key(req, 'post_')
+        self.assertTrue(cache.get(key))
 
 
 class SiteMapTests(TestCase):
