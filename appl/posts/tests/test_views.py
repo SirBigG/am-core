@@ -6,10 +6,23 @@ from django.utils.cache import get_cache_key
 
 from utils.tests.factories import PostFactory, CategoryFactory
 
-
 client = Client()
 
 request = RequestFactory()
+
+
+class MainPageTest(TestCase):
+
+    def test_response(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_caching(self):
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        req = request.get('/')
+        key = get_cache_key(req, key_prefix='index_')
+        self.assertTrue(cache.get(key))
 
 
 class PostListTests(TestCase):

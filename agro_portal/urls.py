@@ -16,6 +16,7 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import TemplateView
+from django.views.decorators.cache import cache_page
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
@@ -24,7 +25,9 @@ from appl.posts.views import SiteMap
 
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
+    url(r'^$',
+        cache_page(60 * 15, key_prefix='index_')(TemplateView.as_view(template_name='index.html')),
+        name='index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
