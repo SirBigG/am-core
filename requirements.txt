@@ -26,3 +26,4 @@ python-dateutil==2.5.0
 pytz==2015.7
 requests==2.9.1
 six==1.10.0
+uWSGI==2.0.12

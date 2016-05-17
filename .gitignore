@@ -13,3 +13,4 @@ env/
 /assets/bundles/*
 webpack-stats.json
 /media/*
+/bower_components/*

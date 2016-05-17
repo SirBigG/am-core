@@ -11,7 +11,7 @@
         {% for group in object_list|group_by:2 %}
             <div class="row">
                 {% for obj in group %}
-                    <div class="col-md-6">
+                    <div class="col-xs-12 col-md-6">
                         <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded " id="image-list-size">
                         <a href="{{ obj.get_absolute_url }}"><h1>{{ obj.title }}</h1></a>
                         <div class="text-justify">

@@ -3,7 +3,7 @@
 {% for group in posts|group_by:2 %}
     <div class="row">
         {% for post in group %}
-            <div class="col-md-6">
+            <div class="col-xs-12 col-md-6">
                 <img src="{{post.photo.first.image.url}}" alt="{{ obj.photo.first.description }}" id="image-list-size" class="img-rounded">
                 <a href="{{ post.get_absolute_url }}"><h1>{{ post.title }}</h1></a>
                 <div class="text-justify">

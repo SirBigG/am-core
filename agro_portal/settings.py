@@ -61,7 +61,7 @@ INSTALLED_APPS = [
     # For nice working with text https://github.com/django-ckeditor/django-ckeditor
     'ckeditor',
     # For integration django and webpack https://github.com/owais/django-webpack-loader
-    # 'webpack_loader',
+    'webpack_loader',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -106,8 +106,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': "agrodb",
-        'USER': 'agr',
-        'PASSWORD': '787898',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
         'HOST': '127.0.0.1',
         'PORT': '5432',
     }
@@ -164,12 +164,12 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'assets')
 ]
 
-#WEBPACK_LOADER = {
-#    'DEFAULT': {
-#        'BUNDLE_DIR_NAME': 'bundles/',
-#        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
-#    }
-#}
+WEBPACK_LOADER = {
+    'DEFAULT': {
+        'BUNDLE_DIR_NAME': 'bundles/',
+        'STATS_FILE': os.path.join(BASE_DIR, 'webpack-stats.json'),
+    }
+}
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
