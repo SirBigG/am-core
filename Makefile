@@ -35,3 +35,6 @@ dev:
 coverage:
 	coverage run manage.py test
 	coverage report -m --include=appl/*,utils/*
+
+reload:
+	uwsgi --reload /home/agr/golub_portal/agro_portal/tmp/project-master.pid
