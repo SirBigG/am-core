@@ -4,13 +4,13 @@
     <div class="row">
         {% for post in group %}
             <div class="col-xs-12 col-md-6">
+                <div class="item">
                 <img src="{{post.photo.first.image.url}}" alt="{{ obj.photo.first.description }}" id="image-list-size" class="img-rounded">
                 <a href="{{ post.get_absolute_url }}"><h1>{{ post.title }}</h1></a>
                 <div class="text-justify">
                     {{ post.text|safe|truncatechars:300 }}
                 </div>
-                {{ post.publish_date|date }}
-                <a href="{{ post.get_absolute_url }}">Читати</a>
+                </div>
             </div>
         {% endfor %}
     </div>

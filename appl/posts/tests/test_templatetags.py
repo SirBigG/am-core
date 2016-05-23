@@ -5,7 +5,7 @@ from django.test import TestCase
 from utils.tests.factories import PostFactory, CategoryFactory
 
 from appl.posts.templatetags.post_extras import posts_list, main_menu, \
-    full_url, group_by, grouped
+    full_url, group_by, grouped, times
 
 
 class PostExtrasTests(TestCase):
@@ -40,3 +40,6 @@ class PostExtrasTests(TestCase):
         for group in groups:
             i += 1
         self.assertEqual(i, 3)
+
+    def test_times_filter(self):
+        self.assertEqual(times(5), range(1, 6))

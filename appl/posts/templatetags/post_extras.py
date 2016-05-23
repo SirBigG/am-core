@@ -58,3 +58,13 @@ def group_by(value, arg):
     :return iterator
     """
     return grouped(value, arg)
+
+
+@register.filter
+def times(number):
+    """
+    For using range function in templatetags.
+    :param number: int
+    :return range obj:
+    """
+    return range(1, number+1)

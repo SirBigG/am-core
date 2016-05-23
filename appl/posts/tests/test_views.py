@@ -6,6 +6,8 @@ from django.utils.cache import get_cache_key
 
 from utils.tests.factories import PostFactory, CategoryFactory
 
+from factory import build_batch
+
 client = Client()
 
 request = RequestFactory()
@@ -60,6 +62,22 @@ class PostListTests(TestCase):
     def test_child_list_404(self):
         response = client.get('/' + self.parent.slug + '/unknown/')
         self.assertEqual(response.status_code, 404)
+
+    def test_list_pagination(self):
+        build_batch(PostFactory, 21, rubric=self.category)
+        response = client.get('/' + self.parent.slug + '/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context['page_obj'].has_next())
+        self.assertFalse(response.context['page_obj'].has_previous())
+        self.assertEqual(response.context['page_obj'].next_page_number(), 2)
+        self.assertEqual(response.context['page_obj'].number, 1)
+        self.assertEqual(response.context['paginator'].num_pages, 2)
+        response = client.get('/' + self.parent.slug + '/?page=2')
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context['page_obj'].has_next())
+        self.assertTrue(response.context['page_obj'].has_previous())
+        self.assertEqual(response.context['page_obj'].previous_page_number(), 1)
+        self.assertEqual(response.context['page_obj'].number, 2)
 
 
 class PostDetailTests(TestCase):
