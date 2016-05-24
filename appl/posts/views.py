@@ -25,17 +25,15 @@ class PostList(ListView):
         return context
 
     def get_queryset(self):
-        queryset = None
+        try:
+            r = Category.objects.get(slug=self.kwargs['parent']).get_children()
+            queryset = Post.objects.filter(rubric_id__in=r)
+        except Category.DoesNotExist:
+            raise Http404
         if 'child' in self.kwargs:
             try:
                 r = Category.objects.get(slug=self.kwargs['child'])
-                queryset = Post.objects.filter(rubric_id=r.id)
-            except Category.DoesNotExist:
-                raise Http404
-        elif 'parent' in self.kwargs:
-            try:
-                r = Category.objects.get(slug=self.kwargs['parent']).get_children()
-                queryset = Post.objects.filter(rubric_id__in=r)
+                queryset = queryset.filter(rubric_id=r.id)
             except Category.DoesNotExist:
                 raise Http404
         return queryset
