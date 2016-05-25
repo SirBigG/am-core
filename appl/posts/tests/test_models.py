@@ -12,7 +12,7 @@ class PostTests(TestCase):
         self.post = PostFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.post), u'Заголовок')
+        self.assertEqual(str(self.post), u'Заголовок')
 
     def test_get_absolute_url(self):
         parent = CategoryFactory(slug='aaa')
@@ -32,7 +32,7 @@ class PhotoTests(TestCase):
         os.remove('media/images/example.jpg')
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.photo), unicode(self.photo.id))
+        self.assertEqual(str(self.photo), str(self.photo.id))
 
     def test_resize(self):
         self.assertEqual(self.photo.image.width, 1000)
@@ -45,4 +45,4 @@ class CommentTests(TestCase):
         self.comment = CommentFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.comment), 'John')
+        self.assertEqual(str(self.comment), 'John')

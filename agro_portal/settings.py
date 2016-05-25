@@ -47,6 +47,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Package for project api: http://www.django-rest-framework.org/
+    'rest_framework',
+
     # project apps
     'appl.classifier',
     'appl.pro_auth',
@@ -62,6 +65,8 @@ INSTALLED_APPS = [
     'ckeditor',
     # For integration django and webpack https://github.com/owais/django-webpack-loader
     'webpack_loader',
+    # For google ReCaptcha using: https://github.com/praekelt/django-recaptcha
+    'captcha',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -125,8 +130,18 @@ AUTH_USER_MODEL = 'pro_auth.User'
 # Project authentication backend
 AUTHENTICATION_BACKENDS = ['appl.pro_auth.backends.AuthBackend']
 
+# ========================================================================================
+# ReCaptcha settings
+# ========================================================================================
+
+RECAPTCHA_PUBLIC_KEY = '6LdxSyITAAAAAJNvP7eOrHlGRddLF3OgOUiAqvxj'
+RECAPTCHA_PRIVATE_KEY = '6LdxSyITAAAAAJIeEbsTxqTYRAGVtFqWexypK_se'
+NOCAPTCHA = True
+
+# ========================================================================================
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
+# ========================================================================================
 
 LANGUAGE_CODE = 'uk-Uk'
 
@@ -135,6 +150,9 @@ LANGUAGES = [
     ('en', _('English')),
 ]
 
+# =========================================================================================
+# Model translation settings
+# =========================================================================================
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'uk'
 
 MODELTRANSLATION_TRANSLATION_FILES = (
@@ -177,3 +195,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
+
+# Importing security settings
+from .settings_local import *  # noqa

@@ -9,4 +9,4 @@ class FeedbackModelTest(TestCase):
         self.feedback = FeedbackFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.feedback), 'Feedback topic')
+        self.assertEqual(str(self.feedback), 'Feedback topic')

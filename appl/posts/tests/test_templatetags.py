@@ -26,8 +26,8 @@ class PostExtrasTests(TestCase):
     def test_grouped(self):
         l = [1, 2, 3, 4]
         group = grouped(l, 2)
-        self.assertEqual(group.next(), [1, 2])
-        self.assertEqual(group.next(), [3, 4])
+        self.assertEqual(next(group), [1, 2])
+        self.assertEqual(next(group), [3, 4])
 
     def test_group_by_filter(self):
         value = [1, 2, 3]

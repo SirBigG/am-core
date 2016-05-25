@@ -1,8 +1,8 @@
 
-$(document).ready(function feedback_get() {
-    $.ajax({
-        type: 'GET',
-        url:'/service/feedback/',
-        success: function(a){$('#feedback-modal').html(a);}
-    });
-});
+var $ = require('jquery');
+require('bootstrap');
+require('./auth/login');
+require('./auth/register');
+require('./services/feedback');
+
+$(document).ready($('.carousel').carousel({interval: false}));

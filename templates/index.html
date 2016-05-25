@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
 {% load post_extras %}
+{% load render_bundle from webpack_loader %}
 
 {% block content %}
-    <div class="col-md-8">
-        {% posts_list 10 %}
+    <div class="col-md-8" id="main-list">
+
     </div>
+    {% render_bundle 'react' %}
 {% endblock %}

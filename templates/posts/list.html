@@ -14,7 +14,7 @@
                     <div class="col-xs-12 col-md-6">
                      <div class="item_in_list">
                         <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded " id="image-list-size">
-                        <a href="{{ obj.get_absolute_url }}"><h1>{{ obj.title }}</h1></a>
+                        <a href="{{ obj.get_absolute_url }}"><h2>{{ obj.title }}</h2></a>
                         <div class="text-justify">
                             {{ obj.text|safe|truncatechars:300 }}
                         </div>

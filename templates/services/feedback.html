@@ -6,32 +6,21 @@
 <form method="post">
     {% csrf_token %}
     <div class="modal-body">
-    {% for field in form %}
-    <div class="form-group">
-        <p class="text-left">{{ field.label }}</p>
-        <p class="text-danger">{{field.errors}}</p>
-        {{ field }}
-    </div>
-    {% endfor %}
+        {% for error in form.non_field_errors %}
+            <p class="text-justify bg-danger">{{error}}</p>
+        {% endfor %}
+        {% for field in form %}
+            <div class="form-group">
+                <p class="text-left">{{ field.label }}</p>
+                {% for error in field.errors %}
+                    <p class="text-danger">{{ error }}</p>
+                {% endfor %}
+                {{ field }}
+            </div>
+        {% endfor %}
     </div>
     <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
-        <button type="submit" class="btn btn-primary" id="f-btn">{% trans 'Відправити' %}</button>
+        <button type="submit" class="btn btn-primary" id="feedback-conf-btn">{% trans 'Відправити' %}</button>
     </div>
 </form>
-<script type="text/javascript">
-    $('#f-btn').click(function(){
-        $.ajax({
-        type: 'POST',
-        url:'/service/feedback/',
-        data: $('form').serialize(),
-        success: function(a){
-            $('#feedback-modal').html(a);
-        },
-        error: function(a){
-            $('#feedback-modal').html(a);
-        }
-        });
-        return false;
-    });
-</script>

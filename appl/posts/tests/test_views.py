@@ -4,9 +4,13 @@ from django.test import TestCase, Client, RequestFactory
 from django.core.cache import cache
 from django.utils.cache import get_cache_key
 
-from utils.tests.factories import PostFactory, CategoryFactory
+from utils.tests.factories import PostFactory, CategoryFactory, PhotoFactory
 
 from factory import build_batch
+
+from rest_framework.test import APITestCase, APIClient
+
+api_client = APIClient()
 
 client = Client()
 
@@ -124,3 +128,44 @@ class ErrorsHandlerTests(TestCase):
         self.assertTemplateUsed(response, 'footer.html')
 
     # TODO: create test for 500 handler
+
+
+class ApiPostListTests(APITestCase):
+    def setUp(self):
+        for i in range(5):
+            post = PostFactory()
+            PhotoFactory(post=post)
+
+    def test_response(self):
+        response = api_client.get('/api/post/all/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_pagination(self):
+        PostFactory.create_batch(20)
+        response = api_client.get('/api/post/all/', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 10)
+        self.assertEqual(response.data['count'], 25)
+        self.assertEqual(response.data['next'], 'http://testserver/api/post/all/?page=2')
+        response = api_client.get('/api/post/all/?page=2', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 10)
+
+
+class RandomApiPostListTests(APITestCase):
+    def setUp(self):
+        PostFactory.create_batch(7)
+
+    def test_response(self):
+        response = api_client.get('/api/post/random/all/', format='json')
+        self.assertEqual(response.status_code, 200)
+
+    def test_pagination(self):
+        response = api_client.get('/api/post/random/all/', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 4)
+        self.assertEqual(response.data['count'], 7)
+        self.assertEqual(response.data['next'], 'http://testserver/api/post/random/all/?page=2')
+        response = api_client.get('/api/post/random/all/?page=2', format='json')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data['results']), 3)

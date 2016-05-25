@@ -31,6 +31,8 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
+    url(r'^api-auth/', include('rest_framework.urls',
+                               namespace='rest_framework')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^service/', include('appl.services.urls')),
     url(r'^', include('appl.classifier.urls')),

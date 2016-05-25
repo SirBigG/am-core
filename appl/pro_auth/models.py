@@ -72,6 +72,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     birth_date = models.DateField(blank=True, null=True,
                                   verbose_name=_('date of birth'))
 
+    validation_key = models.CharField(max_length=255, blank=True, null=True,
+                                      verbose_name=_('mail validation key'))
+
+    choices_owner = models.ManyToManyField('posts.Post', blank=True,
+                                           related_name='user_post',
+                                           verbose_name=_('relation with posts'))
+
     is_staff = models.BooleanField(
         _('staff status'),
         default=False,
@@ -101,7 +108,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = _('custom users')
         swappable = 'AUTH_USER_MODEL'
 
-    def __unicode__(self):
+    def __str__(self):
         if self.first_name:
             return self.first_name
         return self.email

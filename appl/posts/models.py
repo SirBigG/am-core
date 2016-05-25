@@ -40,12 +40,14 @@ class Post(models.Model):
 
     rubric = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('post category'))
 
+    meta_description = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('meta description'))
+
     class Meta:
         db_table = 'post'
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     def get_absolute_url(self):
@@ -73,17 +75,17 @@ class Photo(models.Model):
         verbose_name = _('Photo')
         verbose_name_plural = _('Photos')
 
-    def __unicode__(self):
-        return unicode(self.id)
+    def __str__(self):
+        return str(self.id)
 
     def save(self, *args, **kwargs):
         if self.image:
             from PIL import Image
-            import StringIO
+            from io import BytesIO
             from django.core.files import File
-            im = Image.open(StringIO.StringIO(self.image.read()))
+            im = Image.open(BytesIO(self.image.read()))
             im.thumbnail((1000, 800), Image.ANTIALIAS)
-            output = StringIO.StringIO()
+            output = BytesIO()
             im.save(output, format='JPEG', quality=85)
             self.image = File(output, self.image.name)
         super(Photo, self).save(*args, **kwargs)
@@ -103,5 +105,5 @@ class Comment(models.Model):
         verbose_name = _('Comment')
         verbose_name_plural = _('Comments')
 
-    def __unicode__(self):
-        return unicode(self.user)
+    def __str__(self):
+        return str(self.user)

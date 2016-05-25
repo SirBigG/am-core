@@ -19,10 +19,10 @@ class UserModelTests(TestCase):
                                  "A user with that email already exists.")
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.user), 'John')
+        self.assertEqual(str(self.user), 'John')
         self.user.first_name = ''
         self.user.save()
-        self.assertEqual(unicode(self.user), self.user.email)
+        self.assertEqual(str(self.user), self.user.email)
 
     def test_fields_exist(self):
         self.assertTrue(hasattr(self.user, 'phone1'))
@@ -31,6 +31,8 @@ class UserModelTests(TestCase):
         self.assertTrue(hasattr(self.user, 'location'))
         self.assertTrue(hasattr(self.user, 'birth_date'))
         self.assertTrue(hasattr(self.user, 'avatar'))
+        self.assertTrue(hasattr(self.user, 'validation_key'))
+        self.assertTrue(hasattr(self.user, 'choices_owner'))
 
     def test_get_full_name(self):
         self.assertEqual(self.user.get_full_name(), 'John Dou')

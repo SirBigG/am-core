@@ -8,9 +8,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-05-14 20:05+0000\n"
-"PO-Revision-Date: 2016-05-14 20:07+0000\n"
-"Last-Translator:   <gots@test.com>\n"
+"POT-Creation-Date: 2016-06-18 21:04+0000\n"
+"PO-Revision-Date: 2016-06-18 21:06+0000\n"
+"Last-Translator: b'  <gotsandriy@gmail.com>'\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,17 +19,17 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Translated-Using: django-rosetta 0.7.11\n"
 
-#: agro_portal/settings.py:134
+#: agro_portal/settings.py:149
 msgid "Ukrainian"
 msgstr "Українська мова"
 
-#: agro_portal/settings.py:135
+#: agro_portal/settings.py:150
 msgid "English"
 msgstr "Англійська мова"
 
 #: appl/classifier/models.py:13 appl/classifier/models.py:30
-#: appl/classifier/models.py:46 appl/classifier/models.py:62
-#: appl/classifier/models.py:81 appl/posts/models.py:27
+#: appl/classifier/models.py:48 appl/classifier/models.py:66
+#: appl/classifier/models.py:87 appl/posts/models.py:27
 msgid "transliteration value"
 msgstr "транслітераційне значення"
 
@@ -41,7 +41,7 @@ msgstr "коротка мітка"
 msgid "country value"
 msgstr "назва країни"
 
-#: appl/classifier/models.py:19 appl/classifier/models.py:64
+#: appl/classifier/models.py:19 appl/classifier/models.py:68
 msgid "country"
 msgstr "країна"
 
@@ -53,45 +53,65 @@ msgstr "країни"
 msgid "region value"
 msgstr "назва області"
 
-#: appl/classifier/models.py:35 appl/classifier/models.py:36
-#: appl/classifier/models.py:65
+#: appl/classifier/models.py:33
+msgid "region country"
+msgstr "область країна"
+
+#: appl/classifier/models.py:37 appl/classifier/models.py:38
+#: appl/classifier/models.py:69
 msgid "region"
 msgstr "область"
 
-#: appl/classifier/models.py:47
+#: appl/classifier/models.py:49
 msgid "area value"
 msgstr "назва району"
 
-#: appl/classifier/models.py:51 appl/classifier/models.py:52
-#: appl/classifier/models.py:66
+#: appl/classifier/models.py:51
+msgid "area region"
+msgstr "район область"
+
+#: appl/classifier/models.py:55 appl/classifier/models.py:56
+#: appl/classifier/models.py:70
 msgid "area"
 msgstr "район"
 
-#: appl/classifier/models.py:63
+#: appl/classifier/models.py:67
 msgid "location value"
 msgstr "назва локації (місто, село)"
 
-#: appl/classifier/models.py:70
+#: appl/classifier/models.py:71
+msgid "location longitude"
+msgstr "географічна довгота"
+
+#: appl/classifier/models.py:72
+msgid "location latitude"
+msgstr "географічна широта"
+
+#: appl/classifier/models.py:76
 msgid "location"
 msgstr "локація"
 
-#: appl/classifier/models.py:71
+#: appl/classifier/models.py:77
 msgid "locations"
 msgstr "локації"
 
-#: appl/classifier/models.py:82
+#: appl/classifier/models.py:88
 msgid "category value"
 msgstr "назва категорії"
 
-#: appl/classifier/models.py:83
+#: appl/classifier/models.py:89
 msgid "category icon"
 msgstr "іконка категорії"
 
-#: appl/classifier/models.py:85
+#: appl/classifier/models.py:91
 msgid "category parent"
 msgstr "предок категорії"
 
-#: appl/classifier/models.py:89
+#: appl/classifier/models.py:92
+msgid "user relation for post category"
+msgstr "зв’язок користувача із категорією публікації"
+
+#: appl/classifier/models.py:96
 msgid "Categories"
 msgstr "Категорії"
 
@@ -143,99 +163,105 @@ msgstr "статус публікації"
 msgid "post category"
 msgstr "рубрика публікації"
 
-#: appl/posts/models.py:45
+#: appl/posts/models.py:43
+#, fuzzy
+#| msgid "photo describing"
+msgid "meta description"
+msgstr ""
+
+#: appl/posts/models.py:47
 msgid "Post"
 msgstr "Публікація"
 
-#: appl/posts/models.py:46
+#: appl/posts/models.py:48
 msgid "Posts"
 msgstr "Публікації"
 
-#: appl/posts/models.py:65
+#: appl/posts/models.py:67
 msgid "image"
 msgstr "зображення"
 
-#: appl/posts/models.py:66
+#: appl/posts/models.py:68
 msgid "photo describing"
 msgstr "опис фотографії"
 
-#: appl/posts/models.py:67
+#: appl/posts/models.py:69
 msgid "post of photo"
 msgstr "публікація фотографії"
 
-#: appl/posts/models.py:68
+#: appl/posts/models.py:70
 msgid "author of photo"
 msgstr "автор фото"
 
-#: appl/posts/models.py:69
+#: appl/posts/models.py:71
 msgid "photo source"
 msgstr "джерело фото"
 
-#: appl/posts/models.py:73
+#: appl/posts/models.py:75
 msgid "Photo"
 msgstr "Фотографія"
 
-#: appl/posts/models.py:74
+#: appl/posts/models.py:76
 msgid "Photos"
 msgstr "Фотографії"
 
-#: appl/posts/models.py:96
+#: appl/posts/models.py:98
 msgid "post of comment"
 msgstr "коментарій публіуації"
 
-#: appl/posts/models.py:97
+#: appl/posts/models.py:99
 msgid "comment text"
 msgstr "текст коментаря"
 
-#: appl/posts/models.py:98
+#: appl/posts/models.py:100
 msgid "comment date"
 msgstr "дата коментаря"
 
-#: appl/posts/models.py:99
+#: appl/posts/models.py:101
 msgid "comment owner"
 msgstr "власник коментаря"
 
-#: appl/posts/models.py:103
+#: appl/posts/models.py:105
 msgid "Comment"
 msgstr "Коментар"
 
-#: appl/posts/models.py:104
+#: appl/posts/models.py:106
 msgid "Comments"
 msgstr "Коментарі"
 
-#: appl/pro_auth/admin.py:22
+#: appl/pro_auth/admin.py:23
 msgid "Phones"
 msgstr "Телефони"
 
-#: appl/pro_auth/admin.py:23
+#: appl/pro_auth/admin.py:24
 msgid "Personal info"
 msgstr "Персональна інформація"
 
-#: appl/pro_auth/admin.py:25
+#: appl/pro_auth/admin.py:26
 msgid "Permissions"
 msgstr "Доступи"
 
-#: appl/pro_auth/forms.py:22
+#: appl/pro_auth/forms.py:23
 msgid "The two password fields didn't match."
 msgstr "Два поля паролів не співпадають."
 
-#: appl/pro_auth/forms.py:24 appl/pro_auth/forms.py:64
+#: appl/pro_auth/forms.py:25
 msgid "Password"
 msgstr "Пароль"
 
-#: appl/pro_auth/forms.py:26
+#: appl/pro_auth/forms.py:27
 msgid "Password confirmation"
 msgstr "Підтвердження пароля"
 
-#: appl/pro_auth/forms.py:28
+#: appl/pro_auth/forms.py:29
 msgid "Enter the same password as before, for verification."
 msgstr "Введіть такий самий пароль як в попередньому для підтвердження."
 
-#: appl/pro_auth/forms.py:29 appl/pro_auth/forms.py:65
-msgid "Phone 1"
-msgstr "Телефон 1"
-
 #: appl/pro_auth/forms.py:30
+msgid "Phone"
+msgstr "Телефон"
+
+#: appl/pro_auth/forms.py:31
 msgid ""
 "Enter phone in International format. Example: '+380991234567'.This field is "
 "required."
@@ -243,28 +269,17 @@ msgstr ""
 "Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'. Це "
 "поле обов’язкове."
 
-#: appl/pro_auth/forms.py:33 appl/pro_auth/forms.py:68
-msgid "Phone 2"
-msgstr "Телефон 2"
-
-#: appl/pro_auth/forms.py:34 appl/pro_auth/forms.py:37
-#: appl/pro_auth/forms.py:66 appl/pro_auth/forms.py:69
-#: appl/pro_auth/forms.py:72
-msgid "Enter phone in International format. Example: '+380991234567'"
-msgstr ""
-"Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'."
-
-#: appl/pro_auth/forms.py:36 appl/pro_auth/forms.py:71
-msgid "Phone 3"
-msgstr "Телефон 3"
-
-#: appl/pro_auth/forms.py:40 appl/pro_auth/forms.py:75
+#: appl/pro_auth/forms.py:38
 msgid "Please select city from list."
 msgstr "Будь-ласка виберіть місто із списку."
 
-#: appl/pro_auth/forms.py:41 appl/pro_auth/forms.py:76
+#: appl/pro_auth/forms.py:39
 msgid "City"
 msgstr "Місто"
+
+#: appl/pro_auth/forms.py:40
+msgid "Captcha"
+msgstr "Підтвердження"
 
 #: appl/pro_auth/models.py:56
 msgid "Required. You use it at every entrance to the site."
@@ -303,18 +318,26 @@ msgid "date of birth"
 msgstr "дата народження"
 
 #: appl/pro_auth/models.py:76
+msgid "mail validation key"
+msgstr "ключ валідації email"
+
+#: appl/pro_auth/models.py:80
+msgid "relation with posts"
+msgstr "зв’язок із публікаціями"
+
+#: appl/pro_auth/models.py:83
 msgid "staff status"
 msgstr "статус персоналу"
 
-#: appl/pro_auth/models.py:78
+#: appl/pro_auth/models.py:85
 msgid "Designates whether the user can log into this admin site."
 msgstr "Визначає, чи може цей користувач увійти на адміністративний сайт."
 
-#: appl/pro_auth/models.py:81
+#: appl/pro_auth/models.py:88
 msgid "active"
 msgstr "активний"
 
-#: appl/pro_auth/models.py:84
+#: appl/pro_auth/models.py:91
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -322,21 +345,25 @@ msgstr ""
 "Визначає, чи повинен цей користувач розглядатись як активний. Скасуйте це "
 "замість того, щоб видаляти обліковий запис."
 
-#: appl/pro_auth/models.py:88
+#: appl/pro_auth/models.py:95
 msgid "date joined"
 msgstr "дата приєднання"
 
-#: appl/pro_auth/models.py:91
+#: appl/pro_auth/models.py:98
 msgid "avatar"
 msgstr "аватар"
 
-#: appl/pro_auth/models.py:100
+#: appl/pro_auth/models.py:107
 msgid "custom user"
 msgstr "Кастомний користувач"
 
-#: appl/pro_auth/models.py:101
+#: appl/pro_auth/models.py:108
 msgid "custom users"
 msgstr "Кастомні користувачі"
+
+#: appl/pro_auth/views.py:25
+msgid "Confirmation of user email."
+msgstr "Підтвердження електронної пошти користувача."
 
 #: appl/services/models.py:8
 msgid "feedback topic"
@@ -360,7 +387,7 @@ msgid ""
 "працюємо на цією проблемою."
 msgstr ""
 
-#: templates/base.html:11 templates/base.html.py:12
+#: templates/base.html:14 templates/base.html:15
 msgid "Текст головного мета тега."
 msgstr "Текст головного мета тега."
 
@@ -368,29 +395,71 @@ msgstr "Текст головного мета тега."
 msgid "Зворотній зв’язок"
 msgstr ""
 
-#: templates/posts/detail.html:57
-msgid "Source "
-msgstr "Джерело"
+#: templates/header.html:21
+msgid "Вийти"
+msgstr ""
 
-#: templates/posts/detail.html:58
+#: templates/header.html:23
+msgid "Увійти"
+msgstr ""
+
+#: templates/header.html:24
+msgid "Зареєструватись"
+msgstr ""
+
+#: templates/posts/detail.html:59
+#| msgid "Source "
+msgid "Source: "
+msgstr "Джерело: "
+
+#: templates/posts/detail.html:60
 msgid "Share with friends: "
 msgstr "Поділитись із друзями:"
 
-#: templates/services/feedback.html:3
-msgid "Зв’яжіться з нами"
+#: templates/posts/detail.html:73
+msgid "Більше статтей тут:"
 msgstr ""
 
-#: templates/services/feedback.html:17
+#: templates/pro_auth/confirmation_email.html:3
+msgid ""
+"Для того щоб підтвердити реєстрацію на сайті AgroMega.in.ua перейдіть за "
+"цією ссилкою"
+msgstr ""
+
+#: templates/pro_auth/confirmation_email.html:4
+msgid "зареєструватись."
+msgstr ""
+
+#: templates/pro_auth/login.html:20 templates/pro_auth/register.html:20
+#: templates/services/feedback.html:23
 msgid "Закрити"
 msgstr ""
 
-#: templates/services/feedback.html:18
+#: templates/pro_auth/login.html:21 templates/pro_auth/register.html:21
+#: templates/services/feedback.html:24
 msgid "Відправити"
+msgstr ""
+
+#: templates/services/feedback.html:4
+msgid "Зв’яжіться з нами"
 msgstr ""
 
 #: templates/services/success.html:3
 msgid "Повідомлення відправлено! Дякуємо!"
 msgstr ""
+
+#~ msgid "Phone 2"
+#~ msgstr "Телефон 2"
+
+#~ msgid "Enter phone in International format. Example: '+380991234567'"
+#~ msgstr ""
+#~ "Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'."
+
+#~ msgid "Phone 3"
+#~ msgstr "Телефон 3"
+
+#~ msgid "Phone 1"
+#~ msgstr "Телефон 1"
 
 #~ msgid "Syndication"
 #~ msgstr "локація"

@@ -14,3 +14,5 @@ env/
 webpack-stats.json
 /media/*
 /bower_components/*
+settings_local.py
+Ukrainian_cities.xls

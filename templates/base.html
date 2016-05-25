@@ -18,7 +18,7 @@
             <meta content="AgroMega.in.ua" property="og:site_name">
         {% endblock extra_meta %}
 
-        {% render_bundle 'main' %}
+
 
         <!-- For bootstrap css connection -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
@@ -31,7 +31,6 @@
 
     </head>
     <body oncopy="return false;" oncontextmenu="return false;">
-
         {% block header %}
             {% include 'header.html' %}
         {% endblock header %}
@@ -44,15 +43,16 @@
 
         {% block extra_body %}{% endblock extra_body %}
 
-        <!-- For webpack loader inclusion scripts and scripts. -->
 
         <footer>
             {% block footer %}
                 {% include 'footer.html' %}
             {% endblock footer %}
         </footer>
+
         <link href="{% static 'css/footer.css' %}" rel="stylesheet"/>
         <link href="{% static 'css/posts/list.css' %}" rel="stylesheet"/>
+
         <!-- Yandex.Metrika counter -->
         <script type="text/javascript">
             (function (d, w, c) {
@@ -81,5 +81,8 @@
         </script>
         <noscript><div><img src="https://mc.yandex.ru/watch/36784110" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
         <!-- /Yandex.Metrika counter -->
+
+        <!-- For webpack loader inclusion scripts and scripts. -->
+        {% render_bundle 'main' %}
     </body>
 </html>

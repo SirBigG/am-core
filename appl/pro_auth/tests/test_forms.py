@@ -1,38 +1,44 @@
 # -*- coding: utf-8 -*-
+import os
 
 from django.test import TestCase
 
-from utils.tests.factories import LocationFactory  # UserFactory
+from utils.tests.factories import LocationFactory
 
-from appl.pro_auth.forms import UserCreationForm  # UserAdminChangeForm
+from appl.pro_auth.forms import UserCreationForm
 from appl.pro_auth.models import User
 
 from django.forms import ValidationError
-# from django.contrib.auth.hashers import make_password
 
 
 class UserCreationFormTests(TestCase):
 
     def test_form_valid(self):
+        os.environ['RECAPTCHA_TESTING'] = 'True'
         location = LocationFactory()
         data = {'email': 'test@test.com',
                 'password1': '11111',
                 'password2': '11111',
                 'phone1': '+380991234567',
                 'location': location.pk,
+                'g-recaptcha-response': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(User.objects.count(), 0)
         form.save()
         self.assertEqual(User.objects.count(), 1)
 
     def test_invalid_phone(self):
+        os.environ['RECAPTCHA_TESTING'] = 'True'
         location = LocationFactory()
         data = {'email': 'test@test.com',
                 'password1': '11111',
                 'password2': '11111',
                 'phone1': '0991234567',
                 'location': location.pk,
+                'g-recaptcha-response': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())
@@ -50,14 +56,22 @@ class UserCreationFormTests(TestCase):
                                  "The two password fields didn't match.")
         self.assertRaises(ValidationError, form1.clean_password2())
 
+    def test_form_invalid_captcha(self):
+        os.environ['RECAPTCHA_TESTING'] = 'False'
+        location = LocationFactory()
+        data = {'email': 'test@test.com',
+                'password1': '11111',
+                'password2': '11111',
+                'phone1': '+380991234567',
+                'location': location.pk,
+                'g-recaptcha-response': 'PASSED'
+                }
+        form = UserCreationForm(data=data)
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors, {'captcha': ['Incorrect, please try again.']})
 
-class UserAdminChangeFormTest(TestCase):
-
-    def test_form_validation(self):
-        pass
-        # password = make_password('12345')
-        # user = UserFactory(password=password)
-        # form = UserAdminChangeForm(data=user.__dict__, instance=user)
-        # import pdb; pdb.set_trace();
-        # TODO: need to work
-        # self.assertTrue(form.is_valid())
+    def tearDown(self):
+        try:
+            del os.environ['RECAPTCHA_TESTING']
+        except KeyError:
+            pass

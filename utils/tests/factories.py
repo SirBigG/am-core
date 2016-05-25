@@ -47,6 +47,7 @@ class RegionFactory(BaseFactory):
 
     slug = 'kiev_region'
     value = factory.Sequence(lambda n: u'Київська область{0}'.format(n))
+    country = factory.SubFactory(CountryFactory)
 
 
 class AreaFactory(BaseFactory):
@@ -58,6 +59,7 @@ class AreaFactory(BaseFactory):
 
     slug = 'kiev_area'
     value = factory.Sequence(lambda n: u'Київський район{0}'.format(n))
+    region = factory.SubFactory(RegionFactory)
 
 
 class LocationFactory(BaseFactory):

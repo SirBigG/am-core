@@ -17,7 +17,8 @@ class LocationModelTests(TestCase):
         self.assertEqual(Location.objects.count(), 1)
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.location), u'Київ')
+        self.assertEqual(str(self.location),
+                         '%s (%s %s)' % (self.location.value, str(self.location.region), str(self.location.area)))
 
     def test_fields_exists(self):
         self.assertTrue(hasattr(self.location, 'slug'))
@@ -33,7 +34,7 @@ class CountryTests(TestCase):
         self.country = CountryFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.country), self.country.value)
+        self.assertEqual(str(self.country), self.country.value)
 
     def test_fields_exist(self):
         self.assertTrue(hasattr(self.country, 'slug'))
@@ -47,7 +48,7 @@ class RegionTests(TestCase):
         self.region = RegionFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.region), self.region.value)
+        self.assertEqual(str(self.region), self.region.value)
 
     def test_fields_exist(self):
         self.assertTrue(hasattr(self.region, 'slug'))
@@ -60,7 +61,7 @@ class AreaTests(TestCase):
         self.area = AreaFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.area), self.area.value)
+        self.assertEqual(str(self.area), self.area.value)
 
     def test_fields_exist(self):
         self.assertTrue(hasattr(self.area, 'slug'))
@@ -73,4 +74,7 @@ class CategoryTests(TestCase):
         self.category = CategoryFactory()
 
     def test_str_representation(self):
-        self.assertEqual(unicode(self.category), u'Категорія')
+        self.assertEqual(str(self.category), u'Категорія')
+
+    def test_default_is_for_user(self):
+        self.assertFalse(self.category.is_for_user)

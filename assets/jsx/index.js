@@ -1,0 +1,1 @@
+require('./index/main_list');

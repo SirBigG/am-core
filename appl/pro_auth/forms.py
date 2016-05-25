@@ -2,7 +2,6 @@
 
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
 from django.utils.translation import ugettext_lazy as _
 
 from appl.pro_auth.models import User
@@ -13,6 +12,8 @@ from phonenumber_field.formfields import PhoneNumberField
 
 from dal import autocomplete
 
+from captcha.fields import ReCaptchaField
+
 
 class UserCreationForm(forms.ModelForm):
     """
@@ -22,27 +23,28 @@ class UserCreationForm(forms.ModelForm):
         'password_mismatch': _("The two password fields didn't match."),
     }
     password1 = forms.CharField(label=_("Password"),
-                                widget=forms.PasswordInput)
+                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
     password2 = forms.CharField(label=_("Password confirmation"),
-                                widget=forms.PasswordInput,
+                                widget=forms.PasswordInput(attrs={'class': 'form-control'}),
                                 help_text=_("Enter the same password as before, for verification."))
-    phone1 = PhoneNumberField(label=_("Phone 1"),
+    phone1 = PhoneNumberField(label=_("Phone"),
                               help_text=_("Enter phone in International format. Example: '+380991234567'."
-                                          "This field is required."))
-    phone2 = PhoneNumberField(required=False,
-                              label=_("Phone 2"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'"))
-    phone3 = PhoneNumberField(required=False,
-                              label=_("Phone 3"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'"))
+                                          "This field is required."),
+                              widget=forms.TextInput(attrs={'class': 'form-control'}))
+
     location = forms.ModelChoiceField(queryset=Location.objects.all(),
-                                      widget=autocomplete.ModelSelect2(url='location-autocomplete'),
+                                      widget=autocomplete.ModelSelect2(url='location-autocomplete',
+                                                                       attrs={'class': 'form-control'}),
                                       help_text=_("Please select city from list."),
                                       label=_("City"))
+    captcha = ReCaptchaField(label=_("Captcha"))
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'birth_date', 'avatar',)
+        fields = ['email', 'phone1', 'location', 'password1', 'password2', 'captcha']
+        widgets = {
+            'email': forms.TextInput(attrs={'class': 'form-control'})
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
@@ -56,31 +58,10 @@ class UserCreationForm(forms.ModelForm):
         password_validation.validate_password(self.cleaned_data.get('password2'), self.instance)
         return password2
 
-
-class UserAdminChangeForm(forms.ModelForm):
-    """
-    A form for change custom user data in admin site.
-    """
-    password = ReadOnlyPasswordHashField(label=_("Password"))
-    phone1 = PhoneNumberField(label=_("Phone 1"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'"))
-    phone2 = PhoneNumberField(required=False,
-                              label=_("Phone 2"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'"))
-    phone3 = PhoneNumberField(required=False,
-                              label=_("Phone 3"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'"))
-    location = forms.ModelChoiceField(queryset=Location.objects.all(),
-                                      widget=autocomplete.ModelSelect2(url='location-autocomplete'),
-                                      help_text=_("Please select city from list."),
-                                      label=_("City"))
-
-    class Meta:
-        model = User
-        fields = '__all__'
-
-    def clean_password(self):
-        # Regardless of what the user provides, return the initial value.
-        # This is done here, rather than on the field, because the
-        # field does not have access to the initial value
-        return self.initial["password"]
+    def save(self, commit=True):
+        """Save the provided password in hashed format."""
+        user = super(UserCreationForm, self).save(commit=False)
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user

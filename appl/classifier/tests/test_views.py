@@ -14,7 +14,7 @@ class LocationAutocompleteTests(TestCase):
         loc = LocationFactory()
         response = client.get(reverse('location-autocomplete'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['results'][0]['text'], unicode(loc))
+        self.assertEqual(response.json()['results'][0]['text'], str(loc))
         LocationFactory(value=u'Львів')
         response = client.get(reverse('location-autocomplete'))
         self.assertEqual(response.status_code, 200)

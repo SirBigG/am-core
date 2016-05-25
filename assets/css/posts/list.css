@@ -6,3 +6,8 @@
 .item_in_list {
     margin: 15px;
 }
+
+#image-detail-list {
+    width: 180px;
+    height: 120px;
+}

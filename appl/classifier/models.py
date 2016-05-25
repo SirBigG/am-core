@@ -19,7 +19,7 @@ class Country(models.Model):
         verbose_name = _('country')
         verbose_name_plural = _('countries')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
@@ -29,13 +29,15 @@ class Region(models.Model):
     """
     slug = models.CharField(max_length=250, verbose_name=_('transliteration value'))
     value = models.CharField(max_length=250, unique=True, verbose_name=_('region value'))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='region_country',
+                                verbose_name=_('region country'))
 
     class Meta:
         db_table = 'region'
         verbose_name = _('region')
         verbose_name_plural = _('region')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
@@ -44,14 +46,16 @@ class Area(models.Model):
     Model for area.
     """
     slug = models.CharField(max_length=250, verbose_name=_('transliteration value'))
-    value = models.CharField(max_length=250, unique=True, verbose_name=_('area value'))
+    value = models.CharField(max_length=250, verbose_name=_('area value'))
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, related_name='area_region',
+                               verbose_name=_('area region'))
 
     class Meta:
         db_table = 'area'
         verbose_name = _('area')
         verbose_name_plural = _('area')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
@@ -64,14 +68,16 @@ class Location(models.Model):
     country = models.ForeignKey(Country, verbose_name=_('country'))
     region = models.ForeignKey(Region, verbose_name=_('region'))
     area = models.ForeignKey(Area, verbose_name=_('area'))
+    longitude = models.FloatField(verbose_name=_('location longitude'), blank=True, null=True)
+    latitude = models.FloatField(verbose_name=_('location latitude'), blank=True, null=True)
 
     class Meta:
         db_table = 'location'
         verbose_name = _('location')
         verbose_name_plural = _('locations')
 
-    def __unicode__(self):
-        return self.value
+    def __str__(self):
+        return '%s (%s %s)' % (self.value, str(self.region), str(self.area))
 
 
 class Category(MPTTModel):
@@ -83,10 +89,11 @@ class Category(MPTTModel):
     icon = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('category icon'))
     parent = TreeForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
                             verbose_name=_('category parent'))
+    is_for_user = models.BooleanField(default=False, verbose_name=_('user relation for post category'))
 
     class MPTTMeta:
         order_insertion_by = ['slug']
         verbose_name_plural = _('Categories')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value

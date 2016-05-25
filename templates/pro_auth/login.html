@@ -1,10 +1,23 @@
-{% extends "base.html" %}
+{% load i18n %}
 
-{% block content %}
-    <form method="post" action="/login/">
-        {{ csrf_input }}
-        {{ form }}
-        <button type="submit" class="btn btn-default">Submit</button>
-    </form>
-
-{% endblock %}
+<form method="post">
+    {% csrf_token %}
+    <div class="modal-body">
+        {% for error in form.non_field_errors %}
+            <p class="text-justify bg-danger">{{error}}</p>
+        {% endfor %}
+        {% for field in form %}
+            <div class="form-group">
+                <p class="text-left">{{ field.label }}</p>
+                {% for error in field.errors %}
+                    <p class="text-left text-danger">{{error}}</p>
+                {% endfor %}
+                {{ field }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
+        <button type="submit" class="btn btn-primary" id="login-conf-btn">{% trans 'Відправити' %}</button>
+    </div>
+</form>

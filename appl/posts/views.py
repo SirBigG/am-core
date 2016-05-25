@@ -6,6 +6,10 @@ from django.http import Http404
 
 from appl.posts.models import Post
 from appl.classifier.models import Category
+from appl.posts.serializers import ShortPostSerializer
+
+from rest_framework.generics import ListAPIView
+from rest_framework.pagination import PageNumberPagination
 
 
 class PostList(ListView):
@@ -60,3 +64,26 @@ class SiteMap(TemplateView):
         context['base'] = settings.HOST + '/'
         context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.all()]
         return context
+
+
+# #################### API views ##################### #
+
+class SmallPagesPagination(PageNumberPagination):
+    page_size = 10
+
+
+class ApiPostList(ListAPIView):
+    queryset = Post.objects.all().order_by('-id')
+    serializer_class = ShortPostSerializer
+    pagination_class = SmallPagesPagination
+
+
+class RandomListPaginator(PageNumberPagination):
+    page_size = 4
+
+
+class RandomApiPostList(ListAPIView):
+    """Returned five random post objects."""
+    queryset = Post.objects.all().order_by('?')
+    serializer_class = ShortPostSerializer
+    pagination_class = RandomListPaginator
