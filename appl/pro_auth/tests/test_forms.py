@@ -3,9 +3,9 @@ import os
 
 from django.test import TestCase
 
-from utils.tests.factories import LocationFactory
+from utils.tests.factories import LocationFactory, UserFactory
 
-from appl.pro_auth.forms import UserCreationForm
+from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm
 from appl.pro_auth.models import User
 
 from django.forms import ValidationError
@@ -75,3 +75,13 @@ class UserCreationFormTests(TestCase):
             del os.environ['RECAPTCHA_TESTING']
         except KeyError:
             pass
+
+
+class AdminUserChangeFormTest(TestCase):
+
+    def test_valid_form(self):
+        user = UserFactory()
+        data = {'email': user.email, 'date_joined': user.date_joined,
+                'location': user.location.pk, 'phone1': user.phone1}
+        form = AdminUserChangeForm(data=data, instance=user)
+        self.assertTrue(form.is_valid())
