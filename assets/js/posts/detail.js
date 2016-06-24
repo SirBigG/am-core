@@ -1,3 +1,4 @@
+import 'bootstrap';
 var $ = require('jquery');
 
 // Rendering random posts on detail page.

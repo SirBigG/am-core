@@ -22,11 +22,17 @@ var $ = require('jquery');
             data: $('form').serialize(),
             success: function(res){
                 // TODO: delete hard code from this block. Translation for button.
-                if(res === 'ok')
+                // TODO: need profile button creating
+                if(res.status === 'ok')
                 {
-                    $('#auth-btn').html('<li><a href="/logout/">' +
-                    '<button class="btn btn-primary navbar-btn">Вийти</button>' +
-                    '</a></li>');
+                    var user_url = "location.href='/user/" + res.user + "/'";
+                    $('#auth-btn').html(
+                        '<li>' +
+                        '<button onclick="' + user_url + '" ' +
+                        'class="btn btn-primary navbar-btn"> Особистий кабінет </button>' +
+                        '<button onclick="location.href=/logout/" class="btn btn-primary navbar-btn"> Вийти </button>' +
+                        '</li>'
+                    );
                     $('.login-modal-lg').modal('hide');
                 }
                 else {

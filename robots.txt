@@ -3,7 +3,7 @@ User-agent: *
 Disallow: /admin/
 Disallow: /rosetta/
 
-Disallow: /api
+Disallow: /user
 Disallow: /service/feedback
 
 Disallow: /register

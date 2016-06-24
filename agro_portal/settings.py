@@ -124,11 +124,17 @@ CACHES = {
     }
 }
 
+# ========================================================================================
+# Authentication settings
+# ========================================================================================
+
 # Project authentication model
 AUTH_USER_MODEL = 'pro_auth.User'
 
 # Project authentication backend
 AUTHENTICATION_BACKENDS = ['appl.pro_auth.backends.AuthBackend']
+
+# TODO: create login_url login_redirect_url
 
 # ========================================================================================
 # ReCaptcha settings

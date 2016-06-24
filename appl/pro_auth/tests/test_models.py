@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -43,6 +43,9 @@ class UserModelTests(TestCase):
     def test_email_user(self):
         # TODO: Add test
         pass
+
+    def test_get_absolute_url(self):
+        self.assertEqual(self.user.get_absolute_url(), '/user/%s/' % self.user.pk)
 
     def test_backend(self):
         self.assertEqual(self.user.backend,

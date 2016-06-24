@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.test import TestCase
 
@@ -28,8 +28,7 @@ class PhotoTests(TestCase):
         self.photo = PhotoFactory()
 
     def tearDown(self):
-        import os
-        os.remove('media/images/example.jpg')
+        self.photo.delete()
 
     def test_str_representation(self):
         self.assertEqual(str(self.photo), str(self.photo.id))
@@ -37,6 +36,16 @@ class PhotoTests(TestCase):
     def test_resize(self):
         self.assertEqual(self.photo.image.width, 1000)
         self.assertEqual(self.photo.image.height, 666)
+
+
+class PhotoDeleteTest(TestCase):
+    def test_file_after_object_delete(self):
+        photo = PhotoFactory()
+        path = photo.image.path
+        photo.delete()
+        import os
+        with self.assertRaises(FileNotFoundError):
+            os.remove(path)
 
 
 class CommentTests(TestCase):

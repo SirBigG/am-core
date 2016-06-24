@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import os
 
 from django.test import TestCase
 
 from utils.tests.factories import LocationFactory, UserFactory
 
-from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm
+from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm
 from appl.pro_auth.models import User
 
 from django.forms import ValidationError
@@ -85,3 +86,14 @@ class AdminUserChangeFormTest(TestCase):
                 'location': user.location.pk, 'phone1': user.phone1}
         form = AdminUserChangeForm(data=data, instance=user)
         self.assertTrue(form.is_valid())
+
+
+class UserChangeFormTest(TestCase):
+    def test_valid_form(self):
+        user = UserFactory(email='test@test.com')
+        data = {'email': 'newtest@test.com', 'location': user.location.pk,
+                'phone1': user.phone1}
+        form = UserChangeForm(data=data, instance=user)
+        self.assertTrue(form.is_valid())
+        form.save()
+        self.assertTrue(User.objects.get(email='newtest@test.com'))

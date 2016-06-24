@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
@@ -6,10 +6,13 @@ from django.http import Http404
 
 from appl.posts.models import Post
 from appl.classifier.models import Category
-from appl.posts.serializers import ShortPostSerializer
+from appl.posts.serializers import ShortPostSerializer, UserPostSerializer
+from appl.posts.permissions import UserPostPermissions
 
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
 
 class PostList(ListView):
@@ -25,13 +28,16 @@ class PostList(ListView):
         Get extra context for classifier to view.
         """
         context = super(PostList, self).get_context_data(**kwargs)
-        context['menu_items'] = Category.objects.get(slug=self.kwargs['parent']).get_children()
+        parent = Category.objects.get(slug=self.kwargs['parent'])
+        context['menu_items'] = parent.get_children()
+        title = Category.objects.get(slug=self.kwargs['child']).value if 'child' in self.kwargs else parent.value
+        context['title'] = title
         return context
 
     def get_queryset(self):
         try:
             r = Category.objects.get(slug=self.kwargs['parent']).get_children()
-            queryset = Post.objects.filter(rubric_id__in=r)
+            queryset = Post.objects.filter(rubric_id__in=r, status=1)
         except Category.DoesNotExist:
             raise Http404
         if 'child' in self.kwargs:
@@ -62,7 +68,7 @@ class SiteMap(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(SiteMap, self).get_context_data(**kwargs)
         context['base'] = settings.HOST + '/'
-        context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.all()]
+        context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.filter(status=1)]
         return context
 
 
@@ -73,7 +79,8 @@ class SmallPagesPagination(PageNumberPagination):
 
 
 class ApiPostList(ListAPIView):
-    queryset = Post.objects.all().order_by('-id')
+    """Returns all active posts."""
+    queryset = Post.objects.filter(status=1).order_by('-id')
     serializer_class = ShortPostSerializer
     pagination_class = SmallPagesPagination
 
@@ -84,6 +91,18 @@ class RandomListPaginator(PageNumberPagination):
 
 class RandomApiPostList(ListAPIView):
     """Returned five random post objects."""
-    queryset = Post.objects.all().order_by('?')
+    queryset = Post.objects.filter(status=1).order_by('?')
     serializer_class = ShortPostSerializer
     pagination_class = RandomListPaginator
+
+
+class UserPostsViewSet(ModelViewSet):
+    """Working just with user posts."""
+    serializer_class = UserPostSerializer
+    pagination_class = SmallPagesPagination
+    permission_classes = [UserPostPermissions, IsAuthenticated]
+
+    def get_queryset(self):
+        return Post.objects.filter(publisher=self.request.user)
+
+    # TODO: update create method for extra data using (slug, user)

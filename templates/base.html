@@ -2,12 +2,12 @@
 {% load static %}
 {% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
     <head>
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}{% endblock title %}Agro Mega</title>
+        <title>{% block title %}{% endblock title %} | AgroMega.in.ua</title>
 
         <!-- For extra meta tags -->
         {% block extra_meta %}
@@ -17,22 +17,15 @@
             <meta content="http://agromega.in.ua" property="og:url">
             <meta content="AgroMega.in.ua" property="og:site_name">
         {% endblock extra_meta %}
-
-
-
-        <!-- For bootstrap css connection -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-              integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
-        <!-- Include fa fa icons -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
-
         <!-- For extra scripts inclusion -->
         {% block extra_script %}{% endblock extra_script %}
 
     </head>
     <body oncopy="return false;" oncontextmenu="return false;">
         {% block header %}
-            {% include 'header.html' %}
+            <div class="container-fluid">
+                {% include 'header.html' %}
+            </div>
         {% endblock header %}
 
         {% block second_menu %}{% endblock %}
@@ -49,9 +42,6 @@
                 {% include 'footer.html' %}
             {% endblock footer %}
         </footer>
-
-        <link href="{% static 'css/footer.css' %}" rel="stylesheet"/>
-        <link href="{% static 'css/posts/list.css' %}" rel="stylesheet"/>
 
         <!-- Yandex.Metrika counter -->
         <script type="text/javascript">
@@ -82,7 +72,7 @@
         <noscript><div><img src="https://mc.yandex.ru/watch/36784110" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
         <!-- /Yandex.Metrika counter -->
 
-        <!-- For webpack loader inclusion scripts and scripts. -->
+        <!-- For webpack loader inclusion scripts. -->
         {% render_bundle 'main' %}
     </body>
 </html>

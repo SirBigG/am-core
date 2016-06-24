@@ -8,14 +8,16 @@ module.exports = {
     //the entry point we created earlier. Note that './' means
     //your current directory. You don't have to specify the extension  now,
     //because you will specify extensions later in the `resolve` section
-    entry: { main: './assets/js/index.js',
-             react: './assets/jsx/index.js',
-             detail: './assets/js/posts/detail.js'
+    entry: { main: './assets/index.js',
+             index: './assets/jsx/index.js',
+             detail: './assets/detail_index.js',
+             personal: './assets/jsx/personal_index.js'
     },
 
     output: {
         //where you want your compiled bundle to be stored
         path: path.resolve('./assets/bundles/'),
+        publicPath: '/static/bundles/',
         //naming convention webpack should use for your files
         filename: '[name]-[hash].js'
     },
@@ -45,14 +47,26 @@ module.exports = {
                     //specify that we will be dealing with React code
                     presets: ['react']
                 }
+            },
+            { test: /\.css$/, loader: "style-loader!css-loader"},
+            { test: /\.svg(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=image/svg+xml" },
+            { test: /\.ttf(\?v=\d+\.\d+\.\d+)?$/, loader: "url?limit=10000&mimetype=application/octet-stream" },
+            { test: /\.(woff|woff2)(\?v=\d+\.\d+\.\d+)?$/, loader:"url?prefix=static/&limit=5000" },
+            { test: /\.eot(\?v=\d+\.\d+\.\d+)?$/, loader: "file" },
+            { test: /\.png/, loader: 'url?prefix=static/&limit=5000'},
+            { test: /\.scss$/,
+                loaders: ["style", "css", "sass"]
             }
         ]
+    },
+    sassLoader: {
+        includePaths: [path.resolve(__dirname, "./assets/scss")]
     },
 
     resolve: {
         //tells webpack where to look for modules
         modulesDirectories: ['node_modules'],
         //extensions that should be used to resolve modules
-        extensions: ['', '.js', '.jsx']
+        extensions: ['', '.js', '.jsx', '.css', '.svg', '.ttf', '.woff', '.woff2', '.eot', '.png']
     }
-}
+};

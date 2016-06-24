@@ -1,15 +1,22 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
+
 import hashlib
 
 from django.views.generic import FormView, View
 from django.contrib.auth import login, logout
-from django.http import HttpResponseRedirect, HttpResponse, Http404
+from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
 from django.contrib.auth.forms import AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 
+
 from appl.pro_auth.forms import UserCreationForm
 from appl.pro_auth.models import User
+from appl.pro_auth.serializers import UserSerializer
+from appl.pro_auth.permissions import PersonalPermission
+
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.permissions import IsAuthenticated
 
 
 class RegisterView(FormView):
@@ -35,8 +42,10 @@ class Login(FormView):
     template_name = 'pro_auth/login.html'
 
     def form_valid(self, form):
-        login(self.request, form.get_user())
-        return HttpResponse('ok')
+        user = form.get_user()
+        login(self.request, user)
+        data = {'status': 'ok', 'user': user.pk}
+        return JsonResponse(data=data)
 
 
 class Logout(View):
@@ -63,3 +72,12 @@ class UserEmailConfirm(View):
             login(request, user)
             return HttpResponseRedirect('/')
         raise Http404
+
+
+# TODO: authentication required need
+# TODO: get method for update form creation
+# TODO: create tokenize authenticate or other for all api login required connections
+class UserViewSet(ModelViewSet):
+    serializer_class = UserSerializer
+    queryset = User.objects.all()
+    permission_classes = [IsAuthenticated, PersonalPermission]

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from __future__ import unicode_literals
 
 from django.db import models
@@ -19,9 +17,7 @@ WORK_STATUS = (
 
 
 class Post(models.Model):
-    """
-    Posts model.
-    """
+    """Posts model."""
     title = models.CharField(max_length=500, verbose_name=_('post title'))
     text = RichTextField(verbose_name=_('post text'))
     slug = models.CharField(max_length=250, unique=True, verbose_name=_('transliteration value'))
@@ -61,9 +57,7 @@ class Post(models.Model):
 
 
 class Photo(models.Model):
-    """
-    Post photos model.
-    """
+    """Post photos model."""
     image = models.ImageField(upload_to='images', verbose_name=_('image'))
     description = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('photo describing'))
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('post of photo'), related_name='photo')
@@ -79,6 +73,7 @@ class Photo(models.Model):
         return str(self.id)
 
     def save(self, *args, **kwargs):
+        """Cut image before save."""
         if self.image:
             from PIL import Image
             from io import BytesIO
@@ -90,11 +85,16 @@ class Photo(models.Model):
             self.image = File(output, self.image.name)
         super(Photo, self).save(*args, **kwargs)
 
+    def delete(self, using=None, keep_parents=False):
+        """Delete file of image after object deleting."""
+        path = self.image.path
+        super(Photo, self).delete(using=None, keep_parents=False)
+        import os
+        os.remove(path)
+
 
 class Comment(models.Model):
-    """
-    Post comments model.
-    """
+    """Post comments model."""
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('post of comment'))
     text = models.TextField(verbose_name=_('comment text'))
     date = models.DateTimeField(_('comment date'), default=timezone.now)

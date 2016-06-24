@@ -2,18 +2,22 @@
 
 {% load post_extras %}
 
+{% block title %}
+    {{ title }}
+{% endblock title %}
+
 {% block second_menu %}
     {% include 'posts/second_menu.html' %}
 {% endblock second_menu %}
 
 {% block content %}
-    <div class="col-xs-12 col-md-8">
+    <div class="col-sm-12 col-md-8">
         {% for group in object_list|group_by:2 %}
             <div class="row">
                 {% for obj in group %}
-                    <div class="col-xs-12 col-md-6">
+                    <div class="col-sm-12 col-md-6">
                      <div class="item_in_list">
-                        <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded " id="image-list-size">
+                        <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
                         <a href="{{ obj.get_absolute_url }}"><h2>{{ obj.title }}</h2></a>
                         <div class="text-justify">
                             {{ obj.text|safe|truncatechars:300 }}

@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 from appl.classifier.models import Location
 
@@ -94,7 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     )
     date_joined = models.DateTimeField(_('date joined'), default=timezone.now)
 
-    avatar = models.ImageField(upload_to='/uploads/avatars/', blank=True,
+    avatar = models.ImageField(upload_to='avatars', blank=True,
                                verbose_name=_('avatar'))
 
     objects = UserManager()
@@ -131,5 +132,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
+
+    def get_absolute_url(self):
+        """Returns absolute url to user room."""
+        return reverse('personal-index', kwargs={'pk': self.pk})
 
     backend = settings.AUTHENTICATION_BACKENDS

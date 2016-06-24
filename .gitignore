@@ -16,3 +16,4 @@ webpack-stats.json
 /bower_components/*
 settings_local.py
 Ukrainian_cities.xls
+npm-debug.log

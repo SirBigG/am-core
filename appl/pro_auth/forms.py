@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+from __future__ import unicode_literals
 
 from django import forms
 from django.contrib.auth import password_validation
@@ -95,3 +95,16 @@ class AdminUserChangeForm(forms.ModelForm):
         # This is done here, rather than on the field, because the
         # field does not have access to the initial value
         return self.initial["password"]
+
+
+class UserChangeForm(forms.ModelForm):
+    location = forms.ModelChoiceField(queryset=Location.objects.all(),
+                                      widget=autocomplete.ModelSelect2(url='location-autocomplete',
+                                                                       attrs={'class': 'form-control'}),
+                                      help_text=_("Please select city from list."),
+                                      label=_("City"))
+
+    class Meta:
+        model = User
+        fields = ('email', 'first_name', 'last_name', 'phone1', 'location',
+                  'birth_date', 'avatar',)
