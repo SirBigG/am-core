@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
+from appl.utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
     CategoryFactory
 
 

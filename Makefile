@@ -1,23 +1,24 @@
 MANAGE=manage.py
 SETTINGS=agro_portal.settings
+DEV_SETTINGS=agro_portal.dev
 
-deploy: update webpack test migrate collectstatic compilemessages
+deploy: pull update webpack test migrate static compilemessages
 
 update:
 	pip install -r requirements.txt
-	npm install
+	cd assets && npm install
 
 test:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test
-	flake8 --exclude '*migrations*' appl utils
+	flake8 --exclude '*migrations*' appl
 
 migrate:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) migrate
 
-collectstatic:
+static:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) collectstatic
 
-makemessages:
+messages:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) makemessages -l uk --ignore=env/*
 
 compilemessages:
@@ -27,14 +28,17 @@ runserver:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver
 
 webpack:
-	webpack
+	cd assets && webpack
 
 dev:
-	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver --settings=agro_portal.dev
+	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(DEV_SETTINGS) ./$(MANAGE) runserver
 
 coverage:
 	coverage run manage.py test
-	coverage report -m --include=appl/*,utils/* --omit=appl/*/tests/*
+	coverage report -m --include=appl/*
+
+pull:
+	git pull origin master
 
 reload:
 	uwsgi --reload /home/agr/golub_portal/agro_portal/tmp/project-master.pid

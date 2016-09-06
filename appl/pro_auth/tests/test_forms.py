@@ -4,7 +4,7 @@ import os
 
 from django.test import TestCase
 
-from utils.tests.factories import LocationFactory, UserFactory
+from appl.utils.tests.factories import LocationFactory, UserFactory
 
 from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm
 from appl.pro_auth.models import User

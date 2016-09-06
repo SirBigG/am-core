@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from dal import autocomplete
 
-from appl.classifier.models import Location
-from appl.classifier.serializers import LocationSerializer
+from appl.classifier.models import Location, Category
+from appl.classifier.serializers import LocationSerializer, CategorySerializer
 
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -34,3 +34,16 @@ class LocationListView(ListAPIView):
         if loc:
             qs = qs.filter(value__istartswith=loc)
         return qs
+
+
+class CategoryListView(ListAPIView):
+    """Returns categories list. Not paginated response.
+       Filters: level - level in tree"""
+    serializer_class = CategorySerializer
+
+    def get_queryset(self):
+        q = Category.objects.all()
+        level = self.request.query_params.get('level', None)
+        if level:
+            q = q.filter(level=level)
+        return q

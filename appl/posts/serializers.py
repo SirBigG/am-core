@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from rest_framework import serializers
 
 from appl.posts.models import Post, Photo
@@ -10,17 +12,14 @@ class AbsoluteUrlMixin(object):
 
 
 class PhotoSerializer(serializers.ModelSerializer):
-    url = serializers.SerializerMethodField('get_image_url')
     description = serializers.CharField(required=False)
     author = serializers.CharField(required=False)
     source = serializers.CharField(required=False)
-
-    def get_image_url(self, instance):
-        return instance.image.url
+    image = serializers.ImageField()
 
     class Meta:
         model = Photo
-        fields = ('url', 'description', 'author', 'source',)
+        fields = ('description', 'author', 'source', 'image')
 
 
 class PostSerializer(serializers.ModelSerializer):
@@ -49,6 +48,7 @@ class ShortPostSerializer(AbsoluteUrlMixin, serializers.ModelSerializer):
 
 
 class CategoryPKRelatedField(serializers.RelatedField):
+    # TODO: changing null error message to required
     def to_internal_value(self, data):
         return self.get_queryset().get(pk=data)
 
@@ -56,20 +56,32 @@ class CategoryPKRelatedField(serializers.RelatedField):
         return {'pk': value.pk, 'value': str(value)}
 
 
-# TODO: automatic slug field if object created
 class UserPostSerializer(AbsoluteUrlMixin, serializers.ModelSerializer):
     """Serializer for user post view set.
        By default created with inactive status."""
     title = serializers.CharField(max_length=500)
     text = serializers.CharField()
-    author = serializers.CharField(max_length=250, required=False)
     source = serializers.CharField(max_length=250, required=False)
     status = serializers.BooleanField(default=0)
-    photo = PhotoSerializer(source='photo.first')
     url = serializers.SerializerMethodField('get_abs_url')
-    rubric = CategoryPKRelatedField(queryset=Category.objects.all())
+    rubric = CategoryPKRelatedField(queryset=Category.objects.filter(level=1))
+    photo = PhotoSerializer(source='photo.first', read_only=True)
+    photos = serializers.ListField(child=serializers.ImageField(), required=False, allow_empty=False)
 
     class Meta:
         model = Post
-        fields = ('title', 'text', 'author', 'source',
-                  'status', 'photo', 'rubric', 'url', 'publisher')
+        fields = ('title', 'text', 'source',
+                  'status', 'rubric', 'url', 'photos', 'photo',)
+
+    def create(self, validated_data):
+        """For related objects created."""
+        photos = validated_data.pop('photos')
+        rubric = validated_data.pop('rubric')
+        user_rubric, created = Category.objects.get_or_create(defaults={"slug": "%s-user" % rubric.slug},
+                                                              **{"parent": rubric,
+                                                                 "value": "Статті користувачів"})
+        validated_data.update({'rubric': user_rubric})
+        post = Post.objects.create(**validated_data)
+        for image in photos:
+            Photo.objects.create(image=image, post=post)
+        return post

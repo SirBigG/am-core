@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from appl.classifier.models import Location
+from appl.classifier.models import Location, Category
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -12,3 +12,9 @@ class LocationSerializer(serializers.ModelSerializer):
 
     def get_location_value(self, instance):
         return str(instance)
+
+
+class CategorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Category
+        fields = ('pk', 'value')

@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
 from django.http import Http404
+from django.utils.translation import get_language
 
 from appl.posts.models import Post
 from appl.classifier.models import Category
@@ -13,6 +14,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+
+from transliterate import slugify
 
 
 class PostList(ListView):
@@ -105,4 +108,8 @@ class UserPostsViewSet(ModelViewSet):
     def get_queryset(self):
         return Post.objects.filter(publisher=self.request.user)
 
-    # TODO: update create method for extra data using (slug, user)
+    def perform_create(self, serializer):
+        """Adding some extra data to created object."""
+        _lang = get_language()[:2]
+        slug = slugify(self.request.data.get('title'), _lang)
+        serializer.save(publisher=self.request.user, slug=slug)

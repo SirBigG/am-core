@@ -4,6 +4,7 @@ import React from 'react'
 import { render } from 'react-dom'
 
 import UserUpdateForm from './UserUpdateForm';
+import UserPostForm from './UserPostForm';
 import PostList from '../components/PostList'
 import NotFound from '../components/NotFound'
 
@@ -22,6 +23,11 @@ const App = React.createClass({
                         <li role="presentation">
                             <a href={"/user/" + this.props.params.user_id + "/update"}>
                                 <i className="fa fa-pencil fo-3x" aria-hidden="true"> Змінити дані</i>
+                            </a>
+                        </li>
+                        <li role="presentation">
+                            <a href={"/user/" + this.props.params.user_id + "/post/create"}>
+                                <i className="fa fa-newspaper-o fo-3x" aria-hidden="true"> Додати статтю</i>
                             </a>
                         </li>
                     </ul>
@@ -50,6 +56,7 @@ render((
     <Route path="/user/:user_id/" component={App}>
         <IndexRoute component={PersonalIndex} />
         <Route path="update" component={UserUpdateForm}/>
+        <Route path="post/create" component={UserPostForm}/>
         <Route path="*" component={NotFound} />
     </Route>
   </Router>

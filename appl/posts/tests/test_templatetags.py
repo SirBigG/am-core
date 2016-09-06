@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from utils.tests.factories import PostFactory, CategoryFactory
+from appl.utils.tests.factories import PostFactory, CategoryFactory
 
 from appl.posts.templatetags.post_extras import posts_list, main_menu, \
     full_url, group_by, grouped, times

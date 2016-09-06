@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from utils.tests.factories import UserFactory
+from appl.utils.tests.factories import UserFactory
 
 from appl.pro_auth.models import User
 

@@ -7,7 +7,7 @@ from django.test import TestCase, Client
 from django.contrib.auth.forms import AuthenticationForm
 from django.conf import settings
 
-from utils.tests.factories import UserFactory, LocationFactory
+from appl.utils.tests.factories import UserFactory, LocationFactory
 
 from appl.pro_auth.forms import UserCreationForm
 from appl.pro_auth.models import User

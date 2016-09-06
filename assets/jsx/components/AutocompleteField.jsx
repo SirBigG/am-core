@@ -15,10 +15,10 @@ var ulStyle = {
 var AutocompleteField = React.createClass({
     mixins: [FieldErrorsMixin],
     getInitialState() {
-        return {data: [], next: "", value: "", scrollData: [], options: [], selectClass: ' hidden'};
+        return {data: [], next: "", value: "", scrollData: [], options: [], selectClass: ' hidden', defValue: ""};
     },
     componentWillReceiveProps(newProps) {
-        this.setState({value: newProps.value.value});
+        this.setState({value: newProps.valueDefault.value, defValue:newProps.valueDefault.pk});
     },
     onChange(event) {
         this.setState({value: event.target.value});
@@ -48,12 +48,12 @@ var AutocompleteField = React.createClass({
     },
     componentWillMount() {
         $.ajax({
-            url: this.props.url,
-            cache: false,
-            success: function (data) {
-                this.setState({data: data.results, next: data.next});
-                this.createOptions(this.state.data)
-            }.bind(this)
+                url: this.props.url,
+                cache: false,
+                success: function (data) {
+                    this.setState({data: data.results, next: data.next});
+                    this.createOptions(this.state.data)
+                }.bind(this)
         });
         this.delayCallback = _.debounce(() => {
             var url = this.props.url + '?loc=' + this.state.value;
@@ -65,8 +65,7 @@ var AutocompleteField = React.createClass({
                     this.state.options = [];
                     this.createOptions(this.state.data)
                 }.bind(this)
-            })
-        }, 1000);
+            })}, 1000);
     },
     createOptions(data){
         return (data.map((item) => {
@@ -101,7 +100,8 @@ var AutocompleteField = React.createClass({
                     role="menu"
                     style={ulStyle}
                     size="5"
-                    onScroll={this.onScroll}>
+                    onScroll={this.onScroll}
+                    value={this.state.defValue}>
                     {this.state.options}
                 </select>
             </div>

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from utils.tests.factories import FeedbackFactory
+from appl.utils.tests.factories import FeedbackFactory
 
 
 class FeedbackModelTest(TestCase):

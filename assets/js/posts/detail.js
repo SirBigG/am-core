@@ -11,7 +11,7 @@ var $ = require('jquery');
             success: function(response){
                 var elements = $.map(response.results, function(post){
                      return '<div class="col-xs-6 col-md-3"><div class="item_in_list">' +
-                            '<img src=' + post.photo.url + ' class="img-rounded img-responsive" id="image-detail-list"/>' +
+                            '<img src=' + post.photo.image + ' class="img-rounded img-responsive" id="image-detail-list"/>' +
                             '<a href=' + post.url + '><h5 class="text-center">' + post.title + '</h5></a></div></div>' ;
                 });
                 $('#random-post-list').html(elements);

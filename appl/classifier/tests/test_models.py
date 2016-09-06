@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.test import TestCase
 
-from utils.tests.factories import LocationFactory, CountryFactory, \
+from appl.utils.tests.factories import LocationFactory, CountryFactory, \
     RegionFactory, AreaFactory, CategoryFactory
 
 from appl.classifier.models import Location

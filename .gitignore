@@ -9,7 +9,7 @@ env/
 /static/*
 *~
 *.*~
-/node_modules/*
+/assets/node_modules/*
 /assets/bundles/*
 webpack-stats.json
 /media/*

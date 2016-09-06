@@ -30,7 +30,7 @@ const ImageUploadField = React.createClass ({
                          onChange={this.props.onChange}
                          className="hidden"
                          name={this.props.name} />
-                   Додати фото
+                  <i className="fa fa-plus-circle fo-3x" aria-hidden="true"> Додати фото</i>
               </label>
               {errors}
               <div className="imgPreview">

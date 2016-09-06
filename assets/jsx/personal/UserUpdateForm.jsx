@@ -8,6 +8,8 @@ import GetCookieMixin from '../mixins/GetCookieMixin';
 import FieldChangeHandlersMixin from '../mixins/FieldChangeHandlersMixin';
 
 
+const fieldClass = "form-control";
+
 var UserUpdateForm = React.createClass({
     mixins: [GetCookieMixin, FieldChangeHandlersMixin],
     getInitialState() {
@@ -62,48 +64,48 @@ var UserUpdateForm = React.createClass({
                             value={this.state.data.email}
                             name="email"
                             label="Email"
-                            class="form-control"
+                            class={fieldClass}
                             errors={this.state.errors.email}
                             onChange={this.handleTextChange.bind(this, 'email')}/>
                 <InputField type="char"
                             value={this.state.data.first_name}
                             name="first_name"
                             label="Ім’я"
-                            class="form-control" 
+                            class={fieldClass} 
                             errors={this.state.errors.first_name}
                             onChange={this.handleTextChange.bind(this, 'first_name')}/>
                 <InputField type="char"
                             value={this.state.data.last_name}
                             name="last_name"
                             label="Прізвище"
-                            class="form-control" 
+                            class={fieldClass}
                             errors={this.state.errors.last_name}
                             onChange={this.handleTextChange.bind(this, 'last_name')}/>
                 <DatePickerField value={this.state.data.birth_date}
                                  name="birth_date"
                                  label="Дата народження"
-                                 class="form-control"
+                                 class={fieldClass}
                                  errors={this.state.errors.birth_date}
                                  onChange={this.handleTextChange.bind(this, 'birth_date')}/>
                 <InputField type="char"
                             value={this.state.data.phone1}
                             name="phone1"
                             label="Телефон"
-                            class="form-control"
+                            class={fieldClass}
                             errors={this.state.errors.phone1}
                             onChange={this.handleTextChange.bind(this, 'phone1')}/>
                 <InputField type="char"
                             value={this.state.data.phone2}
                             name="phone2"
                             label="Інший телефон"
-                            class="form-control" 
+                            class={fieldClass}
                             errors={this.state.errors.phone2} 
                             onChange={this.handleTextChange.bind(this, 'phone2')}/>
                 <AutocompleteField url="/api/locations/" 
-                                   value={this.state.data.location} 
+                                   valueDefault={this.state.data.location} 
                                    name="location" 
                                    label="Місце" 
-                                   class="form-control"
+                                   class={fieldClass}
                                    errors={this.state.errors.location}/>
                 <ImageUploadField name="avatar"
                                   image_url={this.state.data.avatar_url}

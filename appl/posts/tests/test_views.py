@@ -2,14 +2,16 @@ from __future__ import unicode_literals
 
 from django.test import TestCase, Client, RequestFactory
 
-from utils.tests.factories import PostFactory, CategoryFactory, PhotoFactory, \
+from appl.utils.tests.factories import PostFactory, CategoryFactory, PhotoFactory, \
     UserFactory
+from appl.utils.tests.utils import make_image
 
 from factory import build_batch
 
 from rest_framework.test import APITestCase, APIClient
 
-from appl.posts.models import Photo
+from appl.posts.models import Photo, Post
+from appl.classifier.models import Category
 
 api_client = APIClient()
 
@@ -70,17 +72,23 @@ class PostListTests(TestCase):
         build_batch(PostFactory, 21, rubric=self.category)
         response = client.get('/' + self.parent.slug + '/')
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'posts/list.html')
+        self.assertTemplateUsed(response, 'helpers/pagination.html')
         self.assertTrue(response.context['page_obj'].has_next())
         self.assertFalse(response.context['page_obj'].has_previous())
         self.assertEqual(response.context['page_obj'].next_page_number(), 2)
         self.assertEqual(response.context['page_obj'].number, 1)
         self.assertEqual(response.context['paginator'].num_pages, 2)
+        self.assertIn(b'pagination', response.content)
         response = client.get('/' + self.parent.slug + '/?page=2')
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'posts/list.html')
+        self.assertTemplateUsed(response, 'helpers/pagination.html')
         self.assertFalse(response.context['page_obj'].has_next())
         self.assertTrue(response.context['page_obj'].has_previous())
         self.assertEqual(response.context['page_obj'].previous_page_number(), 1)
         self.assertEqual(response.context['page_obj'].number, 2)
+        self.assertIn(b'pagination', response.content)
 
 
 class PostDetailTests(TestCase):
@@ -186,6 +194,7 @@ class UserPostsViewSetTests(APITestCase):
         self.assertEqual(response.status_code, 403)
 
     def test_detail_post(self):
+        PhotoFactory(post=self.post)
         api_client.login(email=self.user.email, password='12345')
         response = api_client.get('/posts/user/%s/' % self.post.pk)
         self.assertEqual(response.status_code, 200)
@@ -194,17 +203,21 @@ class UserPostsViewSetTests(APITestCase):
         self.assertIn('photo', response.data)
         self.assertTrue(response.data['status'])
 
-    # TODO: create this test
-    # TODO: more tests for view set
-    """
     def test_creating_post_by_user(self):
-        rubric = CategoryFactory()
+        root = CategoryFactory()
+        parent = CategoryFactory(parent=root, slug='pigeon')
         api_client.login(email=self.user.email, password='12345')
-        response = api_client.post('/posts/user/', data={'title': 'title', 'text': 'text',
-                                                         'photo': 'photo', 'rubric': rubric.pk,
-                                                         'publisher': self.user.pk})
+        response = api_client.post('/posts/user/', data=dict(title=u'тайтл',
+                                                             text='text',
+                                                             photos=[make_image(), make_image()],
+                                                             rubric=parent.pk))
         self.assertEqual(response.status_code, 201)
         self.assertEqual(Post.objects.filter(publisher=self.user).count(), 2)
-        # response = client.get(response.data['url'])
-        # self.assertEqual(response.status_code, 200)
-    """
+        self.assertEqual(Post.objects.get(title=u'тайтл').slug, 'tajtl')
+        self.assertEqual(Post.objects.get(title=u'тайтл').status, 0)
+        self.assertEqual(Photo.objects.count(), 2)
+        # Test creating user category for parent
+        self.assertTrue(Category.objects.get(slug="pigeon-user"))
+        # Test returns url for created post
+        response = client.get(response.data['url'])
+        self.assertEqual(response.status_code, 200)
