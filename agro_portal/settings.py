@@ -25,11 +25,17 @@ SECRET_KEY = 'v$rhqt_l$w55_wg4yz6yz&$#g@7$7_im0=r&$*dcx=8ei#)%yq'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-HOST = 'http://agromega.in.ua'
+HOST = 'https://agromega.in.ua'
 
 ALLOWED_HOSTS = ['.agromega.in.ua']
 
 WSGI_APPLICATION = 'agro_portal.wsgi.application'
+
+# https settings
+#SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+#SECURE_SSL_REDIRECT = True
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
 # Application definition
 
 INSTALLED_APPS = [
