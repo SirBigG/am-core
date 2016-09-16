@@ -3,9 +3,9 @@
 {% load i18n %}
 {% load render_bundle from webpack_loader %}
 
-{% block content %}
+{% block base_content_block %}
     {# React profile App block #}
     <div id="root"></div>
 
     {% render_bundle 'personal' %}
-{% endblock content %}
+{% endblock base_content_block %}

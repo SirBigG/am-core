@@ -11,24 +11,18 @@
 {% endblock second_menu %}
 
 {% block content %}
-    <div class="col-sm-12 col-md-8">
-        {% for group in object_list|group_by:2 %}
-            <div class="row">
-                {% for obj in group %}
-                    <div class="col-sm-12 col-md-6">
-                     <div class="item_in_list">
-                        <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
-                        <a href="{{ obj.get_absolute_url }}"><h2>{{ obj.title }}</h2></a>
-                        <div class="text-justify">
-                            {{ obj.text|safe|truncatechars:300 }}
-                        </div>
-                     </div>
+    {% for group in object_list|group_by:2 %}
+        <div class="row">
+            {% for obj in group %}
+                <div class="col-sm-12 col-md-6">
+                    <div class="item_in_list"><img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size"><a href="{{ obj.get_absolute_url }}"><h2>{{ obj.title }}</h2></a><div class="text-justify">
+                        {{ obj.text|safe|truncatechars:300 }}
                     </div>
-                {% endfor %}
-            </div>
-        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
 
-        {% include "helpers/pagination.html" %}
-
-    </div>
+    {% include "helpers/pagination.html" %}
 {% endblock content %}

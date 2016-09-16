@@ -31,7 +31,22 @@
         {% block second_menu %}{% endblock %}
 
         <div class="container">
-            {% block content %}{% endblock content %}
+            {% block base_content_block %}
+                <div class="row">
+                    <div class="col-sm-12 col-md-8">
+                        {% block content %}{% endblock content %}
+                    </div>
+                    <div class="col-md-4">
+                        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                            <!-- agro_ad -->
+                            <ins class="adsbygoogle"
+                                 style="display:inline-block;width:300px;height:600px"
+                                 data-ad-client="ca-pub-4522526101011449"
+                                 data-ad-slot="4846518412"></ins>
+                        <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+                    </div>
+                </div>
+            {% endblock base_content_block %}
         </div>
 
         {% block extra_body %}{% endblock extra_body %}
