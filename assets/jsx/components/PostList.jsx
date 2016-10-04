@@ -6,20 +6,41 @@ import ListPostItem from './ListPostItem'
 
 const PostList = React.createClass({
 
-
     getInitialState() {
-        return {data: []};
+        return {data: [], previous: "", next: "", url: ""};
     },
-    
+    componentWillReceiveProps(newProps) {
+        this.setState({url: newProps.url});
+    },
     componentDidMount() {
+        if (this.state.url){
+            this.fetchData(this.state.url)
+        } else {
+            this.fetchData(this.props.url)
+        }
+    },
+    fetchData(url){
         $.ajax({
-            url: this.props.url,
+            url: url,
             datatype: 'json',
             cache: false,
             success: function(data) {
-                this.setState({data: orderBy(data.results, 2)});
+                if (data.results){
+                    this.setState({data: orderBy(data.results, 2), previous: data.previous,
+                    next: data.next});
+                }
             }.bind(this)
         })
+    },
+    onNext(e){
+        e.preventDefault();
+        this.setState({url: this.state.next});
+        this.fetchData(this.state.next)
+    },
+    onPrevious(e){
+        e.preventDefault();
+        this.setState({url: this.state.previous});
+        this.fetchData(this.state.previous)
     },
     render() {
         var postNodes = this.state.data.map((group, i) => {
@@ -27,9 +48,24 @@ const PostList = React.createClass({
                       <ListPostItem group={group} grid_class={this.props.grid} />
                    </div>)
         });
+        if(this.state.previous){
+            var previous = <button aria-label="Previous" type="submit"
+                                       className="btn btn-success btn-sm" onClick={this.onPrevious}>
+                <span aria-hidden="true">&laquo; Попередня</span></button>
+        }
+        if(this.state.next){
+            var next = <button type="submit" className="btn btn-success btn-sm"
+                                   onClick={this.onNext} aria-label="Next">
+                <span aria-hidden="true">Наступна &raquo;</span></button>
+        }
         return (
-            <div id="items">
-                {postNodes}
+            <div>
+                <div id="items">
+                    {postNodes}
+                </div>
+                <div className="text-center">
+                    {previous}   {next}
+                </div>
             </div>
         )
     }
