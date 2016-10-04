@@ -2,11 +2,11 @@ MANAGE=manage.py
 SETTINGS=agro_portal.settings
 DEV_SETTINGS=agro_portal.dev
 
-deploy: pull update webpack test migrate static compilemessages
+deploy: pull update webpack test migrate statics compilemessages
 
 update:
 	pip install -r requirements.txt
-	cd assets && npm install
+	cd assets && npm install --no-optional
 
 test:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test
@@ -15,8 +15,8 @@ test:
 migrate:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) migrate
 
-static:
-	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) collectstatic
+statics:
+	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) collectstatic --noinput
 
 messages:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) makemessages -l uk --ignore=env/*

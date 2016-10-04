@@ -21,7 +21,7 @@ class PostExtrasTests(TestCase):
 
     def test_full_url(self):
         url = '/foo/asd.html'
-        self.assertEqual(full_url(url), 'http://agromega.in.ua/foo/asd.html')
+        self.assertEqual(full_url(url), 'https://agromega.in.ua/foo/asd.html')
 
     def test_grouped(self):
         l = [1, 2, 3, 4]
