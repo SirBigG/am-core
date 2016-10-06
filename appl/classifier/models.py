@@ -5,6 +5,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from mptt.models import MPTTModel, TreeForeignKey
 
+from appl.services.models import MetaData
+
 
 class Country(models.Model):
     """
@@ -90,6 +92,10 @@ class Category(MPTTModel):
     parent = TreeForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
                             verbose_name=_('category parent'))
     is_for_user = models.BooleanField(default=False, verbose_name=_('user relation for post category'))
+    is_active = models.BooleanField(default=True, verbose_name=_('for feel on off'))
+
+    meta = models.OneToOneField(MetaData, on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name=_('category meta data'), related_name='category-meta-data+')
 
     class MPTTMeta:
         order_insertion_by = ['slug']

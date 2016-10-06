@@ -8,7 +8,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>{% block title %}{% endblock title %} AgroMega.in.ua</title>
-
+        <meta name="description" content={% block meta_description %}{% endblock %}>
         <!-- For extra meta tags -->
         {% block extra_meta %}
             <meta content="{% trans 'Текст головного мета тега.' %}" property="og:title">

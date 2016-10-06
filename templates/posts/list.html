@@ -3,14 +3,22 @@
 {% load post_extras %}
 
 {% block title %}
-    {{ title }} |
+    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }} |{% endif %}
 {% endblock title %}
+
+{% block meta_description %}
+    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}
+{% endblock %}
+
 
 {% block second_menu %}
     {% include 'posts/second_menu.html' %}
 {% endblock second_menu %}
 
 {% block content %}
+    <div class="list-h1">
+        {% if category.meta and category.meta.h1 %}<h1>{{ category.meta.h1 }}</h1>{% endif %}
+    </div>
     {% for group in object_list|group_by:2 %}
         <div class="row">
             {% for obj in group %}

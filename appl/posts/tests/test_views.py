@@ -3,8 +3,8 @@ from __future__ import unicode_literals
 from django.test import TestCase, Client, RequestFactory
 
 from appl.utils.tests.factories import PostFactory, CategoryFactory, PhotoFactory, \
-    UserFactory
-from appl.utils.tests.utils import make_image
+    UserFactory, MetaDataFactory
+from appl.utils.tests.utils import make_image, HtmlTestCaseMixin
 
 from factory import build_batch
 
@@ -27,7 +27,7 @@ class MainPageTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class PostListTests(TestCase):
+class PostListTests(HtmlTestCaseMixin, TestCase):
 
     def setUp(self):
         self.parent = CategoryFactory()
@@ -45,7 +45,7 @@ class PostListTests(TestCase):
         PostFactory(rubric=self.post.rubric, status=0)
         response = client.get('/' + self.parent.slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
-        self.assertEqual(response.context['title'], self.parent.value)
+        self.assertEqual(response.context['category'], self.parent)
 
     def test_parent_list_404(self):
         response = client.get('/unknown/')
@@ -62,7 +62,7 @@ class PostListTests(TestCase):
         response = client.get('/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(len(response.context['menu_items']), 1)
-        self.assertEqual(response.context['title'], self.post.rubric.value)
+        self.assertEqual(response.context['category'], self.post.rubric)
 
     def test_child_list_404(self):
         response = client.get('/' + self.parent.slug + '/unknown/')
@@ -90,8 +90,18 @@ class PostListTests(TestCase):
         self.assertEqual(response.context['page_obj'].number, 2)
         self.assertIn(b'pagination', response.content)
 
+    def test_meta_data(self):
+        meta = MetaDataFactory()
+        self.parent.meta = meta
+        self.parent.save()
+        response = client.get('/' + self.parent.slug + '/')
+        self.assertEqual(response.status_code, 200)
+        self.assertMetaDataIn(response.content)
+        self.assertH1(response.content)
+        self.assertClassIn('list-h1', response.content)
 
-class PostDetailTests(TestCase):
+
+class PostDetailTests(HtmlTestCaseMixin, TestCase):
 
     def setUp(self):
         self.parent = CategoryFactory()
@@ -105,6 +115,12 @@ class PostDetailTests(TestCase):
         self.assertTemplateUsed(response, 'posts/detail.html')
         self.assertIn('object', response.context)
         self.assertEqual(len(response.context['menu_items']), 1)
+
+    def test_meta_data(self):
+        response = client.get(self.post.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        self.assertMetaDataIn(response.content)
+        self.assertH1(response.content)
 
 
 class SiteMapTests(TestCase):

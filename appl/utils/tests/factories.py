@@ -6,7 +6,7 @@ from appl.pro_auth.models import User
 from appl.classifier.models import Location, Country, Region, \
     Area, Category
 from appl.posts.models import Post, Photo, Comment
-from appl.services.models import Feedback
+from appl.services.models import Feedback, MetaData
 
 from django.contrib.auth.hashers import make_password
 
@@ -51,9 +51,7 @@ class RegionFactory(BaseFactory):
 
 
 class AreaFactory(BaseFactory):
-    """
-    Creating area.
-    """
+    """Creating area."""
     class Meta:
         model = Area
 
@@ -63,9 +61,7 @@ class AreaFactory(BaseFactory):
 
 
 class LocationFactory(BaseFactory):
-    """
-    Creating locations.
-    """
+    """Creating locations."""
     class Meta:
         model = Location
 
@@ -77,9 +73,7 @@ class LocationFactory(BaseFactory):
 
 
 class CategoryFactory(BaseFactory):
-    """
-    Creating post categories.
-    """
+    """Creating post categories."""
     class Meta:
         model = Category
 
@@ -91,9 +85,7 @@ class CategoryFactory(BaseFactory):
 
 
 class UserFactory(BaseFactory):
-    """
-    Custom user modal factory.
-    """
+    """Custom user modal factory."""
     class Meta:
         model = User
 
@@ -108,9 +100,7 @@ class UserFactory(BaseFactory):
 
 
 class StaffUserFactory(UserFactory):
-    """
-    Creating users with staff privileges.
-    """
+    """Creating users with staff privileges."""
     is_staff = True
 
 
@@ -118,9 +108,7 @@ class StaffUserFactory(UserFactory):
 
 
 class PostFactory(BaseFactory):
-    """
-    Creation posts.
-    """
+    """Creation posts."""
     class Meta:
         model = Post
 
@@ -132,9 +120,7 @@ class PostFactory(BaseFactory):
 
 
 class PhotoFactory(BaseFactory):
-    """
-    Creation photos for posts.
-    """
+    """Creation photos for posts."""
     class Meta:
         model = Photo
 
@@ -143,9 +129,7 @@ class PhotoFactory(BaseFactory):
 
 
 class CommentFactory(BaseFactory):
-    """
-    Creation comments for posts.
-    """
+    """Creation comments for posts."""
     class Meta:
         model = Comment
 
@@ -154,16 +138,23 @@ class CommentFactory(BaseFactory):
     user = factory.SubFactory(UserFactory)
 
 
-# ##################   Feedback factories     ####################### #
+# ##################   Services factories     ####################### #
 
 
 class FeedbackFactory(BaseFactory):
-    """
-    Creation feedbacks.
-    """
+    """Creation feedbacks."""
     class Meta:
         model = Feedback
 
     title = 'Feedback topic'
     email = 'test@test.com'
     text = 'Feedback text'
+
+
+class MetaDataFactory(BaseFactory):
+    class Meta:
+        model = MetaData
+
+    title = 'title'
+    description = 'description'
+    h1 = 'h1'

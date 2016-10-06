@@ -7,6 +7,7 @@ from django.utils import timezone
 from appl.pro_auth.models import User
 
 from appl.classifier.models import Category
+from appl.services.models import MetaData
 
 from ckeditor.fields import RichTextField
 
@@ -37,6 +38,9 @@ class Post(models.Model):
     rubric = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('post category'))
 
     meta_description = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('meta description'))
+
+    meta = models.OneToOneField(MetaData, on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name=_('post meta data'), related_name="post-meta-data+")
 
     class Meta:
         db_table = 'post'

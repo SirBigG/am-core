@@ -170,6 +170,7 @@ MODELTRANSLATION_DEFAULT_LANGUAGE = 'uk'
 MODELTRANSLATION_TRANSLATION_FILES = (
     'appl.classifier.translation',
     'appl.posts.translation',
+    'appl.services.translation',
 )
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]

@@ -11,8 +11,23 @@ class Feedback(models.Model):
 
     class Meta:
         db_table = 'feedback'
-        verbose_name = 'Feedback'
-        verbose_name_plural = 'Feedbacks'
+        verbose_name = _('Feedback')
+        verbose_name_plural = _('Feedbacks')
+
+    def __str__(self):
+        return self.title
+
+
+class MetaData(models.Model):
+    """Stores meta data for seo optimizing."""
+    title = models.CharField(max_length=255, verbose_name=_('meta title'))
+    description = models.CharField(max_length=255, verbose_name=_('meta description'))
+    h1 = models.CharField(max_length=255, verbose_name=_('meta_description'), blank=True, null=True)
+
+    class Meta:
+        db_table = 'metadata'
+        verbose_name = _('meta data')
+        verbose_name_plural = _('meta data')
 
     def __str__(self):
         return self.title
