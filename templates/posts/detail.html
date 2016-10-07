@@ -9,7 +9,7 @@
 {% endblock title %}
 
 {% block meta_description %}
-    {% if object.meta %}{{ object.meta.description }}{% else %}{{ object.text|truncatechars:300|striptags }}{% endif %}
+    {% if object.meta %}{{ object.meta.description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}
 {% endblock %}
 
 {% block extra_meta %}
@@ -18,7 +18,7 @@
     <meta content="{% if object.meta_description %}
                         {{ object.meta_description }}
                    {% else %}
-                        {{ object.text|truncatechars:300|striptags }}
+                        {{ object.text|truncatechars:300|striptags|safe }}
                    {% endif %}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
