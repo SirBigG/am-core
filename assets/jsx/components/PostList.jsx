@@ -20,17 +20,21 @@ const PostList = React.createClass({
         }
     },
     fetchData(url){
-        $.ajax({
-            url: url,
-            datatype: 'json',
-            cache: false,
-            success: function(data) {
-                if (data.results){
-                    this.setState({data: orderBy(data.results, 2), previous: data.previous,
-                    next: data.next});
-                }
-            }.bind(this)
-        })
+        fetch(url,
+            {
+                method: 'GET',
+                credentials: 'same-origin'
+            }
+        )
+            .then(
+                (response) => {
+                    if (response.status === 200){
+                        response.json().then((json) => {this.setState({data: orderBy(json.results, 2),
+                                                                       previous: json.previous,
+                            next: json.next})})
+                    }
+            }
+            );
     },
     onNext(e){
         e.preventDefault();

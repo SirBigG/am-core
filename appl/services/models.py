@@ -22,7 +22,7 @@ class MetaData(models.Model):
     """Stores meta data for seo optimizing."""
     title = models.CharField(max_length=255, verbose_name=_('meta title'))
     description = models.CharField(max_length=255, verbose_name=_('meta description'))
-    h1 = models.CharField(max_length=255, verbose_name=_('meta_description'), blank=True, null=True)
+    h1 = models.CharField(max_length=255, verbose_name=_('h1 tag'), blank=True, null=True)
 
     class Meta:
         db_table = 'metadata'

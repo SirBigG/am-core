@@ -3,7 +3,7 @@
 {% load post_extras %}
 
 {% block title %}
-    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }} |{% endif %}
+    {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.title }} |{% endif %}
 {% endblock title %}
 
 {% block meta_description %}

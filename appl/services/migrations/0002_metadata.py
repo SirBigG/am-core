@@ -22,9 +22,9 @@ class Migration(migrations.Migration):
                 ('description', models.CharField(max_length=255, verbose_name='meta description')),
                 ('description_uk', models.CharField(max_length=255, null=True, verbose_name='meta description')),
                 ('description_en', models.CharField(max_length=255, null=True, verbose_name='meta description')),
-                ('h1', models.CharField(blank=True, max_length=255, null=True, verbose_name='meta_description')),
-                ('h1_uk', models.CharField(blank=True, max_length=255, null=True, verbose_name='meta_description')),
-                ('h1_en', models.CharField(blank=True, max_length=255, null=True, verbose_name='meta_description')),
+                ('h1', models.CharField(blank=True, max_length=255, null=True, verbose_name='h1 tag')),
+                ('h1_uk', models.CharField(blank=True, max_length=255, null=True, verbose_name='h1 tag')),
+                ('h1_en', models.CharField(blank=True, max_length=255, null=True, verbose_name='h1 tag')),
             ],
             options={
                 'verbose_name': 'meta data',

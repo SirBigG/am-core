@@ -99,6 +99,8 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         self.assertMetaDataIn(response.content)
         self.assertH1(response.content)
         self.assertClassIn('list-h1', response.content)
+        self.assertEqualTitleValue(response.content, 'title | AgroMega.in.ua')
+        self.assertEqualMetaTagContent(response.content, 'description', 'description')
 
 
 class PostDetailTests(HtmlTestCaseMixin, TestCase):

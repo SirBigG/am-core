@@ -4,5 +4,5 @@ from appl.services.models import MetaData
 
 
 @register(MetaData)
-class CountryTranslation(TranslationOptions):
+class MetaDataTranslation(TranslationOptions):
     fields = ('title', 'description', 'h1', )
