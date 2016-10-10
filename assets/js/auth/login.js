@@ -94,7 +94,7 @@ var $ = require('jquery');
     $('body').on('click', '#password-change-btn', function(){
             $.ajax({
             type: 'POST',
-            url: window.location.pathname,
+            url: window.location.href,
             data: $('form').serialize(),
             success: function(res){
                     window.location = '/';
