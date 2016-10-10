@@ -62,10 +62,10 @@ class Logout(View):
 class UserEmailConfirm(View):
 
     def get(self, request, **kwargs):
-        _validation_key = kwargs.get('hash', '')
-        if _validation_key:
+        _key = kwargs.get('hash', '')
+        if _key:
             try:
-                user = User.objects.get(validation_key=_validation_key)
+                user = User.objects.get(validation_key=_key)
             except User.DoesNotExist:
                 raise Http404
             user.is_active = True
@@ -77,7 +77,9 @@ class UserEmailConfirm(View):
 
 
 class UserPasswordReset(FormView):
-
+    """User changing password logic.
+       Sends email with hash in email if user exists.
+       Checking if hash right and reset password."""
     def get_template_names(self):
         if self.kwargs.get('action') == 'confirm':
             return ['pro_auth/email_confirm_for_pass.html']

@@ -8,7 +8,7 @@
         {% endfor %}
         {% for field in form %}
             <div class="form-group">
-                <p class="text-left">{{ field.label }}</p>
+                <p>{{ field.label }}</p>
                 {% for error in field.errors %}
                     <p class="text-left text-danger">{{error}}</p>
                 {% endfor %}
@@ -18,6 +18,7 @@
     </div>
     <div class="modal-footer">
         {% block auth_buttons %}
+            <a id="confirm-email-btn" href="" class="pull-left">{% trans 'Забули пароль?' %}</a>
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
             <button type="submit" class="btn btn-primary" id="login-conf-btn">{% trans 'Відправити' %}</button>
         {% endblock %}

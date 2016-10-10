@@ -46,3 +46,62 @@ var $ = require('jquery');
             return false;
     });
 }(jQuery);
+
+// Rendering email confirm form.
++function ($) {
+    'use strict';
+    $('body').on('click', '#confirm-email-btn', function () {
+        $.ajax({
+            type: 'GET',
+            url:'/password/confirm/email/',
+            success: function(res){$('#login-modal').html(res);}
+        });
+        return false
+    })
+}(jQuery);
+
+// Email confirmation logic.
++function ($) {
+    'use strict';
+    $('body').on('click', '#email-check-btn', function(){
+            $.ajax({
+            type: 'POST',
+            url:'/password/confirm/email/',
+            data: $('form').serialize(),
+            success: function(res){
+                if(res.status === 'ok')
+                {
+                    $('.login-modal-lg').modal('hide');
+                    alert('На пошут, що ви вказали відправлений лист підтвердження. ' +
+                        'Перейдіть по посиланні в листі, щоб змінити свій пароль.' +
+                        'Якщо лист не прийшов, обов’язково зв’яжіться з нами, використовуючи форму внизу сайту.');
+                }
+                else {
+                    $('#login-modal').html(res);
+                }
+            },
+            error: function(res){
+                $('#login-modal').html(res);
+            }
+            });
+            return false;
+    });
+}(jQuery);
+
+// Password reset logic.
++function ($) {
+    'use strict';
+    $('body').on('click', '#password-change-btn', function(){
+            $.ajax({
+            type: 'POST',
+            url: window.location.pathname,
+            data: $('form').serialize(),
+            success: function(res){
+                    window.location = '/';
+            },
+            error: function(res){
+                $('#check-password-form').html(res);
+            }
+            });
+    });
+}(jQuery);

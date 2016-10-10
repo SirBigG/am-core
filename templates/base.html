@@ -21,7 +21,9 @@
         {% block extra_script %}{% endblock extra_script %}
 
     </head>
-    <body oncopy="return false;" oncontextmenu="return false;">
+    {% block body_head_tag %}
+        <body oncopy="return false;" oncontextmenu="return false;">
+    {% endblock %}
         {% block header %}
             <div class="container-fluid">
                 {% include 'header.html' %}

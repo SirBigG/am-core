@@ -8,6 +8,7 @@ from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.conf import settings
 
 from appl.utils.tests.factories import UserFactory, LocationFactory
+from appl.utils.tests.utils import HtmlTestCaseMixin
 
 from appl.pro_auth.forms import UserCreationForm, EmailConfirmForm
 from appl.pro_auth.models import User
@@ -143,7 +144,7 @@ class UserViewSetTests(APITestCase):
         self.assertEqual(response.status_code, 403)
 
 
-class PersonalIndexViewTests(TestCase):
+class PersonalIndexViewTests(HtmlTestCaseMixin, TestCase):
     def test_response_ok(self):
         user = UserFactory()
         client.login(username=user.email, password='12345')
@@ -152,6 +153,7 @@ class PersonalIndexViewTests(TestCase):
         self.assertTemplateUsed(response, 'personal/personal_index.html')
         response = client.get('/user/%d/update/' % user.pk)
         self.assertEqual(response.status_code, 200)
+        self.assertIdIn('root', response.content)
 
     def test_user_not_login(self):
         response = client.get('/user/2353647/')
@@ -179,6 +181,9 @@ class UserPasswordResetTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(isinstance(response.context['form'], SetPasswordForm))
         self.assertTemplateUsed(response, 'pro_auth/check_password.html')
+        # Test bad hash
+        response = self.client.get('/password/check/email/hashingssss.html')
+        self.assertEqual(response.status_code, 404)
 
     def test_post_check(self):
         UserFactory(email='test@test.com', validation_key='hash')
