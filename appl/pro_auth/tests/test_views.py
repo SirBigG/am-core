@@ -4,12 +4,12 @@ import os
 import hashlib
 
 from django.test import TestCase, Client
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.conf import settings
 
 from appl.utils.tests.factories import UserFactory, LocationFactory
 
-from appl.pro_auth.forms import UserCreationForm
+from appl.pro_auth.forms import UserCreationForm, EmailConfirmForm
 from appl.pro_auth.models import User
 
 from rest_framework.test import APIClient, APITestCase
@@ -157,3 +157,36 @@ class PersonalIndexViewTests(TestCase):
         response = client.get('/user/2353647/')
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/user/2353647/')
+
+
+class UserPasswordResetTests(TestCase):
+    def test_get_confirm(self):
+        response = self.client.get('/password/confirm/email/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pro_auth/email_confirm_for_pass.html')
+        self.assertTrue(isinstance(response.context['form'], EmailConfirmForm))
+
+    def test_post_confirm(self):
+        UserFactory(email='test@test.com')
+        response = self.client.post('/password/confirm/email/', data={'email': 'test@test.com'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'ok')
+        self.assertTrue(User.objects.get(email='test@test.com').validation_key)
+
+    def test_get_check(self):
+        UserFactory(email='test@test.com', validation_key='hashing')
+        response = self.client.get('/password/check/email/hashing.html')
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(isinstance(response.context['form'], SetPasswordForm))
+        self.assertTemplateUsed(response, 'pro_auth/check_password.html')
+
+    def test_post_check(self):
+        UserFactory(email='test@test.com', validation_key='hash')
+        response = self.client.post('/password/check/email/hash.html', {'new_password1': '11111',
+                                                                        'new_password2': '11111'})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+        user = User.objects.get(email='test@test.com')
+        self.assertFalse(user.validation_key)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)

@@ -6,7 +6,7 @@ from django.test import TestCase
 
 from appl.utils.tests.factories import LocationFactory, UserFactory
 
-from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm
+from appl.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm, EmailConfirmForm
 from appl.pro_auth.models import User
 
 from django.forms import ValidationError
@@ -97,3 +97,17 @@ class UserChangeFormTest(TestCase):
         self.assertTrue(form.is_valid())
         form.save()
         self.assertTrue(User.objects.get(email='newtest@test.com'))
+
+
+class EmailConfirmFormTests(TestCase):
+    def test_invalid_form(self):
+        form = EmailConfirmForm({'email': 'aa@test.com'})
+        self.assertFalse(form.is_valid())
+        self.assertEqual(form.errors['email'], [str(form.error_messages.get('not_user'))])
+
+    def test_valid_form(self):
+        u = UserFactory(email='aaa@test.com')
+        form = EmailConfirmForm({'email': 'aaa@test.com'})
+        self.assertTrue(form.is_valid())
+        # Test get_user
+        self.assertEqual(form.get_user(), u)

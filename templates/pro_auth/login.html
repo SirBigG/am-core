@@ -17,7 +17,9 @@
         {% endfor %}
     </div>
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
-        <button type="submit" class="btn btn-primary" id="login-conf-btn">{% trans 'Відправити' %}</button>
+        {% block auth_buttons %}
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
+            <button type="submit" class="btn btn-primary" id="login-conf-btn">{% trans 'Відправити' %}</button>
+        {% endblock %}
     </div>
 </form>

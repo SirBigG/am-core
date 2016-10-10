@@ -4,8 +4,12 @@ DEV_SETTINGS=agro_portal.dev
 
 deploy: pull update webpack test migrate statics compilemessages
 
-update:
+update: pip_update npm_update
+
+pip_update:
 	pip install -r requirements.txt
+
+npm_update:
 	cd assets && npm install --no-optional
 
 test:

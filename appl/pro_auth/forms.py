@@ -108,3 +108,30 @@ class UserChangeForm(forms.ModelForm):
         model = User
         fields = ('email', 'first_name', 'last_name', 'phone1', 'location',
                   'birth_date', 'avatar',)
+
+
+class EmailConfirmForm(forms.Form):
+    email = forms.EmailField()
+
+    error_messages = {
+        'not_user': _('Sorry, but user with this email does not found!')
+    }
+
+    def __init__(self, *args, **kwargs):
+        self.user_cache = None
+        return super(EmailConfirmForm, self).__init__(*args, **kwargs)
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            try:
+                self.user_cache = User.objects.get(email=email)
+            except User.DoesNotExist:
+                raise forms.ValidationError(
+                    self.error_messages['not_user'],
+                    code='not_user'
+                )
+        return email
+
+    def get_user(self):
+        return self.user_cache
