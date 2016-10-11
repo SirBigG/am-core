@@ -32,9 +32,11 @@ class RegisterView(FormView):
             str('new_user_%s_%s' % (user.email, user.phone1)).encode('utf-8')).hexdigest()
         user.save()
         user.email_user(_("Confirmation of user email."),
-                        render_to_string('pro_auth/confirmation_email.html',
-                                         {'hash': user.validation_key}),
-                        "agr@agromega.in.ua")
+                        _("Register information"),
+                        "agr@agromega.in.ua",
+                        html_message=render_to_string('pro_auth/confirmation_email.html',
+                                                      {'hash': user.validation_key})
+                        )
         # TODO: need to ajax mixin creation
         return HttpResponse("ok")
 
@@ -111,9 +113,10 @@ class UserPasswordReset(FormView):
             _u.validation_key = _validation_key
             _u.save()
             _u.email_user(_("Confirmation of user email."),
-                          render_to_string('pro_auth/check_password_email.html',
-                                           {'hash': _validation_key}),
-                          "agr@agromega.in.ua")
+                          _("Changing password email"),
+                          "agr@agromega.in.ua",
+                          html_message=render_to_string('pro_auth/check_password_email.html',
+                                                        {'hash': _validation_key}))
             return JsonResponse({'status': 'ok'})
 
         if isinstance(form, SetPasswordForm):
