@@ -39,12 +39,15 @@ const PostList = React.createClass({
     onNext(e){
         e.preventDefault();
         this.setState({url: this.state.next});
-        this.fetchData(this.state.next)
+        this.fetchData(this.state.next);
+        // TODO: maybe nicer solusion
+        window.scrollTo(0, 0)
     },
     onPrevious(e){
         e.preventDefault();
         this.setState({url: this.state.previous});
-        this.fetchData(this.state.previous)
+        this.fetchData(this.state.previous);
+        window.scrollTo(0, 0)
     },
     render() {
         var postNodes = this.state.data.map((group, i) => {

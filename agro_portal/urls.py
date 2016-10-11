@@ -20,21 +20,22 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
-from appl.posts.views import SiteMap
+from core.posts.views import SiteMap
 
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name='index.html'), name='index'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
-    url(r'sitemap.xml/$', SiteMap.as_view(), name='sitemap'),
+    url(r'^sitemap\.xml', SiteMap.as_view(), name='sitemap'),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
-    url(r'^service/', include('appl.services.urls')),
-    url(r'^', include('appl.classifier.urls')),
-    url(r'^', include('appl.pro_auth.urls')),
-    url(r'^', include('appl.posts.urls')),
+    url(r'^service/', include('core.services.urls')),
+    url(r'^api/', include('api.v1.urls')),
+    url(r'^', include('core.classifier.urls')),
+    url(r'^', include('core.pro_auth.urls')),
+    url(r'^', include('core.posts.urls')),
 ]
 
 # For returning errors pages. Need to be the last.

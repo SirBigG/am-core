@@ -1,6 +1,6 @@
 import React from 'react';
 
-import ImageUploadField from './ImageUploadField'
+import ImageUploadField from './fields/ImageUploadField'
 import FieldErrorsMixin from '../mixins/FieldErrorsMixin';
 
 const PhotoSet = React.createClass({

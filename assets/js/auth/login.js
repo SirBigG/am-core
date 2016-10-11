@@ -33,7 +33,9 @@ var $ = require('jquery');
                         '<button onclick="location.href=/logout/" class="btn btn-primary navbar-btn"> Вийти </button>' +
                         '</li>'
                     );
-                    $('.login-modal-lg').modal('hide');
+                    $('.login-modal-lg').hide();
+                    $('body').removeClass('modal-open');
+                    $('.modal-backdrop').removeClass('modal-backdrop fade in');
                 }
                 else {
                     $('#login-modal').html(res);
@@ -71,8 +73,12 @@ var $ = require('jquery');
             success: function(res){
                 if(res.status === 'ok')
                 {
-                    $('.login-modal-lg').modal('hide');
-                    alert('На пошут, що ви вказали відправлений лист підтвердження. ' +
+
+                    $('.login-modal-lg').hide();
+                    $('body').removeClass('modal-open');
+                    $(document).off('focusin.bs.modal');
+                    $('.modal-backdrop').removeClass('modal-backdrop fade in');
+                    alert('На пошту, що ви вказали відправлений лист підтвердження. ' +
                         'Перейдіть по посиланні в листі, щоб змінити свій пароль.' +
                         'Якщо лист не прийшов, обов’язково зв’яжіться з нами, використовуючи форму внизу сайту.');
                 }

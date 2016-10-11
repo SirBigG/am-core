@@ -1,3 +1,5 @@
+
+require('../../jsx/detail/components/DetailApp');
 var $ = require('jquery');
 
 // TODO: changing this with react component or just with responsive row

@@ -3,8 +3,8 @@ import { Router, Route, Link, browserHistory, IndexRoute } from 'react-router'
 import React from 'react'
 import { render } from 'react-dom'
 
-import UserUpdateForm from './UserUpdateForm';
-import UserPostForm from './UserPostForm';
+import UserUpdateForm from '../components/forms/UserUpdateForm';
+import UserPostForm from '../components/forms/UserPostForm';
 import PostList from '../components/PostList'
 import NotFound from '../components/NotFound'
 
@@ -44,7 +44,7 @@ const PersonalIndex = React.createClass({
     render(){
         return(
             <div>
-                <PostList url="/posts/user/" grid="col-sm-6 col-md-6" />
+                <PostList url="/api/user/posts/" grid="col-sm-6 col-md-6" />
             </div>
         )
     }

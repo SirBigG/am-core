@@ -57,10 +57,10 @@ INSTALLED_APPS = [
     'rest_framework',
 
     # project apps
-    'appl.classifier',
-    'appl.pro_auth',
-    'appl.posts',
-    'appl.services',
+    'core.classifier',
+    'core.pro_auth',
+    'core.posts',
+    'core.services',
 
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
@@ -87,7 +87,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'appl.utils.middleware.SecurityMiddleware',
+    'core.utils.middleware.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'agro_portal.urls'
@@ -138,7 +138,7 @@ CACHES = {
 AUTH_USER_MODEL = 'pro_auth.User'
 
 # Project authentication backend
-AUTHENTICATION_BACKENDS = ['appl.pro_auth.backends.AuthBackend']
+AUTHENTICATION_BACKENDS = ['core.pro_auth.backends.AuthBackend']
 
 # TODO: create login_url login_redirect_url
 
@@ -168,9 +168,9 @@ LANGUAGES = [
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'uk'
 
 MODELTRANSLATION_TRANSLATION_FILES = (
-    'appl.classifier.translation',
-    'appl.posts.translation',
-    'appl.services.translation',
+    'core.classifier.translation',
+    'core.posts.translation',
+    'core.services.translation',
 )
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
@@ -192,7 +192,9 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR + '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'assets')
+    os.path.join(BASE_DIR, 'assets'),
+    os.path.join(BASE_DIR, 'assets/node_modules/bootstrap/dist'),
+    os.path.join(BASE_DIR, 'assets/node_modules/jquery/dist'),
 ]
 
 WEBPACK_LOADER = {

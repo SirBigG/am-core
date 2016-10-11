@@ -40,8 +40,3 @@ var $ = require('jquery');
             return false;
     });
 }(jQuery);
-
-// For using popover in register form
-$(document).ready(function(){
-    $('[data-toggle="tooltip"]').popover();
-});

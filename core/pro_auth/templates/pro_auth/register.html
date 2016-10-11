@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block base_content_block %}
+    <div class="jumbotron">
+    <form method="post" action="/register/">
+        {% csrf_token %}
+        <div class="col-md-12 text-center">
+            {% for error in form.non_field_errors %}
+                <p class="text-justify bg-danger">{{error}}</p>
+            {% endfor %}
+            {% for field in form %}
+                <div class="form-group">
+                    <p class="text-left">{{ field.label }}</p>
+                    {% for error in field.errors %}
+                        <p class="text-danger">{{error}}</p>
+                    {% endfor %}
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </div>
+        <div class="pull-right">
+            <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
+        </div>
+        <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
+        {{ form.media }}
+    </form>
+    </div>
+{% endblock %}
