@@ -40,7 +40,7 @@ runserver:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver
 
 webpack:
-	cd assets && webpack
+	cd assets && npm run build
 
 dev:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(DEV_SETTINGS) ./$(MANAGE) runserver
