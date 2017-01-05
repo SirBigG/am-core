@@ -89,7 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'core.utils.middleware.SecurityMiddleware',
+    'core.utils.middleware.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'agro_portal.urls'
