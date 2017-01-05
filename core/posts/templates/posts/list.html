@@ -23,9 +23,10 @@
         <div class="row">
             {% for obj in group %}
                 <div class="col-sm-12 col-md-6">
-                    <div class="item_in_list"><img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size"><a href="{{ obj.get_absolute_url }}"><h2>{{ obj.title }}</h2></a><div class="text-justify">
-                        {{ obj.text|safe|truncatechars:300 }}
-                    </div>
+                    <div class="item_in_list">
+                        <img src="{{obj.photo.first.image.url}}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
+                        <a href="{{ obj.get_absolute_url }}"><h2 class="text-center">{{ obj.title }}</h2></a>
+                        <div class="text-justify">{{ obj.text|safe|truncatechars:300 }}</div>
                     </div>
                 </div>
             {% endfor %}

@@ -43,21 +43,26 @@
                     <div class="item">
                 {% endif %}
             <img alt="{{ photo.description }}" src="{{ photo.image.url }}" class="img-rounded img-responsive" />
-            <div class="carousel-caption">
-                {% if photo.description %}<h3>{{ photo.description }}</h3>{% endif %}
-            </div>
+            {# Photo description #}
+            {% if photo.description %}
+                <div class="carousel-caption">
+                    <h4>{{ photo.description }}</h4>
+                </div>
+            {% endif %}
             </div>
             {% endfor %}
             </div>
-            <!-- Controls -->
-            <a class="left carousel-control" href="#post-carousel" role="button" data-slide="prev">
-                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="right carousel-control" href="#post-carousel" role="button" data-slide="next">
-                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
+            {#  Controls #}
+            {% if object.photo.count > 1 %}
+                <a class="left carousel-control" href="#post-carousel" role="button" data-slide="prev">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="right carousel-control" href="#post-carousel" role="button" data-slide="next">
+                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            {% endif %}
         </div>
     </div>
     <div class="text-justify">
