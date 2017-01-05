@@ -28,13 +28,14 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'^sitemap\.xml', SiteMap.as_view(), name='sitemap'),
+    url(r'social/', include('social_django.urls', namespace='social')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^service/', include('core.services.urls')),
     url(r'^api/', include('api.v1.urls')),
     url(r'^', include('core.classifier.urls')),
-    url(r'^', include('core.pro_auth.urls')),
+    url(r'^', include('core.pro_auth.urls', namespace='pro_auth')),
     url(r'^', include('core.posts.urls')),
 ]
 

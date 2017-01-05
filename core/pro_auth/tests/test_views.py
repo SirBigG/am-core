@@ -58,31 +58,6 @@ class AuthTests(TestCase):
         response = client.get('/')
         self.assertEqual(response.status_code, 200)
 
-    def test_register_ajax(self):
-        # Get request
-        response = client.get('/register/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pro_auth/register_form.html')
-        self.assertTrue(isinstance(response.context_data['form'], UserCreationForm))
-        # Post request
-        os.environ['RECAPTCHA_TESTING'] = 'True'
-        location = LocationFactory()
-        data = {'email': 'test@test.com',
-                'password1': '11111',
-                'password2': '11111',
-                'phone1': '+380991234567',
-                'location': location.pk,
-                'g-recaptcha-response': 'PASSED'
-                }
-        response = client.post('/register/', data=data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
-        user = User.objects.get(email='test@test.com')
-        self.assertFalse(user.is_active)
-        key = hashlib.sha256(str('new_user_%s_%s' % (user.email, user.phone1)).encode('utf-8')).hexdigest()
-        self.assertEqual(user.validation_key, key)
-        self.assertEqual(response.content, b'ok')
-        del os.environ['RECAPTCHA_TESTING']
-
     def test_register(self):
         response = client.get('/register/')
         self.assertEqual(response.status_code, 200)

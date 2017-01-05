@@ -47,10 +47,6 @@ class UserModelTests(TestCase):
     def test_get_absolute_url(self):
         self.assertEqual(self.user.get_absolute_url(), '/user/%s/' % self.user.pk)
 
-    def test_backend(self):
-        self.assertEqual(self.user.backend,
-                         ['core.pro_auth.backends.AuthBackend'])
-
 
 class UserManagerTests(TestCase):
 

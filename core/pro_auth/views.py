@@ -19,7 +19,6 @@ from core.pro_auth.models import User
 class RegisterView(FormView):
     form_class = UserCreationForm
     template_name = 'pro_auth/register.html'
-    ajax_template_name = 'pro_auth/register_form.html'
     success_url = '/'
 
     def form_valid(self, form):
@@ -34,13 +33,7 @@ class RegisterView(FormView):
                         html_message=render_to_string('pro_auth/confirmation_email.html',
                                                       {'hash': user.validation_key})
                         )
-        if self.request.is_ajax():
-            return HttpResponse("ok")
-        else:
-            return super().form_valid(form)
-
-    def get_template_names(self):
-        return [self.ajax_template_name] if self.request.is_ajax() else [self.template_name]
+        return super().form_valid(form)
 
 
 class Login(FormView):

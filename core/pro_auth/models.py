@@ -133,6 +133,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_absolute_url(self):
         """Returns absolute url to user room."""
-        return reverse('personal-index', kwargs={'pk': self.pk})
+        return reverse('pro_auth:personal-index', kwargs={'pk': self.pk})
 
     backend = settings.AUTHENTICATION_BACKENDS

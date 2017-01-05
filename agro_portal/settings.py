@@ -73,6 +73,8 @@ INSTALLED_APPS = [
     'webpack_loader',
     # For google ReCaptcha using: https://github.com/praekelt/django-recaptcha
     'captcha',
+    # For social authentication: https://github.com/python-social-auth/social-app-django
+    'social_django',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -87,7 +89,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.utils.middleware.SecurityMiddleware',
+    # 'core.utils.middleware.SecurityMiddleware',
 )
 
 ROOT_URLCONF = 'agro_portal.urls'
@@ -104,6 +106,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'social_django.context_processors.backends',
+                'social_django.context_processors.login_redirect'
             ],
         },
     },
@@ -138,7 +142,15 @@ CACHES = {
 AUTH_USER_MODEL = 'pro_auth.User'
 
 # Project authentication backend
-AUTHENTICATION_BACKENDS = ['core.pro_auth.backends.AuthBackend']
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.open_id.OpenIdAuth',
+    'social_core.backends.facebook.FacebookAppOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'social_core.backends.vk.VKAppOAuth2',
+    'social_core.backends.vk.VKOAuth2',
+    'social_core.backends.vk.VKontakteOpenAPI',
+    'core.pro_auth.backends.AuthBackend'
+]
 
 # TODO: create login_url login_redirect_url
 
