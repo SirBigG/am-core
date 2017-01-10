@@ -38,6 +38,8 @@ class RegisterView(FormView):
 
 
 class SocialRegisterView(RegisterView):
+    template_name = 'pro_auth/register_social.html'
+
     def form_valid(self, form):
         self.request.session['phone1'] = form.cleanrd_data['phone1']
         return HttpResponseRedirect(reverse('social:complete', args=('vk-oauth2',)))
