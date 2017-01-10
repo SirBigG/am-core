@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from core.pro_auth.models import User
-from core.pro_auth.forms import UserCreationForm, AdminUserChangeForm
+from core.pro_auth.forms import AdminUserCreationForm, AdminUserChangeForm
 
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import ugettext_lazy as _
@@ -12,7 +12,7 @@ class UserAdmin(BaseUserAdmin):
     Representation custom user in admin site.
     """
     form = AdminUserChangeForm
-    add_form = UserCreationForm
+    add_form = AdminUserCreationForm
 
     list_display = ('email', 'phone1', 'birth_date', 'date_joined',
                     'is_superuser')

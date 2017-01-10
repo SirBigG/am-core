@@ -16,7 +16,7 @@ from dal import autocomplete
 from captcha.fields import ReCaptchaField
 
 
-class UserCreationForm(forms.ModelForm):
+class AdminUserCreationForm(forms.ModelForm):
     """
     A form that create a user, with no privileges.
     """
@@ -38,7 +38,6 @@ class UserCreationForm(forms.ModelForm):
                                                                        attrs={'class': 'form-control'}),
                                       help_text=_("Please select city from list."),
                                       label=_("City"))
-    captcha = ReCaptchaField(label=_("Captcha"))
 
     class Meta:
         model = User
@@ -61,11 +60,15 @@ class UserCreationForm(forms.ModelForm):
 
     def save(self, commit=True):
         """Save the provided password in hashed format."""
-        user = super(UserCreationForm, self).save(commit=False)
+        user = super(AdminUserCreationForm, self).save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
         return user
+
+
+class UserCreationForm(AdminUserCreationForm):
+    captcha = ReCaptchaField(label=_("Captcha"))
 
 
 class AdminUserChangeForm(forms.ModelForm):

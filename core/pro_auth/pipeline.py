@@ -8,7 +8,7 @@ USER_FIELDS = ['email', 'phone1']
 
 @partial
 def add_user_extra_data(strategy, backend, request, details, *args, **kwargs):
-    if not request.get('phone1', None):
+    if not request.get('phone1', None) or not request.get('email', None):
         return HttpResponseRedirect(redirect_to=reverse('pro_auth:social-register'))
     return
 
