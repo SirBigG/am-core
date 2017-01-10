@@ -41,7 +41,7 @@ class AdminUserCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['email', 'phone1', 'location', 'password1', 'password2', 'captcha']
+        fields = ['email', 'phone1', 'location', 'password1', 'password2']
         widgets = {
             'email': forms.TextInput(attrs={'class': 'form-control'})
         }
@@ -69,6 +69,9 @@ class AdminUserCreationForm(forms.ModelForm):
 
 class UserCreationForm(AdminUserCreationForm):
     captcha = ReCaptchaField(label=_("Captcha"))
+
+    class Meta(AdminUserCreationForm.Meta):
+        fields = ['email', 'phone1', 'location', 'password1', 'password2', 'captcha']
 
 
 class AdminUserChangeForm(forms.ModelForm):
