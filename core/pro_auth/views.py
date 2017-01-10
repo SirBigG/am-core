@@ -41,7 +41,8 @@ class SocialRegisterView(RegisterView):
     template_name = 'pro_auth/register_social.html'
 
     def form_valid(self, form):
-        self.request.session['phone1'] = form.cleanrd_data['phone1']
+        self.request.session['phone1'] = form.cleaned_data['phone1']
+        self.request.session['email'] = form.cleaned_data['email']
         return HttpResponseRedirect(reverse('social:complete', args=('vk-oauth2',)))
 
 
