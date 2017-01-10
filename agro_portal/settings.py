@@ -149,6 +149,10 @@ AUTHENTICATION_BACKENDS = [
     'core.pro_auth.backends.AuthBackend'
 ]
 
+
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['phone1', ]
+
+
 SOCIAL_AUTH_PIPELINE = (
     'social.pipeline.social_auth.social_details',
     'social.pipeline.social_auth.social_uid',
