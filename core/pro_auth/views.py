@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonRespons
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
+from django.urls import reverse, reverse_lazy
 
 
 from core.pro_auth.forms import UserCreationForm, EmailConfirmForm
@@ -19,7 +20,7 @@ from core.pro_auth.models import User
 class RegisterView(FormView):
     form_class = UserCreationForm
     template_name = 'pro_auth/register.html'
-    success_url = '/'
+    success_url = reverse_lazy('index')
 
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -34,6 +35,12 @@ class RegisterView(FormView):
                                                       {'hash': user.validation_key})
                         )
         return super().form_valid(form)
+
+
+class SocialRegisterView(RegisterView):
+    def form_valid(self, form):
+        self.request.session['phone1'] = form.cleanrd_data['phone1']
+        return HttpResponseRedirect(reverse('social:complete', args=('vk-oauth2',)))
 
 
 class Login(FormView):

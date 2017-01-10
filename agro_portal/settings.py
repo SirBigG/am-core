@@ -144,13 +144,22 @@ AUTH_USER_MODEL = 'pro_auth.User'
 # Project authentication backend
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.open_id.OpenIdAuth',
-    'social_core.backends.facebook.FacebookAppOAuth2',
     'social_core.backends.facebook.FacebookOAuth2',
-    'social_core.backends.vk.VKAppOAuth2',
     'social_core.backends.vk.VKOAuth2',
-    'social_core.backends.vk.VKontakteOpenAPI',
     'core.pro_auth.backends.AuthBackend'
 ]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social.pipeline.social_auth.social_details',
+    'social.pipeline.social_auth.social_uid',
+    'social.pipeline.social_auth.auth_allowed',
+    'social.pipeline.social_auth.social_user',
+    'pro_auth.pipeline.add_user_extra_data',
+    'pro_auth.pipeline.create_user',
+    'social.pipeline.social_auth.associate_user',
+    'social.pipeline.social_auth.load_extra_data',
+    'social.pipeline.user.user_details',
+)
 
 # TODO: create login_url login_redirect_url
 
