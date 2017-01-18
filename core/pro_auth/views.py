@@ -6,14 +6,14 @@ from datetime import datetime
 
 from django.views.generic import FormView, View
 from django.contrib.auth import login, logout
-from django.http import HttpResponseRedirect, HttpResponse, Http404, JsonResponse
+from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 
 
-from core.pro_auth.forms import UserCreationForm, EmailConfirmForm
+from core.pro_auth.forms import UserCreationForm, EmailConfirmForm, AdminUserCreationForm
 from core.pro_auth.models import User
 
 
@@ -38,12 +38,13 @@ class RegisterView(FormView):
 
 
 class SocialRegisterView(RegisterView):
+    form_class = AdminUserCreationForm
     template_name = 'pro_auth/register_social.html'
 
     def form_valid(self, form):
         self.request.session['phone1'] = str(form.cleaned_data['phone1'])
         self.request.session['email'] = form.cleaned_data['email']
-        return HttpResponseRedirect(reverse('social:complete', args=('vk-oauth2',)))
+        return HttpResponseRedirect(reverse('social:complete', args=(self.kwargs.get('backend_name'),)))
 
 
 class Login(FormView):

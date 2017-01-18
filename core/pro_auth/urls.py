@@ -9,7 +9,7 @@ from core.pro_auth.views import RegisterView, Login, Logout, UserEmailConfirm, U
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
-    url(r'^register/social/$', SocialRegisterView.as_view(), name='social-register'),
+    url(r'^register/social/(?P<backend_name>[\w-]+)/$', SocialRegisterView.as_view(), name='social-register'),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^is-authenticate/$', IsAuthenticate.as_view(), name='is_authenticate'),

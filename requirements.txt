@@ -36,3 +36,4 @@ social-auth-app-django==0.1.0
 transliterate==1.8.1
 uWSGI==2.0.13.1
 xlrd==1.0.0
+HTTPretty==0.8.14

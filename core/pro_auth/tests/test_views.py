@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 import os
-import hashlib
 
 from django.test import TestCase, Client
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
@@ -10,7 +9,7 @@ from django.conf import settings
 from core.utils.tests.factories import UserFactory, LocationFactory
 from core.utils.tests.utils import HtmlTestCaseMixin
 
-from core.pro_auth.forms import UserCreationForm, EmailConfirmForm
+from core.pro_auth.forms import EmailConfirmForm
 from core.pro_auth.models import User
 
 

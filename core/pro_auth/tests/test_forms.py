@@ -6,7 +6,8 @@ from django.test import TestCase
 
 from core.utils.tests.factories import LocationFactory, UserFactory
 
-from core.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm, EmailConfirmForm
+from core.pro_auth.forms import UserCreationForm, AdminUserChangeForm, UserChangeForm, EmailConfirmForm, \
+    AdminUserCreationForm
 from core.pro_auth.models import User
 
 from django.forms import ValidationError
@@ -111,3 +112,20 @@ class EmailConfirmFormTests(TestCase):
         self.assertTrue(form.is_valid())
         # Test get_user
         self.assertEqual(form.get_user(), u)
+
+
+class AdminUserCreationFormTests(TestCase):
+    def test_form_valid(self):
+        location = LocationFactory()
+        data = {'email': 'test@test.com',
+                'password1': '11111',
+                'password2': '11111',
+                'phone1': '+380991234567',
+                'location': location.pk
+                }
+        form = AdminUserCreationForm(data=data)
+        self.assertTrue(form.is_valid())
+        form.save(commit=False)
+        self.assertEqual(User.objects.count(), 0)
+        form.save()
+        self.assertEqual(User.objects.count(), 1)
