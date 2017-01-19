@@ -8,9 +8,12 @@ USER_FIELDS = ['email', 'phone1']
 
 @partial
 def add_user_extra_data(strategy, backend, request, details, *args, **kwargs):
-    phone1 = backend.strategy.session.get('phone1', None)
-    email = backend.strategy.session.get('email', None)
-    if not phone1 or not email:
+    # If social user created not write extra data to session
+    if kwargs.get('user', None):
+        return
+    _form_data = backend.strategy.session.get('social_form_data', None)
+    if not _form_data:
+        # For adding extra data for new user creation
         return HttpResponseRedirect(redirect_to=reverse('pro_auth:social-register', args=(backend.name,)))
     return
 
@@ -23,8 +26,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     if not fields:
         return
 
-    fields.update({'phone1': strategy.session_get('phone1'),
-                   'email': strategy.session_get('email')})
+    fields.update(strategy.session_get('social_form_data'))
 
     return {
         'is_new': True,

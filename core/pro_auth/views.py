@@ -6,6 +6,7 @@ from datetime import datetime
 
 from django.views.generic import FormView, View
 from django.contrib.auth import login, logout
+from django.contrib.auth.hashers import make_password
 from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.utils.translation import ugettext_lazy as _
@@ -42,8 +43,11 @@ class SocialRegisterView(RegisterView):
     template_name = 'pro_auth/register_social.html'
 
     def form_valid(self, form):
-        self.request.session['phone1'] = str(form.cleaned_data['phone1'])
-        self.request.session['email'] = form.cleaned_data['email']
+        _form_data = self.cleaned_data.copy()
+        _form_data['password'] = make_password(self.cleaned_data['password1'])
+        _form_data.pop('password1')
+        _form_data.pop('password2')
+        self.request.session['social_form_data'] = _form_data
         return HttpResponseRedirect(reverse('social:complete', args=(self.kwargs.get('backend_name'),)))
 
 

@@ -18,7 +18,29 @@
         {% endfor %}
         </div>
         <div class="col-md-6 col-sm-12">
-            <a href="{% url 'pro_auth:register' %}" class="btn btn-success text-center">{% trans "Зареєструватись" %}</a>
+            <div class="panel panel-default">
+                {# ToDo: reverse urls #}
+                <div class="panel-body text-center">
+                    <div class="col-md-12">
+                    <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
+                        </div>
+                <a tabindex="-1" target="Login-with-vk"
+                    onclick="window.open(this.href, 'Login-with-vk' , 'width=400, height=200'); return false;"
+                    href="/social/login/vk-oauth2/">
+                    <i class="fa fa-vk fa-2x"></i>
+                </a>
+                <a tabindex="-1" target="Login-with-facebook"
+                    onclick="window.open(this.href, 'Login-with-facebook' , 'width=400, height=400'); return false;"
+                    href="/social/login/facebook/">
+                    <i class="fa fa-facebook fa-2x"></i>
+                </a>
+                </div>
+            </div>
+            <div class="panel panel-default text-center">
+                <div class="panel-body">
+                <a href="{% url 'pro_auth:register' %}" class="btn btn-success text-center">{% trans "Зареєструватись" %}</a>
+                </div>
+            </div>
         </div>
     </div>
     <div class="modal-footer">
