@@ -8,13 +8,13 @@ from django.views.generic import FormView, View
 from django.contrib.auth import login, logout
 from django.contrib.auth.hashers import make_password
 from django.http import HttpResponseRedirect, Http404, JsonResponse
-from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
+from django.contrib.auth.forms import SetPasswordForm
 from django.utils.translation import ugettext_lazy as _
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 
 
-from core.pro_auth.forms import UserCreationForm, EmailConfirmForm, AdminUserCreationForm
+from core.pro_auth.forms import UserCreationForm, EmailConfirmForm, AdminUserCreationForm, LoginForm
 from core.pro_auth.models import User
 
 
@@ -52,7 +52,7 @@ class SocialRegisterView(RegisterView):
 
 
 class Login(FormView):
-    form_class = AuthenticationForm
+    form_class = LoginForm
     template_name = 'pro_auth/login.html'
     ajax_template_name = 'pro_auth/login_form.html'
     success_url = '/'

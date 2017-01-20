@@ -2,6 +2,14 @@
 
 <form method="post">
     {% csrf_token %}
+    <div class="modal-header">
+        {% block auth_buttons %}
+            <div class="col-md-9">
+                <p class="h4">{% trans 'Увійдіть на сайт, відчуйте перевагу зареєстрованих користувачів!' %}</p>
+            </div>
+            <a href="#" class="text-danger pull-right" data-dismiss="modal"><i class="fa fa-times-circle"></i></a>
+        {% endblock %}
+    </div>
     <div class="modal-body clearfix">
         <div class="col-md-6 col-sm-12">
         {% for error in form.non_field_errors %}
@@ -16,24 +24,23 @@
                 {{ field }}
             </div>
         {% endfor %}
+        <a id="confirm-email-btn" href="" class="pull-left clearfix">{% trans 'Забули пароль?' %}</a>
+        <button type="submit" class="btn btn-success pull-right" id="login-conf-btn">{% trans 'Увійти' %}</button>
         </div>
         <div class="col-md-6 col-sm-12">
             <div class="panel panel-default">
-                {# ToDo: reverse urls #}
                 <div class="panel-body text-center">
                     <div class="col-md-12">
-                    <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
-                        </div>
-                <a tabindex="-1" target="Login-with-vk"
-                    onclick="window.open(this.href, 'Login-with-vk' , 'width=400, height=200'); return false;"
-                    href="/social/login/vk-oauth2/">
-                    <i class="fa fa-vk fa-2x"></i>
-                </a>
-                <a tabindex="-1" target="Login-with-facebook"
-                    onclick="window.open(this.href, 'Login-with-facebook' , 'width=400, height=400'); return false;"
-                    href="/social/login/facebook/">
-                    <i class="fa fa-facebook fa-2x"></i>
-                </a>
+                        <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
+                    </div>
+                    <ul class="nav nav-pills">
+                        <li role="presentation">
+                            <a href="{% url 'social:begin' 'vk-oauth2' %}"><i class="fa fa-vk fa-2x"></i></a>
+                        </li>
+                        <li role="presentation">
+                            <a href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-2x"></i></a>
+                        </li>
+                        </ul>
                 </div>
             </div>
             <div class="panel panel-default text-center">
@@ -42,12 +49,5 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal-footer">
-        {% block auth_buttons %}
-            <a id="confirm-email-btn" href="" class="pull-left">{% trans 'Забули пароль?' %}</a>
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
-            <button type="submit" class="btn btn-primary" id="login-conf-btn">{% trans 'Відправити' %}</button>
-        {% endblock %}
     </div>
 </form>

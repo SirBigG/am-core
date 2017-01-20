@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import ReadOnlyPasswordHashField
+from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm
 from django.utils.translation import ugettext_lazy as _
 
 from core.pro_auth.models import User
@@ -141,3 +141,10 @@ class EmailConfirmForm(forms.Form):
 
     def get_user(self):
         return self.user_cache
+
+
+class LoginForm(AuthenticationForm):
+    def __init__(self, request=None, *args, **kwargs):
+        super().__init__(request=None, *args, **kwargs)
+        self.fields['username'].widget.attrs['class'] = 'form-control'
+        self.fields['password'].widget.attrs['class'] = 'form-control'

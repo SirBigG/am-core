@@ -165,7 +165,8 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.user.user_details',
 )
 
-# TODO: create login_url login_redirect_url
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
 
 # ========================================================================================
 # ReCaptcha settings
