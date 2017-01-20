@@ -2,7 +2,7 @@
 {% load i18n %}
 
 {% block base_content_block %}
-    <div class="jumbotron">
+    {% block help_text %}{% endblock %}
     <form method="post" action="{% block action_block %}/register/{% endblock %}">
         {% csrf_token %}
         <div class="col-md-12 text-center">
@@ -25,5 +25,4 @@
         <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
         {{ form.media }}
     </form>
-    </div>
 {% endblock %}

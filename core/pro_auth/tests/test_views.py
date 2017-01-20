@@ -5,6 +5,7 @@ import os
 from django.test import TestCase, Client
 from django.contrib.auth.forms import AuthenticationForm, SetPasswordForm
 from django.conf import settings
+from django.urls import reverse
 
 from core.utils.tests.factories import UserFactory, LocationFactory
 from core.utils.tests.utils import HtmlTestCaseMixin
@@ -170,3 +171,38 @@ class IsAuthenticateTests(TestCase):
         response = self.client.get('/is-authenticate/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get('is_authenticate'), 1)
+
+
+class SocialRegisterViewTests(TestCase):
+    def test_valid_data(self):
+        loc = LocationFactory()
+        data = {'email': 'test@test.com', 'phone1': '+380991234567', 'password1': '11111', 'password2': '11111',
+                'location': loc.pk}
+        response = self.client.post('/register/social/vk-oauth2/', data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], reverse('social:complete', args=('vk-oauth2',)))
+        session = self.client.session
+        self.assertIsNotNone(session.get('social_form_data'))
+
+    def test_get(self):
+        response = self.client.post('/register/social/vk-oauth2/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pro_auth/register_social.html')
+
+
+class SocialExistUserLoginViewTests(TestCase):
+    def test_get(self):
+        response = self.client.post('/register/social/vk-oauth2/login/')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'pro_auth/login.html')
+
+    def test_valid_data(self):
+        _user = UserFactory(email='test@test.com')
+        _user.set_password('11111')
+        _user.save()
+        data = {'username': 'test@test.com', 'password': '11111'}
+        response = self.client.post('/register/social/vk-oauth2/login/', data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], reverse('social:complete', args=('vk-oauth2',)))
+        session = self.client.session
+        self.assertIsNotNone(session.get('user_pk'))

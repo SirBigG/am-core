@@ -43,10 +43,10 @@ class SocialRegisterView(RegisterView):
     template_name = 'pro_auth/register_social.html'
 
     def form_valid(self, form):
-        _form_data = self.cleaned_data.copy()
-        _form_data['password'] = make_password(self.cleaned_data['password1'])
-        _form_data.pop('password1')
-        _form_data.pop('password2')
+        _form_data = dict(password=make_password(form.cleaned_data.pop('password1')),
+                          phone1=str(form.cleaned_data.pop('phone1')),
+                          location_id=form.cleaned_data.pop('location').pk,
+                          email=form.cleaned_data.pop('email'))
         self.request.session['social_form_data'] = _form_data
         return HttpResponseRedirect(reverse('social:complete', args=(self.kwargs.get('backend_name'),)))
 
@@ -68,6 +68,12 @@ class Login(FormView):
 
     def get_template_names(self):
         return [self.ajax_template_name] if self.request.is_ajax() else [self.template_name]
+
+
+class SocialExistUserLogin(Login):
+    def form_valid(self, form):
+        self.request.session['user_pk'] = form.get_user().pk
+        return HttpResponseRedirect(reverse('social:complete', args=(self.kwargs.get('backend_name'),)))
 
 
 class Logout(View):
@@ -101,7 +107,6 @@ class UserEmailConfirm(View):
             user.save()
             login(request, user)
             return HttpResponseRedirect('/')
-        raise Http404
 
 
 class UserPasswordReset(FormView):

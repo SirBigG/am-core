@@ -1,3 +1,18 @@
 {% extends 'pro_auth/register.html' %}
+{% load i18n %}
 
-{% block action_block %}/register/social/{{ view.kwargs.backend_name }}/{% endblock %}
+{% block help_text %}
+    <div class="col-md-12">
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <p class="text-justify">{% trans 'Якщо у вас вже є користувач на сайті перейдіть за ' %}
+                    <a href="{% url 'pro_auth:social-user-exist' view.kwargs.backend_name %}">
+                        {% trans 'посиланням' %}
+                    </a>
+                {% trans ', щоб привязати акаунт у соцмережі до акаунту на сайті.' %}</p>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block action_block %}{% url 'pro_auth:social-register' view.kwargs.backend_name %}{% endblock %}

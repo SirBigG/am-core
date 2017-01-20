@@ -5,11 +5,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView
 
 from core.pro_auth.views import RegisterView, Login, Logout, UserEmailConfirm, UserPasswordReset, IsAuthenticate, \
-    SocialRegisterView
+    SocialRegisterView, SocialExistUserLogin
 
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
     url(r'^register/social/(?P<backend_name>[\w-]+)/$', SocialRegisterView.as_view(), name='social-register'),
+    url(r'^register/social/(?P<backend_name>[\w-]+)/login/$', SocialExistUserLogin.as_view(), name='social-user-exist'),
     url(r'^login/$', Login.as_view(), name='login'),
     url(r'^logout/$', Logout.as_view(), name='logout'),
     url(r'^is-authenticate/$', IsAuthenticate.as_view(), name='is_authenticate'),
