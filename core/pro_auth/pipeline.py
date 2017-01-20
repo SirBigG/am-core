@@ -27,7 +27,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     user = user
     if user:
         return {'is_new': False}
-    _user_pk = strategy.session_get('user_pk', None)
+    _user_pk = backend.strategy.session_get('user_pk', None)
     if _user_pk:
         return {'is_new': True, 'user': get_user_model().objects.get(pk=_user_pk)}
     fields = dict((name, kwargs.get(name, details.get(name)))
@@ -35,7 +35,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     if not fields:
         return
 
-    fields.update(strategy.session_get('social_form_data'))
+    fields.update(backend.strategy.session_get('social_form_data'))
 
     return {
         'is_new': True,
