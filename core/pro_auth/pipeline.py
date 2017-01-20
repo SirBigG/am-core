@@ -24,9 +24,12 @@ def add_user_extra_data(strategy, backend, request, details, *args, **kwargs):
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
-    user = user or get_user_model().objects.get(pk=strategy.session_get('user_pk'))
+    user = user
     if user:
-        return {'is_new': False, 'user': user}
+        return {'is_new': False}
+    _user_pk = strategy.session_get('user_pk', None)
+    if _user_pk:
+        return {'is_new': True, 'user': get_user_model().objects.get(pk=_user_pk)}
     fields = dict((name, kwargs.get(name, details.get(name)))
                   for name in backend.setting('USER_FIELDS', USER_FIELDS))
     if not fields:
