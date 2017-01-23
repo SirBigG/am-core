@@ -175,14 +175,16 @@ class IsAuthenticateTests(TestCase):
 
 class SocialRegisterViewTests(TestCase):
     def test_valid_data(self):
+        os.environ['RECAPTCHA_TESTING'] = 'True'
         loc = LocationFactory()
         data = {'email': 'test@test.com', 'phone1': '+380991234567', 'password1': '11111', 'password2': '11111',
-                'location': loc.pk}
+                'location': loc.pk, 'g-recaptcha-response': 'PASSED'}
         response = self.client.post('/register/social/vk-oauth2/', data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], reverse('social:complete', args=('vk-oauth2',)))
         session = self.client.session
         self.assertIsNotNone(session.get('social_form_data'))
+        del os.environ['RECAPTCHA_TESTING']
 
     def test_get(self):
         response = self.client.post('/register/social/vk-oauth2/')

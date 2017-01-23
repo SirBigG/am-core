@@ -14,7 +14,7 @@ from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 
 
-from core.pro_auth.forms import UserCreationForm, EmailConfirmForm, AdminUserCreationForm, LoginForm
+from core.pro_auth.forms import UserCreationForm, EmailConfirmForm, LoginForm
 from core.pro_auth.models import User
 
 
@@ -39,7 +39,6 @@ class RegisterView(FormView):
 
 
 class SocialRegisterView(RegisterView):
-    form_class = AdminUserCreationForm
     template_name = 'pro_auth/register_social.html'
 
     def form_valid(self, form):
