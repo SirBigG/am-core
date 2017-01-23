@@ -3,7 +3,7 @@
 
 {% block base_content_block %}
     {% block help_text %}{% endblock %}
-    <form method="post" action="{% block action_block %}/register/{% endblock %}">
+    <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
         {% csrf_token %}
         <div class="col-md-12 text-center">
             {% for error in form.non_field_errors %}

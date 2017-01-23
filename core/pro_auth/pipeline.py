@@ -13,29 +13,29 @@ def add_user_extra_data(strategy, backend, request, details, *args, **kwargs):
     if kwargs.get('user', None):
         return
     # For existing users association
-    _user_pk = backend.strategy.session.get('user_pk', None)
-    if _user_pk:
+    if backend.strategy.session_get('user_pk'):
         return
-    _form_data = backend.strategy.session.get('social_form_data', None)
-    if not _form_data:
+    if not backend.strategy.session_get('social_form_data'):
         # For adding extra data for new user creation
         return HttpResponseRedirect(redirect_to=reverse('pro_auth:social-register', args=(backend.name,)))
     return
 
 
 def create_user(strategy, details, backend, user=None, *args, **kwargs):
-    user = user
+    _user_pk = backend.strategy.session_pop('user_pk')
+    if _user_pk:
+        return {'is_new': False, 'user': get_user_model().objects.get(pk=_user_pk)}
     if user:
         return {'is_new': False}
-    _user_pk = backend.strategy.session_get('user_pk', None)
-    if _user_pk:
-        return {'is_new': True, 'user': get_user_model().objects.get(pk=_user_pk)}
     fields = dict((name, kwargs.get(name, details.get(name)))
                   for name in backend.setting('USER_FIELDS', USER_FIELDS))
+
+    _user_data = backend.strategy.session_pop('social_form_data')
+    if _user_data:
+        fields.update(_user_data)
+
     if not fields:
         return
-
-    fields.update(backend.strategy.session_get('social_form_data'))
 
     return {
         'is_new': True,
