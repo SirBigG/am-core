@@ -10,7 +10,7 @@ module.exports = {
     //because you will specify extensions later in the `resolve` section
     entry: { main: './index.js',
              index: './jsx/main_index.js',
-             detail: './detail_index.js',
+             detail: './jsx/detail/detail_index.js',
              personal: './jsx/personal_index.js'
     },
 

@@ -14,6 +14,7 @@ class PostAdmin(TranslationAdmin):
         PhotoInLine,
     ]
     list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', )
+    readonly_fields = ('slug', )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)

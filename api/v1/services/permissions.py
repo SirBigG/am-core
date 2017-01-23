@@ -4,7 +4,7 @@ from rest_framework.permissions import BasePermission, IsAuthenticated
 SECURE_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH']
 
 
-class CommentsCreateUpdatePermission(BasePermission):
+class CreateUpdatePermission(BasePermission):
     """For security user information from other users."""
     def has_permission(self, request, view):
         if request.method in SECURE_METHODS:

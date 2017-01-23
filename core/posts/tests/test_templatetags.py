@@ -5,7 +5,7 @@ from django.test import TestCase
 from core.utils.tests.factories import PostFactory, CategoryFactory
 
 from core.posts.templatetags.post_extras import posts_list, main_menu, \
-    full_url, group_by, grouped, times
+    full_url, group_by, grouped, times, second_menu
 
 
 class PostExtrasTests(TestCase):
@@ -43,3 +43,9 @@ class PostExtrasTests(TestCase):
 
     def test_times_filter(self):
         self.assertEqual(times(5), range(1, 6))
+
+    def test_second_menu(self):
+        parent = CategoryFactory(slug='parent')
+        CategoryFactory(parent=parent)
+        CategoryFactory(parent=parent)
+        self.assertEqual(len(second_menu({'parent': 'parent'})['menu_items']), 2)

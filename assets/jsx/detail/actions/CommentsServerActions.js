@@ -4,11 +4,17 @@ import CommentsConstants from '../constants/CommentsConstants';
 
 module.exports = {
 
-    receiveComments: (data) => {
-        DetailDispatcher.handleServerAction({
-            actionType: CommentsConstants.GET_COMMENTS_RESPONSE,
-            data: data
-        })
+    receiveComments: (url) => {
+        fetch(url).then((response) => {
+                    if (response.status === 200){
+                            response.json().then((json) =>{
+                                DetailDispatcher.handleServerAction({
+                                    actionType: CommentsConstants.GET_COMMENTS_RESPONSE,
+                                    data: json.results
+                                });
+                        });
+                    }}
+            );
     },
     createComment: (comment) => {
         DetailDispatcher.handleServerAction({

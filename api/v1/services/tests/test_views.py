@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 from django.contrib.contenttypes.models import ContentType
 
-from core.utils.tests.factories import UserFactory, PostFactory, CommentsFactory
-from core.services.models import Comments
+from core.utils.tests.factories import UserFactory, PostFactory, CommentsFactory, CategoryFactory
+from core.services.models import Comments, Reviews
 
 from rest_framework.test import APIClient, APITestCase
 
@@ -66,3 +66,16 @@ class PostCommentsTests(APITestCase):
         self.assertTrue(Comments.objects.get(object_id=p.pk, text='root'))
 
     # TODO create tests for update
+
+
+class CategoryReviewsViewSetTests(APITestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.client.force_login(self.user)
+        self.category = CategoryFactory(slug='view_set_test')
+
+    def test_create_review(self):
+        response = self.client.post('/api/category/reviews/', {'description': 'description test',
+                                                               'mark': 5, 'slug': 'view_set_test'})
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(response.data)

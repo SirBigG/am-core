@@ -5,6 +5,8 @@ from django.test import TestCase
 from core.utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
     CategoryFactory
 
+from core.classifier.models import Category
+
 
 class PostTests(TestCase):
 
@@ -20,6 +22,16 @@ class PostTests(TestCase):
         child2 = CategoryFactory(parent=child, slug='ccc')
         post = PostFactory(rubric=child2, slug='ddd', id='12')
         self.assertEqual(post.get_absolute_url(), '/bbb/ccc/ddd-12.html')
+
+    def test_auto_slug_create(self):
+        post = PostFactory(title='Тест автоідентифікатор', slug=None)
+        self.assertEqual(post.slug, 'test-avtoidentyfikator')
+
+    def test_category_created(self):
+        rubric = CategoryFactory(value='breeds', is_for_user=True, is_active=True)
+        post = PostFactory(rubric=rubric, title='Породи голубів', slug=None)
+        self.assertEqual(post.slug, 'porody-holubiv')
+        self.assertTrue(Category.objects.get(slug=post.slug))
 
 
 class PhotoTests(TestCase):

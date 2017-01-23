@@ -3,11 +3,12 @@ from __future__ import unicode_literals
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.pagination import PageNumberPagination
 
-from api.v1.services.serializers import CommentsSerializer
-from api.v1.services.permissions import CommentsCreateUpdatePermission
+from api.v1.services.serializers import CommentsSerializer, ReviewsSerializer
+from api.v1.services.permissions import CreateUpdatePermission
 
 from core.services.models import Comments
 from core.pro_auth.models import User
+from core.classifier.models import Category
 
 from django.contrib.contenttypes.models import ContentType
 
@@ -26,7 +27,7 @@ class PostCommentsViewSet(ModelViewSet):
                  POST: /api/post/comments/ - create comment for post(id in request body)."""
     serializer_class = CommentsSerializer
     pagination_class = PostCommentsPagination
-    permission_classes = [CommentsCreateUpdatePermission, ]
+    permission_classes = [CreateUpdatePermission, ]
 
     def get_queryset(self):
         post_id = self.request.query_params.get('post', None)
@@ -41,3 +42,12 @@ class PostCommentsViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user, content_type=ContentType.objects.get(model='post'))
+
+
+class CategoryReviewsViewSet(ModelViewSet):
+    serializer_class = ReviewsSerializer
+    permission_classes = [CreateUpdatePermission, ]
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user, content_type=ContentType.objects.get(model='category'),
+                        object_id=Category.objects.get(slug=self.request.data.get('slug')).pk)

@@ -1,15 +1,15 @@
-from django.forms import ModelForm, TextInput, Textarea
+from django import forms
 
 from core.services.models import Feedback
 
 
-class FeedbackForm(ModelForm):
+class FeedbackForm(forms.ModelForm):
     class Meta:
         model = Feedback
         fields = '__all__'
         widgets = {
-            'title': TextInput(attrs={'class': 'form-control input-lg'}),
-            'email': TextInput(attrs={'class': 'form-control input-lg'}),
-            'text': Textarea(attrs={'class': 'form-control input-lg',
-                                    'cols': 60, 'rows': 6})
+            'title': forms.TextInput(attrs={'class': 'form-control input-lg'}),
+            'email': forms.TextInput(attrs={'class': 'form-control input-lg'}),
+            'text': forms.Textarea(attrs={'class': 'form-control input-lg',
+                                          'cols': 60, 'rows': 6})
         }

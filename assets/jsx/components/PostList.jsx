@@ -50,6 +50,13 @@ const PostList = React.createClass({
         window.scrollTo(0, 0)
     },
     render() {
+        if(this.state.data === []){
+            return (<div>
+                        <i class="fa fa-spinner fa-pulse fa-3x fa-fw"> </i>
+                        <span class="sr-only">Loading...</span>
+                    </div>
+            )
+        }
         var postNodes = this.state.data.map((group, i) => {
             return (<div className="row" key={i}>
                       <ListPostItem group={group} grid_class={this.props.grid} />

@@ -54,7 +54,6 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         PostFactory(rubric=self.post.rubric)
         response = client.get('/' + self.parent.slug + '/' + slug + '/')
         self.assertEqual(len(response.context['object_list']), 3)
-        self.assertEqual(len(response.context['menu_items']), 1)
         self.assertEqual(response.context['category'], self.post.rubric)
 
     def test_child_list_404(self):

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% load post_extras cache %}
+
+
+{% block content %}
+        <div class="row">
+          <div class="col-md-12">
+            <ul class="media-list">
+                {% for obj in object_list %}
+                    <li class="media">
+                        <div class="media-body">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <h4 class="media-heading">{{ obj.user }}    <small>{{ obj.date }}</small>    <span class="pull-right">{{ obj.mark }}</span></h4>
+                                    <p class="text-justify">{{ obj.description }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+          </div>
+        </div>
+
+    {% include "helpers/pagination.html" %}
+{% endblock content %}

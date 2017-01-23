@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import get_language, ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse
 
@@ -11,6 +11,8 @@ from core.classifier.models import Category
 from core.services.models import MetaData
 
 from ckeditor.fields import RichTextField
+
+from transliterate import slugify
 
 WORK_STATUS = (
     (1, _('Translate')),
@@ -50,6 +52,16 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    def _save_category(self):
+        if self.rubric.is_for_user:
+            Category.objects.get_or_create(slug=self.slug, parent=self.rubric, value=self.title)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title.lower(), get_language()[:2])
+        self._save_category()
+        super().save(*args, **kwargs)
 
     def get_absolute_url(self):
         return reverse('post-detail', args=(self.rubric.parent.slug, self.rubric.slug,

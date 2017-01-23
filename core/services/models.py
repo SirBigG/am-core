@@ -52,6 +52,27 @@ class Comments(MPTTModel):
 
     class MPTTMeta:
         verbose_name_plural = _('Comments')
+        verbose_name = _('Comment')
 
     def __str__(self):
         return self.text
+
+
+MARKS = [(i, i) for i in range(1, 6)]
+
+
+class Reviews(models.Model):
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveIntegerField()
+    content_object = GenericForeignKey('content_type', 'object_id')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Review owner.'))
+    mark = models.IntegerField(choices=MARKS, verbose_name=_('Mark'))
+    description = models.TextField(verbose_name=_('Review description'))
+    date = models.DateTimeField(auto_now_add=True, verbose_name=_('Review date'))
+
+    class Meta:
+        verbose_name = _('Review')
+        verbose_name_plural = _('Reviews')
+
+    def __str__(self):
+        return '%i-%s' % (self.mark, self.description)

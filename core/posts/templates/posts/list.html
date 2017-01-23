@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load post_extras cache %}
 
 {% block title %}
     {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.title }} |{% endif %}
@@ -12,7 +12,9 @@
 
 
 {% block second_menu %}
-    {% include 'posts/second_menu.html' %}
+    {% cache 3600 'second_menu' view.kwargs %}
+        {% second_menu view.kwargs %}
+    {% endcache %}
 {% endblock second_menu %}
 
 {% block content %}

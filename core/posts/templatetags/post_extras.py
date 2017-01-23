@@ -31,6 +31,12 @@ def main_menu():
     return {'roots': roots}
 
 
+@register.inclusion_tag('posts/second_menu.html')
+def second_menu(dict_):
+    parent = Category.objects.get(slug=dict_['parent'])
+    return {'menu_items': parent.get_children()}
+
+
 @register.simple_tag
 def full_url(url):
     """

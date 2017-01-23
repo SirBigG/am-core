@@ -1,15 +1,10 @@
 import DetailDispatcher from './../dispatcher/DetailDispatcher'
-import events from 'events'
 import CommentsConstants from './../constants/CommentsConstants'
-
-
-var EventEmitter = events.EventEmitter;
-
-var CHANGE_EVENT = 'change';
+import StoreEventsMixin from './../../mixins/StoreEventsMixin'
 
 var _comments = [];
 
-var CommentsStore = Object.assign({}, EventEmitter.prototype, {
+var CommentsStore = Object.assign({}, StoreEventsMixin, {
     getComments() {
         return _comments;
     },
@@ -18,18 +13,7 @@ var CommentsStore = Object.assign({}, EventEmitter.prototype, {
     },
     setComment(comment){
         _comments.push(comment)
-    },
-    emitChange()  {
-        this.emit(CHANGE_EVENT)
-    },
-    addChangeListener(cb) {
-        this.on(CHANGE_EVENT, cb);
-    },
-
-    removeChangeListener(cb) {
-        this.removeListener(CHANGE_EVENT, cb);
     }
-
 });
 
 

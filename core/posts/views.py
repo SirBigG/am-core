@@ -22,7 +22,6 @@ class PostList(ListView):
         """
         context = super(PostList, self).get_context_data(**kwargs)
         parent = Category.objects.get(slug=self.kwargs['parent'])
-        context['menu_items'] = parent.get_children()
         category = Category.objects.get(slug=self.kwargs['child']) if 'child' in self.kwargs else parent
         context['category'] = category
         return context

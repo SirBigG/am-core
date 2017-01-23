@@ -1,0 +1,31 @@
+.star-rating__wrap{
+	&:after{
+		content: "";
+		display: table;
+		clear: both;
+	}
+	display: inline-block;
+	font-size: 2rem;
+	direction: rtl;
+
+	.star-rating__ico {
+		float: right;
+		padding-left: 2px;
+		cursor: pointer;
+		color: #FFB300;
+		&:last-child {
+			padding-left: 0;
+		}
+		&:hover:before,
+		&:hover ~ .star-rating__ico:before {
+			content: "\f005";
+		}
+	}
+
+	.star-rating__input {
+		display: none;
+		&:checked ~ .star-rating__ico:before {
+			content: "\f005";
+		}
+	}
+}

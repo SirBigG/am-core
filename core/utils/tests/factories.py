@@ -6,7 +6,7 @@ from core.pro_auth.models import User
 from core.classifier.models import Location, Country, Region, \
     Area, Category
 from core.posts.models import Post, Photo, Comment
-from core.services.models import Feedback, MetaData, Comments
+from core.services.models import Feedback, MetaData, Comments, Reviews
 
 from django.contrib.auth.hashers import make_password
 
@@ -165,3 +165,11 @@ class CommentsFactory(BaseFactory):
         model = Comments
 
     text = 'comment text'
+
+
+class ReviewsFactory(BaseFactory):
+    class Meta:
+        model = Reviews
+
+    description = 'description'
+    mark = 5

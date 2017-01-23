@@ -2,7 +2,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 import GetCookieMixin from '../../mixins/GetCookieMixin';
-import FieldChangeHandlersMixin from '../../mixins/FieldChangeHandlersMixin';
 import FieldErrorsMixin from '../../mixins/FieldErrorsMixin';
 
 import {createComment} from './../actions/CommentsServerActions'
@@ -10,7 +9,7 @@ import {createComment} from './../actions/CommentsServerActions'
 const fieldClass = "form-control";
 
 var CommentsForm = React.createClass({
-    mixins: [GetCookieMixin, FieldChangeHandlersMixin, FieldErrorsMixin],
+    mixins: [GetCookieMixin, FieldErrorsMixin],
     getInitialState() {
         return {errors: {}}
     },

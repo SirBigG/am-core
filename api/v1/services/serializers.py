@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from core.services.models import Comments
+from core.services.models import Comments, Reviews
 from core.pro_auth.models import User
 
 from rest_framework import serializers
@@ -28,3 +28,9 @@ class CommentsSerializer(serializers.ModelSerializer):
                                                              'text': 'root'})
             validated_data.update({'parent': root})
         return Comments.objects.create(**validated_data)
+
+
+class ReviewsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Reviews
+        fields = ('pk', 'mark', 'description')
