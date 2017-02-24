@@ -29,7 +29,7 @@ var $ = require('jquery');
                     $('#auth-btn').html(
                         '<li>' +
                         '<button onclick="' + user_url + '" ' +
-                        'class="btn btn-primary navbar-btn"> Особистий кабінет </button>' +
+                        'class="btn btn-primary navbar-btn"> Особистий кабінет </button> ' +
                         '<button onclick="location.href=/logout/" class="btn btn-primary navbar-btn"> Вийти </button>' +
                         '</li>'
                     );

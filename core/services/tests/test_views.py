@@ -35,15 +35,20 @@ class IsReviewedTests(TestCase):
                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['is-reviewed'], 0)
+        self.assertEqual(response.json()['is-valid'], 0)
 
     def test_authorized_with_review(self):
         self.client.force_login(self.user)
-        ReviewsFactory(user=self.user, content_type=ContentType.objects.get(model='reviews'),
-                       object_id=self.category.pk)
-        response = self.client.get('/service/reviews/is-reviewed/', data={'slug': 'test_slug'},
+        self.category.is_for_user = True
+        self.category.save()
+        cat = CategoryFactory(parent=self.category, slug='valid-slug')
+        ReviewsFactory(user=self.user, content_type=ContentType.objects.get(model='category'),
+                       object_id=cat.pk)
+        response = self.client.get('/service/reviews/is-reviewed/', data={'slug': 'valid-slug'},
                                    HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['is-reviewed'], 1)
+        self.assertEqual(response.json()['is-valid'], 1)
 
     def test_not_ajax_response(self):
         self.client.force_login(self.user)
