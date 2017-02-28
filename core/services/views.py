@@ -24,18 +24,18 @@ class ReviewInfoView(View):
             if not request.user.is_authenticated:
                 return HttpResponseForbidden()
             if request.GET.get('slug', None):
-                category = Category.objects.select_related('parent').get(slug=request.GET.get('slug'))
-                parent = category.parent
-                is_valid = 1 if parent and parent.is_for_user else 0
-                is_reviewed = None
-                if is_valid:
-                    try:
-                        Reviews.objects.get(object_id=category.pk,
-                                            user=request.user)
-                        is_reviewed = 1
-                    except Reviews.DoesNotExist:
-                        is_reviewed = 0
-                return JsonResponse({'is-valid': is_valid, 'is-reviewed': 0 if is_reviewed is None else is_reviewed})
+                is_valid = 0
+                is_reviewed = 0
+                try:
+                    category = Category.objects.select_related('parent').get(slug=request.GET.get('slug'))
+                    parent = category.parent
+                    if parent and parent.is_for_user:
+                        is_valid = 1
+                        if Reviews.objects.filter(object_id=category.pk, user=request.user).exists():
+                            is_reviewed = 1
+                except Category.DoesNotExist:
+                    pass
+                return JsonResponse({'is-valid': is_valid, 'is-reviewed': is_reviewed})
         raise Http404
 
 

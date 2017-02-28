@@ -7,7 +7,7 @@ import ListPostItem from './ListPostItem'
 const PostList = React.createClass({
 
     getInitialState() {
-        return {data: [], previous: "", next: "", url: ""};
+        return {data: undefined, previous: "", next: "", url: ""};
     },
     componentWillReceiveProps(newProps) {
         this.setState({url: newProps.url});
@@ -23,7 +23,8 @@ const PostList = React.createClass({
         fetch(url,
             {
                 method: 'GET',
-                credentials: 'same-origin'
+                credentials: 'same-origin',
+                headers: {'X-Requested-With': 'XMLHttpRequest'}
             }
         )
             .then(
@@ -50,10 +51,10 @@ const PostList = React.createClass({
         window.scrollTo(0, 0)
     },
     render() {
-        if(this.state.data === []){
+        if(!this.state.data){
             return (<div>
-                        <i class="fa fa-spinner fa-pulse fa-3x fa-fw"> </i>
-                        <span class="sr-only">Loading...</span>
+                        <i className="fa fa-spinner fa-pulse fa-3x fa-fw"> </i>
+                        <p className="sr-only">Loading...</p>
                     </div>
             )
         }
