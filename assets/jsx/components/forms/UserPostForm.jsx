@@ -5,7 +5,8 @@ import FieldChangeHandlersMixin from '../../mixins/FieldChangeHandlersMixin';
 import InputField from '../fields/InputField';
 import TextField from '../fields/TextField';
 import SelectField from '../fields/SelectField';
-import PhotoSet from '../PhotoSet'
+import PhotoSet from '../PhotoSet';
+import 'whatwg-fetch';
 
 const fieldClass = "form-control";
 

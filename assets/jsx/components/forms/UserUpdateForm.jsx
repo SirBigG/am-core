@@ -6,6 +6,7 @@ import ImageUploadField from '../fields/ImageUploadField';
 import DatePickerField from '../fields/DatePickerField';
 import GetCookieMixin from '../../mixins/GetCookieMixin';
 import FieldChangeHandlersMixin from '../../mixins/FieldChangeHandlersMixin';
+import 'whatwg-fetch';
 
 
 const fieldClass = "form-control";

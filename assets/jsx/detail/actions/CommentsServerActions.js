@@ -1,6 +1,6 @@
 import DetailDispatcher from '../dispatcher/DetailDispatcher';
 import CommentsConstants from '../constants/CommentsConstants';
-
+import 'whatwg-fetch';
 
 module.exports = {
 

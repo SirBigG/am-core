@@ -1,5 +1,6 @@
 import React from 'react';
 import FieldErrorsMixin from '../../mixins/FieldErrorsMixin';
+import 'whatwg-fetch';
 
 const SelectField = React.createClass({
     mixins: [FieldErrorsMixin],

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import 'whatwg-fetch';
 
 import GetCookieMixin from '../../mixins/GetCookieMixin';
 import FieldErrorsMixin from '../../mixins/FieldErrorsMixin';

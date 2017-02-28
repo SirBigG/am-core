@@ -1,4 +1,5 @@
-import StoreEventsMixin from './../../mixins/StoreEventsMixin'
+import StoreEventsMixin from './../../mixins/StoreEventsMixin';
+import 'whatwg-fetch';
 
 var auth_data = new Map().set('is_auth', false).set('timestamp', 1000);
 

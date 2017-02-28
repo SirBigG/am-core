@@ -22,12 +22,13 @@
     "bootstrap": "^3.3.6",
     "bootstrap-datepicker": "^1.6.4",
     "ckeditor": "^4.5.10",
+    "flux": "^3.1.0",
     "font-awesome": "^4.6.3",
     "jquery": "^2.2.4",
     "react": "^15.1.0",
     "react-dom": "^15.1.0",
     "react-router": "^2.6.1",
-    "flux": "^3.1.0"
+    "whatwg-fetch": "^2.0.2"
   },
   "devDependencies": {
     "babel": "^6.5.2",

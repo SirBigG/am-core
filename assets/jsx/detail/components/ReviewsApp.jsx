@@ -1,4 +1,5 @@
 import React from 'react';
+import 'whatwg-fetch';
 
 import AuthStore from '../stores/AuthStore'
 import ReviewForm from '../components/ReviewForm'
