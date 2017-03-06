@@ -10,7 +10,8 @@ const TextField = React.createClass({
         return {value: ''}
     },
     componentDidMount(){
-      CKEDITOR.replace(this.props.name, {language: 'uk', uiColor: '#428BCA', height: this.props.height});
+      CKEDITOR.replace(this.props.name, {language: 'uk', uiColor: '#428BCA', height: this.props.height,
+          toolbar: [['Cut', 'Copy', 'Paste', '-', 'Undo', 'Redo'],['Bold', 'Italic'], ['NumberedList', 'BulletedList']]});
     },
     componentWillReceiveProps(newProps) {
         this.setState({value: newProps.value});

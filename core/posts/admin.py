@@ -1,6 +1,8 @@
 from django.contrib import admin
+from django import forms
 
 from core.posts.models import Post, Photo, Comment
+from core.classifier.models import Category
 
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 
@@ -9,7 +11,16 @@ class PhotoInLine(TranslationTabularInline):
     model = Photo
 
 
+class AdminPostForm(forms.ModelForm):
+    rubric = forms.ModelChoiceField(queryset=Category.objects.filter(level=2))
+
+    class Meta:
+        model = Post
+        fields = '__all__'
+
+
 class PostAdmin(TranslationAdmin):
+    form = AdminPostForm
     inlines = [
         PhotoInLine,
     ]
