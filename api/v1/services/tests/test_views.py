@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 
 from core.utils.tests.factories import UserFactory, PostFactory, CommentsFactory, CategoryFactory
-from core.services.models import Comments, Reviews
+from core.services.models import Comments
 
 from rest_framework.test import APIClient, APITestCase
 

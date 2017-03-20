@@ -12,12 +12,11 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="navbar-brand" href="/">
-                <img alt="Agro Mega" src="{% static 'image/brand.jpg' %}" width="100" height="25">
+                AgroMega
             </a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
-                <li><a>AgroMega</a></li>
                 {% cache 3600 'main_menu' %}
                     {% main_menu %}
                 {% endcache %}

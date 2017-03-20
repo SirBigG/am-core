@@ -49,6 +49,7 @@ class Post(models.Model):
         db_table = 'post'
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
+        ordering = ['-publish_date']
 
     def __str__(self):
         return self.title

@@ -26,7 +26,8 @@ class IsReviewedTests(TestCase):
         self.category = CategoryFactory(slug='test_slug')
 
     def test_response_not_authorized(self):
-        response = self.client.get('/service/reviews/is-reviewed/', data={'slug': 'test_slug'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.get('/service/reviews/is-reviewed/', data={'slug': 'test_slug'},
+                                   HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, 403)
 
     def test_authorized_without_review(self):
