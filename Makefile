@@ -1,7 +1,7 @@
 MANAGE=manage.py
-SETTINGS=agro_portal.settings
-DEV_SETTINGS=agro_portal.dev
-TEST_SETTINGS=agro_portal.test_settings
+SETTINGS=settings.settings
+DEV_SETTINGS=settings.dev
+TEST_SETTINGS=settings.test_settings
 
 deploy: pull update webpack test migrate statics compilemessages
 
@@ -57,6 +57,3 @@ coverage_api:
 
 pull:
 	git pull origin master
-
-reload:
-	uwsgi --reload /home/agr/golub_portal/agro_portal/tmp/project-master.pid

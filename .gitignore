@@ -5,7 +5,7 @@ env/
 .coverage
 /htmlcov/*
 *.mo
-/agro_portal/tmp/*
+/tmp/*
 /static/*
 *~
 *.*~

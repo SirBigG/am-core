@@ -19,17 +19,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'v$rhqt_l$w55_wg4yz6yz&$#g@7$7_im0=r&$*dcx=8ei#)%yq'
-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-HOST = 'https://agromega.in.ua'
+HOST = 'localhost:8000'
 
-ALLOWED_HOSTS = ['.agromega.in.ua']
+ALLOWED_HOSTS = ['localhost:8000']
 
-WSGI_APPLICATION = 'agro_portal.wsgi.application'
+WSGI_APPLICATION = 'settings.wsgi.application'
 
 # https settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
@@ -92,7 +89,7 @@ MIDDLEWARE_CLASSES = (
     'core.utils.middleware.SecurityMiddleware',
 )
 
-ROOT_URLCONF = 'agro_portal.urls'
+ROOT_URLCONF = 'settings.urls'
 
 
 TEMPLATES = [
@@ -167,14 +164,6 @@ SOCIAL_AUTH_PIPELINE = (
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
-
-# ========================================================================================
-# ReCaptcha settings
-# ========================================================================================
-
-RECAPTCHA_PUBLIC_KEY = '6LdxSyITAAAAAJNvP7eOrHlGRddLF3OgOUiAqvxj'
-RECAPTCHA_PRIVATE_KEY = '6LdxSyITAAAAAJIeEbsTxqTYRAGVtFqWexypK_se'
-NOCAPTCHA = True
 
 # ========================================================================================
 # Internationalization

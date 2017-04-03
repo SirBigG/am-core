@@ -1,4 +1,4 @@
-from agro_portal.settings import *
+from settings.settings import *
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

@@ -1,4 +1,4 @@
-from agro_portal.settings import *  # noqa
+from settings.settings import *  # noqa
 
 ALLOWED_HOSTS = ['localhost:8000', 'localhost']
 
