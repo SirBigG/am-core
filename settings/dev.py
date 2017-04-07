@@ -1,6 +1,18 @@
 from settings.settings import *  # noqa
 
-ALLOWED_HOSTS = ['localhost:8000', 'localhost']
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': "postgres",
+        'USER': 'postgres',
+        'HOST': 'db',
+        'PORT': '5432',
+    }
+}
+
+ALLOWED_HOSTS = ['*']
+
+SECRET_KEY = 'adrfgnlkjbh25687ywdrgn45wrth$#%#&356'
 
 DEBUG = True
 
