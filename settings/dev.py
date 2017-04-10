@@ -23,3 +23,6 @@ CACHES = {
         'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
     }
 }
+
+STATIC_ROOT = '/static'
+MEDIA_ROOT = '/media'

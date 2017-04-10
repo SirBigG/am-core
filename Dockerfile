@@ -14,5 +14,3 @@
  ADD docker/uwsgi.ini /am-core/docker/
 
  ADD . /am-core/
-
- CMD uwsgi --ini docker/uwsgi.ini | sleep 365d | python3 manage.py migrate --settings=settings.dev
