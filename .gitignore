@@ -9,11 +9,6 @@ env/
 /static/*
 *~
 *.*~
-/assets/node_modules/*
-/assets/bundles/*
-webpack-stats.json
 /media/*
-/bower_components/*
 settings_local.py
 Ukrainian_cities.xls
-npm-debug.log

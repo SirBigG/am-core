@@ -1,6 +1,5 @@
 {% load i18n %}
 {% load static %}
-{% load render_bundle from webpack_loader %}
 <!DOCTYPE html>
 <html lang="uk">
     <head>
@@ -93,7 +92,7 @@
         <noscript><div><img src="https://mc.yandex.ru/watch/36784110" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
         <!-- /Yandex.Metrika counter -->
 
-        <!-- For webpack loader inclusion scripts. -->
-        {% render_bundle 'main' %}
+        {# TODO: adding versions for static #}
+        <script src="{% static "bundles/main.js" %}"></script>
     </body>
 </html>

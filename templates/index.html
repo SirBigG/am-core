@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
 {% load post_extras %}
-{% load render_bundle from webpack_loader %}
+{% load static %}
 
 {% block content %}
     <div id="main-list"></div>
 
-    {% render_bundle 'index' %}
+    {# TODO: adding versions for static #}
+    <script src="{% static "bundles/main.js" %}"></script>
 {% endblock %}

@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
 {% load static staticfiles i18n %}
-{% load render_bundle from webpack_loader %}
 {% load cache %}
 
 {% block title %}
@@ -109,5 +108,7 @@
         <div id="comment" class="{{ object.id }}"></div>
     </div>
 
-    {% render_bundle 'detail' %}
+
+    {# TODO: adding versions for static #}
+    <script src="{% static "bundles/detail.js" %}"></script>
 {% endblock content %}

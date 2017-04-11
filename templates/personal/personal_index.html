@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load i18n %}
-{% load render_bundle from webpack_loader %}
+{% load static %}
 
 {% block body_head_tag %}
     <body>
@@ -11,5 +11,6 @@
     {# React profile App block #}
     <div id="root"></div>
 
-    {% render_bundle 'personal' %}
+    {# TODO: adding versions for static #}
+    <script src="{% static "bundles/personal.js" %}"></script>
 {% endblock base_content_block %}

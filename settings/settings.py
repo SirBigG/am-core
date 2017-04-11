@@ -66,8 +66,6 @@ INSTALLED_APPS = [
     'mptt',
     # For nice working with text https://github.com/django-ckeditor/django-ckeditor
     'ckeditor',
-    # For integration django and webpack https://github.com/owais/django-webpack-loader
-    'webpack_loader',
     # For google ReCaptcha using: https://github.com/praekelt/django-recaptcha
     'captcha',
     # For social authentication: https://github.com/python-social-auth/social-app-django
@@ -204,20 +202,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR + '/static/'
-
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'assets'),
-    os.path.join(BASE_DIR, 'assets/node_modules/bootstrap/dist'),
-    os.path.join(BASE_DIR, 'assets/node_modules/jquery/dist'),
-]
-
-WEBPACK_LOADER = {
-    'DEFAULT': {
-        'CACHE': not DEBUG,
-        'BUNDLE_DIR_NAME': 'bundles/',
-        'STATS_FILE': os.path.join(BASE_DIR, 'assets/webpack-stats.json'),
-    }
-}
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
