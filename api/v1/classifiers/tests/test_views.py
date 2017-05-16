@@ -28,10 +28,11 @@ class LocationListTest(APITestCase):
         LocationFactory(value='Київ')
         LocationFactory(value='Краків')
         LocationFactory(value='Хоростків')
-        response = api_client.get(reverse('location-list'), data={"loc": "к"})
+        # Case sensitive because used SqlLite backend for tests
+        response = api_client.get(reverse('location-list'), data={"loc": "К"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 2)
-        response = api_client.get(reverse('location-list'), data={"loc": "кр"})
+        response = api_client.get(reverse('location-list'), data={"loc": "Кр"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data['results']), 1)
 

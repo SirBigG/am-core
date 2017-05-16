@@ -3,15 +3,10 @@ SETTINGS=settings.settings
 DEV_SETTINGS=settings.dev
 TEST_SETTINGS=settings.test_settings
 
-deploy: pull update webpack test migrate statics compilemessages
+deploy: pull update test migrate statics compilemessages
 
-update: pip_update npm_update
-
-pip_update:
+update:
 	pip install -r requirements.txt
-
-npm_update:
-	cd assets && npm install --no-optional
 
 test: test_core test_api flake
 
@@ -38,9 +33,6 @@ compilemessages:
 
 runserver:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) runserver
-
-webpack:
-	cd assets && npm run build
 
 dev:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(DEV_SETTINGS) ./$(MANAGE) runserver

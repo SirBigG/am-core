@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
 from django.test import TestCase, Client
@@ -15,10 +16,11 @@ class LocationAutocompleteTests(TestCase):
         response = client.get(reverse('location-autocomplete'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()['results'][0]['text'], str(loc))
-        LocationFactory(value=u'Львів')
+        LocationFactory(value='Львів')
         response = client.get(reverse('location-autocomplete'))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['results']), 2)
-        response = client.get(reverse('location-autocomplete') + u'?q=к')
+        # Case sensitive because used SqlLite backend for tests
+        response = client.get(reverse('location-autocomplete') + '?q=К')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()['results']), 1)
