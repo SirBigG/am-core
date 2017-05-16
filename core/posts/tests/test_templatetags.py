@@ -1,19 +1,15 @@
 from __future__ import unicode_literals
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from django.conf import settings
 
-from core.utils.tests.factories import PostFactory, CategoryFactory
+from core.utils.tests.factories import CategoryFactory
 
-from core.posts.templatetags.post_extras import posts_list, main_menu, \
-    full_url, group_by, grouped, times, second_menu
+from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu, \
+    static_version
 
 
 class PostExtrasTests(TestCase):
-
-    def test_posts_list(self):
-        PostFactory.create_batch(size=11)
-        self.assertEqual(len(posts_list(10)['posts']), 10)
-        self.assertEqual(len(posts_list(5)['posts']), 5)
 
     def test_main_menu(self):
         CategoryFactory.create_batch(size=5)
@@ -33,11 +29,11 @@ class PostExtrasTests(TestCase):
         value = [1, 2, 3]
         groups = group_by(value, 2)
         i = 0
-        for group in groups:
+        for _ in groups:
             i += 1
         self.assertEqual(i, 2)
         groups = group_by(value, 3)
-        for group in groups:
+        for _ in groups:
             i += 1
         self.assertEqual(i, 3)
 
@@ -48,4 +44,11 @@ class PostExtrasTests(TestCase):
         parent = CategoryFactory(slug='parent')
         CategoryFactory(parent=parent)
         CategoryFactory(parent=parent)
-        self.assertEqual(len(second_menu({'parent': 'parent'})['menu_items']), 2)
+        self.assertEqual(len(second_menu('parent')['menu_items']), 2)
+
+    def test_static_version_without_settings(self):
+        self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css' % settings.STATIC_URL)
+
+    @override_settings(MEDIA_VERSION='1.0')
+    def test_static_version_with_setting(self):
+        self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css?1.0' % settings.STATIC_URL)

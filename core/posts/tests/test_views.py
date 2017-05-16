@@ -28,16 +28,9 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         self.post = PostFactory(rubric=self.category)
 
     def test_parent_list(self):
-        response = client.get('/' + self.parent.slug + '/')
+        response = client.get('/%s/' % self.parent.slug)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['object_list']), 1)
-        PostFactory(rubric=self.post.rubric)
-        PostFactory(rubric=self.post.rubric)
-        response = client.get('/' + self.parent.slug + '/')
-        self.assertEqual(len(response.context['object_list']), 3)
-        PostFactory(rubric=self.post.rubric, status=0)
-        response = client.get('/' + self.parent.slug + '/')
-        self.assertEqual(len(response.context['object_list']), 3)
+        self.assertTemplateUsed(response, 'posts/parent_index.html')
         self.assertEqual(response.context['category'], self.parent)
 
     def test_parent_list_404(self):
@@ -46,23 +39,23 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
 
     def test_child_list(self):
         slug = self.post.rubric.slug
-        response = client.get('/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/%s/%s/' % (self.parent.slug, slug))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/' + self.parent.slug + '/' + slug + '/')
+        response = client.get('/%s/%s/' % (self.parent.slug, slug))
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(response.context['category'], self.post.rubric)
 
     def test_child_list_404(self):
-        response = client.get('/' + self.parent.slug + '/unknown/')
+        response = client.get('/%s/unknown/' % self.parent.slug)
         self.assertEqual(response.status_code, 404)
 
     def test_list_pagination(self):
         build_batch(PostFactory, 21, rubric=self.category)
-        response = client.get('/' + self.parent.slug + '/')
+        response = client.get('/%s/%s/' % (self.parent.slug, self.category.slug))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertTemplateUsed(response, 'helpers/pagination.html')
@@ -72,7 +65,7 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         self.assertEqual(response.context['page_obj'].number, 1)
         self.assertEqual(response.context['paginator'].num_pages, 2)
         self.assertIn(b'pagination', response.content)
-        response = client.get('/' + self.parent.slug + '/?page=2')
+        response = client.get('/%s/%s/?page=2' % (self.parent.slug, self.category.slug))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertTemplateUsed(response, 'helpers/pagination.html')
@@ -80,13 +73,14 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         self.assertTrue(response.context['page_obj'].has_previous())
         self.assertEqual(response.context['page_obj'].previous_page_number(), 1)
         self.assertEqual(response.context['page_obj'].number, 2)
+        self.assertMetaTagIn(response.content, 'robots')
         self.assertIn(b'pagination', response.content)
 
     def test_meta_data(self):
         meta = MetaDataFactory()
         self.parent.meta = meta
         self.parent.save()
-        response = client.get('/' + self.parent.slug + '/')
+        response = client.get('/%s/' % self.parent.slug)
         self.assertEqual(response.status_code, 200)
         self.assertMetaDataIn(response.content)
         self.assertH1(response.content)

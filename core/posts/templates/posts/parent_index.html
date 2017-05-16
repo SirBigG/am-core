@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% load post_extras cache %}
+
+{% block title %}
+    {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}
+{% endblock title %}
+
+{% block meta_description %}
+    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}
+{% endblock %}
+
+
+{% block second_menu %}
+    {% cache 3600 'second_menu' view.kwargs.parent category.slug %}
+        {% second_menu view.kwargs.parent category.slug %}
+    {% endcache %}
+{% endblock second_menu %}
+
+{% block content %}
+    <div class="list-h1">
+        <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
+    </div>
+    {% if category.meta and category.meta.text %}
+        <div class="col-md-12 col-xs-12">
+            <div class="text-justify">
+                {{ category.meta.text|safe }}
+            </div>
+        </div>
+    {% endif %}
+{% endblock content %}

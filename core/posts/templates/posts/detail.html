@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% load static staticfiles i18n %}
-{% load cache %}
+{% load staticfiles i18n %}
+{% load cache post_extras %}
 
 {% block title %}
     {% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}
@@ -26,11 +26,13 @@
 {% endblock extra_meta %}
 
 {% block second_menu %}
-    {% include 'posts/second_menu.html' %}
+    {% cache 3600 'second_menu' view.kwargs.parent category.slug %}
+        {% second_menu view.kwargs.parent object.rubric.slug %}
+    {% endcache %}
 {% endblock second_menu %}
 
 {% block content %}
-    <h1 class="clearfix">{% if object.meta %}{{ object.h1 }}{% else %}{{ object.title }}{% endif %}</h1>
+    <h1 class="clearfix">{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}</h1>
 
     <hr>
 
@@ -109,6 +111,5 @@
     </div>
 
 
-    {# TODO: adding versions for static #}
-    <script src="{% static "bundles/detail.js" %}"></script>
+    <script src="{% static_version 'bundles/detail.js' %}"></script>
 {% endblock content %}

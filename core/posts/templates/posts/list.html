@@ -1,25 +1,16 @@
-{% extends "base.html" %}
+{% extends "posts/parent_index.html" %}
 
-{% load post_extras cache %}
+{% load post_extras %}
 
-{% block title %}
-    {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.title }} |{% endif %}
-{% endblock title %}
-
-{% block meta_description %}
-    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}
-{% endblock %}
-
-
-{% block second_menu %}
-    {% cache 3600 'second_menu' view.kwargs %}
-        {% second_menu view.kwargs %}
-    {% endcache %}
-{% endblock second_menu %}
+{% block extra_meta %}
+    {% if page_obj.number > 1 %}
+        <meta name="robots" content="noindex,nofollow">
+    {% endif %}
+{% endblock extra_meta %}
 
 {% block content %}
     <div class="list-h1">
-        {% if category.meta and category.meta.h1 %}<h1>{{ category.meta.h1 }}</h1>{% endif %}
+        <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
     </div>
     {% for group in object_list|group_by:2 %}
         <div class="row">

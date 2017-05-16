@@ -2,23 +2,12 @@ from __future__ import unicode_literals
 
 from django import template
 from django.conf import settings
+from django.templatetags.static import static
 
-from core.posts.models import Post
 from core.classifier.models import Category
 
 
 register = template.Library()
-
-
-@register.inclusion_tag('posts/main_list.html')
-def posts_list(number):
-    """
-    Creating list of last posts for index page.
-    :param number: int
-    :return: posts queryset
-    """
-    qs = Post.objects.all().order_by('-publish_date')[:number]
-    return {'posts': qs}
 
 
 @register.inclusion_tag('posts/main_menu.html')
@@ -32,9 +21,9 @@ def main_menu():
 
 
 @register.inclusion_tag('posts/second_menu.html')
-def second_menu(dict_):
-    parent = Category.objects.get(slug=dict_['parent'])
-    return {'menu_items': parent.get_children()}
+def second_menu(parent_slug, current_slug=None):
+    parent = Category.objects.get(slug=parent_slug)
+    return {'menu_items': parent.get_children(), 'slug': current_slug}
 
 
 @register.simple_tag
@@ -74,3 +63,17 @@ def times(number):
     :return range obj:
     """
     return range(1, number+1)
+
+
+@register.simple_tag
+def static_version(path):
+    """
+    Add version end to static path.
+    :param path: path to static file
+    :return: full static file path with version
+    """
+    version = getattr(settings, 'MEDIA_VERSION', '')
+    _path = static(path)
+    if version:
+        _path = '{0}?{1}'.format(_path, version)
+    return _path

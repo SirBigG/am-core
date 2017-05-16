@@ -1,11 +1,9 @@
 {% extends "base.html" %}
 
 {% load post_extras %}
-{% load static %}
 
 {% block content %}
     <div id="main-list"></div>
 
-    {# TODO: adding versions for static #}
-    <script src="{% static "bundles/main.js" %}"></script>
+    <script src="{% static_version 'bundles/main.js' %}"></script>
 {% endblock %}

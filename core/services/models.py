@@ -30,6 +30,7 @@ class MetaData(models.Model):
     title = models.CharField(max_length=255, verbose_name=_('meta title'))
     description = models.CharField(max_length=255, verbose_name=_('meta description'))
     h1 = models.CharField(max_length=255, verbose_name=_('h1 tag'), blank=True, null=True)
+    text = models.TextField(blank=True, null=True, verbose_name=_('meta text'))
 
     class Meta:
         db_table = 'metadata'

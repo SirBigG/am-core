@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load i18n %}
-{% load static %}
+{% load post_extras %}
 
 {% block body_head_tag %}
     <body>
@@ -11,6 +11,5 @@
     {# React profile App block #}
     <div id="root"></div>
 
-    {# TODO: adding versions for static #}
-    <script src="{% static "bundles/personal.js" %}"></script>
+    <script src="{% static_version 'bundles/personal.js' %}"></script>
 {% endblock base_content_block %}
