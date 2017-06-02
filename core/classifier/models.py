@@ -99,7 +99,11 @@ class Category(MPTTModel):
 
     class MPTTMeta:
         order_insertion_by = ['slug']
+        verbose_name = _('Category')
         verbose_name_plural = _('Categories')
 
     def __str__(self):
         return self.value
+
+    def get_absolute_url(self):
+        return '/%s/' % '/'.join(self.get_ancestors(include_self=True).values_list('slug', flat=True)[1:])

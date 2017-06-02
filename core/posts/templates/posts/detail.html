@@ -31,6 +31,13 @@
     {% endcache %}
 {% endblock second_menu %}
 
+
+{% block breadcrumbs %}
+    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
+        {% breadcrumbs object.rubric object.title %}
+    {% endcache %}
+{% endblock %}
+
 {% block content %}
     <h1 class="clearfix">{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}</h1>
 

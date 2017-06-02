@@ -1,0 +1,16 @@
+<ol class="breadcrumb">
+  {% if post_title%}
+    {% for item in items %}
+      <li><a href="{{ item.get_absolute_url }}">{{item.value}}</a></li>
+    {% endfor %}
+    <li class="active">{{post_title}}</li>
+  {% else %}
+    {% for item in items %}
+      {% if forloop.last %}
+        <li class="active">{{item.value}}</li>
+      {% else %}
+        <li><a href="{{ item.get_absolute_url }}">{{item.value}}</a></li>
+      {% endif %}
+    {% endfor %}
+  {% endif %}
+</ol>

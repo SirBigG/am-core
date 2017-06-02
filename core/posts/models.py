@@ -56,7 +56,13 @@ class Post(models.Model):
 
     def _save_category(self):
         if self.rubric.is_for_user:
-            Category.objects.get_or_create(slug=self.slug, parent=self.rubric, value=self.title)
+            try:
+                category = Category.objects.get(slug=self.slug, parent=self.rubric)
+                if category.title != self.title:
+                    category.title = self.title
+                    category.save()
+            except Category.DoesNotExist:
+                Category.objects.create(slug=self.slug, parent=self.rubric, value=self.title)
 
     def save(self, *args, **kwargs):
         if not self.slug:

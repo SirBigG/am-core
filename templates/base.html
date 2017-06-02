@@ -30,10 +30,14 @@
         {% block header %}
             {% include 'header.html' %}
         {% endblock header %}
-
-        {% block second_menu %}{% endblock %}
-
         <div class="container">
+            <div class="row">
+              {% block second_menu %}{% endblock %}
+            </div>
+            <div class="row">
+               {% block breadcrumbs %}{% endblock %}
+            </div>
+
             {% block base_content_block %}
                 <div class="row">
                     <div class="col-sm-12 col-md-8">
@@ -57,7 +61,7 @@
         {% block extra_body %}{% endblock extra_body %}
 
 
-        <footer>
+        <footer class="footer--wrapper">
             {% block footer %}
                 {% include 'footer.html' %}
             {% endblock footer %}

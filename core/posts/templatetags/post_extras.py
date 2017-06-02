@@ -26,6 +26,12 @@ def second_menu(parent_slug, current_slug=None):
     return {'menu_items': parent.get_children(), 'slug': current_slug}
 
 
+@register.inclusion_tag('posts/breadcrumbs.html')
+def breadcrumbs(category, post_title=None):
+    """Breadcrumbs block."""
+    return {'items': category.get_ancestors(include_self=True)[1:], 'post_title': post_title}
+
+
 @register.simple_tag
 def full_url(url):
     """

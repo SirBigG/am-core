@@ -10,6 +10,8 @@ from mptt.fields import TreeForeignKey
 
 from core.pro_auth.models import User
 
+from ckeditor.fields import RichTextField
+
 
 class Feedback(models.Model):
     title = models.CharField(max_length=255, verbose_name=_('feedback topic'))
@@ -30,7 +32,7 @@ class MetaData(models.Model):
     title = models.CharField(max_length=255, verbose_name=_('meta title'))
     description = models.CharField(max_length=255, verbose_name=_('meta description'))
     h1 = models.CharField(max_length=255, verbose_name=_('h1 tag'), blank=True, null=True)
-    text = models.TextField(blank=True, null=True, verbose_name=_('meta text'))
+    text = RichTextField(blank=True, null=True, verbose_name=_('meta text'))
 
     class Meta:
         db_table = 'metadata'

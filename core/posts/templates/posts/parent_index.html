@@ -17,6 +17,12 @@
     {% endcache %}
 {% endblock second_menu %}
 
+{% block breadcrumbs %}
+    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
+        {% breadcrumbs category %}
+    {% endcache %}
+{% endblock %}
+
 {% block content %}
     <div class="list-h1">
         <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>

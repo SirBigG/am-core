@@ -78,3 +78,10 @@ class CategoryTests(TestCase):
 
     def test_default_is_for_user(self):
         self.assertFalse(self.category.is_for_user)
+
+    def test_get_absolute_url(self):
+        root = CategoryFactory(slug='root')
+        first = CategoryFactory(slug='first', parent=root)
+        second = CategoryFactory(slug='second', parent=first)
+        self.assertEqual(first.get_absolute_url(), '/first/')
+        self.assertEqual(second.get_absolute_url(), '/first/second/')
