@@ -8,10 +8,11 @@
     {% endif %}
 {% endblock extra_meta %}
 
+{% block page_title %}
+    <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
+{% endblock %}
+
 {% block content %}
-    <div class="list-h1">
-        <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
-    </div>
     {% for group in object_list|group_by:2 %}
         <div class="row">
             {% for obj in group %}
