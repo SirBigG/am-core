@@ -62,8 +62,8 @@ class Post(models.Model):
         if self.rubric.is_for_user:
             try:
                 category = Category.objects.get(slug=self.slug, parent=self.rubric)
-                if category.title != self.title:
-                    category.title = self.title
+                if category.value != self.title:
+                    category.value = self.title
                     category.save()
             except Category.DoesNotExist:
                 Category.objects.create(slug=self.slug, parent=self.rubric, value=self.title)
