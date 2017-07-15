@@ -1,6 +1,7 @@
-from __future__ import unicode_literals
+import os
 
 from django.test import TestCase
+from django.conf import settings
 
 from core.utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
     CategoryFactory
@@ -48,6 +49,17 @@ class PhotoTests(TestCase):
     def test_resize(self):
         self.assertEqual(self.photo.image.width, 1000)
         self.assertEqual(self.photo.image.height, 666)
+
+    def test_thumbnail(self):
+        thumbnail = self.photo.thumbnail(400, 300)
+        self.assertEqual(thumbnail,
+                         '%s%s' % (settings.MEDIA_URL, 'images/thumb/400/%s' % self.photo.image.name.split('/')[-1]))
+        os.remove(settings.MEDIA_ROOT + '/images/thumb/400/%s' % self.photo.image.name.split('/')[-1])
+
+    def test_no_file_thumbnail(self):
+        photo = PhotoFactory()
+        photo.image = 'images/test_no_file.jpg'
+        self.assertIsNone(photo.thumbnail())
 
 
 class PhotoDeleteTest(TestCase):

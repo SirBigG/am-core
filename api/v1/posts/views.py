@@ -4,7 +4,7 @@ from django.utils.translation import get_language
 
 from core.posts.models import Post
 
-from api.v1.posts.serializers import ShortPostSerializer, UserPostSerializer
+from api.v1.posts.serializers import UserPostSerializer, ShortPostListSerializer
 from api.v1.posts.permissions import UserPostPermissions
 
 from rest_framework.generics import ListAPIView
@@ -22,7 +22,7 @@ class SmallPagesPagination(PageNumberPagination):
 class ApiPostList(ListAPIView):
     """Returns all active posts."""
     queryset = Post.objects.filter(status=1).order_by('-id')
-    serializer_class = ShortPostSerializer
+    serializer_class = ShortPostListSerializer
     pagination_class = SmallPagesPagination
 
 
@@ -33,7 +33,7 @@ class RandomListPaginator(PageNumberPagination):
 class RandomApiPostList(ListAPIView):
     """Returned five random post objects."""
     queryset = Post.objects.filter(status=1).order_by('?')
-    serializer_class = ShortPostSerializer
+    serializer_class = ShortPostListSerializer
     pagination_class = RandomListPaginator
 
 

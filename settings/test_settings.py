@@ -13,3 +13,5 @@ DATABASES = {
         'NAME': 'testdb',
     },
 }
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/test')

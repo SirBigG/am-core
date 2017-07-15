@@ -42,6 +42,13 @@ def full_url(url):
     return settings.HOST + url
 
 
+@register.simple_tag
+def thumbnail(photo_obj, width=300, height=200):
+    if photo_obj:
+        return photo_obj.thumbnail(width, height)
+    return ''
+
+
 # ####################    Filters    ################### #
 
 def grouped(l, n):

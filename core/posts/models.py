@@ -1,9 +1,13 @@
-from __future__ import unicode_literals
+from PIL import Image
+from io import BytesIO
+from pathlib import Path
 
 from django.db import models
 from django.utils.translation import get_language, ugettext_lazy as _
 from django.utils import timezone
 from django.core.urlresolvers import reverse
+from django.core.files import File
+from django.conf import settings
 
 from core.pro_auth.models import User
 
@@ -91,12 +95,36 @@ class Photo(models.Model):
     def __str__(self):
         return str(self.id)
 
+    def _get_thumbnail_path(self, width):
+        """Return thumbnail path with dirs created."""
+        path_dict = self.image.path.split('/')
+        path = Path('%s/thumb/' % ('/'.join(path_dict[:-1])))
+        if path.is_dir() is False:
+            path.mkdir()
+        path = Path(('%s/%s/' % (str(path), width)).replace('//', '/'))
+        if path.is_dir() is False:
+            path.mkdir()
+        return '%s/%s' % (str(path), path_dict[-1])
+
+    def thumbnail(self, width=300, height=200):
+        """
+           Create thumbnail if not exists for current image.
+           Returns: url to thumbnail.
+        """
+        if self.image:
+            thumb_path = Path(self._get_thumbnail_path(width))
+            if thumb_path.is_file() is False:
+                try:
+                    im = Image.open(self.image.path)
+                except FileNotFoundError:
+                    return
+                im.thumbnail((width, height), Image.ANTIALIAS)
+                im.save(thumb_path, format='JPEG')
+            return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
+
     def save(self, *args, **kwargs):
         """Cut image before save."""
         if self.image:
-            from PIL import Image
-            from io import BytesIO
-            from django.core.files import File
             im = Image.open(BytesIO(self.image.read()))
             im.thumbnail((1000, 800), Image.ANTIALIAS)
             output = BytesIO()

@@ -22,6 +22,16 @@ class PhotoSerializer(serializers.ModelSerializer):
         fields = ('description', 'author', 'source', 'image')
 
 
+class PhotoThumbnailSerializer(PhotoSerializer):
+    """For make thumbnails in lists."""
+    # TODO: parametrization
+    image = serializers.SerializerMethodField()
+
+    @staticmethod
+    def get_image(obj):
+        return obj.thumbnail(340, 230)
+
+
 class PostSerializer(serializers.ModelSerializer):
     title = serializers.CharField(max_length=500)
     text = serializers.CharField()
@@ -45,6 +55,10 @@ class ShortPostSerializer(AbsoluteUrlMixin, serializers.ModelSerializer):
     class Meta:
         model = Post
         fields = ('title', 'text', 'url', 'photo',)
+
+
+class ShortPostListSerializer(ShortPostSerializer):
+    photo = PhotoThumbnailSerializer(source='photo.first')
 
 
 class CategoryPKRelatedField(serializers.RelatedField):
