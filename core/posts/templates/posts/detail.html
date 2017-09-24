@@ -88,24 +88,22 @@
             {{ object.text|safe }}
         </div>
         {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
-        <div class="post-source">
-            {% if object.source %}<h5>{% trans 'Source: ' %}{{ object.source }}</h5>{% endif %}
-        </div>
+        {% if object.source %}
+            <div class="post-source">
+                <h5>{% trans 'Source: ' %}{{ object.source }}</h5>
+            </div>
+        {% endif %}
     </div>
     <div class="col-md-12 col-xs-12">
         <ul class="nav nav-pills pull-right">
             <li role="presentation">
-                <a tabindex="-1" target="Share-in-vk"
-                    onclick="window.open(this.href, 'Share-in-vk' , 'width=400, height=200'); return false;"
-                    href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}">
-                        <i class="fa fa-vk fa-2x"></i>
+                <a tabindex="-1" target="Share-in-vk" onclick="window.open(this.href, 'Share-in-vk' , 'width=400, height=200'); return false;" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}">
+                    <i class="fa fa-vk fa-2x"></i>
                 </a>
             </li>
             <li role="presentation">
-                <a tabindex="-1" target="Share-in-facebook"
-                    onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                    href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
-                        <i class="fa fa-facebook fa-2x"></i>
+                <a tabindex="-1" target="Share-in-facebook" onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+                    <i class="fa fa-facebook fa-2x"></i>
                 </a>
             </li>
         </ul>
