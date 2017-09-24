@@ -21,21 +21,21 @@
                     {% main_menu %}
                 {% endcache %}
             </ul>
-            <ul class="nav navbar-nav navbar-right" id="auth-btn">
+            <ul class="nav navbar-nav-no-collapse navbar-right"id="auth-btn">
                 {% if user.is_authenticated %}
                     <li>
-                        <button onclick="location.href='{{ user.get_absolute_url }}'" class="btn btn-primary navbar-btn">
-                            {% trans 'Особистий кабінет' %}
+                        <button onclick="location.href='{{ user.get_absolute_url }}'" class="btn navbar-btn" title="{% trans 'Особистий кабінет' %}">
+                            <i class="fa fa-user-circle fa-lg text-success"></i>
                         </button>
-                        <button onclick="location.href='/logout/'" class="btn btn-primary navbar-btn">
-                            {% trans 'Вийти' %}
+                        <button onclick="location.href='/logout/'" class="btn navbar-btn" title="{% trans 'Вийти' %}">
+                            <i class="fa fa-sign-out fa-lg text-danger"></i>
                         </button>
                     </li>
                 {% else %}
                     <li>
-                        <button id="login-btn" type="button" href="#" class="btn btn-primary navbar-btn"
-                                data-toggle="modal" data-target=".login-modal-lg">
-                            {% trans 'Увійти' %}
+                        <button id="login-btn" type="button" href="#" class="btn navbar-btn"
+                                data-toggle="modal" data-target=".login-modal-lg" title="{% trans 'Увійти' %}">
+                            <i class="fa fa-sign-in fa-lg text-success"></i>
                         </button>
                     </li>
                 {% endif %}

@@ -12,5 +12,11 @@
  RUN mkdir /am-core/tmp
  RUN mkdir /am-core/docker
  ADD docker/uwsgi.ini /am-core/docker/
+ RUN touch /am-core/tmp/uwsgi.log
 
  ADD . /am-core/
+
+ RUN python manage.py collectstatic --noinput --settings=settings.dev
+
+
+

@@ -5,7 +5,7 @@
     {% block help_text %}{% endblock %}
     <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
         {% csrf_token %}
-        <div class="col-md-12 text-center">
+        <div class="col-md-6">
             {% for error in form.non_field_errors %}
                 <p class="text-justify bg-danger">{{error}}</p>
             {% endfor %}
@@ -18,9 +18,9 @@
                     {{ field }}
                 </div>
             {% endfor %}
-        </div>
-        <div class="pull-right">
-            <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
+            <div class="pull-right">
+                <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
+            </div>
         </div>
         <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
         {{ form.media }}

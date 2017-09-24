@@ -24,15 +24,13 @@
                 {{ field }}
             </div>
         {% endfor %}
-        <a id="confirm-email-btn" href="" class="pull-left clearfix">{% trans 'Забули пароль?' %}</a>
-        <button type="submit" class="btn btn-success pull-right" id="login-conf-btn">{% trans 'Увійти' %}</button>
+                <a id="confirm-email-btn" href="" class="pull-left clearfix">{% trans 'Забули пароль?' %}</a>
+                <button type="submit" class="btn btn-success pull-right" id="login-conf-btn">{% trans 'Увійти' %}</button>
         </div>
+        <br>
+        <br>
         <div class="col-md-6 col-sm-12">
-            <div class="panel panel-default">
-                <div class="panel-body text-center">
-                    <div class="col-md-12">
-                        <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
-                    </div>
+                <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
                     <ul class="nav nav-pills">
                         <li role="presentation">
                             <a href="{% url 'social:begin' 'vk-oauth2' %}"><i class="fa fa-vk fa-2x"></i></a>
@@ -41,13 +39,7 @@
                             <a href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-2x"></i></a>
                         </li>
                         </ul>
-                </div>
-            </div>
-            <div class="panel panel-default text-center">
-                <div class="panel-body">
-                <a href="{% url 'pro_auth:register' %}" class="btn btn-success text-center">{% trans "Зареєструватись" %}</a>
-                </div>
-            </div>
+            <a href="{% url 'pro_auth:register' %}" class="btn btn-success text-center">{% trans "Зареєструватись" %}</a>
         </div>
     </div>
 </form>
