@@ -52,7 +52,7 @@
                         {% else %}
                             <div class="item">
                         {% endif %}
-                    <img alt="{{ photo.description }}" src="{{ photo.image.url }}" class="img-rounded img-responsive" />
+                    <img alt="{{ object.title }}" src="{{ photo.image.url }}" class="img-rounded img-responsive" />
                     {# Photo description #}
                     {% if photo.description %}
                         <div class="carousel-caption">
@@ -85,7 +85,7 @@
 
     <div class="col-md-12 col-xs-12">
         <div class="text-justify">
-            {{ object.text|safe }}
+            {{ object.text }}
         </div>
         {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
         {% if object.source %}

@@ -20,7 +20,7 @@
                     <div class="item_in_list">
                         <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
                         <a href="{{ obj.get_absolute_url }}"><h2 class="text-center">{{ obj.title }}</h2></a>
-                        <div class="text-justify">{{ obj.text|safe|truncatechars:300 }}</div>
+                        <div class="text-justify">{{ obj.text|striptags|safe|truncatechars:300 }}</div>
                     </div>
                 </div>
             {% endfor %}
