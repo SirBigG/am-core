@@ -85,7 +85,7 @@
 
     <div class="col-md-12 col-xs-12">
         <div class="text-justify">
-            {{ object.text }}
+            {{ object.text|safe }}
         </div>
         {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
         {% if object.source %}
