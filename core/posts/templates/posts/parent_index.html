@@ -34,8 +34,9 @@
                 {{ category.meta.text|safe }}
             </div>
         </div>
+    {% endif %}
         <div class="row">
-            {% for obj in objects %}
+            {% for obj in object_list %}
                 <div class="col-sm-12 col-md-6">
                     <div class="item_in_list">
                         <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
@@ -45,5 +46,4 @@
                 </div>
             {% endfor %}
         </div>
-    {% endif %}
 {% endblock content %}

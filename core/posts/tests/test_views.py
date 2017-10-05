@@ -32,7 +32,7 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/parent_index.html')
         self.assertEqual(response.context['category'], self.parent)
-        self.assertEqual(len(response.context['objects']), 1)
+        self.assertEqual(len(response.context['object_list']), 1)
 
     def test_parent_list_404(self):
         response = client.get('/unknown/')
