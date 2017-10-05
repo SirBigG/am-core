@@ -35,8 +35,9 @@
             </div>
         </div>
     {% endif %}
+    {% for group in object_list|group_by:2 %}
         <div class="row">
-            {% for obj in object_list %}
+            {% for obj in group %}
                 <div class="col-sm-12 col-md-6">
                     <div class="item_in_list">
                         <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-responsive" id="image-list-size">
@@ -46,4 +47,5 @@
                 </div>
             {% endfor %}
         </div>
+    {% endfor %}
 {% endblock content %}
