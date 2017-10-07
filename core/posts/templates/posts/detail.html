@@ -43,16 +43,16 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-xs-12 col-md-8">
+        <div class="col-12 col-lg-8">
             <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
                 <div class="carousel-inner" role="listbox">
                     {% for photo in object.photo.all%}
                         {% if photo == object.photo.first %}
-                            <div class="item active">
+                            <div class="carousel-item active">
                         {% else %}
-                            <div class="item">
+                            <div class="carousel-item">
                         {% endif %}
-                    <img alt="{{ object.title }}" src="{{ photo.image.url }}" class="img-rounded img-responsive" />
+                    <img alt="{{ object.title }}" src="{{ photo.image.url }}" class="img-rounded img-fluid" />
                     {# Photo description #}
                     {% if photo.description %}
                         <div class="carousel-caption">
@@ -64,26 +64,26 @@
                     </div>
                     {#  Controls #}
                     {% if object.photo.count > 1 %}
-                        <a class="left carousel-control" href="#post-carousel" role="button" data-slide="prev">
-                            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                        <a class="carousel-control-prev" href="#post-carousel" role="button" data-slide="prev">
+                            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                             <span class="sr-only">Previous</span>
                         </a>
-                        <a class="right carousel-control" href="#post-carousel" role="button" data-slide="next">
-                            <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                        <a class="carousel-control-next" href="#post-carousel" role="button" data-slide="next">
+                            <span class="carousel-control-next-icon" aria-hidden="true"></span>
                             <span class="sr-only">Next</span>
                         </a>
                     {% endif %}
                 </div>
             </div>
         {# Reviews block #}
-        <div class="col-md-4 col-xs-12">
+        <div class="col-lg-4 col-12">
             <div id="reviews" class="{{ object.slug }}"></div>
         </div>
     </div>
 
     <hr>
-
-    <div class="col-md-12 col-xs-12">
+    <div class="row">
+      <div class="col-lg-12 col-12">
         <div class="text-justify">
             {{ object.text|safe }}
         </div>
@@ -93,23 +93,26 @@
                 <h5>{% trans 'Source: ' %}{{ object.source }}</h5>
             </div>
         {% endif %}
+      </div>
     </div>
-    <div class="col-md-12 col-xs-12">
-        <ul class="nav nav-pills pull-right">
-            <li role="presentation">
-                <a tabindex="-1" target="Share-in-vk" onclick="window.open(this.href, 'Share-in-vk' , 'width=400, height=200'); return false;" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}">
+    <div class="row">
+      <div class="col-lg-12 col-12">
+        <ul class="nav nav-pills float-right">
+            <li class="nav-item">
+                <a class="nav-link" tabindex="-1" target="Share-in-vk" onclick="window.open(this.href, 'Share-in-vk' , 'width=400, height=200'); return false;" href="http://vk.com/share.php?url={% full_url object.get_absolute_url %}">
                     <i class="fa fa-vk fa-2x"></i>
                 </a>
             </li>
-            <li role="presentation">
-                <a tabindex="-1" target="Share-in-facebook" onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+            <li class="nav-item">
+                <a class="nav-link" tabindex="-1" target="Share-in-facebook" onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
                     <i class="fa fa-facebook fa-2x"></i>
                 </a>
             </li>
         </ul>
-    </div>
+      </div>
+     </div>
     <div class="row">
-      <div class="col-md-12 col-xs-12">
+      <div class="col-lg-12 col-12">
         {# Random posts block. #}
         <div class="h5">{% trans 'Більше статтей тут:' %}</div>
         <div id="random-post-list"></div>

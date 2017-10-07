@@ -6,6 +6,7 @@
         <meta charset="utf-8">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#24A824">
         <title>{% spaceless %}{% block title %}{% trans 'Агропортал України' %} |{% endblock title %}{% endspaceless %} AgroMega.in.ua</title>
         <meta name="description" content="{% spaceless %}{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}{% endspaceless %}">
         <!-- For extra meta tags -->
@@ -18,7 +19,7 @@
         {% endblock extra_meta %}
         <!-- For extra scripts inclusion -->
         {% block extra_script %}{% endblock extra_script %}
-
+    <script src="{% static "js/popper.min.js" %}"></script>
     <script src="{% static "js/jquery.min.js" %}"></script>
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "css/bootstrap-theme.min.css" %}">
@@ -43,10 +44,10 @@
             </div>
             <div class="row">
                 {% block base_content_block %}
-                    <div class="col-sm-12 col-md-8">
+                    <div class="col-12 col-lg-8">
                         {% block content %}{% endblock content %}
                     </div>
-                    <div class="col-md-4 col-sm-12">
+                    <div class="col-lg-4 col-12">
                         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                         <!-- agro_ad -->
                         <ins class="adsbygoogle"
@@ -63,12 +64,9 @@
 
         {% block extra_body %}{% endblock extra_body %}
 
-
-        <footer class="footer--wrapper">
-            {% block footer %}
-                {% include 'footer.html' %}
-            {% endblock footer %}
-        </footer>
+        {% block footer %}
+            {% include 'footer.html' %}
+        {% endblock footer %}
 
         <!-- Google Analytics -->
         <script>

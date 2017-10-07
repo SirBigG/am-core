@@ -2,47 +2,44 @@
 {% load post_extras %}
 <!-- Site header -->
 
-<nav class="navbar navbar-default">
+<header class="navbar navbar-green navbar-expand-lg">
     <div class="container-fluid">
-        <div class="navbar-header">
-            {# button for mobile menu #}
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="/">
+        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="main-menu-collapse">
+              <a class="navbar-brand" href="/">
                 AgroMega
-            </a>
-        </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
+              </a>
+              <ul class="navbar-nav">
                 {% cache 3600 'main_menu' %}
                     {% main_menu %}
                 {% endcache %}
-            </ul>
-            <ul class="nav navbar-nav-no-collapse navbar-right"id="auth-btn">
-                {% if user.is_authenticated %}
-                    <li>
-                        <button onclick="location.href='{{ user.get_absolute_url }}'" class="btn navbar-btn" title="{% trans 'Особистий кабінет' %}">
-                            <i class="fa fa-user-circle fa-lg text-success"></i>
-                        </button>
-                        <button onclick="location.href='/logout/'" class="btn navbar-btn" title="{% trans 'Вийти' %}">
-                            <i class="fa fa-sign-out fa-lg text-danger"></i>
-                        </button>
-                    </li>
-                {% else %}
-                    <li>
-                        <button id="login-btn" type="button" href="#" class="btn navbar-btn"
-                                data-toggle="modal" data-target=".login-modal-lg" title="{% trans 'Увійти' %}">
-                            <i class="fa fa-sign-in fa-lg text-success"></i>
-                        </button>
-                    </li>
-                {% endif %}
-            </ul>
+              </ul>
+        </div>
+        <div class="navbar-nav d-inline-flex flex-row auth-block">
+            {% if user.is_authenticated %}
+                <div class="nav-item m-1">
+                  <button onclick="location.href='{{ user.get_absolute_url }}'" class="btn btn-outline-success" title="{% trans 'Особистий кабінет' %}">
+                    <i class="fa fa-user-circle fa-lg"></i>
+                  </button>
+                </div>
+                <div class="nav-item m-1">
+                  <button onclick="location.href='/logout/'" class="btn btn-outline-danger" title="{% trans 'Вийти' %}">
+                     <i class="fa fa-sign-out fa-lg"></i>
+                  </button>
+                </div>
+            {% else %}
+                 <div class="nav-item m-1">
+                   <button id="login-btn" type="button" class="btn btn-outline-success"
+                      data-toggle="modal" data-target=".login-modal-lg" title="{% trans 'Увійти' %}">
+                     <i class="fa fa-sign-in fa-lg"></i>
+                   </button>
+                 </div>
+            {% endif %}
         </div>
     </div>
-</nav>
+</header>
 
 <div class="modal fade login-modal-lg" tabindex="-1" role="dialog" aria-labelledby="LoginLabel">
     <div class="modal-dialog">

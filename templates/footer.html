@@ -1,17 +1,15 @@
 {% load i18n %}
 
-<nav class="navbar navbar-default">
-  <div class="container">
-      <div class="row">
-        <p class="navbar-text">©2016 AgroMega</p>
-        <button id="feedback-btn" type="button" class="btn btn-default navbar-btn navbar-right" data-toggle="modal" data-target=".bs-example-modal-lg">
+<footer class="navbar navbar-light">
+    <p class="navbar-text">©2016-2017 AgroMega</p>
+    <div class="float-lg-right">
+        <button id="feedback-btn" type="button" class="btn btn-outline-success" data-toggle="modal" data-target=".feedback-modal">
             {% trans 'Зворотній зв’язок' %}
         </button>
-      </div>
-  </div>
-</nav>
+    </div>
+</footer>
 
-<div class="modal fade bs-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
+<div class="modal fade feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
     <div class="modal-dialog modal-lg">
         <div id="feedback-modal" class="modal-content"></div>
     </div>
