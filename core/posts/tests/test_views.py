@@ -16,8 +16,12 @@ request = RequestFactory()
 class MainPageTest(TestCase):
 
     def test_response(self):
+        PostFactory.create_batch(3)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
+        self.assertIn('object_list', response.context)
+        self.assertTemplateUsed(response, 'index.html')
+        self.assertTemplateUsed(response, 'posts/helpers/object_list.html')
 
 
 class PostListTests(HtmlTestCaseMixin, TestCase):

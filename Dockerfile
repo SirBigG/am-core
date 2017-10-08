@@ -19,4 +19,3 @@
  RUN python manage.py collectstatic --noinput --settings=settings.dev
 
 
-

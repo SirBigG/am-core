@@ -1,9 +1,5 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
-
 {% block content %}
-    <div id="main-list"></div>
-
-    <script src="{% static_version 'bundles/index.js' %}"></script>
+    {% include "posts/helpers/object_list.html" %}
 {% endblock %}

@@ -35,17 +35,7 @@
             </div>
         </div>
     {% endif %}
-    {% for group in object_list|group_by:2 %}
-        <div class="row">
-            {% for obj in group %}
-                <div class="col-12 col-lg-6">
-                    <div class="item_in_list">
-                        <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-fluid" id="image-list-size">
-                        <a href="{{ obj.get_absolute_url }}"><h2 class="text-center">{{ obj.title }}</h2></a>
-                        <div class="text-justify">{{ obj.text|striptags|safe|truncatechars:300 }}</div>
-                    </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endfor %}
+
+    {% include "posts/helpers/object_list.html" %}
+
 {% endblock content %}

@@ -8,6 +8,15 @@ from core.posts.models import Post
 from core.classifier.models import Category
 
 
+class IndexView(TemplateView):
+    template_name = 'index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object_list'] = Post.objects.all()[:10]
+        return context
+
+
 class ParentRubricView(TemplateView):
     """For base rubric text."""
     template_name = 'posts/parent_index.html'
