@@ -6,13 +6,8 @@
  WORKDIR /am-core
  ADD requirements.txt /am-core/
 
- RUN pip3 install -r requirements.txt
- RUN pip3 install uwsgi
-
- RUN mkdir /am-core/tmp
- RUN mkdir /am-core/docker
+ RUN pip3 install -r requirements.txt && pip3 install uwsgi && mkdir /am-core/tmp && mkdir /am-core/docker && touch /am-core/tmp/uwsgi.log
  ADD docker/uwsgi.ini /am-core/docker/
- RUN touch /am-core/tmp/uwsgi.log
 
  ADD . /am-core/
 
