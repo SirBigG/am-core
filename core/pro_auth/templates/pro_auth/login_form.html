@@ -4,22 +4,23 @@
     {% csrf_token %}
     <div class="modal-header">
         {% block auth_buttons %}
-            <div class="col-md-9">
-                <p class="h4">{% trans 'Увійдіть на сайт, відчуйте перевагу зареєстрованих користувачів!' %}</p>
+            <div class="col-lg-9 col-9">
+                <p class="h6 text-success">{% trans 'Увійдіть на сайт, відчуйте перевагу зареєстрованих користувачів!' %}</p>
             </div>
-            <a href="#" class="text-danger pull-right" data-dismiss="modal"><i class="fa fa-times-circle"></i></a>
+            <a href="#" class="text-danger pull-right" data-dismiss="modal"><i class="fa fa-times-circle fa-2x"></i></a>
         {% endblock %}
     </div>
     <div class="modal-body clearfix">
-        <div class="col-md-6 col-sm-12">
+        <div class="row">
+        <div class="col-lg-6 col-12">
         {% for error in form.non_field_errors %}
-            <p class="text-justify bg-danger">{{error}}</p>
+            <small class="text-justify text-danger">{{error}}</small>
         {% endfor %}
         {% for field in form %}
             <div class="form-group">
                 <p>{{ field.label }}</p>
                 {% for error in field.errors %}
-                    <p class="text-left text-danger">{{error}}</p>
+                    <small class="text-left text-danger">{{error}}</small>
                 {% endfor %}
                 {{ field }}
             </div>
@@ -29,17 +30,18 @@
         </div>
         <br>
         <br>
-        <div class="col-md-6 col-sm-12">
-                <span class="h5">{% trans 'Увійти через соцмережу' %}</span>
+        <div class="col-lg-6 col-12">
+                <span class="h6">{% trans 'Увійти через соцмережу' %}</span>
                     <ul class="nav nav-pills">
-                        <li role="presentation">
-                            <a href="{% url 'social:begin' 'vk-oauth2' %}"><i class="fa fa-vk fa-2x"></i></a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'social:begin' 'vk-oauth2' %}"><i class="fa fa-vk fa-2x"></i></a>
                         </li>
-                        <li role="presentation">
-                            <a href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-2x"></i></a>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-2x"></i></a>
                         </li>
                         </ul>
             <a href="{% url 'pro_auth:register' %}" class="btn btn-success text-center">{% trans "Зареєструватись" %}</a>
         </div>
+            </div>
     </div>
 </form>

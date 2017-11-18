@@ -3,26 +3,26 @@
 
 {% block base_content_block %}
     {% block help_text %}{% endblock %}
+  <div class="col-lg-6 col-6 mx-auto">
     <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
         {% csrf_token %}
-        <div class="col-md-6">
             {% for error in form.non_field_errors %}
-                <p class="text-justify bg-danger">{{error}}</p>
+                <p class="text-justify text-danger">{{error}}</p>
             {% endfor %}
             {% for field in form %}
                 <div class="form-group">
-                    <p class="text-left">{{ field.label }}</p>
+                    <label>{{ field.label }}</label>
                     {% for error in field.errors %}
-                        <p class="text-danger">{{error}}</p>
+                        <p class="form-text text-danger">{{error}}</p>
                     {% endfor %}
                     {{ field }}
                 </div>
             {% endfor %}
             <div class="pull-right">
-                <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
+                <button type="submit" class="btn btn-primary">{% trans 'Зареєструватись' %}</button>
             </div>
-        </div>
         <script type="text/javascript" src="/static/admin/js/vendor/jquery/jquery.js"></script>
         {{ form.media }}
     </form>
+  </div>
 {% endblock %}

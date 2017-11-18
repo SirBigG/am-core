@@ -24,9 +24,9 @@ class AdminUserCreationForm(forms.ModelForm):
         'password_mismatch': _("The two password fields didn't match."),
     }
     password1 = forms.CharField(label=_("Password"),
-                                widget=forms.PasswordInput(attrs={'class': 'form-control'}))
+                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
     password2 = forms.CharField(label=_("Password confirmation"),
-                                widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
                                 help_text=_("Enter the same password as before, for verification."))
     phone1 = PhoneNumberField(label=_("Phone"),
                               help_text=_("Enter phone in International format. Example: '+380991234567'."

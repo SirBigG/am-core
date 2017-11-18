@@ -13,7 +13,7 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.all()[:10]
+        context['object_list'] = Post.objects.filter(status=1)[:10]
         return context
 
 
@@ -27,7 +27,7 @@ class ParentRubricView(TemplateView):
         """
         context = super(ParentRubricView, self).get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['parent'])
-        context['object_list'] = Post.objects.filter(rubric__parent_id=context['category'].pk)[:4]
+        context['object_list'] = Post.objects.filter(rubric__parent_id=context['category'].pk, status=1)[:4]
         return context
 
 

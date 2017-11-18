@@ -23,6 +23,13 @@ class MainPageTest(TestCase):
         self.assertTemplateUsed(response, 'index.html')
         self.assertTemplateUsed(response, 'posts/helpers/object_list.html')
 
+    def test_active_status_filter(self):
+        PostFactory.create_batch(2)
+        PostFactory.create_batch(2, status=0)
+        response = self.client.get('/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context['object_list'].count(), 2)
+
 
 class PostListTests(HtmlTestCaseMixin, TestCase):
 

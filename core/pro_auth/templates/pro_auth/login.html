@@ -2,31 +2,31 @@
 {% load i18n %}
 
 {% block base_content_block %}
-    <div class="jumbotron">
-    <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
+     <div class="col-12 col-lg-4 mx-auto">
+       <div class="jumbotron">
+      <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
         {% csrf_token %}
-        <div class="col-md-12 text-center">
             {% for error in form.non_field_errors %}
-                <p class="text-justify bg-danger">{{error}}</p>
+                <p class="text-justify text-danger">{{error}}</p>
             {% endfor %}
             {% for field in form %}
                 <div class="form-group">
-                    <p>{{ field.label }}</p>
+                    <label>{{ field.label }}</label>
                     {% for error in field.errors %}
-                        <p class="text-left text-danger">{{error}}</p>
+                        <small class="form-text text-muted text-danger">{{error}}</small>
                     {% endfor %}
                     {{ field }}
                 </div>
             {% endfor %}
-        </div>
         <div class="row">
             <div class="col-md-6 text-center">
                 <!-- <a href="" >{% trans 'Забули пароль?' %}</a> -->
             </div>
             <div class="col-md-6 text-center">
-                <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
+                <button type="submit" class="btn btn-primary">{% trans 'Увійти' %}</button>
             </div>
         </div>
     </form>
     </div>
+     </div>
 {% endblock %}
