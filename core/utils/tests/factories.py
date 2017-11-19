@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import factory
 
 from core.pro_auth.models import User
@@ -7,8 +5,10 @@ from core.classifier.models import Location, Country, Region, \
     Area, Category
 from core.posts.models import Post, Photo, Comment
 from core.services.models import Feedback, MetaData, Comments, Reviews
+from core.events.models import Event, EventType
 
 from django.contrib.auth.hashers import make_password
+from django.utils import timezone
 
 
 class BaseFactory(factory.django.DjangoModelFactory):
@@ -173,3 +173,24 @@ class ReviewsFactory(BaseFactory):
 
     description = 'description'
     mark = 5
+
+
+class EventTypeFactory(BaseFactory):
+    class Meta:
+        model = EventType
+
+    title = "event type title"
+    slug = factory.Sequence(lambda n: 'event-type-{0}'.format(n))
+
+
+class EventFactory(BaseFactory):
+    class Meta:
+        model = Event
+
+    title = 'title'
+    slug = factory.Sequence(lambda n: 'event{0}'.format(n))
+    text = 'text'
+    start = timezone.now()
+    stop = timezone.now() + timezone.timedelta(days=1)
+    type = factory.SubFactory(EventTypeFactory)
+    location = factory.SubFactory(LocationFactory)

@@ -33,6 +33,7 @@ urlpatterns = [
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^service/', include('core.services.urls')),
     url(r'^api/', include('api.v1.urls')),
+    url(r'^events/', include('core.events.urls', namespace='events')),
     url(r'^', include('core.classifier.urls')),
     url(r'^', include('core.pro_auth.urls', namespace='pro_auth')),
     url(r'^', include('core.posts.urls')),

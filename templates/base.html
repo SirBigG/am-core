@@ -1,5 +1,5 @@
 {% load i18n %}
-{% load static post_extras %}
+{% load static post_extras events_extras %}
 <!DOCTYPE html>
 <html lang="uk">
     <head>
@@ -47,6 +47,7 @@
                         {% block content %}{% endblock content %}
                     </div>
                     <div class="col-lg-4 col-12">
+                        {% events_list %}
                         <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
                         <!-- agro_ad -->
                         <ins class="adsbygoogle"

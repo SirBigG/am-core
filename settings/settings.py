@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'core.pro_auth',
     'core.posts',
     'core.services',
+    'core.events',
 
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
@@ -183,6 +184,7 @@ MODELTRANSLATION_TRANSLATION_FILES = (
     'core.classifier.translation',
     'core.posts.translation',
     'core.services.translation',
+    'core.events.translation',
 )
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
