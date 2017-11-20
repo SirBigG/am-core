@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% load staticfiles i18n %}
+{% load cache post_extras %}
+
+{% block title %}
+    {{ object.title }} |
+{% endblock title %}
+
+{% block meta_description %}
+    {{ object.text|truncatechars:300|striptags|safe }}
+{% endblock %}
+
+{% block extra_meta %}
+    {% load post_extras %}
+    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.text|truncatechars:300|striptags|safe }}" property="og:description">
+    <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
+    <meta content="{% full_url object.get_absolute_url %}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+    <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
+{% endblock extra_meta %}
+
+{% block second_menu %}{% endblock second_menu %}
+
+{% block page_title %}
+    <h1>{{ object.title }}</h1>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12 col-lg-6">
+            <img alt="{{ object.title }}" src="{{ object.poster.url }}" class="img-rounded img-fluid" />
+        </div>
+        <div class="col-12 col-lg-6">
+             <p class="text-muted">{{object.location.value}}</p>
+             <p>{{object.address}}</p>
+             <p class="text-muted">{{object.start|date:"d-m-Y"}} {{object.start|time:"H:i"}} - {{object.stop|date:"d-m-Y"}} {{object.stop|time:"H:i"}}</p>
+        </div>
+    </div>
+
+    <hr>
+    <div class="row">
+      <div class="col-lg-12 col-12">
+        <div class="text-justify">
+            {{ object.text|safe }}
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12 col-12 mt-4">
+        {# Random posts block. #}
+        <div class="h5">{% trans 'Більше статтей тут:' %}</div>
+        <div id="random-post-list"></div>
+        {# Comments block. #}
+        <div id="comment" class="{{ object.id }}"></div>
+      </div>
+    </div>
+
+    <script src="{% static_version 'bundles/detail.js' %}"></script>
+{% endblock content %}

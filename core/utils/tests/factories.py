@@ -187,6 +187,7 @@ class EventFactory(BaseFactory):
     class Meta:
         model = Event
 
+    user = factory.SubFactory(UserFactory)
     title = 'title'
     slug = factory.Sequence(lambda n: 'event{0}'.format(n))
     text = 'text'
@@ -194,3 +195,4 @@ class EventFactory(BaseFactory):
     stop = timezone.now() + timezone.timedelta(days=1)
     type = factory.SubFactory(EventTypeFactory)
     location = factory.SubFactory(LocationFactory)
+    poster = factory.django.ImageField(color='green', width=300, height=200)

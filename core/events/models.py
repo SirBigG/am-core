@@ -3,6 +3,8 @@ from django.core.cache import cache
 from django.utils.translation import get_language
 from django.core.urlresolvers import reverse
 
+from core.pro_auth.models import User
+
 from transliterate import slugify
 
 
@@ -20,15 +22,17 @@ class EventType(models.Model):
 
 
 class Event(models.Model):
+    user = models.ForeignKey(User, related_name='events')
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=250, unique=True)
+    address = models.CharField(max_length=350)
     text = models.TextField()
     status = models.BooleanField(default=0)
     start = models.DateTimeField()
     stop = models.DateTimeField()
-    type = models.ForeignKey(EventType)
+    type = models.ForeignKey(EventType, related_name='event_types')
     location = models.ForeignKey('classifier.Location')
-    poster = models.ImageField(upload_to="posters", blank=True, null=True)
+    poster = models.ImageField(upload_to="posters")
 
     def __str__(self):
         return self.title
