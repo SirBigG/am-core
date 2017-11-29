@@ -44,9 +44,6 @@ class UserModelTests(TestCase):
         # TODO: Add test
         pass
 
-    def test_get_absolute_url(self):
-        self.assertEqual(self.user.get_absolute_url(), '/user/%s/' % self.user.pk)
-
 
 class UserManagerTests(TestCase):
 

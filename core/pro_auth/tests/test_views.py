@@ -104,17 +104,17 @@ class PersonalIndexViewTests(HtmlTestCaseMixin, TestCase):
     def test_response_ok(self):
         user = UserFactory()
         client.login(username=user.email, password='12345')
-        response = client.get('/user/%d/' % user.pk)
+        response = client.get('/profile/')
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'personal/personal_index.html')
-        response = client.get('/user/%d/update/' % user.pk)
+        response = client.get('/profile/update/')
         self.assertEqual(response.status_code, 200)
         self.assertIdIn('root', response.content)
 
     def test_user_not_login(self):
-        response = client.get('/user/2353647/')
+        response = client.get('/profile/')
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/user/2353647/')
+        self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/profile/')
 
 
 class UserPasswordResetTests(TestCase):

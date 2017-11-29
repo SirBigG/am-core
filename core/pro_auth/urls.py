@@ -16,7 +16,7 @@ urlpatterns = [
     url(r'^password/(?P<action>confirm)/email/', UserPasswordReset.as_view(), name='password-reset'),
     url(r'^password/(?P<action>check)/email/(?P<hash>[\w-]+).html$',
         UserPasswordReset.as_view(), name='password-check'),
-    # Rendering index page for all urls starts with /user/<user_id>/ for personal page.
-    url(r'^user/(?P<pk>\d+)/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
+    # Rendering index page for all urls starts with /profile/ for personal page.
+    url(r'^profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
         name='personal-index'),
 ]

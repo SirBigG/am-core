@@ -7,7 +7,6 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from django.core.mail import send_mail
 from django.conf import settings
-from django.core.urlresolvers import reverse
 
 
 class UserManager(BaseUserManager):
@@ -130,9 +129,5 @@ class User(AbstractBaseUser, PermissionsMixin):
         Sends an email to this User.
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
-
-    def get_absolute_url(self):
-        """Returns absolute url to user room."""
-        return reverse('pro_auth:personal-index', kwargs={'pk': self.pk})
 
     backend = settings.AUTHENTICATION_BACKENDS

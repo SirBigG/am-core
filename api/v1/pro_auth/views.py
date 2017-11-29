@@ -9,10 +9,10 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
 
 
-# TODO: authentication required need
-# TODO: get method for update form creation
-# TODO: create tokenize authenticate or other for all api login required connections
 class UserViewSet(ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
     permission_classes = [IsAuthenticated, PersonalPermission]
+
+    def get_object(self):
+        return self.request.user
