@@ -14,7 +14,7 @@ class EventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Event
-        fields = ('title', 'address', 'text', 'start', 'stop', 'type', 'location', 'poster',)
+        fields = ('title', 'address', 'text', 'start', 'stop', 'type', 'location', 'poster', 'url',)
 
     def get_absolute_url(self, instance):
         return instance.get_absolute_url()
