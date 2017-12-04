@@ -1,6 +1,6 @@
 {% for root in roots %}
-    <li class="nav-item dropdown">
-          <a href="#" class="nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <li class="nav-item dropdown m-1">
+          <a href="#" class="btn btn-outline-success nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{ root.value }}<span class="caret"></span></a>
         <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
             {% for child in root.get_children %}
