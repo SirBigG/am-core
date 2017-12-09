@@ -15,7 +15,7 @@ class UserAdmin(BaseUserAdmin):
     add_form = AdminUserCreationForm
 
     list_display = ('email', 'phone1', 'birth_date', 'date_joined',
-                    'is_superuser')
+                    'is_superuser', 'number_of_characters')
     list_filter = ('is_superuser',)
     fieldsets = (
         (None, {'fields': ('email', 'password')}),
@@ -33,6 +33,11 @@ class UserAdmin(BaseUserAdmin):
     search_fields = ('email',)
     ordering = ('email',)
     filter_horizontal = ()
+
+    def number_of_characters(self, obj):
+        from core.posts.models import Post
+        return len(''.join(Post.objects.filter(user_id=obj.pk,
+                                               status=False).values_list('text', flat=True)).replace(' ', ''))
 
 
 admin.site.register(User, UserAdmin)
