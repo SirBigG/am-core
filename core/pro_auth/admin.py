@@ -36,7 +36,7 @@ class UserAdmin(BaseUserAdmin):
 
     def number_of_characters(self, obj):
         from core.posts.models import Post
-        return len(''.join(Post.objects.filter(user_id=obj.pk,
+        return len(''.join(Post.objects.filter(publisher_id=obj.pk,
                                                status=False).values_list('text', flat=True)).replace(' ', ''))
 
 
