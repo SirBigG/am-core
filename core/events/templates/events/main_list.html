@@ -8,7 +8,7 @@
         <div class="card-body">
             <a class="card-title" href="{{event.get_absolute_url}}" style="color: #24A824;"><span class="h5">{{event.title}}</span></a> <span class="badge badge-success">{{event.type.title}}</span>
             <p class="card-subtitle mt-2 text-muted">{{event.location.value}}</p>
-            <small class="card-subtitle mb-2 text-muted">{{event.start|date:"d-m-Y"}} {{event.start|time:"H:i"}} - {{event.stop|date:"d-m-Y"}} {{event.stop|time:"H:i"}}</small>
+            <small class="card-subtitle mb-2 text-muted">{{event.start|date:"d-m-Y"}} - {{event.stop|date:"d-m-Y"}}</small>
         </div>
     </div>
 {% endfor %}
