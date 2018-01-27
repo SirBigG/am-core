@@ -1,11 +1,13 @@
 from django.db import models
 from django.core.cache import cache
 from django.utils.translation import get_language
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from core.pro_auth.models import User
 
 from transliterate import slugify
+
+from ckeditor.fields import RichTextField
 
 
 class EventType(models.Model):
@@ -26,7 +28,7 @@ class Event(models.Model):
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=250, unique=True)
     address = models.CharField(max_length=350)
-    text = models.TextField()
+    text = RichTextField()
     status = models.BooleanField(default=0)
     start = models.DateTimeField()
     stop = models.DateTimeField()
