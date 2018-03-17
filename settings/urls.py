@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'social/', include('social_django.urls', namespace='social')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),
+    url('^page/', include('django.contrib.flatpages.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^service/', include('core.services.urls')),
     url(r'^api/', include('api.v1.urls')),
