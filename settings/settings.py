@@ -142,7 +142,7 @@ AUTH_USER_MODEL = 'pro_auth.User'
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.open_id.OpenIdAuth',
     'social_core.backends.facebook.FacebookOAuth2',
-    'social_core.backends.vk.VKOAuth2',
+    'social_core.backends.google.GoogleOAuth2',
     'core.pro_auth.backends.AuthBackend',
 ]
 
