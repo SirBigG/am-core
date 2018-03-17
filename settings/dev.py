@@ -1,6 +1,6 @@
 from settings.settings import *  # noqa
 
-"""
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -11,14 +11,15 @@ DATABASES = {
         'PORT': '5432',
     }
 }
-"""
 
+"""
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'mydatabase',
     }
 }
+"""
 
 ALLOWED_HOSTS = ['*']
 

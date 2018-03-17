@@ -3,6 +3,9 @@ from django.conf.urls import url
 from core.services.views import FeedbackView, ReviewInfoView, ReviewsList
 
 
+app_name = 'services'
+
+
 urlpatterns = [
     url(r'^feedback/$', FeedbackView.as_view(), name='feedback'),
     url(r'^reviews/is-reviewed/$', ReviewInfoView.as_view(), name='review-is-reviewed'),

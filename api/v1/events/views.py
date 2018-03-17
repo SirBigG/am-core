@@ -1,7 +1,7 @@
 from rest_framework.generics import ListAPIView, CreateAPIView
 from rest_framework.permissions import IsAuthenticated
 
-from core.events.models import EventType, Event
+from core.events.models import EventType
 
 from .serializers import EventTypeSerializer, EventSerializer
 

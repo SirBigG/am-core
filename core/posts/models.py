@@ -5,7 +5,7 @@ from pathlib import Path
 from django.db import models
 from django.utils.translation import get_language, ugettext_lazy as _
 from django.utils import timezone
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.files import File
 from django.conf import settings
 
@@ -35,7 +35,7 @@ class Post(models.Model):
     author = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('post author'))
     source = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('post source'))
 
-    publisher = models.ForeignKey(User, verbose_name=_('post publisher'))
+    publisher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('post publisher'))
     publish_date = models.DateTimeField(_('date of publish'), default=timezone.now)
 
     hits = models.IntegerField(default=0, verbose_name=_('count of views'))
@@ -145,7 +145,7 @@ class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('post of comment'))
     text = models.TextField(verbose_name=_('comment text'))
     date = models.DateTimeField(_('comment date'), default=timezone.now)
-    user = models.ForeignKey(User, verbose_name=_('comment owner'))
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('comment owner'))
 
     class Meta:
         db_table = 'comment'

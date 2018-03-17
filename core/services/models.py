@@ -49,7 +49,7 @@ class Comments(MPTTModel):
     content_object = GenericForeignKey('content_type', 'object_id')
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('Comments owner.'))
     text = models.TextField()
-    parent = TreeForeignKey('self', blank=True, null=True)
+    parent = TreeForeignKey('self', blank=True, null=True, on_delete=models.CASCADE)
     creation = models.DateTimeField(auto_now_add=True, verbose_name=_('Date of comment creation.'))
     is_active = models.BooleanField(default=True)
 

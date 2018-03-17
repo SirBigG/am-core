@@ -23,7 +23,7 @@ class UserCreationFormTests(TestCase):
                 'password2': '11111',
                 'phone1': '+380991234567',
                 'location': location.pk,
-                'g-recaptcha-response': 'PASSED'
+                'recaptcha_response_field': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertTrue(form.is_valid())
@@ -40,7 +40,7 @@ class UserCreationFormTests(TestCase):
                 'password2': '11111',
                 'phone1': '0991234567',
                 'location': location.pk,
-                'g-recaptcha-response': 'PASSED'
+                'recaptcha_response_field': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())
@@ -66,7 +66,7 @@ class UserCreationFormTests(TestCase):
                 'password2': '11111',
                 'phone1': '+380991234567',
                 'location': location.pk,
-                'g-recaptcha-response': 'PASSED'
+                'recaptcha_response_field': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())

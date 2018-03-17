@@ -31,7 +31,7 @@ class AuthTests(TestCase):
         context_data = response.context_data
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pro_auth/login.html')
-        self.assertTrue(context_data['view'].request.user.is_authenticated())
+        self.assertTrue(context_data['view'].request.user.is_authenticated)
         self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     def test_login_ajax(self):
@@ -45,14 +45,14 @@ class AuthTests(TestCase):
         context_data = response.context_data
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pro_auth/login_form.html')
-        self.assertTrue(context_data['view'].request.user.is_authenticated())
+        self.assertTrue(context_data['view'].request.user.is_authenticated)
         self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     def test_logout(self):
         client.login(username=self.user.email, password='12345')
         response = client.get('/', {'user': self.user})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['request'].user.is_authenticated())
+        self.assertTrue(response.context['request'].user.is_authenticated)
         response = client.get('/logout/')
         self.assertEqual(response.status_code, 302)
         response = client.get('/')
@@ -69,7 +69,7 @@ class AuthTests(TestCase):
                 'password2': '11111',
                 'phone1': '+380991234567',
                 'location': location.pk,
-                'g-recaptcha-response': 'PASSED'
+                'recaptcha_response_field': 'PASSED'
                 }
         response = client.post('/register/', data=data)
         self.assertEqual(response.status_code, 302)
@@ -178,7 +178,7 @@ class SocialRegisterViewTests(TestCase):
         os.environ['RECAPTCHA_TESTING'] = 'True'
         loc = LocationFactory()
         data = {'email': 'test@test.com', 'phone1': '+380991234567', 'password1': '11111', 'password2': '11111',
-                'location': loc.pk, 'g-recaptcha-response': 'PASSED'}
+                'location': loc.pk, 'recaptcha_response_field': 'PASSED'}
         response = self.client.post('/register/social/vk-oauth2/', data=data)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], reverse('social:complete', args=('vk-oauth2',)))

@@ -5,6 +5,9 @@ from django.views.generic import TemplateView
 from core.pro_auth.views import RegisterView, Login, Logout, UserEmailConfirm, UserPasswordReset, IsAuthenticate, \
     SocialRegisterView, SocialExistUserLogin
 
+
+app_name = 'pro_auth'
+
 urlpatterns = [
     url(r'^register/$', RegisterView.as_view(), name='register'),
     url(r'^register/social/(?P<backend_name>[\w-]+)/$', SocialRegisterView.as_view(), name='social-register'),

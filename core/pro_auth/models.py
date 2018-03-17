@@ -66,7 +66,7 @@ class User(AbstractBaseUser, PermissionsMixin):
                               verbose_name=_('extra phone'))
 
     location = models.ForeignKey('classifier.Location', blank=True, null=True,
-                                 verbose_name=_('user location'))
+                                 on_delete=models.CASCADE, verbose_name=_('user location'))
     birth_date = models.DateField(blank=True, null=True,
                                   verbose_name=_('date of birth'))
 

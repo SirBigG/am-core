@@ -67,9 +67,9 @@ class Location(models.Model):
     """
     slug = models.CharField(max_length=250, verbose_name=_('transliteration value'))
     value = models.CharField(max_length=250, verbose_name=_('location value'))
-    country = models.ForeignKey(Country, verbose_name=_('country'))
-    region = models.ForeignKey(Region, verbose_name=_('region'))
-    area = models.ForeignKey(Area, verbose_name=_('area'))
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, verbose_name=_('country'))
+    region = models.ForeignKey(Region, on_delete=models.CASCADE, verbose_name=_('region'))
+    area = models.ForeignKey(Area, on_delete=models.CASCADE, verbose_name=_('area'))
     longitude = models.FloatField(verbose_name=_('location longitude'), blank=True, null=True)
     latitude = models.FloatField(verbose_name=_('location latitude'), blank=True, null=True)
 
@@ -90,7 +90,7 @@ class Category(MPTTModel):
     value = models.CharField(max_length=250, verbose_name=_('category value'))
     icon = models.CharField(max_length=250, blank=True, null=True, verbose_name=_('category icon'))
     parent = TreeForeignKey('self', blank=True, null=True, related_name='children', db_index=True,
-                            verbose_name=_('category parent'))
+                            on_delete=models.CASCADE, verbose_name=_('category parent'))
     is_for_user = models.BooleanField(default=False, verbose_name=_('user relation for post category'))
     is_active = models.BooleanField(default=True, verbose_name=_('for feel on off'))
 

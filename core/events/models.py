@@ -24,7 +24,7 @@ class EventType(models.Model):
 
 
 class Event(models.Model):
-    user = models.ForeignKey(User, related_name='events')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='events')
     title = models.CharField(max_length=255)
     slug = models.CharField(max_length=250, unique=True)
     address = models.CharField(max_length=350)
@@ -32,8 +32,8 @@ class Event(models.Model):
     status = models.BooleanField(default=0)
     start = models.DateTimeField()
     stop = models.DateTimeField()
-    type = models.ForeignKey(EventType, related_name='event_types')
-    location = models.ForeignKey('classifier.Location')
+    type = models.ForeignKey(EventType, on_delete=models.CASCADE, related_name='event_types')
+    location = models.ForeignKey('classifier.Location', on_delete=models.CASCADE)
     poster = models.ImageField(upload_to="posters")
 
     def __str__(self):
