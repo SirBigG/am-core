@@ -164,7 +164,7 @@ class ParsedMap(models.Model):
     type = models.IntegerField()
 
     def __str__(self):
-        return f'{self.host} {self.link}'
+        return '{} {}'.format(self.host, self.link)
 
 
 class Link(models.Model):
