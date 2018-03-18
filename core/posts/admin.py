@@ -48,9 +48,10 @@ class AdminParsedPostForm(forms.ModelForm):
 
 class ParsedPostAdmin(admin.ModelAdmin):
     form = AdminParsedPostForm
-    list_display = ('title', 'original', 'is_processed')
+    list_display = ('title', 'original', 'is_processed', 'is_translated', 'is_finished',)
     raw_id_fields = ('publisher',)
     readonly_fields = ('hash',)
+    list_filter = ('is_processed', 'is_translated', 'is_finished',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
