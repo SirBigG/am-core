@@ -26,6 +26,7 @@ class PostAdmin(TranslationAdmin):
     ]
     list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', )
     readonly_fields = ('slug', )
+    raw_id_fields = ('publisher',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)
@@ -37,8 +38,24 @@ class LinkAdmin(admin.ModelAdmin):
     list_display = ('link', 'is_parsed')
 
 
+class AdminParsedPostForm(forms.ModelForm):
+    rubric = forms.ModelChoiceField(queryset=Category.objects.filter(level=2))
+
+    class Meta:
+        model = ParsedPost
+        fields = '__all__'
+
+
 class ParsedPostAdmin(admin.ModelAdmin):
+    form = AdminParsedPostForm
     list_display = ('title', 'original', 'is_processed')
+    raw_id_fields = ('publisher',)
+    readonly_fields = ('hash',)
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['publisher'].initial = request.user
+        return form
 
 
 admin.site.register(Post, PostAdmin)

@@ -1,6 +1,7 @@
 from PIL import Image
 from io import BytesIO
 from pathlib import Path
+import hashlib
 
 from django.db import models
 from django.utils.translation import get_language, ugettext_lazy as _
@@ -185,8 +186,24 @@ class ParsedPost(models.Model):
     original = RichTextField(verbose_name=_('parsed text'))
     translated_title = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('translated title'))
     translated = RichTextField(verbose_name=_('translated text'), blank=True, null=True)
+    rubric = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('post category'),
+                               blank=True, null=True)
+    publisher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('post publisher'),
+                                  blank=True, null=True)
     is_processed = models.BooleanField(default=False)
-    hash = models.CharField(max_length=500)
+    is_translated = models.BooleanField(default=False)
+    is_finished = models.BooleanField(default=False)
+    hash = models.CharField(max_length=500, blank=True)
 
     def __str__(self):
         return self.title
+
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        if self.is_processed and not self.is_finished:
+            Post(title=self.translated_title, text=self.translated, rubric=self.rubric,
+                 publisher=self.publisher, status=0).save()
+            self.is_finished = True
+        if not self.hash:
+            self.hash = hashlib.sha256((self.title + self.original).encode('utf-8')).hexdigest()
+        super().save(force_insert=False, force_update=False, using=None, update_fields=None)
