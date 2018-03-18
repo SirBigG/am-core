@@ -154,3 +154,39 @@ class Comment(models.Model):
 
     def __str__(self):
         return str(self.user)
+
+
+class ParsedMap(models.Model):
+    host = models.CharField(max_length=255)
+    link = models.CharField(max_length=500)
+    map = models.TextField()
+    root = models.CharField(max_length=255)
+    type = models.IntegerField()
+
+    def __str__(self):
+        return f'{self.host} {self.link}'
+
+
+class Link(models.Model):
+    link = models.URLField(max_length=500, unique=True)
+    is_parsed = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'links'
+        verbose_name = _('Link')
+        verbose_name_plural = _('Links')
+
+    def __str__(self):
+        return self.link
+
+
+class ParsedPost(models.Model):
+    title = models.CharField(max_length=500, verbose_name=_('parsed title'))
+    original = RichTextField(verbose_name=_('parsed text'))
+    translated_title = models.CharField(max_length=500, blank=True, null=True, verbose_name=_('translated title'))
+    translated = RichTextField(verbose_name=_('translated text'), blank=True, null=True)
+    is_processed = models.BooleanField(default=False)
+    hash = models.CharField(max_length=500)
+
+    def __str__(self):
+        return self.title

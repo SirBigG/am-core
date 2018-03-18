@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 
-from core.posts.models import Post, Photo, Comment
+from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost
 from core.classifier.models import Category
 
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
@@ -34,3 +34,6 @@ class PostAdmin(TranslationAdmin):
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment)
+admin.site.register(ParsedMap)
+admin.site.register(ParsedPost)
+admin.site.register(Link)
