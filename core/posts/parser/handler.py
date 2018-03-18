@@ -1,4 +1,4 @@
-from core.posts.models import ParsedMap, Link, ParsedPost
+from core.posts.models import Link, ParsedPost
 from .parsers import PARSER_CLASSES
 
 

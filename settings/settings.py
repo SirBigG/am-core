@@ -214,5 +214,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 
+# Multillect translator secrets
+MULTILLECT_ACCOUNT_ID = ''
+MULTILLECT_SECRET_KEY = ''
+
 # Importing security settings
 from .settings_local import *  # noqa
