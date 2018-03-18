@@ -32,8 +32,17 @@ class PostAdmin(TranslationAdmin):
         form.base_fields['publisher'].initial = request.user
         return form
 
+
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ('link', 'is_parsed')
+
+
+class ParsedPostAdmin(admin.ModelAdmin):
+    list_display = ('title', 'original', 'is_processed')
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment)
 admin.site.register(ParsedMap)
-admin.site.register(ParsedPost)
-admin.site.register(Link)
+admin.site.register(ParsedPost, ParsedPostAdmin)
+admin.site.register(Link, LinkAdmin)
