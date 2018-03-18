@@ -22,6 +22,7 @@ class ParseHandler(object):
     def create_posts(self):
         for link in Link.objects.filter(is_parsed=False):
             item = PARSER_CLASSES.get(self.map.type)(self.map, link=link).get_item()
-            ParsedPost(title=item['title'], original=item['text']).save()
-            link.is_parsed = True
-            link.save()
+            if item:
+                ParsedPost(title=item['title'], original=item["type"] + item['text']).save()
+                link.is_parsed = True
+                link.save()

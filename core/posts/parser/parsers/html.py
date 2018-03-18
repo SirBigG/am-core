@@ -15,7 +15,10 @@ class HtmlParser(BaseParser):
     def get_item(self):
         tree = html.fromstring(self.get_content())
         for i in tree.xpath(self.info.root):
-            return {k: i.xpath(v)[0].text_content() for k, v in self.get_map().items()}
+            try:
+                return {k: i.xpath(v)[0].text_content() for k, v in self.get_map().items()}
+            except Exception as e:
+                print(e)
 
 
 class HtmlIterParser(HtmlParser):
