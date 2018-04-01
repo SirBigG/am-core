@@ -2,14 +2,14 @@
 {% load post_extras %}
 <!-- Site header -->
 
-<header class="navbar navbar-green navbar-expand-lg">
+<header class="navbar navbar-green navbar-expand-lg sticky-top" style="background-color: white;">
     <div class="container-fluid">
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="main-menu-collapse">
               <a class="navbar-brand" href="/">
-                AgroMega
+                <img width="200" height="50" src="{% static "posts/logo.png" %}">
               </a>
               <ul class="navbar-nav">
                 {% cache 3600 'main_menu' %}
