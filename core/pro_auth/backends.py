@@ -31,7 +31,7 @@ class AuthBackend(object):
         be either "group" or "user" to return permissions from
         `_get_group_permissions` or `_get_user_permissions` respectively.
         """
-        if not user_obj.is_active or user_obj.is_anonymous() or obj is not None:
+        if not user_obj.is_active or user_obj.is_anonymous or obj is not None:
             return set()
 
         perm_cache_name = '_%s_perm_cache' % from_name
