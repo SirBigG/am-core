@@ -1,4 +1,4 @@
-from __future__ import unicode_literals
+import uuid
 
 from django.db import models
 from django.contrib.auth.models import PermissionsMixin
@@ -48,12 +48,16 @@ class User(AbstractBaseUser, PermissionsMixin):
     Email, phone1 and password are required. Other fields are optional.
     """
     email = models.EmailField(
-        unique=True,
+        unique=True, blank=True, null=True,
         help_text=_('Required. You use it at every entrance to the site.'),
         error_messages={
                 'unique': _("A user with that email already exists."),
                 },
         verbose_name=_('user email'), )
+    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    # Social auth extra data field
+    details = models.TextField(blank=True, null=True)
+
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
 

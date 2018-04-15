@@ -30,6 +30,7 @@ def create_user(strategy, details, backend, user=None, *args, **kwargs):
     fields = dict((name, kwargs.get(name, details.get(name)))
                   for name in backend.setting('USER_FIELDS', USER_FIELDS))
 
+    fields.update({'details': details})
     # _user_data = backend.strategy.session_pop('social_form_data')
     # if _user_data:
     #    fields.update(_user_data)
