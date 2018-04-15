@@ -54,7 +54,6 @@ class User(AbstractBaseUser, PermissionsMixin):
                 'unique': _("A user with that email already exists."),
                 },
         verbose_name=_('user email'), )
-    uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     # Social auth extra data field
     details = models.TextField(blank=True, null=True)
 
