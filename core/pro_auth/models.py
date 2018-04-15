@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('first name'), max_length=30, blank=True)
     last_name = models.CharField(_('last name'), max_length=30, blank=True)
 
-    phone1 = models.CharField(max_length=25, verbose_name=_('main phone'))
+    phone1 = models.CharField(max_length=25, blank=True, null=True, verbose_name=_('main phone'))
     phone2 = models.CharField(max_length=25, blank=True, null=True,
                               verbose_name=_('extra phone'))
     phone3 = models.CharField(max_length=25, blank=True, null=True,
