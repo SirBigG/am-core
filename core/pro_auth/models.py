@@ -46,7 +46,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     Email, phone1 and password are required. Other fields are optional.
     """
     email = models.EmailField(
-        unique=True, blank=True, null=True,
+        blank=True, null=True,
         help_text=_('Required. You use it at every entrance to the site.'),
         error_messages={
                 'unique': _("A user with that email already exists."),
