@@ -7,4 +7,5 @@ urlpatterns = [
     url(r'^', include('api.v1.pro_auth.urls')),
     url(r'^', include('api.v1.services.urls')),
     url(r'^', include('api.v1.events.urls')),
+    url(r'^', include('api.v1.news.urls')),
 ]

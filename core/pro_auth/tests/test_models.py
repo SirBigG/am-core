@@ -48,15 +48,13 @@ class UserModelTests(TestCase):
 class UserManagerTests(TestCase):
 
     def test_create_user(self):
-        User.objects.create_user('aaaa@test.com', '+380991234567',
-                                 '11111')
+        User.objects.create_user('aaaa@test.com', '11111')
         self.assertEqual(User.objects.count(), 1)
         self.assertFalse(User.objects.all()[0].is_staff)
         self.assertFalse(User.objects.all()[0].is_superuser)
 
     def test_create_superuser(self):
-        User.objects.create_superuser('aaaa@test.com', '+380991234567',
-                                      '11111')
+        User.objects.create_superuser('aaaa@test.com', '11111')
         self.assertEqual(User.objects.count(), 1)
         self.assertTrue(User.objects.all()[0].is_staff)
         self.assertTrue(User.objects.all()[0].is_superuser)
@@ -64,10 +62,8 @@ class UserManagerTests(TestCase):
     def test_crete_user_raises(self):
         u = User.objects
         # Create user test.
-        with self.assertRaisesMessage(ValueError, 'The given email must be set'):
-            u.create_user(email='', phone1='+380991234567', password='11111')
-        with self.assertRaisesMessage(ValueError, 'The given phone must be set'):
-            u.create_user(email='test@test.com', phone1='', password='11111')
+        # with self.assertRaisesMessage(ValueError, 'The given email must be set'):
+        #    u.create_user(email='', phone1='+380991234567', password='11111')
         # Create superuser test.
         with self.assertRaisesMessage(ValueError, 'Superuser must have is_staff=True.'):
             u.create_superuser(email='test@test.com', phone1='+380991234567',

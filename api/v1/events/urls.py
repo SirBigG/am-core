@@ -2,7 +2,7 @@ from django.conf.urls import url
 
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from ..events.views import EventTypeListView, EventCreateView
+from .views import EventTypeListView, EventCreateView
 
 
 urlpatterns = format_suffix_patterns([

@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     'core.posts',
     'core.services',
     'core.events',
+    'core.news',
 
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
