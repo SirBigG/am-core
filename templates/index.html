@@ -8,7 +8,9 @@
     </div>
     <p class="text-muted">Останні новини:</p>
     {% include "news/helpers/news_list.html" %}
-    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary text-center p-3">Підписатись на новини в Telegram  <i class="fa fa-paper-plane fa-lg"></i></a>
+    <p class="text-center p-3">
+      <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram  <i class="fa fa-paper-plane fa-lg"></i></a>
+    </p>
     <p class="text-muted">Останні публікації:</p>
     {% include "posts/helpers/object_list.html" %}
 {% endblock %}
