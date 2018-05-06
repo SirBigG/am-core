@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block extra_meta %}
-   <meta name="robots" content="noindex,follow">
+   <meta name="robots" content="noindex,nofollow">
 {% endblock extra_meta %}
 
 {% block page_title %}
-    <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
+    <h1>Агроновини</h1>
 {% endblock %}
 
 {% block content %}
@@ -13,8 +13,8 @@
   {% for obj in object_list %}
       <li class="media" id="{{obj.pk}}">
         <img class="mr-3" src="{{obj.poster}}" alt="">
-        <div class="media-body">
-          <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;" target="_blank"><h6 class="text-success">{{ obj.title }}</h6></a>
+        <div class="media-body pb-3">
+          <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;" target="_blank"><h5 class="text-primary">{{ obj.title }}</h5></a>
         </div>
       </li>
   {% endfor %}

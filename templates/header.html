@@ -18,6 +18,11 @@
               </ul>
         </div>
         <div class="navbar-nav d-inline-flex flex-row auth-block">
+            <div class="nav-item m-1">
+                  <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-outline-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
+                    <i class="fa fa-paper-plane fa-lg"></i>
+                  </button>
+                </div>
             {% if user.is_authenticated %}
                 <div class="nav-item m-1">
                   <button onclick="location.href='/profile/'" class="btn btn-outline-success" title="{% trans 'Особистий кабінет' %}">
