@@ -7,7 +7,7 @@
       <p class="lead text-success text-right">Адміністрація</p>
     </div>
     <p class="text-muted">Останні новини:</p>
-    {% news/helpers/news_list.html %}
+    {% include "news/helpers/news_list.html" %}
     <p class="text-muted">Останні публікації:</p>
     {% include "posts/helpers/object_list.html" %}
 {% endblock %}

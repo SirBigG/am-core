@@ -13,7 +13,6 @@ class CreateNewsView(APIView):
         News.objects.bulk_create([News(title=item.get('title'),
                                        link=item.get('link'),
                                        poster=item.get('poster')) for item in request.data["items"]])
-        return Response({"link":
-                             f"{settings.HOST}/news/list/"
-                             f"?from={int((datetime.now() - timedelta(days=1)).timestamp())}"
+        return Response({"link": "%s/news/list/?from=%i" % (settings.HOST,
+                                                            int((datetime.now() - timedelta(days=1)).timestamp()))
                          })
