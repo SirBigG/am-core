@@ -3,7 +3,7 @@
       <li class="media">
         <img class="mr-3" src="{{obj.poster}}" alt="">
         <div class="media-body">
-          <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;"><h2 class="text-success">{{ obj.title }}</h2></a>
+          <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="text-success">{{ obj.title }}</h2></a>
         </div>
       </li>
   {% endfor %}

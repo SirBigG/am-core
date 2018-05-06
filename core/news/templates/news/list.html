@@ -11,7 +11,7 @@
 {% block content %}
   <ul class="list-unstyled">
   {% for obj in object_list %}
-      <li class="media">
+      <li class="media" id="{{obj.pk}}">
         <img class="mr-3" src="{{obj.poster}}" alt="">
         <div class="media-body">
           <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;"><h2 class="text-success">{{ obj.title }}</h2></a>
