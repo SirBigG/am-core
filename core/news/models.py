@@ -7,6 +7,7 @@ class News(models.Model):
     link = models.URLField()
     poster = models.URLField(null=True, blank=True)
     extra = models.TextField(null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         db_table = 'news'

@@ -6,6 +6,8 @@
       <p class="lead text-success">Вітаємо вас на порталі однодумців. Додавайте цікаві статті про своїх улюбленців і ставте відгуки улюбленим породам, сортам та видам. Скоро більше функціоналу та інформації. Якщо у Вас є побажання щодо додаткових функцій зв'яжіться з нами через форму зворотнього зв'язку.</p>
       <p class="lead text-success text-right">Адміністрація</p>
     </div>
+    <p class="text-muted">Останні новини:</p>
+    {% news/helpers/news_list.html %}
     <p class="text-muted">Останні публікації:</p>
     {% include "posts/helpers/object_list.html" %}
 {% endblock %}

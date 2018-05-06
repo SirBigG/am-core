@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block extra_meta %}
+   <meta name="robots" content="noindex,follow">
+{% endblock extra_meta %}
+
+{% block page_title %}
+    <h1>{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}</h1>
+{% endblock %}
+
+{% block content %}
+  <ul class="list-unstyled">
+  {% for obj in object_list %}
+      <li class="media">
+        <img class="mr-3" src="{{obj.poster}}" alt="">
+        <div class="media-body">
+          <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;"><h2 class="text-success">{{ obj.title }}</h2></a>
+        </div>
+      </li>
+  {% endfor %}
+  </ul>
+
+    {% include "helpers/pagination.html" %}
+{% endblock content %}

@@ -16,5 +16,4 @@ class CreateNewsView(APIView):
         return Response({"link":
                              f"{settings.HOST}/news/"
                              f"?from={int((datetime.now() - timedelta(days=1)).timestamp())}"
-                             f"&to={int(datetime.now().timestamp())}"
                          })
