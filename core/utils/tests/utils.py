@@ -125,3 +125,29 @@ class HtmlTestCaseMixin(object):
         elif n > 1:
             msg = self._formatMessage(msg, "You have more than one H1 tag.")
             raise self.failureException(msg)
+
+
+class DisableAutoAdd(object):
+    """Context manager for off auto_now_add date for tests and back it.
+       Example: with DisableAutoAdd(*[Model1, Model2]):
+                    # Do something
+    """
+    def __init__(self, *models):
+        self.models = models
+
+    def change_auto_now_fields(self, status):
+        """Turns off the auto_now and auto_now_add attributes on a Model's fields,
+            so that an instance of the Model can be saved with a custom value.
+            """
+        for model in self.models:
+            for field in model._meta.local_fields:
+                if hasattr(field, 'auto_now'):
+                    field.auto_now = status
+                if hasattr(field, 'auto_now_add'):
+                    field.auto_now_add = status
+
+    def __enter__(self):
+        self.change_auto_now_fields(False)
+
+    def __exit__(self, type, value, traceback):
+        self.change_auto_now_fields(True)

@@ -1,10 +1,12 @@
 <ul class="list-unstyled">
   {% for obj in news_list %}
       <li class="media">
-        <img class="mr-3" src="{{obj.poster}}" alt="">
-        <div class="media-body pb-3">
-          <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h6 class="text-primary">{{ obj.title }}</h6></a>
-        </div>
+          {% if obj.poster %}
+            <img class="mr-3" src="{{obj.poster}}" alt="">
+          {% endif %}}
+          <div class="media-body pb-3">
+            <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h6 class="text-primary">{{ obj.title }}</h6></a>
+          </div>
       </li>
   {% endfor %}
 </ul>

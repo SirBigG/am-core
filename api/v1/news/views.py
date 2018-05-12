@@ -14,5 +14,5 @@ class CreateNewsView(APIView):
                                        link=item.get('link'),
                                        poster=item.get('poster')) for item in request.data["items"]])
         return Response({"link": "%s/news/list/?from=%i" % (settings.HOST,
-                                                            int((datetime.now() - timedelta(days=1)).timestamp()))
+                                                            int((datetime.now() - timedelta(hours=1)).timestamp()))
                          })
