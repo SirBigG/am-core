@@ -118,11 +118,11 @@ TEMPLATES = [
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "agrodb",
-        'USER': 'agr',
-        'PASSWORD': '787898',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT'),
     }
 }
 
@@ -220,4 +220,7 @@ MULTILLECT_ACCOUNT_ID = ''
 MULTILLECT_SECRET_KEY = ''
 
 # Importing security settings
-from .settings_local import *  # noqa
+try:
+    from .settings_local import *  # noqa
+except ImportError:
+    pass
