@@ -4,7 +4,7 @@ from django.conf import settings
 from core.utils.tests.factories import CategoryFactory
 
 from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu, \
-    static_version
+    static_version, index_categories
 
 
 class PostExtrasTests(TestCase):
@@ -12,6 +12,10 @@ class PostExtrasTests(TestCase):
     def test_main_menu(self):
         CategoryFactory.create_batch(size=5)
         self.assertEqual(len(main_menu()['roots']), 5)
+
+    def test_index_categories(self):
+        CategoryFactory.create_batch(size=5)
+        self.assertEqual(len(index_categories()['roots']), 5)
 
     def test_full_url(self):
         url = '/foo/asd.html'

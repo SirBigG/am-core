@@ -14,8 +14,16 @@ def main_menu():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    roots = Category.objects.filter(level=0)
+    roots = Category.objects.filter(level=0).order_by("value")
     return {'roots': roots}
+
+
+@register.inclusion_tag('posts/index_categories.html')
+def index_categories():
+    """
+    :return: rubric roots queryset
+    """
+    return main_menu()
 
 
 @register.inclusion_tag('posts/second_menu.html')
