@@ -19,12 +19,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
+SECRET_KEY = os.getenv("SECRET_KEY")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-HOST = 'localhost:8000'
+HOST = os.getenv("HOST") or 'localhost:8000'
 
-ALLOWED_HOSTS = ['localhost:8000']
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv('ALLOWED_HOSTS') else ['localhost:8000']
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 
@@ -148,7 +150,8 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 
-SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['phone1', 'email', ]
+SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = ['state', ]
+SESSION_COOKIE_SECURE = False
 
 
 SOCIAL_AUTH_PIPELINE = (
@@ -162,6 +165,12 @@ SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.load_extra_data',
     'social_core.pipeline.user.user_details',
 )
+
+SOCIAL_AUTH_FACEBOOK_KEY = os.getenv("SOCIAL_AUTH_FACEBOOK_KEY")
+SOCIAL_AUTH_FACEBOOK_SECRET = os.getenv("SOCIAL_AUTH_FACEBOOK_SECRET")
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY")
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -206,21 +215,33 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR + '/static/'
+STATIC_ROOT = os.getenv("STATIC_ROOT") or BASE_DIR + '/static/'
 
 # Media files (uploads)
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = os.getenv("MEDIA_ROOT") or os.path.join(BASE_DIR, 'media')
 
 
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 
 # Multillect translator secrets
-MULTILLECT_ACCOUNT_ID = ''
-MULTILLECT_SECRET_KEY = ''
+MULTILLECT_ACCOUNT_ID = os.getenv("MULTILLECT_ACCOUNT_ID")
+MULTILLECT_SECRET_KEY = os.getenv("MULTILLECT_SECRET_KEY")
 
-# Importing security settings
-try:
-    from .settings_local import *  # noqa
-except ImportError:
-    pass
+
+EMAIL_HOST = os.getenv("EMAIL_HOST")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT")) if os.getenv("EMAIL_PORT") else None
+EMAIL_USE_TLS = True
+
+SERVER_EMAIL = os.getenv("SERVER_EMAIL")
+ADMINS = [i.split(",") for i in os.getenv("ADMINS").split(":")] if os.getenv("ADMINS") else []
+
+# ################################# Google captcha ###################################### #
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY")
+NOCAPTCHA = True
+
+# Media version for browser cache refresh
+MEDIA_VERSION = os.getenv("MEDIA_VERSION")
