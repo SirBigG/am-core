@@ -16,11 +16,11 @@
       <li class="media" id="{{obj.pk}}">
           {% if obj.poster %}
             <img class="mr-3" src="{{obj.poster}}" alt="">
-          {% endif %}}
+          {% endif %}
           <div class="media-body pb-3">
             <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;" target="_blank"><h5 class="text-primary">{{ obj.title }}</h5></a>
             <div class="float-right">
-                <p class="h5 text-danger">{{obj.link|get_domain}}</p>
+                <p class="h6 text-danger">{{obj.link|get_domain}}</p>
             </div>
           </div>
       </li>
