@@ -1,3 +1,5 @@
+from urllib.parse import urlparse
+
 from django import template
 from django.conf import settings
 from django.templatetags.static import static
@@ -55,6 +57,20 @@ def thumbnail(photo_obj, width=300, height=200):
     return ''
 
 
+@register.simple_tag
+def static_version(path):
+    """
+    Add version end to static path.
+    :param path: path to static file
+    :return: full static file path with version
+    """
+    version = getattr(settings, 'MEDIA_VERSION', '')
+    _path = static(path)
+    if version:
+        _path = '{0}?{1}'.format(_path, version)
+    return _path
+
+
 # ####################    Filters    ################### #
 
 def grouped(l, n):
@@ -84,15 +100,11 @@ def times(number):
     return range(1, number+1)
 
 
-@register.simple_tag
-def static_version(path):
+@register.filter
+def get_domain(link):
     """
-    Add version end to static path.
-    :param path: path to static file
-    :return: full static file path with version
+    Get domain from start link.
+    :param link:
+    :return domain:
     """
-    version = getattr(settings, 'MEDIA_VERSION', '')
-    _path = static(path)
-    if version:
-        _path = '{0}?{1}'.format(_path, version)
-    return _path
+    return urlparse(link).netloc

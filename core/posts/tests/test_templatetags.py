@@ -4,7 +4,7 @@ from django.conf import settings
 from core.utils.tests.factories import CategoryFactory
 
 from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu, \
-    static_version, index_categories
+    static_version, index_categories, get_domain
 
 
 class PostExtrasTests(TestCase):
@@ -54,3 +54,6 @@ class PostExtrasTests(TestCase):
     @override_settings(MEDIA_VERSION='1.0')
     def test_static_version_with_setting(self):
         self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css?1.0' % settings.STATIC_URL)
+
+    def test_get_domain(self):
+        self.assertEqual("http://test.com/test", "test.com")

@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load post_extras %}
+
 {% block extra_meta %}
    <meta name="robots" content="noindex,nofollow">
 {% endblock extra_meta %}
@@ -12,13 +14,18 @@
   <ul class="list-unstyled">
   {% for obj in object_list %}
       <li class="media" id="{{obj.pk}}">
-        <img class="mr-3" src="{{obj.poster}}" alt="">
-        <div class="media-body pb-3">
-          <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;" target="_blank"><h5 class="text-primary">{{ obj.title }}</h5></a>
-        </div>
+          {% if obj.poster %}
+            <img class="mr-3" src="{{obj.poster}}" alt="">
+          {% endif %}}
+          <div class="media-body pb-3">
+            <a href="{{ obj.link }}" style="text-decoration: none;outline: 0;" target="_blank"><h5 class="text-primary">{{ obj.title }}</h5></a>
+            <div class="float-right">
+                <p class="h5 text-danger">{{obj.link|get_domain}}</p>
+            </div>
+          </div>
       </li>
   {% endfor %}
   </ul>
 
-    {% include "helpers/pagination.html" %}
+    {% include "helpers/pagination_short.html" %}
 {% endblock content %}
