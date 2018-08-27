@@ -1,5 +1,6 @@
 from settings.settings import *
 
+HOST = "localhost:8000"
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 

@@ -67,5 +67,8 @@ class SiteMap(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(SiteMap, self).get_context_data(**kwargs)
         context['base'] = settings.HOST + '/'
-        context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.filter(status=1)]
+        context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.select_related(
+            'rubric').prefetch_related('rubric__parent').filter(status=1)]
+        context['urls'].extend([
+            settings.HOST + "/" + slug for slug in Category.objects.filter(level=1).values_list('slug', flat=True)])
         return context

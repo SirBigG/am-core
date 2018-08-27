@@ -6,6 +6,7 @@
     {% for url in urls %}
         <url>
             <loc>{{ url }}</loc>
+            <changefreq>weekly</changefreq>
         </url>
     {% endfor %}
 </urlset>
