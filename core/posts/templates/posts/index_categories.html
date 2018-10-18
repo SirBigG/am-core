@@ -3,7 +3,7 @@
 {% for group in roots|group_by:2 %}
     <div class="row mb-2">
         {% for root in group %}
-            <div class="col-12 col-lg-6">
+            <div class="col-6">
                 <p class="h5 text-success">{{ root.value }}</p>
                 {% for child in root.get_children %}
                     <div class="col-12">

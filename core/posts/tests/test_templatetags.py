@@ -48,6 +48,7 @@ class PostExtrasTests(TestCase):
         CategoryFactory(parent=parent)
         self.assertEqual(len(second_menu('parent')['menu_items']), 2)
 
+    @override_settings(MEDIA_VERSION='')
     def test_static_version_without_settings(self):
         self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css' % settings.STATIC_URL)
 

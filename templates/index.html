@@ -3,19 +3,19 @@
 {% load post_extras %}
 
 {% block content %}
-    <div class="alert alert-success" role="alert">
-      <h3 class="alert-heading">Дорогі друзі!</h3>
-      <p class="lead text-success">Вітаємо вас на порталі однодумців. Додавайте цікаві статті про своїх улюбленців і ставте відгуки улюбленим породам, сортам та видам. Скоро більше функціоналу та інформації. Якщо у Вас є побажання щодо додаткових функцій зв'яжіться з нами через форму зворотнього зв'язку.</p>
-      <p class="lead text-success text-right">Адміністрація</p>
-    </div>
     <div>
         {% index_categories %}
     </div>
     <p class="text-muted">Останні новини:</p>
     {% include "news/helpers/news_list.html" %}
+    <div class="row">
     <p class="text-center p-3">
       <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram  <i class="fa fa-paper-plane fa-lg"></i></a>
     </p>
+    <p class="p-3">
+        <a href="/news/list" class="btn btn-outline-success">Всі новини</a>
+    </p>
+    </div>
     <p class="text-muted">Останні публікації:</p>
     {% include "posts/helpers/object_list.html" %}
 {% endblock %}

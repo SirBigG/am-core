@@ -24,10 +24,9 @@
     <script src="{% static "js/jquery.min.js" %}"></script>
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
     <script src="{% static "js/bootstrap.min.js" %}"></script>
-    <script src='{% static_version "bundles/init.js" %}'></script>
     </head>
     {% block body_head_tag %}
-        <body oncopy="return false;" oncontextmenu="return false;">
+        <body style="background-color:#eeeeee;">
     {% endblock %}
         {% block header %}
             {% include 'header.html' %}
