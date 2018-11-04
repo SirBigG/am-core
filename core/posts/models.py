@@ -12,7 +12,7 @@ from django.conf import settings
 
 from core.pro_auth.models import User
 
-from core.classifier.models import Category
+from core.classifier.models import Category, Country, Tag
 from core.services.models import MetaData
 
 from ckeditor.fields import RichTextField
@@ -49,6 +49,11 @@ class Post(models.Model):
 
     meta = models.OneToOneField(MetaData, on_delete=models.CASCADE, blank=True, null=True,
                                 verbose_name=_('post meta data'), related_name="post-meta-data+")
+
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True,
+                                verbose_name=_('post country'))
+
+    tags = models.ManyToManyField(Tag, verbose_name=_('past tags'))
 
     class Meta:
         db_table = 'post'

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
@@ -107,3 +105,32 @@ class Category(MPTTModel):
 
     def get_absolute_url(self):
         return '/%s/' % '/'.join(self.get_ancestors(include_self=True).values_list('slug', flat=True)[1:])
+
+
+class Type(models.Model):
+    slug = models.CharField(max_length=255, unique=True, verbose_name=_('transliteration value'))
+    title = models.CharField(max_length=255, verbose_name=_('type title'))
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'tag_types'
+        verbose_name = _('tag type')
+        verbose_name_plural = _('tag types')
+
+
+class Tag(models.Model):
+    """Realize many to many post tags."""
+    slug = models.CharField(max_length=255, unique=True, verbose_name=_('transliteration value'))
+    title = models.CharField(max_length=255, verbose_name=_('tag title'))
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('tag category'))
+    type = models.ForeignKey(Type, on_delete=models.CASCADE, verbose_name=_('tag type'))
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        db_table = 'tags'
+        verbose_name = 'tag'
+        verbose_name_plural = 'tags'

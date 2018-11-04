@@ -32,7 +32,7 @@
 {% endblock second_menu %}
 
 {% block page_title %}
-    {% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}
+    {% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %} {% if object.country %}<span class="flag-icon flag-icon-{{object.country.short_slug}}"></span>{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
