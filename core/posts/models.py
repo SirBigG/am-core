@@ -53,7 +53,7 @@ class Post(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True,
                                 verbose_name=_('post country'))
 
-    tags = models.ManyToManyField(Tag, verbose_name=_('past tags'))
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('past tags'))
 
     class Meta:
         db_table = 'post'
