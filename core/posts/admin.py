@@ -19,6 +19,18 @@ class AdminPostForm(forms.ModelForm):
         fields = '__all__'
 
 
+class CategoryFilter(admin.SimpleListFilter):
+    title = 'category'
+    parameter_name = 'category'
+
+    def lookups(self, request, model_admin):
+        return ((i.pk, i.value) for i in Category.objects.filter(level=2))
+
+    def queryset(self, request, queryset):
+        if self.value():
+            return queryset.filter(rubric_id=self.value())
+
+
 class PostAdmin(TranslationAdmin):
     form = AdminPostForm
     inlines = [
@@ -27,6 +39,7 @@ class PostAdmin(TranslationAdmin):
     list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', )
     readonly_fields = ('slug', )
     raw_id_fields = ('publisher',)
+    list_filter = (CategoryFilter, 'status',)
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)
