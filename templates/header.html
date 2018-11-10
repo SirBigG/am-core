@@ -2,14 +2,15 @@
 {% load post_extras %}
 <!-- Site header -->
 
-<header class="navbar navbar-green navbar-expand-lg sticky-top" style="background-color:#eeeeee;">
+<header class="navbar fixed-bottom navbar-green navbar-expand-lg sticky-top" style="background-color:#005c00;">
     <div class="container-fluid">
         <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">
-            <span class="text-success">Меню</span>
+            <span class="text-success"><span class="fa fa-bars fa-lg"></span></span>
         </button>
         <div class="collapse navbar-collapse" id="main-menu-collapse">
               <a class="navbar-brand" href="/">
-                <img width="200" height="50" src="{% static "posts/logo.png" %}">
+                  <h4>Agro Mega</h4>
+                <!--<img width="200" height="50" src="{% static "posts/logo.png" %}">-->
               </a>
               <ul class="navbar-nav">
                 {% cache 3600 'main_menu' %}
@@ -19,24 +20,24 @@
         </div>
         <div class="navbar-nav d-inline-flex flex-row auth-block">
             <div class="nav-item m-1">
-                  <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-outline-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
+                  <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
                     <i class="fa fa-paper-plane fa-lg"></i>
                   </button>
                 </div>
             {% if user.is_authenticated %}
                 <div class="nav-item m-1">
-                  <button onclick="location.href='/profile/'" class="btn btn-outline-success" title="{% trans 'Особистий кабінет' %}">
+                  <button onclick="location.href='/profile/'" class="btn btn-success" title="{% trans 'Особистий кабінет' %}">
                     <i class="fa fa-user-circle fa-lg"></i>
                   </button>
                 </div>
                 <div class="nav-item m-1">
-                  <button onclick="location.href='/logout/'" class="btn btn-outline-danger" title="{% trans 'Вийти' %}">
+                  <button onclick="location.href='/logout/'" class="btn btn-danger" title="{% trans 'Вийти' %}">
                      <i class="fa fa-sign-out fa-lg"></i>
                   </button>
                 </div>
             {% else %}
                  <div class="nav-item m-1">
-                   <button id="login-btn" type="button" class="btn btn-outline-success"
+                   <button id="login-btn" type="button" class="btn btn-success"
                       data-toggle="modal" data-target=".login-modal-lg" title="{% trans 'Увійти' %}">
                      <i class="fa fa-sign-in fa-lg"></i>
                    </button>

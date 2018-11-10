@@ -1,4 +1,8 @@
-<ul class="list-unstyled">
+<div class="card">
+    <div class="card-header">
+        <h4 class="text-success">Останні новини:</h4>
+    </div>
+    <div class="card-body">
   {% for obj in news_list %}
       <li class="media">
           {% if obj.poster %}
@@ -9,4 +13,15 @@
           </div>
       </li>
   {% endfor %}
-</ul>
+    </div>
+    <div class="card-footer">
+    <div class="row">
+        <p class="p-2">
+      <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram  <i class="fa fa-paper-plane fa-lg"></i></a>
+    </p>
+    <p class="p-2">
+        <a href="/news/list" class="btn btn-outline-success">Всі новини</a>
+    </p>
+    </div>
+    </div>
+</div>
