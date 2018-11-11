@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from dal import autocomplete
 
 from core.classifier.models import Location

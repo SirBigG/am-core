@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}
+{% endblock title %}
+
+{% block extra_meta %}
+    <meta name="robots" content="noindex,follow">
+{% endblock extra_meta %}
+
+{% block page_title %}
+    Пошук
+{% endblock %}
+
+{% block content %}
+    <div class="col-12m-2">
+        <form class="form-inline" action="/search/" method="get">
+            <div class="form-group m-2">
+                <input class="form-control" name="q" type="text" placeholder="Текст пошуку">
+            </div>
+            <button type="submit" class="btn btn-success m-2"><i class="fa fa-search fa-lg"></i></button>
+
+        </form>
+    </div>
+
+    {% if object_list %}
+        {% include "posts/helpers/object_list.html" %}
+    {% else %}
+        <p class="h5 text-warning">Жодних статей за Вашим запитом не знайдено.</p>
+    {% endif %}
+
+    {% include "helpers/pagination.html" %}
+{% endblock content %}

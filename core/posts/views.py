@@ -1,8 +1,7 @@
-from __future__ import unicode_literals
-
 from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
+from django.contrib.postgres.search import SearchVector
 
 from core.posts.models import Post
 from core.classifier.models import Category
@@ -52,6 +51,15 @@ class PostList(ListView):
     def get_queryset(self):
         return Post.objects.prefetch_related('country').filter(
             rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1)
+
+
+class PostSearchView(ListView):
+    paginate_by = 20
+    template_name = 'posts/search.html'
+
+    def get_queryset(self):
+        return Post.objects.prefetch_related('country').annotate(
+            search=SearchVector('text', 'title')).filter(search=self.request.GET.get('q', ''))
 
 
 class PostDetail(DetailView):

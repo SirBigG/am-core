@@ -17,9 +17,8 @@
                     {% main_menu %}
                 {% endcache %}
               </ul>
-        </div>
-        <div class="navbar-nav d-inline-flex flex-row auth-block">
-            <div class="nav-item m-1">
+            <div class="navbar-nav d-inline-flex flex-row auth-block">
+              <div class="nav-item m-1">
                   <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
                     <i class="fa fa-paper-plane fa-lg"></i>
                   </button>
@@ -43,6 +42,14 @@
                    </button>
                  </div>
             {% endif %}
+            </div>
+        </div>
+        <div class="navbar-nav d-inline-flex flex-row auth-block">
+            <div class="nav-item m-1">
+                <button onclick="location.href='/search/'"  class="btn btn-success" type="submit">
+                    <i class="fa fa-search fa-lg"></i>
+                </button>
+            </div>
         </div>
     </div>
 </header>
