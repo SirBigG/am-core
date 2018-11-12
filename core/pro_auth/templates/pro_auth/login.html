@@ -4,27 +4,15 @@
 {% block base_content_block %}
      <div class="col-12 col-lg-4 mx-auto">
        <div class="jumbotron">
-      <form method="post" action="{% block action_block %}{{ view.request.path }}{% endblock %}">
-        {% csrf_token %}
-            {% for error in form.non_field_errors %}
-                <p class="text-justify text-danger">{{error}}</p>
-            {% endfor %}
-            {% for field in form %}
-                <div class="form-group">
-                    <label>{{ field.label }}</label>
-                    {% for error in field.errors %}
-                        <small class="form-text text-muted text-danger">{{error}}</small>
-                    {% endfor %}
-                    {{ field }}
-                </div>
-            {% endfor %}
-        <div class="row">
-            <div class="col-md-6 text-center">
-                <!-- <a href="" >{% trans 'Забули пароль?' %}</a> -->
-            </div>
-            <div class="col-md-6 text-center">
-                <button type="submit" class="btn btn-primary">{% trans 'Увійти' %}</button>
-            </div>
+           <h1 class="text-success h3">Увійти за допомогою:</h1>
+       <ul class="nav nav-pills justify-content-center">
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{% url 'social:begin' 'google-oauth2' %}"><i class="fa fa-google fa-3x"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-3x"></i></a>
+                </li>
+            </ul>
         </div>
     </form>
     </div>
