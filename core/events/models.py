@@ -1,7 +1,11 @@
+from PIL import Image
+from io import BytesIO
+
 from django.db import models
 from django.core.cache import cache
 from django.utils.translation import get_language
 from django.urls import reverse
+from django.core.files import File
 
 from core.pro_auth.models import User
 
@@ -44,6 +48,14 @@ class Event(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify('{} {}'.format(self.title.lower(), self.location.slug), get_language()[:2])
+        if self.poster:
+            im = Image.open(BytesIO(self.image.read()))
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+            im.thumbnail((1000, 800), Image.ANTIALIAS)
+            output = BytesIO()
+            im.save(output, format='JPEG', quality=85)
+            self.poster = File(output, self.image.name)
         super().save(*args, **kwargs)
         cache.delete(self.MAIN_CACHE_KEY)
 

@@ -132,16 +132,18 @@ class Photo(models.Model):
         """Cut image before save."""
         if self.image:
             im = Image.open(BytesIO(self.image.read()))
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
             im.thumbnail((1000, 800), Image.ANTIALIAS)
             output = BytesIO()
             im.save(output, format='JPEG', quality=85)
             self.image = File(output, self.image.name)
-        super(Photo, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
         """Delete file of image after object deleting."""
         path = self.image.path
-        super(Photo, self).delete(using=None, keep_parents=False)
+        super().delete(using=None, keep_parents=False)
         import os
         os.remove(path)
 
