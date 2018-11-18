@@ -49,13 +49,13 @@ class Event(models.Model):
         if not self.slug:
             self.slug = slugify('{} {}'.format(self.title.lower(), self.location.slug), get_language()[:2])
         if self.poster:
-            im = Image.open(BytesIO(self.image.read()))
+            im = Image.open(BytesIO(self.poster.read()))
             if im.mode != 'RGB':
                 im = im.convert('RGB')
             im.thumbnail((1000, 800), Image.ANTIALIAS)
             output = BytesIO()
             im.save(output, format='JPEG', quality=85)
-            self.poster = File(output, self.image.name)
+            self.poster = File(output, self.poster.name)
         super().save(*args, **kwargs)
         cache.delete(self.MAIN_CACHE_KEY)
 
