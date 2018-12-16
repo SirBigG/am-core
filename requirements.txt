@@ -34,3 +34,4 @@ social-auth-app-django==2.1.0
 transliterate==1.8.1
 xlrd==1.0.0
 HTTPretty==0.8.14
+django-jet

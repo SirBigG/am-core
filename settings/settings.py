@@ -38,6 +38,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
+    'jet',
     # Autocomplete field. https://github.com/yourlabs/django-autocomplete-light.
     'dal',
     'dal_select2',

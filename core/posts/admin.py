@@ -2,7 +2,10 @@ from django.contrib import admin
 from django import forms
 
 from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost
+
 from core.classifier.models import Category
+
+from core.posts.parser.handler import ParseHandler
 
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 
@@ -31,6 +34,13 @@ class CategoryFilter(admin.SimpleListFilter):
             return queryset.filter(rubric_id=self.value())
 
 
+def activate_posts(modelsadmin, request, queryset):
+    queryset.update(status=True)
+
+
+activate_posts.short_description = "Activate selected posts"
+
+
 class PostAdmin(TranslationAdmin):
     form = AdminPostForm
     inlines = [
@@ -40,6 +50,7 @@ class PostAdmin(TranslationAdmin):
     readonly_fields = ('slug', )
     raw_id_fields = ('publisher',)
     list_filter = (CategoryFilter, 'status',)
+    actions = [activate_posts]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)
@@ -72,8 +83,29 @@ class ParsedPostAdmin(admin.ModelAdmin):
         return form
 
 
+def parse_links(modelsadmin, request, queryset):
+    for i in queryset:
+        ParseHandler(i).create_links()
+
+
+parse_links.short_description = "Parse links from map"
+
+
+def parse_posts(modelsadmin, request, queryset):
+    for i in queryset:
+        ParseHandler(i).create_posts()
+
+
+parse_posts.short_description = "Parse posts from map"
+
+
+class ParsedMapAdmin(admin.ModelAdmin):
+    list_display = ('host', 'link', 'type')
+    actions = [parse_links, parse_posts]
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment)
-admin.site.register(ParsedMap)
+admin.site.register(ParsedMap, ParsedMapAdmin)
 admin.site.register(ParsedPost, ParsedPostAdmin)
 admin.site.register(Link, LinkAdmin)

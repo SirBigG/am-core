@@ -11,13 +11,9 @@ class ParseHandler(object):
         for item in PARSER_CLASSES.get(self.map.type)(self.map):
             to_create = list()
             for i in item:
-                i = self.get_link_item(i)
                 if i:
                     to_create.append(i)
-            Link.objects.bulk_create(to_create)
-
-    def get_link_item(self, data):
-        return Link(link=data['link'])
+            Link.objects.bulk_create([Link(link=j["link"]) for j in set(to_create)])
 
     def create_posts(self):
         for link in Link.objects.filter(is_parsed=False):

@@ -24,6 +24,7 @@ from core.posts import views
 
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^jet/', include('jet.urls', 'jet')),
     url(r'^admin/', admin.site.urls),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'^sitemap\.xml', views.SiteMap.as_view(), name='sitemap'),
