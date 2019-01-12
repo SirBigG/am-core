@@ -77,7 +77,7 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title.lower(), get_language()[:2])
-        self._save_category()
+        # self._save_category()
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
