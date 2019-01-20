@@ -112,3 +112,18 @@ class UserPostsViewSetTests(APITestCase):
         # Test returns url for created post
         response = api_client.get(response.data['url'])
         self.assertEqual(response.status_code, 200)
+
+
+class PostViewTests(APITestCase):
+    def setUp(self):
+        self.post = PostFactory()
+
+    def test_create_view_instance(self):
+        self.assertEqual(Post.objects.get(pk=self.post.pk).hits, 0)
+        response = self.client.post('/api/post/view/', json={"fingerprint": "fingerprint", "post_id": self.post.pk})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.get(pk=self.post.pk).hits, 1)
+        # Test second time not inc counter
+        response = self.client.post('/api/post/view/', json={"fingerprint": "fingerprint", "post_id": self.post.pk})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Post.objects.get(pk=self.post.pk).hits, 1)

@@ -1,14 +1,16 @@
 from django.utils.translation import get_language
 
-from core.posts.models import Post
+from core.posts.models import Post, PostView as PostViewModel
 
 from api.v1.posts.serializers import UserPostSerializer, ShortPostListSerializer
 from api.v1.posts.permissions import UserPostPermissions
 
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from transliterate import slugify
 
@@ -49,3 +51,16 @@ class UserPostsViewSet(ModelViewSet):
         _lang = get_language()[:2]
         slug = slugify(self.request.data.get('title'), _lang)
         serializer.save(publisher=self.request.user, slug=slug)
+
+
+class PostView(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        if request.data and 'fingerprint' in request.data:
+            if PostViewModel.objects.filter(**request.data).exists() is False:
+                PostViewModel.objects.create(**request.data)
+                post = Post.objects.get(pk=request.data.get('post_id'))
+                post.hits += 1
+                post.save()
+        return Response({"code": 200, "message": "Success"})

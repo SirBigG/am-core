@@ -97,6 +97,12 @@
     </div>
     <div class="row">
       <div class="col-lg-12 col-12">
+        <div class="col-lg-12 col-12">
+            <ul class="nav nav-pills float-left">
+                <li><span class="text-success h5"><i class="fa fa-eye"></i> {{object.hits}}</span></li>
+            </ul>
+        </div>
+        <div class="col-lg-12 col-12">
         <ul class="nav nav-pills float-right">
             <li class="nav-item">
                 <a class="nav-link" tabindex="-1" target="Share-in-facebook" onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;" href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
@@ -104,6 +110,7 @@
                 </a>
             </li>
         </ul>
+        </div>
       </div>
      </div>
     <div class="row">

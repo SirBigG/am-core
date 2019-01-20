@@ -214,3 +214,12 @@ class ParsedPost(models.Model):
         if not self.hash:
             self.hash = hashlib.sha256((self.title + self.original).encode('utf-8')).hexdigest()
         super().save(force_insert=False, force_update=False, using=None, update_fields=None)
+
+
+class PostView(models.Model):
+    fingerprint = models.CharField(max_length=255, verbose_name=_('fingerprint'))
+    post_id = models.IntegerField(verbose_name=_("post identifier"))
+    user_id = models.IntegerField(blank=True, null=True, verbose_name=_("user identifier"))
+
+    def __str__(self):
+        return f"{self.fingerprint} - {self.post_id}"
