@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django import forms
 
-from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost
+from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost, PostView
 
 from core.classifier.models import Category
 
@@ -104,8 +104,13 @@ class ParsedMapAdmin(admin.ModelAdmin):
     actions = [parse_links, parse_posts]
 
 
+class PostViewAdmin(admin.ModelAdmin):
+    list_display = ('fingerprint', 'post_id', 'user_id')
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(Comment)
 admin.site.register(ParsedMap, ParsedMapAdmin)
 admin.site.register(ParsedPost, ParsedPostAdmin)
 admin.site.register(Link, LinkAdmin)
+admin.site.register(PostView, PostViewAdmin)
