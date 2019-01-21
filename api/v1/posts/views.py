@@ -1,6 +1,6 @@
 from django.utils.translation import get_language
 
-from core.posts.models import Post, PostView as PostViewModel
+from core.posts.models import Post, PostView as PostViewModel, UsefulStatistic
 
 from api.v1.posts.serializers import UserPostSerializer, ShortPostListSerializer
 from api.v1.posts.permissions import UserPostPermissions
@@ -63,4 +63,14 @@ class PostView(APIView):
                 post = Post.objects.get(pk=request.data.get('post_id'))
                 post.hits += 1
                 post.save()
+        return Response({"code": 200, "message": "Success"})
+
+
+class PostUsefulView(APIView):
+    permission_classes = []
+
+    def post(self, request, *args, **kwargs):
+        if request.data and 'fingerprint' in request.data:
+            if UsefulStatistic.objects.filter(**request.data).exists() is False:
+                UsefulStatistic.objects.create(**request.data)
         return Response({"code": 200, "message": "Success"})

@@ -3,7 +3,7 @@ from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchVector
 
-from core.posts.models import Post
+from core.posts.models import Post, SearchStatistic
 from core.classifier.models import Category
 from core.news.models import News
 
@@ -14,6 +14,7 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object_list'] = Post.objects.prefetch_related('country').filter(status=1)[:10]
+        context['ordered_list'] = Post.objects.prefetch_related('country').filter(status=1).order_by('-hits')[:10]
         context['news_list'] = News.objects.all().order_by('-date')[:10]
         return context
 
@@ -59,6 +60,9 @@ class PostSearchView(ListView):
     template_name = 'posts/search.html'
 
     def get_queryset(self):
+        if self.request.GET.get('q', ''):
+            SearchStatistic.objects.create(**{"fingerprint": "fingerprint",
+                                              "search_phrase": self.request.GET.get('q')})
         return Post.objects.prefetch_related('country').annotate(
             search=SearchVector('text', 'title')).filter(search=self.request.GET.get('q', ''))
 

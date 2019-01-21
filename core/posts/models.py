@@ -223,3 +223,21 @@ class PostView(models.Model):
 
     def __str__(self):
         return f"{self.fingerprint} - {self.post_id}"
+
+
+class UsefulStatistic(models.Model):
+    fingerprint = models.CharField(max_length=255, verbose_name=_('fingerprint'))
+    post_id = models.IntegerField(verbose_name=_("post identifier"))
+    user_id = models.IntegerField(blank=True, null=True, verbose_name=_("user identifier"))
+    is_useful = models.BooleanField(_("is useful post"))
+
+    def __str__(self):
+        return f"{self.fingerprint} - {self.post_id}"
+
+
+class SearchStatistic(models.Model):
+    fingerprint = models.CharField(max_length=255, verbose_name=_('fingerprint'))
+    search_phrase = models.CharField(max_length=255, verbose_name=_('fingerprint'))
+
+    def __str__(self):
+        return f"{self.fingerprint} - {self.search_phrase[:40]}"

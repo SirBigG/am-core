@@ -1,6 +1,6 @@
 {% load post_extras %}
 
-{% for group in object_list|group_by:2 %}
+{% for group in ordered_list|group_by:2 %}
 <div class="row">
     {% for obj in group %}
     <div class="col-12 col-lg-6">

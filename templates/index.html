@@ -7,6 +7,9 @@
         {% index_categories %}
     </div>
     {% include "news/helpers/news_list.html" %}
-    <p class="text-muted">Останні публікації:</p>
+<p class="h4 text-muted"><strong>Останні публікації:</strong></p>
     {% include "posts/helpers/object_list.html" %}
+
+<p class="h4 text-muted"><strong>Популярне:</strong></p>
+    {% include "posts/helpers/ordered_object_list.html" %}
 {% endblock %}
