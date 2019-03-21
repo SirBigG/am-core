@@ -1,18 +1,10 @@
 <div class="card">
     <div class="card-header">
-        <h4 class="text-success">Останні новини:</h4>
+        <h4 class="text-success">Новини</h4>
     </div>
     <div class="card-body">
-  {% for obj in news_list %}
-      <li class="media">
-          {% if obj.poster %}
-            <img class="mr-3" src="{{obj.poster}}" alt="">
-          {% endif %}
-          <div class="media-body pb-3">
-            <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h6 class="text-primary">{{ obj.title }}</h6></a>
-          </div>
-      </li>
-  {% endfor %}
+        <p>Ми збираємо всі агроновини для Вас! Якщо ви вдасник сайту агроновин або користувач якому не вистачає якогось ресурсу, пишіть нам через форму зворотнього зв'язку, що знаходиться у футері сайту.</p>
+        <p>На сайті розміщаються тільки короткий опис та заголовок. З кожної новини відбувається перехід на ресурс оригіналу.</p>
     </div>
     <div class="card-footer">
     <div class="row">

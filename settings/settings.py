@@ -247,3 +247,6 @@ NOCAPTCHA = True
 
 # Media version for browser cache refresh
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
+
+
+API_HOST = os.getenv('API_HOST')
