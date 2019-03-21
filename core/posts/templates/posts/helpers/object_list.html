@@ -1,17 +1,39 @@
 {% load post_extras %}
 
-{% for group in object_list|group_by:2 %}
+<!--{% for group in object_list|group_by:2 %}-->
+<!--<div class="row">-->
+    <!--{% for obj in group %}-->
+    <!--<div class="col-12 col-lg-6">-->
+        <!--<div class="item_in_list">-->
+            <!--<img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-fluid" id="image-list-size">-->
+            <!--<a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="text-success text-center">{{ obj.title }} {% if obj.country %}-->
+                <!--<span class="flag-icon flag-icon-{{obj.country.short_slug}}"></span>-->
+            <!--{% endif %}</h2></a>-->
+            <!--<div class="text-justify">{{ obj.text|striptags|safe|truncatechars:300 }}</div>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--{% endfor %}-->
+<!--</div>-->
+<!--{% endfor %}-->
+
+
+{% for obj in object_list %}
 <div class="row">
-    {% for obj in group %}
-    <div class="col-12 col-lg-6">
-        <div class="item_in_list">
-            <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-rounded img-fluid" id="image-list-size">
-            <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="text-success text-center">{{ obj.title }} {% if obj.country %}
-                <span class="flag-icon flag-icon-{{obj.country.short_slug}}"></span>
-            {% endif %}</h2></a>
-            <div class="text-justify">{{ obj.text|striptags|safe|truncatechars:300 }}</div>
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-4 p-3 text-center">
+                <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-fluid" id="image-list-size">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="card-title text-success text-center h4">{{ obj.title }} {% if obj.country %}<span class="flag-icon flag-icon-{{obj.country.short_slug}} h5"></span>{% endif %}</h2></a>
+                    <div class="card-text">{{ obj.text|striptags|safe|truncatechars:200 }}</div>
+                    <div class="text-right mt-2">
+                        <a class="btn btn-outline-success" href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                     </div>
+                </div>
+            </div>
         </div>
     </div>
-    {% endfor %}
 </div>
 {% endfor %}
