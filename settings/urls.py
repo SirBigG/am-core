@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 from core.posts import views
+from core.news.views import AdvertListView
 
 
 urlpatterns = [
@@ -37,6 +38,7 @@ urlpatterns = [
     url(r'^api/', include('api.v1.urls')),
     url(r'^events/', include('core.events.urls', namespace='events')),
     url(r'^news/', include('core.news.urls', namespace='news')),
+    url(r'adverts/$', AdvertListView.as_view(), name="adverts-list"),
     url(r'^', include('core.classifier.urls')),
     url(r'^', include('core.pro_auth.urls', namespace='pro_auth')),
     url(r'^', include('core.posts.urls')),
