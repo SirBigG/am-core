@@ -5,7 +5,6 @@ from django.contrib.postgres.search import SearchVector
 
 from core.posts.models import Post, SearchStatistic
 from core.classifier.models import Category
-from core.news.models import News
 
 
 class IndexView(TemplateView):
@@ -14,8 +13,6 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object_list'] = Post.objects.prefetch_related('country').filter(status=1)[:10]
-        context['ordered_list'] = Post.objects.prefetch_related('country').filter(status=1).order_by('-hits')[:10]
-        context['news_list'] = News.objects.all().order_by('-date')[:10]
         return context
 
 

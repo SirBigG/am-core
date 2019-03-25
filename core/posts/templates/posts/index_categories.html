@@ -1,16 +1,28 @@
 {% load post_extras %}
 
-{% for group in roots|group_by:2 %}
-    <div class="row mb-2">
-        {% for root in group %}
-            <div class="col-6">
-                <p class="h5 text-success">{{ root.value }}</p>
-                {% for child in root.get_children %}
-                    <div class="col-12">
+<div class="accordion" id="accordion-categories">
+    {% for root in roots %}
+    <div class="card">
+        <div class="card-header" id="{{root.slug}}">
+            <h2 class="mb-0">
+                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapse{{root.slug}}"
+                        aria-expanded="true" aria-controls="collapse{{root.slug}}">
+                    <span class="text-success">{{root.value}}</span>
+                </button>
+            </h2>
+        </div>
+        <div id="collapse{{root.slug}}" class="collapse" aria-labelledby="{{root.slug}}"
+             data-parent="#accordion-categories">
+            <div class="card-body">
+                <ul class="list-group list-group-flush">
+                    {% for child in root.get_children %}
+                    <li class="list-group-item">
                         <a class="text-success ml-2" href="/{{ child.slug }}/">{{ child.value }}</a>
-                    </div>
-                {% endfor %}
+                    </li>
+                    {% endfor %}
+                </ul>
             </div>
-        {% endfor %}
+        </div>
     </div>
-{% endfor %}
+    {% endfor %}
+</div>
