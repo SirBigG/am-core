@@ -119,7 +119,7 @@
     </div>
 
     <div id="useful"></div>
-    {% cache 900 object.rubric.parent.slug %}
+    {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
     {% post_adverts object.rubric.parent %}
     {% endcache %}
 
