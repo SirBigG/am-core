@@ -38,6 +38,7 @@ urlpatterns = [
     url(r'^api/', include('api.v1.urls')),
     url(r'^events/', include('core.events.urls', namespace='events')),
     url(r'^news/', include('core.news.urls', namespace='news')),
+    url(r'adverts/(?P<category>[\w-]+)/$', AdvertListView.as_view(), name="adverts-list"),
     url(r'adverts/$', AdvertListView.as_view(), name="adverts-list"),
     url(r'^', include('core.classifier.urls')),
     url(r'^', include('core.pro_auth.urls', namespace='pro_auth')),

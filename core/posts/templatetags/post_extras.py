@@ -40,6 +40,21 @@ def breadcrumbs(category, post_title=None):
     return {'items': category.get_ancestors(include_self=True)[1:], 'post_title': post_title}
 
 
+@register.inclusion_tag('posts/post_adverts_block.html')
+def post_adverts(category):
+    """
+    Creating main page menu.
+    :return: rubric roots queryset
+    """
+    print(category)
+    import requests
+    response = requests.get(f'{settings.API_HOST}/adverts?category={category.id}')
+    adverts = []
+    if response.status_code == 200:
+        adverts = response.json()["items"][:4]
+    return {'adverts': adverts, "link": f"/adverts/{category.slug}/"}
+
+
 @register.simple_tag
 def full_url(url):
     """

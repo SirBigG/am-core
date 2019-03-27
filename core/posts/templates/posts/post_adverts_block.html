@@ -1,0 +1,18 @@
+{% if adverts %}
+<h5 class="text-success">Оголошення в категорії</h5>
+{% endif %}
+
+<div class="row mt-3 mb-3">
+    {% for item in adverts %}
+    <div class="col-6 col-lg-3">
+        <a href="{{link}}">
+            {% if item.data.image %}
+            <img src="{{item.data.image}}" class="img-rounded img-fluid">
+            {% endif %}
+        </a>
+        <h5 class="text-center" style="overflow: auto;">
+            <a href="{{link}}">{{item.data.title}}</a>
+        </h5>
+    </div>
+    {% endfor %}
+</div>

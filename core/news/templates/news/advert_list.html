@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load cache post_extras news_extras %}
 
 {% block extra_meta %}
 <meta name="robots" content="noindex,nofollow">
 {% endblock extra_meta %}
 
 {% block page_title %}
-Всі аграрні оголошення в одному місці
+Всі аграрні оголошення {% if category %} в категорії {{category.value}} {% endif %}
 {% endblock %}
 {
 {% block content %}
@@ -15,6 +15,12 @@
     <div class="alert alert-warning" role="alert">
         Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що Ви з нами!
     </div>
+    <div class="col-md-4 col-sm-12">
+        {% cache 1800 'categories_filter_block' %}
+            {% categories_filter %}
+        {% endcache %}
+    </div>
+
     {% for obj in object_list %}
     <div class="card m-3 col-md-12">
         <div class="row no-gutters">

@@ -1,0 +1,11 @@
+<div class="btn-group">
+  <button class="btn btn-success btn-lg dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Вибрати категорію
+  </button>
+  <div class="dropdown-menu">
+        {% for item in categories %}
+            <a class="dropdown-item" href="/adverts/{{item.slug}}/">{{item.value}}</a>
+        {% endfor %}
+        <a class="dropdown-item" href="/adverts/other/">Інше</a>
+  </div>
+</div>

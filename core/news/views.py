@@ -1,11 +1,9 @@
-from datetime import datetime
-
 from django.views.generic import TemplateView
 from django.conf import settings
 
 from urllib import parse
 
-from .models import News
+from core.classifier.models import Category
 
 import requests
 
@@ -51,9 +49,23 @@ class AdvertListView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        _category = kwargs.get('category')
+        if _category:
+            if _category == "other":
+                class Cat:
+                    id = 0
+                    value = "Інше"
+                _category = Cat
+            else:
+                _category = Category.objects.get(slug=_category)
         _url = f"{settings.API_HOST}/adverts"
         if self.request.GET.get("page"):
             _url = f"{_url}?page={self.request.GET.get('page')}"
+            if _category:
+                _url = f"{_url}&category={_category.id}"
+        else:
+            if _category:
+                _url = f"{_url}?category={_category.id}"
         response = requests.get(_url)
         if response.status_code != 200:
             context["object_list"] = []
@@ -67,10 +79,10 @@ class AdvertListView(TemplateView):
         _has_next = False
         prev_page_number = None
         next_page_number = None
-        if adverts.get("previous"):
+        if adverts.get("previous") and parse.parse_qs(parse.urlparse(adverts.get("previous")).query).get("page"):
             _has_previous = True
             prev_page_number = parse.parse_qs(parse.urlparse(adverts.get("previous")).query).get("page")[0]
-        if adverts.get("next"):
+        if adverts.get("next") and parse.parse_qs(parse.urlparse(adverts.get("next")).query).get("page"):
             _has_next = True
             next_page_number = parse.parse_qs(parse.urlparse(adverts.get("next")).query).get("page")[0]
         context["object_list"] = adverts["items"]
@@ -79,4 +91,5 @@ class AdvertListView(TemplateView):
                                "next_page_number": next_page_number,
                                "has_next": _has_next}
         context["paginator"] = {"num_pages": 2}
+        context["category"] = _category
         return context
