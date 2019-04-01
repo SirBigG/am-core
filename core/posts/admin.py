@@ -9,6 +9,8 @@ from core.posts.parser.handler import ParseHandler
 
 from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
 
+from dal import autocomplete
+
 
 class PhotoInLine(TranslationTabularInline):
     model = Photo
@@ -55,6 +57,8 @@ class PostAdmin(TranslationAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)
         form.base_fields['publisher'].initial = request.user
+        form.base_fields['tags'].widget = autocomplete.TaggitSelect2('/taggit-autocomplete/')
+        form.base_fields['tags'].required = False
         return form
 
 

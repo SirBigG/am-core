@@ -78,6 +78,8 @@ INSTALLED_APPS = [
     'captcha',
     # For social authentication: https://github.com/python-social-auth/social-app-django
     'social_django',
+    # Simple tags https://github.com/jazzband/django-taggit
+    'taggit',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy

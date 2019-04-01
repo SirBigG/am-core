@@ -12,12 +12,15 @@ from django.conf import settings
 
 from core.pro_auth.models import User
 
-from core.classifier.models import Category, Country, Tag
+from core.classifier.models import Category, Country
 from core.services.models import MetaData
 
 from ckeditor.fields import RichTextField
 
 from transliterate import slugify
+
+from taggit.managers import TaggableManager
+
 
 WORK_STATUS = (
     (1, _('Translate')),
@@ -53,7 +56,7 @@ class Post(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True,
                                 verbose_name=_('post country'))
 
-    tags = models.ManyToManyField(Tag, blank=True, verbose_name=_('past tags'))
+    tags = TaggableManager()
 
     class Meta:
         db_table = 'post'
