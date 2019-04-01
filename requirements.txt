@@ -3,8 +3,6 @@ coverage==4.2
 Django==2.0.8
 django-autocomplete-light==3.2.10
 django-ckeditor==5.3.1
-# django-modeltranslation==0.12.2
-git+https://github.com/deschler/django-modeltranslation
 django-mptt==0.9.0
 django-phonenumber-field==1.1.0
 django-recaptcha==1.4.0
@@ -34,5 +32,4 @@ social-auth-app-django==2.1.0
 transliterate==1.8.1
 xlrd==1.0.0
 HTTPretty==0.8.14
-django-jet
 django-taggit==1.1.0

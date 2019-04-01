@@ -38,13 +38,9 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # Application definition
 
 INSTALLED_APPS = [
-    'jet',
     # Autocomplete field. https://github.com/yourlabs/django-autocomplete-light.
     'dal',
     'dal_select2',
-    # Package for model fields translation
-    # http://django-modeltranslation.readthedocs.org/en/latest/installation.html
-    'modeltranslation',
     # Standard django apps
     'django.contrib.admin',
     'django.contrib.auth',
@@ -191,17 +187,6 @@ LANGUAGES = [
     ('en', _('English')),
 ]
 
-# =========================================================================================
-# Model translation settings
-# =========================================================================================
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'uk'
-
-MODELTRANSLATION_TRANSLATION_FILES = (
-    'core.classifier.translation',
-    'core.posts.translation',
-    'core.services.translation',
-    'core.events.translation',
-)
 
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 

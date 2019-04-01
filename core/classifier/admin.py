@@ -7,15 +7,13 @@ from mptt.admin import DraggableMPTTAdmin
 from core.classifier.models import Location, Country, Region, Area, \
     Category
 
-from modeltranslation.admin import TranslationAdmin
 
-
-class CategoryAdmin(DraggableMPTTAdmin, TranslationAdmin):
+class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
     pass
 
 
-admin.site.register(Location, TranslationAdmin)
-admin.site.register(Country, TranslationAdmin)
-admin.site.register(Region, TranslationAdmin)
-admin.site.register(Area, TranslationAdmin)
+admin.site.register(Location)
+admin.site.register(Country)
+admin.site.register(Region)
+admin.site.register(Area)
 admin.site.register(Category, CategoryAdmin)

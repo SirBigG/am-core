@@ -7,12 +7,10 @@ from core.classifier.models import Category
 
 from core.posts.parser.handler import ParseHandler
 
-from modeltranslation.admin import TranslationAdmin, TranslationTabularInline
-
 from dal import autocomplete
 
 
-class PhotoInLine(TranslationTabularInline):
+class PhotoInLine(admin.TabularInline):
     model = Photo
 
 
@@ -43,16 +41,29 @@ def activate_posts(modelsadmin, request, queryset):
 activate_posts.short_description = "Activate selected posts"
 
 
-class PostAdmin(TranslationAdmin):
+class PostAdmin(admin.ModelAdmin):
     form = AdminPostForm
     inlines = [
         PhotoInLine,
     ]
     list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', )
-    readonly_fields = ('slug', )
+    readonly_fields = ('slug', 'hits')
     raw_id_fields = ('publisher',)
     list_filter = (CategoryFilter, 'status',)
     actions = [activate_posts]
+
+    fieldsets = (
+        ("Main data", {
+            'fields': ('title', 'text', 'status', 'rubric')
+        }),
+        ("Extra data", {
+           'fields': ('country', 'meta', 'meta_description', "tags")
+        }),
+        ('Advanced options', {
+            'classes': ('collapse',),
+            'fields': ('work_status', 'author', 'source', 'publisher', 'publish_date', 'hits', 'slug'),
+        }),
+    )
 
     def get_form(self, request, obj=None, **kwargs):
         form = super(PostAdmin, self).get_form(request, obj, **kwargs)
