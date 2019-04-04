@@ -127,8 +127,8 @@ class Photo(models.Model):
                     im = Image.open(self.image.path)
                 except FileNotFoundError:
                     return
-                im.thumbnail((width, height), Image.ANTIALIAS)
-                im.save(thumb_path, format='JPEG')
+                im = im.resize((width, height), Image.ANTIALIAS)
+                im.save(thumb_path, format='JPEG', quality=80)
             return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
 
     def save(self, *args, **kwargs):
