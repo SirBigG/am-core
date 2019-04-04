@@ -2,6 +2,20 @@ from django.conf.urls import url
 
 from core.posts.views import ParentRubricView, PostList, PostDetail, PostSearchView
 
+from taggit.models import TagBase
+from transliterate import slugify
+
+
+# TODO: Updated this hack contribute to library
+def custom_slugify(self, tag, i=None):
+    slug = slugify(tag)
+    if i is not None:
+        slug += "_%d" % i
+    return slug
+
+
+TagBase.slugify = custom_slugify
+
 
 urlpatterns = [
     url(r'^search/$', PostSearchView.as_view(), name='post-search-list'),

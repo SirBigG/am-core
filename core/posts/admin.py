@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django import forms
+from django.utils import six
 
 from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost, PostView, UsefulStatistic, SearchStatistic
 
@@ -8,6 +9,8 @@ from core.classifier.models import Category
 from core.posts.parser.handler import ParseHandler
 
 from dal import autocomplete
+
+from taggit.models import Tag
 
 
 class PhotoInLine(admin.TabularInline):
@@ -41,13 +44,41 @@ def activate_posts(modelsadmin, request, queryset):
 activate_posts.short_description = "Activate selected posts"
 
 
+class TestTaggit(autocomplete.TaggitSelect2):
+    def format_value(self, value):
+        print(value)
+        values = set()
+        for v in value:
+            if not v:
+                continue
+
+            values.add(self.option_value(v))
+        return values
+
+    def options(self, name, value, attrs=None):
+        """Return only select options."""
+        # When the data hasn't validated, we get the raw input
+        if isinstance(value, six.text_type):
+            value = value.split(',')
+
+        for v in value:
+            if not v:
+                continue
+
+            real_values = v.split(',') if hasattr(v, 'split') else v
+            if real_values is not list:
+                real_values = [real_values]
+            for rv in real_values:
+                yield self.option_value(rv)
+
+
 class PostAdmin(admin.ModelAdmin):
     form = AdminPostForm
     inlines = [
         PhotoInLine,
     ]
-    list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', )
-    readonly_fields = ('slug', 'hits')
+    list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', 'tag_list')
+    readonly_fields = ('slug', 'hits',)
     raw_id_fields = ('publisher',)
     list_filter = (CategoryFilter, 'status',)
     actions = [activate_posts]
@@ -56,8 +87,11 @@ class PostAdmin(admin.ModelAdmin):
         ("Main data", {
             'fields': ('title', 'text', 'status', 'rubric')
         }),
+        (None, {
+           'fields': ('tags',)
+        }),
         ("Extra data", {
-           'fields': ('country', 'meta', 'meta_description', "tags")
+           'fields': ('country', 'meta', 'meta_description')
         }),
         ('Advanced options', {
             'classes': ('collapse',),
@@ -66,11 +100,16 @@ class PostAdmin(admin.ModelAdmin):
     )
 
     def get_form(self, request, obj=None, **kwargs):
-        form = super(PostAdmin, self).get_form(request, obj, **kwargs)
+        form = super().get_form(request, obj, **kwargs)
         form.base_fields['publisher'].initial = request.user
-        form.base_fields['tags'].widget = autocomplete.TaggitSelect2('/taggit-autocomplete/')
+        # print(form.base_fields)
+        # form.base_fields['tags'].widget = autocomplete.TaggitSelect2('/taggit-autocomplete/')
+        form.base_fields['tags'].widget = TestTaggit('/taggit-autocomplete/')
         form.base_fields['tags'].required = False
         return form
+
+    def tag_list(self, obj):
+        return ", ".join(o.name for o in obj.tags.all())
 
 
 class LinkAdmin(admin.ModelAdmin):
