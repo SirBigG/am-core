@@ -11,7 +11,12 @@
                 <div class="card-body">
                     <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="card-title text-success text-center h4">{{ obj.title }} {% if obj.country %}<span class="flag-icon flag-icon-{{obj.country.short_slug}} h5"></span>{% endif %}</h2></a>
                     <div class="card-text">{{ obj.text|striptags|safe|truncatechars:200 }}</div>
-                    <div class="text-right mt-2">
+                    <div class="row">
+                        {% for tag in obj.tags.all %}
+                            <span class="badge badge-pill badge-success m-2">{{tag.name}}</span>
+                        {% endfor %}
+                    </div>
+                    <div class="text-right mt-3">
                         <a class="btn btn-outline-success" href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
                      </div>
                 </div>

@@ -26,7 +26,7 @@ class ParentRubricView(TemplateView):
         """
         context = super(ParentRubricView, self).get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['parent'])
-        context['object_list'] = Post.objects.prefetch_related('country').filter(
+        context['object_list'] = Post.objects.prefetch_related('country').prefetch_related('tags').filter(
             rubric__parent_id=context['category'].pk, status=1)[:4]
         return context
 
@@ -48,7 +48,7 @@ class PostList(ListView):
         return context
 
     def get_queryset(self):
-        return Post.objects.prefetch_related('country').filter(
+        return Post.objects.prefetch_related('country').prefetch_related('tags').filter(
             rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1)
 
 

@@ -44,7 +44,7 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-12 col-lg-8">
+    <div class="col-12">
         <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
             <div class="carousel-inner" role="listbox">
                 {% for photo in object.photo.all%}
@@ -77,10 +77,15 @@
             </div>
         </div>
         {# Reviews block #}
-        <div class="col-lg-4 col-12">
+        <div class="col-lg-4 col-12" style="display: none;">
             <div id="reviews" class="{{ object.slug }}"></div>
         </div>
     </div>
+    <div class="h4">
+    {% for tag in object.tags.all %}
+        <span class="badge badge-pill badge-success mt-3 mr-1">{{tag.name}}</span>
+    {% endfor %}
+        </div>
 
     <hr>
     <div class="row">
