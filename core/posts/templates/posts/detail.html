@@ -33,7 +33,7 @@
 
 {% block page_title %}
 {% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %} {% if object.country %}
-<span class="flag-icon flag-icon-{{object.country.short_slug}}"></span>{% endif %}
+{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px" ></object>{% endwith %}{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}

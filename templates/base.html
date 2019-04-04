@@ -2,83 +2,301 @@
 {% load static post_extras events_extras %}
 <!DOCTYPE html>
 <html lang="uk">
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="theme-color" content="#24A824">
-        <title>{% spaceless %}{% block title %}{% trans 'Агропортал України' %} |{% endblock title %}{% endspaceless %} AgroMega.in.ua</title>
-        <meta name="description" content="{% spaceless %}{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}{% endspaceless %}">
-        <link rel="shortcut icon" type="image/x-icon" href="{% static "posts/favicon.ico" %}" />
-        <!-- For extra meta tags -->
-        {% block extra_meta %}
-            <meta content="{% trans 'Агропортал України' %} | AgroMega.in.ua" property="og:title">
-            <meta content="{% trans 'Все про аграрну сферу і навіть більше.' %}" property="og:description">
-            <meta content="" property="og:image">
-            <meta content="https://agromega.in.ua" property="og:url">
-            <meta content="AgroMega.in.ua" property="og:site_name">
-        {% endblock extra_meta %}
-        <!-- For extra scripts inclusion -->
-        {% block extra_script %}{% endblock extra_script %}
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#24A824">
+    <title>{% spaceless %}{% block title %}{% trans 'Агропортал України' %} |{% endblock title %}{% endspaceless %}
+        AgroMega.in.ua</title>
+    <meta name="description"
+          content="{% spaceless %}{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}{% endspaceless %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "posts/favicon.ico" %}" />
+    <!-- For extra meta tags -->
+    {% block extra_meta %}
+    <meta content="{% trans 'Агропортал України' %} | AgroMega.in.ua" property="og:title">
+    <meta content="{% trans 'Все про аграрну сферу і навіть більше.' %}" property="og:description">
+    <meta content="" property="og:image">
+    <meta content="https://agromega.in.ua" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+    {% endblock extra_meta %}
+    <!-- For extra scripts inclusion -->
+    {% block extra_script %}{% endblock extra_script %}
     <script src="{% static "js/popper.min.js" %}"></script>
     <script src="{% static "js/jquery.min.js" %}"></script>
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
+    <link rel="stylesheet" href="{% static "posts/css/font-awesome.css" %}">
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     </head>
     {% block body_head_tag %}
-        <body style="background-color:#eeeeee;">
+    <body style="background-color:#eeeeee;">
     {% endblock %}
-        {% block header %}
-            {% include 'header.html' %}
-        {% endblock header %}
-        <div class="container">
-            <div class="row">
-              <div class="col-12 mb-4">
-                  {% block second_menu %}{% endblock %}
-              </div>
-            </div>
-            <div class="row">
-                <div class="col-12">
-                    <h1 class="h2 text-success"><strong>{% block page_title %}{% endblock %}</strong></h1>
-                </div>
-            </div>
-               {% block breadcrumbs %}{% endblock %}
-            <div class="row">
-                {% block base_content_block %}
-                    <div class="col-12 col-lg-8">
-                        {% block content %}{% endblock content %}
-                    </div>
-                    <div class="col-lg-4 col-12">
-                        {% events_list %}
-                        <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-<script>
-  (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-4522526101011449",
-    enable_page_level_ads: true
-  });
-</script>
-                    </div>
-                {% endblock base_content_block %}
+    {% block header %}
+    {% include 'header.html' %}
+    {% endblock header %}
+    <div class="container">
+        <div class="row">
+            <div class="col-12 mb-4">
+                {% block second_menu %}{% endblock %}
             </div>
         </div>
+        <div class="row">
+            <div class="col-12">
+                <h1 class="h2 text-success"><strong>{% block page_title %}{% endblock %}</strong></h1>
+            </div>
+        </div>
+        {% block breadcrumbs %}{% endblock %}
+        <div class="row">
+            {% block base_content_block %}
+            <div class="col-12 col-lg-8">
+                {% block content %}{% endblock content %}
+            </div>
+            <div class="col-lg-4 col-12">
+                {% events_list %}
+                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-4522526101011449",
+            enable_page_level_ads: true
+        });
+    </script>
+    </div>
+    {% endblock base_content_block %}
+    </div>
+    </div>
 
-        {% block extra_body %}{% endblock extra_body %}
+    {% block extra_body %}{% endblock extra_body %}
 
-        {% block footer %}
-            {% include 'footer.html' %}
-        {% endblock footer %}
+    {% block footer %}
+    {% include 'footer.html' %}
+    {% endblock footer %}
 
-        <!-- Google Analytics -->
-        <script>
-            (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-            (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-                    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-                })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-            ga('create', 'UA-99575306-1', 'auto');
-            ga('send', 'pageview');
-        </script>
-        <!-- /Google Analytics -->
+    <!-- Google Analytics -->
+    <script>
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r;
+            i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date();
+            a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0];
+            a.async = 1;
+            a.src = g;
+            m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
+        ga('create', 'UA-99575306-1', 'auto');
+        ga('send', 'pageview');
+    </script>
+    <!-- /Google Analytics -->
+    <style>
+        :root {
+            --navbar-green-color: #16ab39;
+        }
 
-        <script src='{% static_version "bundles/main.js" %}'></script>
+        :root {
+            --navbar-green-focus-color: #13C813;
+        }
+
+        :root {
+            --white-color: #ffffff;
+        }
+
+        :root {
+            --navbar-light-toggler-icon-bg: str-replace(url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='#{$navbar-light-color}' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E"), "#", "%23") ! default;
+        }
+
+        .navbar-green .navbar-brand {
+            color: var(--navbar-green-color);
+        }
+
+        .navbar-green .navbar-brand:hover {
+            color: var(--navbar-green-focus-color);
+        }
+
+        .navbar-green .navbar-brand:focus {
+            color: var(--navbar-green-focus-color);
+        }
+
+        .navbar-nav .dropdown-item {
+            color: var(--navbar-green-color);
+        }
+
+        .navbar-nav .dropdown-item:hover {
+            color: var(--white-color);
+            background-color: var(--navbar-green-focus-color);
+        }
+
+        .navbar-nav .dropdown-item:focus {
+            color: var(--white-color);
+            background-color: var(--navbar-green-focus-color);
+        }
+
+
+        .navbar-toggler {
+            color: var(--navbar-green-focus-color);
+            border-color: var(--navbar-green-focus-color);
+        }
+
+        .navbar-toggler-icon {
+            color: var(--navbar-green-color);
+            background-image: var(--navbar-light-toggler-icon-bg);
+        }
+
+        .navbar-text {
+            color: var(--navbar-green-focus-color);
+        }
+
+        }
+    </style>
+    <script type="text/javascript">
+
+
+        // Rendering feedback form.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#feedback-btn', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/service/feedback/',
+                    success: function (a) {
+                        $('#feedback-modal').html(a);
+                    }
+                });
+            })
+        }(jQuery);
+
+        // Confirmation feedback.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#feedback-conf-btn', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/service/feedback/',
+                    data: $('form').serialize(),
+                    success: function (res) {
+                        $('#feedback-modal').html(res);
+                    },
+                    error: function (res) {
+                        $('#feedback-modal').html(res);
+                    }
+                });
+                return false;
+            });
+        }(jQuery);
+
+
+        // Rendering login form.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#login-btn', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/login/',
+                    success: function (res) {
+                        $('#login-modal').html(res);
+                    }
+                });
+            })
+        }(jQuery);
+
+        // Login confirmation logic.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#login-conf-btn', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/login/',
+                    data: $('form').serialize(),
+                    success: function (res) {
+                        // TODO: delete hard code from this block. Translation for button.
+                        // TODO: need profile button creating
+                        if (res.status === 'ok') {
+                            $('.auth-block').html(
+                                '<div class="nav-item m-1"><button onclick="location.href=/profile/" ' +
+                                'class="btn btn-outline-success"><i class="fa fa-user-circle fa-lg text-success"></i></button></div> ' +
+                                '<div class="nav-item m-1"><button onclick="location.href=/logout/" class="btn btn-outline-danger">' +
+                                '<i class="fa fa-sign-out fa-lg text-danger"></i> </button></div>'
+                            );
+                            $('.login-modal-lg').hide();
+                            $('body').removeClass('modal-open');
+                            $('.modal-backdrop').removeClass('modal-backdrop fade in');
+                        } else {
+                            $('#login-modal').html(res);
+                        }
+                    },
+                    error: function (res) {
+                        $('#login-modal').html(res);
+                    }
+                });
+                return false;
+            });
+        }(jQuery);
+
+        // Rendering email confirm form.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#confirm-email-btn', function () {
+                $.ajax({
+                    type: 'GET',
+                    url: '/password/confirm/email/',
+                    success: function (res) {
+                        $('#login-modal').html(res);
+                    }
+                });
+                return false
+            })
+        }(jQuery);
+
+        // Email confirmation logic.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#email-check-btn', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: '/password/confirm/email/',
+                    data: $('form').serialize(),
+                    success: function (res) {
+                        if (res.status === 'ok') {
+
+                            $('.login-modal-lg').hide();
+                            $('body').removeClass('modal-open');
+                            $(document).off('focusin.bs.modal');
+                            $('.modal-backdrop').removeClass('modal-backdrop fade in');
+                            alert('На пошту, що ви вказали відправлений лист підтвердження. ' +
+                                'Перейдіть по посиланні в листі, щоб змінити свій пароль.' +
+                                'Якщо лист не прийшов, обов’язково зв’яжіться з нами, використовуючи форму внизу сайту.');
+                        } else {
+                            $('#login-modal').html(res);
+                        }
+                    },
+                    error: function (res) {
+                        $('#login-modal').html(res);
+                    }
+                });
+                return false;
+            });
+        }(jQuery);
+
+        // Password reset logic.
+        +function ($) {
+            'use strict';
+            $('body').on('click', '#password-change-btn', function () {
+                $.ajax({
+                    type: 'POST',
+                    url: window.location.href,
+                    data: $('form').serialize(),
+                    success: function (res) {
+                        window.location = '/';
+                    },
+                    error: function (res) {
+                        $('#check-password-form').html(res);
+                    }
+                });
+            });
+        }(jQuery);
+
+    </script>
+
+    <!--<script src='{% static_version "bundles/main.js" %}'></script>-->
     </body>
 </html>

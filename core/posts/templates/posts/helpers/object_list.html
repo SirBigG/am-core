@@ -1,24 +1,32 @@
-{% load post_extras %}
+{% load post_extras static %}
 
 {% for obj in object_list %}
 <div class="row">
     <div class="card mb-3">
         <div class="row no-gutters">
             <div class="col-md-4 p-3 text-center">
-                <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}" class="img-fluid" id="image-list-size">
+                <img src="{%thumbnail obj.photo.first 340 230%}" alt="{{ odj.photo.first.description }}"
+                     class="img-fluid" id="image-list-size">
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;"><h2 class="card-title text-success text-center h4">{{ obj.title }} {% if obj.country %}<span class="flag-icon flag-icon-{{obj.country.short_slug}} h5"></span>{% endif %}</h2></a>
+                    <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;">
+
+
+                        <h2 class="card-title text-success text-center h4">{{ obj.title }} {% if obj.country %}{% with 'posts/flags/'|add:obj.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
+
+                    </a>
                     <div class="card-text">{{ obj.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="row">
                         {% for tag in obj.tags.all %}
-                            <span class="badge badge-pill badge-success m-2">{{tag.name}}</span>
+                        <span class="badge badge-pill badge-success m-2">{{tag.name}}</span>
                         {% endfor %}
                     </div>
                     <div class="text-right mt-3">
-                        <a class="btn btn-outline-success" href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
-                     </div>
+                        <a class="btn btn-outline-success" href="{{ obj.get_absolute_url }}"
+                           style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right"
+                                                                                    aria-hidden="true"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
