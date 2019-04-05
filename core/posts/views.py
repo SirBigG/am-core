@@ -2,6 +2,7 @@ from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchVector
+from django.http import Http404
 
 from core.posts.models import Post, SearchStatistic
 from core.classifier.models import Category
@@ -12,7 +13,8 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.prefetch_related('country').filter(status=1)[:10]
+        context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
+            'rubric').select_related('rubric__parent').prefetch_related('tags').filter(status=1)[:10]
         return context
 
 
@@ -24,9 +26,10 @@ class ParentRubricView(TemplateView):
         """
         Get extra context for classifier to view.
         """
-        context = super(ParentRubricView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['parent'])
-        context['object_list'] = Post.objects.prefetch_related('country').prefetch_related('tags').filter(
+        context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
+            'rubric').select_related('rubric__parent').select_related('rubric__meta').prefetch_related('tags').filter(
             rubric__parent_id=context['category'].pk, status=1)[:4]
         return context
 
@@ -43,12 +46,16 @@ class PostList(ListView):
         """
         Get extra context for classifier to view.
         """
-        context = super(PostList, self).get_context_data(**kwargs)
-        context['category'] = get_object_or_404(Category, slug=self.kwargs['child'])
+        context = super().get_context_data(**kwargs)
+        category = Category.objects.select_related('meta').filter(slug=self.kwargs['child']).first()
+        if category is None:
+            raise Http404
+        context['category'] = category
         return context
 
     def get_queryset(self):
-        return Post.objects.prefetch_related('country').prefetch_related('tags').filter(
+        return Post.objects.select_related('country').prefetch_related('photo').select_related(
+            'rubric').select_related('rubric__parent').select_related('rubric__meta').prefetch_related('tags').filter(
             rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1)
 
 

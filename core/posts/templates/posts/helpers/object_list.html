@@ -1,29 +1,29 @@
 {% load post_extras static %}
 
-{% for obj in object_list %}
+{% for post in object_list %}
 <div class="row">
     <div class="card mb-3">
         <div class="row no-gutters">
             <div class="col-md-4 p-3 text-center">
-                <img src="{%thumbnail obj.photo.first 350 280 %}" alt="{{ odj.photo.first.description }}"
+                <img src="{%thumbnail post.photo.all.0 350 280 %}" alt="{{ post.photo.all.0.description }}"
                      class="img-fluid" id="image-list-size">
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <a href="{{ obj.get_absolute_url }}" style="text-decoration: none;outline: 0;">
+                    <a href="{{ post.get_absolute_url }}" style="text-decoration: none;outline: 0;">
 
 
-                        <h2 class="card-title text-success text-center h4">{{ obj.title }} {% if obj.country %}{% with 'posts/flags/'|add:obj.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" alt="{{obj.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
+                        <h2 class="card-title text-success text-center h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
 
                     </a>
-                    <div class="card-text">{{ obj.text|striptags|safe|truncatechars:200 }}</div>
+                    <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="row">
-                        {% for tag in obj.tags.all %}
+                        {% for tag in post.tags.all %}
                         <span class="badge badge-pill badge-success m-2">{{tag.name}}</span>
                         {% endfor %}
                     </div>
                     <div class="text-right mt-3">
-                        <a class="btn btn-outline-success" href="{{ obj.get_absolute_url }}"
+                        <a class="btn btn-outline-success" href="{{ post.get_absolute_url }}"
                            style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </div>
