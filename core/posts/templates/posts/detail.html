@@ -151,8 +151,10 @@
                 $.ajax({
                     type: 'POST',
                     url: '/api/post/useful/',
+                    beforeSend: function(request) {
+                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
+                    },
                     contentType:"application/json; charset=utf-8",
-                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }},
                     "is_useful": true}),
@@ -171,9 +173,11 @@
                 const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
                 $.ajax({
                     type: 'POST',
+                    beforeSend: function(request) {
+                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
+                    },
                     url: '/api/post/useful/',
                     contentType:"application/json; charset=utf-8",
-                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }},
                     "is_useful": false}),
@@ -192,8 +196,10 @@
                 $.ajax({
                     type: 'POST',
                     url: '/api/post/view/',
+                    beforeSend: function(request) {
+                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
+                    },
                     contentType:"application/json; charset=utf-8",
-                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }}}),
                     success: function (res) {
