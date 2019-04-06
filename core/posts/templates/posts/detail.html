@@ -139,6 +139,7 @@
 {% block extra_footerscript  %}
 <script type="text/javascript">
         $('body').on('click', '#useful', function () {
+                "use strict";
                 Fingerprint2.get(function(components) {
                 const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
                 $.ajax({
@@ -158,6 +159,7 @@
             });
             });
         $('body').on('click', '#notuseful', function () {
+            "use strict";
                 Fingerprint2.get(function(components) {
                 const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
                 $.ajax({
@@ -177,6 +179,7 @@
             });
             });
         window.onload = Fingerprint2.get(function(components) {
+            "use strict";
                 const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
                 $.ajax({
                     type: 'POST',
