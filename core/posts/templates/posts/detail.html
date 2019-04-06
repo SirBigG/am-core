@@ -138,6 +138,12 @@
 
 {% block extra_footerscript  %}
 <script type="text/javascript">
+    function getCookie(name) {
+  var matches = document.cookie.match(new RegExp(
+    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+  ));
+  return matches ? decodeURIComponent(matches[1]) : undefined;
+}
         $('body').on('click', '#useful', function () {
                 "use strict";
                 Fingerprint2.get(function(components) {
@@ -146,6 +152,7 @@
                     type: 'POST',
                     url: '/api/post/useful/',
                     contentType:"application/json; charset=utf-8",
+                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }},
                     "is_useful": true}),
@@ -166,6 +173,7 @@
                     type: 'POST',
                     url: '/api/post/useful/',
                     contentType:"application/json; charset=utf-8",
+                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }},
                     "is_useful": false}),
@@ -185,6 +193,7 @@
                     type: 'POST',
                     url: '/api/post/view/',
                     contentType:"application/json; charset=utf-8",
+                    csrfmiddlewaretoken: getCookie("csrftoken"),
                     data: JSON.stringify({"fingerprint": fingerprint,
                     "post_id": {{ object.id }}}),
                     success: function (res) {
