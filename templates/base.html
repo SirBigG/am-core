@@ -23,6 +23,8 @@
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "posts/css/font-awesome.css" %}">
     <script src="{% static "js/jquery.min.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <script src="{% static "js/popper.min.js" %}"></script>
     </head>
     {% block body_head_tag %}
     <body style="background-color:#eeeeee;">
@@ -102,9 +104,6 @@
     <script type="text/javascript">
         !function(o){"use strict";o("body").on("click","#feedback-btn",function(){o.ajax({type:"GET",url:"/service/feedback/",success:function(n){o("#feedback-modal").html(n)}})})}(jQuery),function(o){"use strict";o("body").on("click","#feedback-conf-btn",function(){return o.ajax({type:"POST",url:"/service/feedback/",data:o("form").serialize(),success:function(n){o("#feedback-modal").html(n)},error:function(n){o("#feedback-modal").html(n)}}),!1})}(jQuery),function(o){"use strict";o("body").on("click","#login-btn",function(){o.ajax({type:"GET",url:"/login/",success:function(n){o("#login-modal").html(n)}})})}(jQuery),function(o){"use strict";o("body").on("click","#login-conf-btn",function(){return o.ajax({type:"POST",url:"/login/",data:o("form").serialize(),success:function(n){"ok"===n.status?(o(".auth-block").html('<div class="nav-item m-1"><button onclick="location.href=/profile/" class="btn btn-outline-success"><i class="fa fa-user-circle fa-lg text-success"></i></button></div> <div class="nav-item m-1"><button onclick="location.href=/logout/" class="btn btn-outline-danger"><i class="fa fa-sign-out fa-lg text-danger"></i> </button></div>'),o(".login-modal-lg").hide(),o("body").removeClass("modal-open"),o(".modal-backdrop").removeClass("modal-backdrop fade in")):o("#login-modal").html(n)},error:function(n){o("#login-modal").html(n)}}),!1})}(jQuery),function(o){"use strict";o("body").on("click","#confirm-email-btn",function(){return o.ajax({type:"GET",url:"/password/confirm/email/",success:function(n){o("#login-modal").html(n)}}),!1})}(jQuery),function(o){"use strict";o("body").on("click","#email-check-btn",function(){return o.ajax({type:"POST",url:"/password/confirm/email/",data:o("form").serialize(),success:function(n){"ok"===n.status?(o(".login-modal-lg").hide(),o("body").removeClass("modal-open"),o(document).off("focusin.bs.modal"),o(".modal-backdrop").removeClass("modal-backdrop fade in"),alert("На пошту, що ви вказали відправлений лист підтвердження. Перейдіть по посиланні в листі, щоб змінити свій пароль.Якщо лист не прийшов, обов’язково зв’яжіться з нами, використовуючи форму внизу сайту.")):o("#login-modal").html(n)},error:function(n){o("#login-modal").html(n)}}),!1})}(jQuery),function(o){"use strict";o("body").on("click","#password-change-btn",function(){o.ajax({type:"POST",url:window.location.href,data:o("form").serialize(),success:function(o){window.location="/"},error:function(n){o("#check-password-form").html(n)}})})}(jQuery);
     </script>
-
-    <script src="{% static "js/bootstrap.min.js" %}"></script>
-    <script src="{% static "js/popper.min.js" %}"></script>
-
+    {% block extra_footerscript %}{% endblock %}
     </body>
 </html>

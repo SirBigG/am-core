@@ -23,6 +23,8 @@
 <meta content="{% full_url object.get_absolute_url %}" property="og:url">
 <meta content="AgroMega.in.ua" property="og:site_name">
 <link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.0.6/fingerprint2.min.js"></script>
+
 {% endblock extra_meta %}
 
 {% block second_menu %}
@@ -33,7 +35,7 @@
 
 {% block page_title %}
 {% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %} {% if object.country %}
-{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px" ></object>{% endwith %}{% endif %}
+{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px"></object>{% endwith %}{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
@@ -76,16 +78,12 @@
                 {% endif %}
             </div>
         </div>
-        {# Reviews block #}
-        <div class="col-lg-4 col-12" style="display: none;">
-            <div id="reviews" class="{{ object.slug }}"></div>
-        </div>
     </div>
     <div class="h4">
-    {% for tag in object.tags.all %}
+        {% for tag in object.tags.all %}
         <span class="badge badge-pill badge-success mt-3 mr-1">{{tag.name}}</span>
-    {% endfor %}
-        </div>
+        {% endfor %}
+    </div>
 
     <hr>
     <div class="row">
@@ -123,23 +121,76 @@
         </div>
     </div>
 
-    <div id="useful"></div>
+    <div class="row">
+        <div class="col-12 mt-4 mb-4" id="useful__wrapper">
+            <span class="h6 mr-4">Публікація була корисною?</span>
+            <button class="btn btn-success mr-2" id="useful">Так</button>
+            <button class="btn btn-danger" id="notuseful">Ні</button>
+        </div>
+    </div>
     {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
     {% post_adverts object.rubric.parent %}
     {% endcache %}
 
-
-    <div class="row">
-        <div class="col-lg-12 col-12">
-            {# Random posts block. #}
-            <div class="h5">{% trans 'Більше статтей тут:' %}</div>
-            <div id="random-post-list"></div>
-            {# Comments block. #}
-            <div id="comment" class="{{ object.id }}"></div>
-        </div>
     </div>
-
-
-    <script src="{% static_version 'bundles/detail.js' %}"></script>
     {% endblock content %}
-</div>
+
+
+{% block extra_footerscript  %}
+<script type="text/javascript">
+        $('body').on('click', '#useful', function () {
+                Fingerprint2.get(function(components) {
+                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/post/useful/',
+                    contentType:"application/json; charset=utf-8",
+                    data: JSON.stringify({"fingerprint": fingerprint,
+                    "post_id": {{ object.id }},
+                    "is_useful": true}),
+                    success: function (res) {
+                         $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
+                    },
+                    error: function (res) {
+                        console.log(res)
+                    }
+                });
+            });
+            });
+        $('body').on('click', '#notuseful', function () {
+                Fingerprint2.get(function(components) {
+                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/post/useful/',
+                    contentType:"application/json; charset=utf-8",
+                    data: JSON.stringify({"fingerprint": fingerprint,
+                    "post_id": {{ object.id }},
+                    "is_useful": false}),
+                    success: function (res) {
+                         $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
+                    },
+                    error: function (res) {
+                        console.log(res)
+                    }
+                });
+            });
+            });
+        window.onload = Fingerprint2.get(function(components) {
+                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
+                $.ajax({
+                    type: 'POST',
+                    url: '/api/post/view/',
+                    contentType:"application/json; charset=utf-8",
+                    data: JSON.stringify({"fingerprint": fingerprint,
+                    "post_id": {{ object.id }}}),
+                    success: function (res) {
+                         console.log("success view");
+                    },
+                    error: function (res) {
+                        console.log(res);
+                    }
+                });
+            });
+    </script>
+{% endblock %}
