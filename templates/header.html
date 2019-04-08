@@ -2,16 +2,17 @@
 {% load post_extras %}
 <!-- Site header -->
 
-<header class="navbar fixed-bottom navbar-green navbar-expand-lg sticky-top" style="background-color:#005c00;">
+<header class="navbar navbar-green navbar-expand-lg" style="background-color:#005c00;">
     <div class="container-fluid">
-        <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">
-            <span class="text-success"><span class="fa fa-bars fa-lg"></span></span>
-        </button>
-        <div class="collapse navbar-collapse" id="main-menu-collapse">
-              <a class="navbar-brand" href="/">
+        <!--<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">-->
+            <!--<span class="text-success"><span class="fa fa-bars fa-lg"></span></span>-->
+        <!--</button>-->
+        <a class="navbar-brand" href="/">
                   <h4>Agro Mega</h4>
                 <!--<img width="200" height="50" src="{% static "posts/logo.png" %}">-->
               </a>
+        <div class="collapse navbar-collapse" id="main-menu-collapse">
+
               <ul class="navbar-nav">
                 {% cache 3600 'main_menu' %}
                     {% main_menu %}
@@ -24,11 +25,11 @@
                     <i class="fa fa-search fa-lg"></i>
                 </button>
             </div>
-            <div class="nav-item m-1">
-                <button onclick="location.href='/news/list/'"  class="btn btn-success" type="submit">
-                    <i class="fa fa-newspaper-o fa-lg" aria-hidden="true"></i>
-                </button>
-            </div>
+            <!--<div class="nav-item m-1">-->
+                <!--<button onclick="location.href='/news/list/'"  class="btn btn-success" type="submit">-->
+                    <!--<i class="fa fa-newspaper-o fa-lg" aria-hidden="true"></i>-->
+                <!--</button>-->
+            <!--</div>-->
             <div class="nav-item m-1">
                   <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
                     <i class="fa fa-paper-plane fa-lg"></i>

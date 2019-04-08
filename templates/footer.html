@@ -1,6 +1,12 @@
 {% load i18n %}
 
-<footer class="navbar navbar-light">
+<div class="navbar navbar-dark bg-dark fixed-bottom d-md-none mt-3">
+    <a class="nav-link text-center" href="/"><i class="fa fa-home fa-lg"></i><br>Головна</a>
+    <!--<a class="nav-link text-center" href="#"><i class="fa fa-th-list fa-lg"></i><br>Категорії</a>-->
+    <a class="nav-link text-center" href="/news/list/"><i class="fa fa-book fa-lg"></i><br>Новини</a>
+    <a class="nav-link text-center" href="/adverts/"><i class="fa fa-newspaper-o fa-lg"></i><br>Оголошення</a>
+  </div>
+<footer class="navbar navbar-light d-none d-sm-block">
     <p class="navbar-text">© 2019 AgroMega</p>
     <a href="/page/privacy_policy/" class="btn nav-item nav-link"><span class="text-success">{% trans "Політика конфіденційності" %}</span></a>
     <div class="float-lg-right">
