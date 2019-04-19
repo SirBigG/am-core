@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django import forms
 from django.utils import six
+from django.db.models import Count
 
 from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost, PostView, UsefulStatistic, SearchStatistic
 
@@ -9,8 +10,6 @@ from core.classifier.models import Category
 from core.posts.parser.handler import ParseHandler
 
 from dal import autocomplete
-
-from taggit.models import Tag
 
 
 class PhotoInLine(admin.TabularInline):
@@ -35,6 +34,21 @@ class CategoryFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         if self.value():
             return queryset.filter(rubric_id=self.value())
+
+
+class HasPhotoFilter(admin.SimpleListFilter):
+    title = 'has photo'
+    parameter_name = 'has_photo'
+
+    def lookups(self, request, model_admin):
+        return (True, 'Has photo'), (False, 'No photo')
+
+    def queryset(self, request, queryset):
+        if self.value():
+            if self.value() is True:
+                return queryset.annotate(photo_count=Count('photo')).filter(photo_count__gt=0)
+            else:
+                return queryset.annotate(photo_count=Count('photo')).filter(photo_count=0)
 
 
 def activate_posts(modelsadmin, request, queryset):
@@ -77,10 +91,10 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [
         PhotoInLine,
     ]
-    list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', 'tag_list')
+    list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', 'tag_list', 'has_photo')
     readonly_fields = ('slug', 'hits',)
     raw_id_fields = ('publisher',)
-    list_filter = (CategoryFilter, 'status',)
+    list_filter = (CategoryFilter, HasPhotoFilter, 'status')
     actions = [activate_posts]
 
     fieldsets = (
@@ -110,6 +124,9 @@ class PostAdmin(admin.ModelAdmin):
 
     def tag_list(self, obj):
         return ", ".join(o.name for o in obj.tags.all())
+
+    def has_photo(self, obj):
+        return obj.photo.count() > 0
 
 
 class LinkAdmin(admin.ModelAdmin):

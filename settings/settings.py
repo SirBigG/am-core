@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 from django.utils.translation import ugettext_lazy as _
 
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Quick-start development settings - unsuitable for production
@@ -94,7 +95,6 @@ MIDDLEWARE = (
 
 ROOT_URLCONF = 'settings.urls'
 
-
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -112,7 +112,6 @@ TEMPLATES = [
         },
     },
 ]
-
 
 LOGGING = {
     'version': 1,
@@ -175,10 +174,8 @@ AUTHENTICATION_BACKENDS = [
     'core.pro_auth.backends.AuthBackend',
 ]
 
-
 SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = []  # ['state', ]
 SESSION_COOKIE_SECURE = False
-
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
@@ -213,7 +210,6 @@ LANGUAGES = [
     ('en', _('English')),
 ]
 
-
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale'), ]
 
 TIME_ZONE = 'UTC'
@@ -223,7 +219,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
@@ -236,13 +231,11 @@ STATIC_ROOT = os.getenv("STATIC_ROOT") or BASE_DIR + '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.getenv("MEDIA_ROOT") or os.path.join(BASE_DIR, 'media')
 
-
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 
 # Multillect translator secrets
 MULTILLECT_ACCOUNT_ID = os.getenv("MULTILLECT_ACCOUNT_ID")
 MULTILLECT_SECRET_KEY = os.getenv("MULTILLECT_SECRET_KEY")
-
 
 EMAIL_HOST = os.getenv("EMAIL_HOST")
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
@@ -261,5 +254,6 @@ NOCAPTCHA = True
 # Media version for browser cache refresh
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
 
-
 API_HOST = os.getenv('API_HOST')
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"

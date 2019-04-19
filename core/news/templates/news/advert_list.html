@@ -3,7 +3,7 @@
 {% load cache post_extras news_extras %}
 
 {% block extra_meta %}
-<meta name="robots" content="noindex,nofollow">
+<meta name="robots" content="noindex, nofollow">
 {% endblock extra_meta %}
 
 {% block page_title %}
@@ -17,7 +17,7 @@
     </div>
     <div class="col-md-4 col-sm-12">
         {% cache 1800 'categories_filter_block' %}
-            {% categories_filter %}
+        {% categories_filter %}
         {% endcache %}
     </div>
 
@@ -28,34 +28,31 @@
                 {% if obj.data.image %}
                 <img class="img-fluid" src="{{obj.data.image}}" alt="">
                 {% endif %}
+                <p><span class="badge badge-pill badge-success" style="position: absolute; top: 20px; right: 20px;">{{obj.link|get_domain}}</span></p>
             </div>
             <div class="col-md-8">
                 <div class="card-body pb-3">
-                    <div class="row text-right mt-3 mb-3">
-                        <div class="col-12">
-                            <p><span class="badge badge-pill badge-success">{{obj.link|get_domain}}</span></p></div>
-                    </div>
                     <h5 class="card-title">{{ obj.data.title }}</h5>
                     {% if obj.data.description %}
-                    <div class="card-text">{{obj.data.description}}</div>
+                    <button class="btn btn-link" type="button" data-toggle="collapse"
+                            data-target="#advert{{forloop.counter}}" aria-expanded="false"
+                            aria-controls="collapseExample" onclick="ga('send', 'event', 'description', 'clicked')">Опис
+                    </button>
+                    <div class="collapse" id="advert{{forloop.counter}}">
+                        <div class="card-text">{{obj.data.description}}</div>
+                    </div>
                     {% endif %}
                     <div class="row mt-3">
                         <div class="col-12 align-self-center">
-                            <p class="h6 text-danger">{{obj.data.location}}</p>
+                            <p class="h6 text-secondary">{{obj.data.location}}</p>
                         </div>
                     </div>
                     <div class="row mt-3">
-                        <div class="col-12">
+                        <div class="col-6">
                             <p class="h6 text-success">{{obj.data.price}}</p>
                         </div>
-                    </div>
-                    <div class="row mt-3">
-                        <span>{{obj.date}}</span>
-                    </div>
-                    <div class="row mt-3 text-right">
-                        <div class="col-12">
-                            <button class="btn btn-outline-success"
-                                    onclick="window.open('{{ obj.link }}', '_blank')">До оголошення <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                        <div class="col-6">
+                            <button class="btn btn-outline-success btn-sm" onclick="ga('send', 'event', '{{obj.link|get_domain}}', 'clicked'); window.open('{{ obj.link }}', '_blank')">До оголошення <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
