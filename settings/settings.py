@@ -256,4 +256,4 @@ MEDIA_VERSION = os.getenv("MEDIA_VERSION")
 
 API_HOST = os.getenv('API_HOST')
 
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+# SESSION_ENGINE = "django.contrib.sessions.backends.cache"
