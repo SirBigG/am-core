@@ -1,7 +1,9 @@
 from api.v1.classifiers.serializers import LocationSerializer, CategorySerializer
 
 from rest_framework.generics import ListAPIView
+from rest_framework.views import APIView
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.response import Response
 
 from core.classifier.models import Location, Category
 
@@ -16,7 +18,7 @@ class LocationListView(ListAPIView):
 
     def get_queryset(self):
         qs = Location.objects.all()
-        loc = self.request.query_params.get('loc', None)
+        loc = self.request.query_params.get('loc')
         if loc:
             qs = qs.filter(value__istartswith=loc)
         return qs
@@ -29,7 +31,25 @@ class CategoryListView(ListAPIView):
 
     def get_queryset(self):
         q = Category.objects.all()
-        level = self.request.query_params.get('level', None)
+        level = self.request.query_params.get('level')
         if level:
             q = q.filter(level=level)
+        if self.request.query_params.get("slug"):
+            q = q.filter(parent__slug=self.request.query_params.get("slug"))
         return q
+
+
+def get_node(node):
+    for i in Category.objects.filter(parent__slug=node['slug']):
+        node['nodes'].append(get_node({"level": i.level, "key": i.slug, "slug": i.slug, "label": i.value, "nodes": []}))
+    return node
+
+
+class CategoryTree(APIView):
+    def _get_children(self, parent):
+        return Category.objects.get(parent=parent)
+
+    def get(self, request, *args, **kwargs):
+        tree = get_node({"slug": "root", "key": "root", "level": 0, "parent_slug": "root",
+                         "label": "root", "nodes": []})
+        return Response(tree.get("nodes"))

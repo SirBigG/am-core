@@ -37,3 +37,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 STATIC_ROOT = '/static'
 MEDIA_ROOT = '/media'
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_CREDENTIALS = True
+
+INSTALLED_APPS = ["corsheaders"] + INSTALLED_APPS
+MIDDLEWARE = ('corsheaders.middleware.CorsMiddleware', ) + MIDDLEWARE

@@ -21,9 +21,16 @@ class SmallPagesPagination(PageNumberPagination):
 
 class ApiPostList(ListAPIView):
     """Returns all active posts."""
-    queryset = Post.objects.filter(status=1).order_by('-id')
     serializer_class = ShortPostListSerializer
     pagination_class = SmallPagesPagination
+
+    def get_queryset(self):
+        qs = Post.objects.filter(status=1)
+        if self.request.query_params.get("parent_slug"):
+            qs = qs.filter(rubric__parent__slug=self.request.query_params.get("parent_slug"))
+        if self.request.query_params.get("slug"):
+            qs = qs.filter(rubric__slug=self.request.query_params.get("slug"))
+        return qs.order_by('-id')
 
 
 class RandomListPaginator(PageNumberPagination):

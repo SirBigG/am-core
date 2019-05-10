@@ -17,4 +17,4 @@ class LocationSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('pk', 'value')
+        fields = ('pk', 'value', 'slug', 'level')
