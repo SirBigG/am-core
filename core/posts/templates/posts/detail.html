@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 
-{% load staticfiles i18n %}
-{% load cache post_extras %}
+{% load staticfiles i18n cache post_extras %}
 
 {% block title %}
 {% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}
@@ -12,7 +11,6 @@
 {% endblock %}
 
 {% block extra_meta %}
-{% load post_extras %}
 <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
 <meta content="{% if object.meta_description %}
                         {{ object.meta_description }}
@@ -24,7 +22,9 @@
 <meta content="AgroMega.in.ua" property="og:site_name">
 <link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.0.6/fingerprint2.min.js"></script>
-
+{% if "-user" in object.rubric.slug %}
+        <meta name="robots" content="noindex, nofollow">
+{% endif %}
 {% endblock extra_meta %}
 
 {% block second_menu %}
