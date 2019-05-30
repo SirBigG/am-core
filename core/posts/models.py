@@ -2,6 +2,8 @@ from PIL import Image
 from io import BytesIO
 from pathlib import Path
 import hashlib
+import random
+import string
 
 from django.db import models
 from django.utils.translation import get_language, ugettext_lazy as _
@@ -80,6 +82,8 @@ class Post(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title.lower(), get_language()[:2])
+            if self.__class__.objects.filter(slug=self.slug).first():
+                self.slug = self.slug + ''.join(random.choice(string.ascii_lowercase) for i in range(4))
         # self._save_category()
         super().save(*args, **kwargs)
 
