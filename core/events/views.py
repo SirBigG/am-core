@@ -10,11 +10,11 @@ class EventList(ListView):
     View for list of posts by category.
     """
     paginate_by = 20
-    template_name = 'posts/list.html'
+    template_name = 'events/list.html'
     ordering = '-start'
 
     def get_queryset(self):
-        return Event.objects.filter(status=0, start__gte=datetime.now())
+        return Event.objects.filter(status=1, start__gte=datetime.now())
 
 
 class EventDetail(DetailView):

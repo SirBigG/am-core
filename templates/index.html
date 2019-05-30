@@ -1,10 +1,11 @@
 {% extends "base.html" %}
 
-{% load post_extras cache %}
+{% load post_extras events_extras cache %}
 
 {% block content %}
+{% index_carousel %}
 <div>
-     {% cache 3600 'index_menu' %}
+    {% cache 3600 'index_menu' %}
     {% index_categories %}
     {% endcache %}
 </div>

@@ -1,11 +1,13 @@
 from PIL import Image
 from io import BytesIO
+from pathlib import Path
 
 from django.db import models
 from django.core.cache import cache
 from django.utils.translation import get_language
 from django.urls import reverse
 from django.core.files import File
+from django.conf import settings
 
 from core.pro_auth.models import User
 
@@ -44,6 +46,34 @@ class Event(models.Model):
         return self.title
 
     MAIN_CACHE_KEY = 'event_main_cache_key'
+    INDEX_CACHE_KEY = 'event_index_cache_key'
+
+    def _get_thumbnail_path(self, width):
+        """Return thumbnail path with dirs created."""
+        path_dict = self.poster.path.split('/')
+        path = Path('%s/thumb/' % ('/'.join(path_dict[:-1])))
+        if path.is_dir() is False:
+            path.mkdir()
+        path = Path(('%s/%s/' % (str(path), width)).replace('//', '/'))
+        if path.is_dir() is False:
+            path.mkdir()
+        return '%s/%s' % (str(path), path_dict[-1])
+
+    def thumbnail(self, width=300, height=200):
+        """
+           Create thumbnail if not exists for current image.
+           Returns: url to thumbnail.
+        """
+        if self.poster:
+            thumb_path = Path(self._get_thumbnail_path(width))
+            if thumb_path.is_file() is False:
+                try:
+                    im = Image.open(self.poster.path)
+                except FileNotFoundError:
+                    return
+                im = im.resize((width, height), Image.ANTIALIAS)
+                im.save(thumb_path, format='JPEG', quality=80)
+            return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
 
     def save(self, *args, **kwargs):
         if not self.slug:

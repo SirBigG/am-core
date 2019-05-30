@@ -1,0 +1,29 @@
+{% load post_extras static %}
+
+{% for event in object_list %}
+<div class="row">
+    <div class="card mb-3">
+        <div class="row no-gutters">
+            <div class="col-md-4 p-3 text-center">
+                <img src="{%thumbnail event 350 280 %}" alt="{{event.title}}"
+                     class="img-fluid" id="image-list-size">
+            </div>
+            <div class="col-md-8">
+                <div class="card-body">
+                    <a href="{{ event.get_absolute_url }}" style="text-decoration: none;outline: 0;">
+
+
+                        <h2 class="card-title text-success text-center h4">{{ event.title }}</h2>
+
+                    </a>
+                    <div class="card-text">{{ event.text|striptags|safe|truncatechars:200 }}</div>
+                    <div class="text-right mt-3">
+                        <a class="btn btn-outline-success" href="{{ event.get_absolute_url }}"
+                           style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

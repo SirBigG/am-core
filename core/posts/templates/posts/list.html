@@ -1,8 +1,10 @@
 {% extends "posts/parent_index.html" %}
 
 {% block extra_meta %}
-    {% if page_obj.number > 1 %}
-        <meta name="robots" content="noindex,follow">
+    {% if "-user" in category.slug %}
+        <meta name="robots" content="noindex, nofollow">
+    {% elif page_obj.number > 1 %}
+        <meta name="robots" content="noindex, follow">
     {% endif %}
 {% endblock extra_meta %}
 

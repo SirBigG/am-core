@@ -1,0 +1,29 @@
+{% extends "posts/parent_index.html" %}
+
+{% block extra_meta %}
+<meta name="robots" content="noindex, nofollow">
+{% endblock extra_meta %}
+
+{% block title %}
+Всі агроподії |
+{% endblock title %}
+
+{% block meta_description %}
+{% endblock meta_description %}
+
+{% block second_menu %}
+{% endblock %}
+
+{% block page_title %}
+Агроподії
+{% endblock %}
+
+{% block breadcrumbs %}
+{% endblock %}
+
+{% block content %}
+
+{% include "events/helpers/object_list.html" %}
+
+{% include "helpers/pagination.html" %}
+{% endblock content %}

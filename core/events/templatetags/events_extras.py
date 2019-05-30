@@ -19,3 +19,13 @@ def events_list():
             status=1, start__gte=date.today()).order_by('start'))
         cache.set(Event.MAIN_CACHE_KEY, events)
     return {'events': events}
+
+
+@register.inclusion_tag('events/index_carousel.html')
+def index_carousel():
+    events = None # cache.get(Event.INDEX_CACHE_KEY)
+    if events is None:
+        events = list(Event.objects.select_related('location').filter(
+            status=1, start__gte=date.today()).order_by('start')[:3])
+        cache.set(Event.INDEX_CACHE_KEY, events)
+    return {'object_list': events}

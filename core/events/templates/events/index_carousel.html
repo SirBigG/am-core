@@ -1,0 +1,29 @@
+{% if object_list %}
+<div class="row">
+    <div class="mb-3">
+        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
+            <div class="carousel-inner">
+                {% for event in object_list %}
+                <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
+                    <img src="{{ event.poster.url }}" class="d-block w-100" alt="{{event.title}}">
+                    <div class="carousel-caption">
+                        <h5 class="text-success">{{event.title}}</h5>
+                        <a class="btn btn-success" href="{{ event.get_absolute_url }}">Читати далі</a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if object_list|length > 1 %}
+            <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="sr-only">Previous</span>
+            </a>
+            <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="sr-only">Next</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endif %}
