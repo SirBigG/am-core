@@ -13,7 +13,7 @@
                     <a href="{{ post.get_absolute_url }}" style="text-decoration: none;outline: 0;">
 
 
-                        <h2 class="card-title text-success text-center h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
+                        <h2 class="card-title text-secondary text-center h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
 
                     </a>
                     <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
@@ -23,8 +23,8 @@
                         {% endfor %}
                     </div>
                     <div class="text-right mt-3">
-                        <a class="btn btn-outline-success" href="{{ post.get_absolute_url }}"
-                           style="text-decoration: none;outline: 0;">Читати далі <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+                        <a class="btn text-success" href="{{ post.get_absolute_url }}"
+                           style="text-decoration: none;outline: 0;">Докладніше <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
                     </div>
                 </div>
             </div>

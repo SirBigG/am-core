@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+from django.views.generic import TemplateView
 
 from core.posts import views
 from core.news.views import AdvertListView
@@ -28,6 +29,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'^sitemap\.xml', views.SiteMap.as_view(), name='sitemap'),
+    url(r'^categories/$', TemplateView.as_view(template_name="categories.html"), name='categories'),
     url(r'social/', include('social_django.urls', namespace='social')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),

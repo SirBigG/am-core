@@ -4,11 +4,7 @@
 
 {% block content %}
 {% index_carousel %}
-<div>
-    {% cache 3600 'index_menu' %}
-    {% index_categories %}
-    {% endcache %}
-</div>
+
 {% include "news/helpers/news_list.html" %}
 <p class="h4 text-muted"><strong>Останні публікації:</strong></p>
 {% include "posts/helpers/object_list.html" %}
