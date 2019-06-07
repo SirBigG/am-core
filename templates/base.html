@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#24A824">
+    <meta name="theme-color" content="#24A824" />
     <title>{% spaceless %}{% block title %}{% trans 'Агропортал України' %} |{% endblock title %}{% endspaceless %} AgroMega.in.ua</title>
     <meta name="description" content="{% spaceless %}{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}{% endspaceless %}">
     <link rel="shortcut icon" type="image/x-icon" href="{% static "posts/favicon.ico" %}" />
@@ -23,8 +23,8 @@
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "posts/css/font-awesome.css" %}">
     <script src="{% static "js/jquery.min.js" %}"></script>
-    <script src="{% static "js/popper.min.js" %}"></script>
-    <script src="{% static "js/bootstrap.min.js" %}"></script>
+    <script async src="{% static "js/popper.min.js" %}"></script>
+    <script async src="{% static "js/bootstrap.min.js" %}"></script>
     </head>
     {% block body_head_tag %}
     <body style="background-color:#eeeeee;">

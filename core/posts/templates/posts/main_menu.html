@@ -1,8 +1,8 @@
 {% for root in roots %}
     <li class="nav-item dropdown m-1">
-          <a href="#" class="btn btn-success nav-link dropdown-toggle" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a href="#" class="btn btn-success nav-link dropdown-toggle" id="categoryDropdown{{forloop.counter}}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               {{ root.value }}<span class="caret"></span></a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+        <div class="dropdown-menu" aria-labelledby="categoryDropdown{{forloop.counter}}">
             {% for child in root.get_children %}
                 <a class="dropdown-item" href="/{{ child.slug }}/">{{ child.value }}</a>
             {% endfor %}
