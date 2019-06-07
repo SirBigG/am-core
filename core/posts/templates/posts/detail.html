@@ -55,7 +55,7 @@
                     {% else %}
                     <div class="carousel-item">
                         {% endif %}
-                        <img alt="{{ object.title }}" src="{{ photo.image.url }}" class="img-rounded img-fluid"/>
+                        <img alt="{{ object.title }}" src="{% thumbnail photo 800 %}" class="img-rounded img-fluid"/>
                         {# Photo description #}
                         {% if photo.description %}
                         <div class="carousel-caption">

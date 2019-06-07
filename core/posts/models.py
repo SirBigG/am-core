@@ -119,7 +119,7 @@ class Photo(models.Model):
             path.mkdir()
         return '%s/%s' % (str(path), path_dict[-1])
 
-    def thumbnail(self, width=300, height=200):
+    def thumbnail(self, width=300, height=None):
         """
            Create thumbnail if not exists for current image.
            Returns: url to thumbnail.
@@ -131,6 +131,8 @@ class Photo(models.Model):
                     im = Image.open(self.image.path)
                 except FileNotFoundError:
                     return
+                if height is None:
+                    height = int((float(im.size[1]) * float(width / float(im.size[0]))))
                 im = im.resize((width, height), Image.ANTIALIAS)
                 im.save(thumb_path, format='JPEG', quality=80)
             return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')

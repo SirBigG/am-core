@@ -66,7 +66,7 @@ def full_url(url):
 
 
 @register.simple_tag
-def thumbnail(photo_obj, width=300, height=200):
+def thumbnail(photo_obj, width=300, height=None):
     if photo_obj:
         return photo_obj.thumbnail(width, height)
     return ''
