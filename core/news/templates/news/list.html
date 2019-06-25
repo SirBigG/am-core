@@ -3,44 +3,49 @@
 {% load post_extras %}
 
 {% block extra_meta %}
-<meta name="robots" content="noindex,nofollow">
+    <meta name="robots" content="noindex,nofollow">
 {% endblock extra_meta %}
 
 {% block page_title %}
-Всі агроновини в одному місці
+    Всі агроновини в одному місці
 {% endblock %}
 {
 {% block content %}
-<div class="row">
-    {% for obj in object_list %}
-    <div class="card m-3 col-md-12">
-        <div class="row no-gutters">
-            <div class="col-md-4 p-3 text-center">
-                {% if obj.data.image %}
-                <img class="img-fluid" src="{{obj.data.image}}" alt="">
-                {% endif %}
-            </div>
-            <div class="col-md-8">
-                <div class="card-body pb-3">
-                    <h5 class="card-title">{{ obj.data.title }}</h5>
-                    {% if obj.data.description %}
-                    <div class="card-text">{{obj.data.description}}</div>
-                    {% endif %}
-                    <div class="row mt-3">
-                        <div class="col-6 align-self-center">
-                            <p class="h6 text-danger">{{obj.data.link|get_domain}}</p>
-                        </div>
-                        <div class="col-6 align-self-center">
-                            <button class="btn text-success"
-                                    onclick="window.open('{{ obj.data.link }}', '_blank')" style="text-decoration: none;outline: 0;">Докладніше <i class="fa fa-arrow-right" aria-hidden="true"></i></button>
+    <div class="row">
+        <div class="col-12">
+            <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram <i class="fa fa-paper-plane fa-lg"></i></a>
+        </div>
+        {% for obj in object_list %}
+            <div class="card m-3 col-12">
+                <div class="row no-gutters">
+                    <div class="col-md-4 p-3 text-center">
+                        {% if obj.data.image %}
+                            <img class="img-fluid" src="{{ obj.data.image }}" alt="">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-8">
+                        <div class="card-body pb-3">
+                            <h5 class="card-title">{{ obj.data.title }}</h5>
+                            {% if obj.data.description %}
+                                <div class="card-text">{{ obj.data.description }}</div>
+                            {% endif %}
+                            <div class="row mt-3">
+                                <div class="col-6 align-self-center">
+                                    <p class="h6 text-danger">{{ obj.data.link|get_domain }}</p>
+                                </div>
+                                <div class="col-6 align-self-center">
+                                    <button class="btn text-success"
+                                            onclick="window.open('{{ obj.data.link }}', '_blank')"
+                                            style="text-decoration: none;outline: 0;">Докладніше <i
+                                            class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        {% endfor %}
     </div>
-    {% endfor %}
-</div>
 
-{% include "helpers/pagination_short.html" %}
+    {% include "helpers/pagination_short.html" %}
 {% endblock content %}

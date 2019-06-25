@@ -1,26 +1,25 @@
+{% extends 'base.html' %}
+
 {% load i18n %}
 
-<div class="modal-header">
-    <h2 class="text-center">{% trans 'Зв’яжіться з нами' %}</h2>
-</div>
+{% block content %}
+<h2 class="text-secondary">{% trans 'Зв’яжіться з нами' %}</h2>
+
 <form method="post">
     {% csrf_token %}
-    <div class="modal-body">
-        {% for error in form.non_field_errors %}
-            <p class="text-justify bg-danger">{{error}}</p>
-        {% endfor %}
-        {% for field in form %}
-            <div class="form-group">
-                <p class="text-left">{{ field.label }}</p>
-                {% for error in field.errors %}
-                    <p class="text-danger">{{ error }}</p>
-                {% endfor %}
-                {{ field }}
-            </div>
-        {% endfor %}
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Закрити' %}</button>
-        <button type="submit" class="btn btn-primary" id="feedback-conf-btn">{% trans 'Відправити' %}</button>
-    </div>
+    {% for error in form.non_field_errors %}
+        <p class="text-justify bg-danger">{{ error }}</p>
+    {% endfor %}
+    {% for field in form %}
+        <div class="form-group">
+            <label>{{ field.label }}</label>
+            {% for error in field.errors %}
+                <p class="text-danger">{{ error }}</p>
+            {% endfor %}
+            {{ field }}
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-primary">{% trans 'Відправити' %}</button>
 </form>
+{% endblock content %}

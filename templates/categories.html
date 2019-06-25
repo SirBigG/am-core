@@ -8,12 +8,12 @@
     <meta content="" property="og:image">
     <meta content="https://agromega.in.ua/categories/" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
-    {% endblock extra_meta %}
+{% endblock extra_meta %}
 
 {% block content %}
-<div class="mb-3">
-    {% cache 3600 'index_menu' %}
-    {% index_categories %}
-    {% endcache %}
-</div>
+    <div class="mb-3">
+        {% cache 3600 'index_menu' %}
+            {% index_categories %}
+        {% endcache %}
+    </div>
 {% endblock %}

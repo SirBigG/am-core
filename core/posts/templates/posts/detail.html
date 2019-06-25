@@ -3,70 +3,74 @@
 {% load staticfiles i18n cache post_extras %}
 
 {% block title %}
-{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}
+    {% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}
 {% endblock title %}
 
 {% block meta_description %}
-{% if object.meta %}{{ object.meta.description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}
+    {% if object.meta %}{{ object.meta.description }}{% else %}
+        {{ object.text|truncatechars:300|striptags|safe }}{% endif %}
 {% endblock %}
 
 {% block extra_meta %}
-<meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
-<meta content="{% if object.meta_description %}
+    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{% if object.meta_description %}
                         {{ object.meta_description }}
                    {% else %}
                         {{ object.text|truncatechars:300|striptags|safe }}
                    {% endif %}" property="og:description">
-<meta content="{% full_url object.photo.first.image.url %}" property="og:image">
-<meta content="{% full_url object.get_absolute_url %}" property="og:url">
-<meta content="AgroMega.in.ua" property="og:site_name">
-<link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.0.6/fingerprint2.min.js"></script>
-{% if "-user" in object.rubric.slug %}
+    <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
+    <meta content="{% full_url object.get_absolute_url %}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+    <link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.0.6/fingerprint2.min.js"></script>
+    {% if "-user" in object.rubric.slug %}
         <meta name="robots" content="noindex, nofollow">
-{% endif %}
+    {% endif %}
 {% endblock extra_meta %}
 
 {% block second_menu %}
-{% cache 3600 'second_menu' view.kwargs.parent category.slug %}
-{% second_menu view.kwargs.parent object.rubric.slug %}
-{% endcache %}
+    {% cache 3600 'second_menu' view.kwargs.parent category.slug %}
+        {% second_menu view.kwargs.parent object.rubric.slug %}
+    {% endcache %}
 {% endblock second_menu %}
 
 {% block page_title %}
-{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %} {% if object.country %}
-{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px"></object>{% endwith %}{% endif %}
+    {% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}
+    {% if object.country %}
+        {% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}
+            <object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px"></object>
+        {% endwith %}{% endif %}
 {% endblock %}
 
 {% block breadcrumbs %}
-{% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
-{% breadcrumbs object.rubric object.title %}
-{% endcache %}
+    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
+        {% breadcrumbs object.rubric object.title %}
+    {% endcache %}
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
-            <div class="carousel-inner" role="listbox">
-                {% for photo in object.photo.all%}
+    <div class="row">
+
+    <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
+        <div class="carousel-inner" role="listbox">
+            {% for photo in object.photo.all %}
                 {% if photo == object.photo.first %}
-                <div class="carousel-item active">
-                    {% else %}
+                    <div class="carousel-item active">
+                {% else %}
                     <div class="carousel-item">
-                        {% endif %}
-                        <img alt="{{ object.title }}" src="{% thumbnail photo 800 %}" class="img-rounded img-fluid"/>
-                        {# Photo description #}
-                        {% if photo.description %}
-                        <div class="carousel-caption">
-                            <h4>{{ photo.description }}</h4>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% endfor %}
+                {% endif %}
+            <img alt="{{ object.title }}" src="{% thumbnail photo 800 %}" class="img-rounded img-fluid"/>
+            {# Photo description #}
+            {% if photo.description %}
+                <div class="carousel-caption">
+                    <h4>{{ photo.description }}</h4>
                 </div>
-                {# Controls #}
-                {% if object.photo.count > 1 %}
+            {% endif %}
+            </div>
+            {% endfor %}
+            </div>
+            {# Controls #}
+            {% if object.photo.count > 1 %}
                 <a class="carousel-control-prev" href="#post-carousel" role="button" data-slide="prev">
                     <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                     <span class="sr-only">Previous</span>
@@ -75,140 +79,127 @@
                     <span class="carousel-control-next-icon" aria-hidden="true"></span>
                     <span class="sr-only">Next</span>
                 </a>
-                {% endif %}
-            </div>
+            {% endif %}
         </div>
+
     </div>
     <div class="h4">
         {% for tag in object.tags.all %}
-        <span class="badge badge-pill badge-success mt-3 mr-1">{{tag.name}}</span>
+            <span class="badge badge-pill badge-success mt-3 mr-1">{{ tag.name }}</span>
         {% endfor %}
     </div>
 
     <hr>
-    <div class="row">
-        <div class="col-lg-12 col-12">
-            <div class="text-justify">
-                {{ object.text|safe }}
-            </div>
-            {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
-            {% if object.source %}
+    <div class="row p-2">
+        {{ object.text|safe }}
+        {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
+        {% if object.source %}
             <div class="post-source">
                 <h5>{% trans 'Source: ' %}{{ object.source }}</h5>
             </div>
-            {% endif %}
-        </div>
+        {% endif %}
     </div>
     <div class="row">
-        <div class="col-lg-12 col-12">
-            <div class="col-lg-12 col-12">
-                <ul class="nav nav-pills float-left">
-                    <li class="nav-item"><span class="text-success h5"><i class="fa fa-eye"></i> {{object.hits}}</span>
-                    </li>
-                </ul>
-            </div>
-            <div class="col-lg-12 col-12">
-                <ul class="nav nav-pills float-right">
-                    <li class="nav-item">
-                        <a class="nav-link" tabindex="-1" target="Share-in-facebook"
-                           onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                           href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
-                            <i class="fa fa-facebook fa-2x"></i>
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <div class="col-12">
+            <ul class="nav nav-pills float-left">
+                <li class="nav-item"><span class="text-success h5"><i
+                        class="fa fa-eye"></i> {{ object.hits }}</span>
+                </li>
+            </ul>
+            <ul class="nav nav-pills float-right">
+                <li class="nav-item">
+                    <a class="nav-link" tabindex="-1" target="Share-in-facebook"
+                       onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+                       href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+                        <i class="fa fa-facebook fa-2x"></i>
+                    </a>
+                </li>
+            </ul>
         </div>
     </div>
 
     <div class="row">
         <div class="col-12 mt-4 mb-4" id="useful__wrapper">
-            <span class="h6 mr-4">Публікація була корисною?</span>
+            <span class="h6 mr-4">Публікація корисна?</span>
             <button class="btn btn-success mr-2" id="useful">Так</button>
             <button class="btn btn-danger" id="notuseful">Ні</button>
         </div>
     </div>
     {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
-    {% post_adverts object.rubric.parent %}
+        {% post_adverts object.rubric.parent %}
     {% endcache %}
 
-    {{obj.link|get_domain}}
-    {% endblock content %}
+    {{ obj.link|get_domain }}
+{% endblock content %}
 
 
-{% block extra_footerscript  %}
-<script type="text/javascript">
-    function getCookie(name) {
-  var matches = document.cookie.match(new RegExp(
-    "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-  ));
-  return matches ? decodeURIComponent(matches[1]) : undefined;
-}
-        $('body').on('click', '#useful', function () {
-                "use strict";
-                Fingerprint2.get(function(components) {
-                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
+{% block extra_footerscript %}
+    <script type="text/javascript">
+        function getCookie(name) {
+            var matches = document.cookie.match(new RegExp(
+                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            ));
+            return matches ? decodeURIComponent(matches[1]) : undefined;
+        }
+
+        function usefull(status) {
+            Fingerprint2.get(function (components) {
+                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) {
+                    return pair.value;
+                }).join(), 31);
                 $.ajax({
                     type: 'POST',
-                    url: '/api/post/useful/',
-                    beforeSend: function(request) {
+                    beforeSend: function (request) {
                         request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
                     },
-                    contentType:"application/json; charset=utf-8",
-                    data: JSON.stringify({"fingerprint": fingerprint,
-                    "post_id": {{ object.id }},
-                    "is_useful": true}),
+                    url: '/api/post/useful/',
+                    contentType: "application/json; charset=utf-8",
+                    data: JSON.stringify({
+                        "fingerprint": fingerprint,
+                        "post_id": {{ object.id }},
+                        "is_useful": status
+                    }),
                     success: function (res) {
-                         $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
+                        $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
                     },
                     error: function (res) {
                         console.log(res)
                     }
                 });
             });
-            });
+        }
+
+        $('body').on('click', '#useful', function () {
+            "use strict";
+            usefull(true)
+        });
         $('body').on('click', '#notuseful', function () {
             "use strict";
-                Fingerprint2.get(function(components) {
-                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
-                $.ajax({
-                    type: 'POST',
-                    beforeSend: function(request) {
-                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
-                    },
-                    url: '/api/post/useful/',
-                    contentType:"application/json; charset=utf-8",
-                    data: JSON.stringify({"fingerprint": fingerprint,
-                    "post_id": {{ object.id }},
-                    "is_useful": false}),
-                    success: function (res) {
-                         $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
-                    },
-                    error: function (res) {
-                        console.log(res)
-                    }
-                });
-            });
-            });
-        window.onload = Fingerprint2.get(function(components) {
+            usefull(false)
+        });
+        window.onload = Fingerprint2.get(function (components) {
             "use strict";
-                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) { return pair.value; }).join(), 31);
-                $.ajax({
-                    type: 'POST',
-                    url: '/api/post/view/',
-                    beforeSend: function(request) {
-                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
-                    },
-                    contentType:"application/json; charset=utf-8",
-                    data: JSON.stringify({"fingerprint": fingerprint,
-                    "post_id": {{ object.id }}}),
-                    success: function (res) {
-                         console.log("success view");
-                    },
-                    error: function (res) {
-                        console.log(res);
-                    }
-                });
+            const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) {
+                return pair.value;
+            }).join(), 31);
+            $.ajax({
+                type: 'POST',
+                url: '/api/post/view/',
+                beforeSend: function (request) {
+                    request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
+                },
+                contentType: "application/json; charset=utf-8",
+                data: JSON.stringify({
+                    "fingerprint": fingerprint,
+                    "post_id": {{ object.id }}
+                }),
+                success: function (res) {
+                    console.log("success view");
+                },
+                error: function (res) {
+                    console.log(res);
+                }
             });
+        });
     </script>
 {% endblock %}

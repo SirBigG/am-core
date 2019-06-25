@@ -1,22 +1,15 @@
 {% load static i18n cache %}
 {% load post_extras %}
-<!-- Site header -->
 
-<header class="navbar navbar-green navbar-expand-lg" style="background-color:#005c00;">
-    <div class="container-fluid">
-        <!--<button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#main-menu-collapse" aria-controls="main-menu-collapse" aria-expanded="false" aria-label="Site navigation">-->
-            <!--<span class="text-success"><span class="fa fa-bars fa-lg"></span></span>-->
-        <!--</button>-->
-        <a class="navbar-brand" href="/">
-                  <h4>Agro Mega</h4>
-                <!--<img width="200" height="50" src="{% static "posts/logo.png" %}">-->
-              </a>
+<header class="navbar navbar-green navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand text-success" href="/"><h4>Agro Mega</h4></a>
         <div class="collapse navbar-collapse" id="main-menu-collapse">
-
               <ul class="navbar-nav">
-                {% cache 3600 'main_menu' %}
-                    {% main_menu %}
-                {% endcache %}
+                  <li class="nav-item"><a class="nav-link text-success" href="/categories/">{% trans "Публікації" %}</a></li>
+                  <li class="nav-item"><a class="nav-link text-success" href="/news/">{% trans "Новини" %}</a></li>
+                  <li class="nav-item"><a class="nav-link text-success" href="/adverts/">{% trans "Оголошення" %}</a></li>
+                  <li class="nav-item"><a class="nav-link text-success" href="/events/">{% trans "Події" %}</a></li>
               </ul>
         </div>
         <div class="navbar-nav d-inline-flex flex-row auth-block">
@@ -25,16 +18,6 @@
                     <i class="fa fa-search fa-lg"></i>
                 </button>
             </div>
-            <!--<div class="nav-item m-1">-->
-                <!--<button onclick="location.href='/news/list/'"  class="btn btn-success" type="submit">-->
-                    <!--<i class="fa fa-newspaper-o fa-lg" aria-hidden="true"></i>-->
-                <!--</button>-->
-            <!--</div>-->
-            <div class="nav-item m-1">
-                  <button onclick="location.href='https://telegram.me/wn_world_news_bot?start=1'" class="btn btn-primary" title="{% trans 'Підписатись на новини в Telegram' %}">
-                    <i class="fa fa-paper-plane fa-lg"></i>
-                  </button>
-                </div>
             {% if user.is_authenticated %}
                 <div class="nav-item m-1">
                   <button onclick="location.href='/profile/'" class="btn btn-success" title="{% trans 'Особистий кабінет' %}">
@@ -47,30 +30,12 @@
                   </button>
                 </div>
             {% else %}
-                 <div class="nav-item m-1">
-                   <button id="login-btn" type="button" class="btn btn-success"
-                      data-toggle="modal" data-target=".login-modal-lg" title="{% trans 'Увійти' %}">
-                     <i class="fa fa-sign-in fa-lg"></i>
-                   </button>
-                 </div>
+                <div class="nav-item m-1">
+                  <button onclick="location.href='/login/'" class="btn btn-success" title="{% trans 'Увійти' %}">
+                     <i class="fa fa-sign-out fa-lg"></i>
+                  </button>
+                </div>
             {% endif %}
         </div>
     </div>
 </header>
-
-<div class="modal fade login-modal-lg" tabindex="-1" role="dialog" aria-labelledby="LoginLabel">
-    <div class="modal-dialog">
-        <div id="login-modal" class="modal-content"></div>
-    </div>
-</div>
-<div class="modal fade register-modal-lg" tabindex="-1" role="dialog" aria-labelledby="RegisterLabel">
-    <div class="modal-dialog">
-        <div id="register-modal" class="modal-content"></div>
-    </div>
-</div>
-
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('[data-toggle="tooltip"]').popover();
-    });
-</script>

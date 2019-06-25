@@ -7,5 +7,5 @@ app_name = 'news'
 
 
 urlpatterns = [
-    url(r'^list/$', views.NewsListView.as_view(), name='news-list'),
+    url(r'^$', views.NewsListView.as_view(), name='news-list'),
 ]

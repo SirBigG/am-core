@@ -22,6 +22,7 @@ from django.views.generic import TemplateView
 
 from core.posts import views
 from core.news.views import AdvertListView
+from core.services.views import FeedbackView
 
 
 urlpatterns = [
@@ -35,6 +36,7 @@ urlpatterns = [
                                namespace='rest_framework')),
     url('^page/', include('django.contrib.flatpages.urls')),
     url(r'^i18n/', include('django.conf.urls.i18n')),
+    url(r'feedback/$', FeedbackView.as_view(), name="feedback-form"),
     url(r'^service/', include('core.services.urls')),
     url(r'^api/', include('api.v1.urls')),
     url(r'^events/', include('core.events.urls', namespace='events')),

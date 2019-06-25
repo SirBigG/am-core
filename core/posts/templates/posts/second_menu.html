@@ -1,9 +1,9 @@
 <ul class="nav nav-tabs pt-3">
     {% for item in menu_items %}
       {% if slug and slug == item.slug %}
-    <li class="nav-item"><a class="nav-link active btn btn-outline-danger" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a></li>
+    <li class="nav-item"><a class="nav-link active text-danger" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a></li>
       {% else %}
-    <li class="nav-item"><a class="nav-link btn btn-outline-danger" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a></li>
+    <li class="nav-item"><a class="nav-link text-danger" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a></li>
       {% endif %}
     {% endfor %}
 </ul>

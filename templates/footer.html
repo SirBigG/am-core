@@ -3,20 +3,13 @@
 <div class="navbar navbar-dark bg-dark fixed-bottom d-md-none mt-3">
     <a class="text-center" href="/"><span class="p"><i class="fa fa-home fa-lg"></i><br>Головна</span></a>
     <a class="text-center" href="/categories/"><span class="p"><i class="fa fa-th-list fa-lg"></i><br>Категорії</span></a>
-    <a class="text-center" href="/news/list/"><span class="p"><i class="fa fa-book fa-lg"></i><br>Новини</span></a>
+    <a class="text-center" href="/news/"><span class="p"><i class="fa fa-book fa-lg"></i><br>Новини</span></a>
     <a class="text-center" href="/adverts/"><span class="p"><i class="fa fa-newspaper-o fa-lg"></i><br>Оголошення</span></a>
 </div>
 <footer class="navbar navbar-light d-none d-sm-block">
     <ul class="nav d-flex justify-content-around">
         <li class="nav-item"><p class="text-secondary">© 2019 AgroMega</p></li>
         <li class="nav-item"><a href="/page/privacy_policy/" class="btn">{% trans "Політика конфіденційності" %}</a></li>
-        <li class="nav-item"><button id="feedback-btn" type="button" class="btn btn-outline-success" data-toggle="modal" data-target=".feedback-modal">{% trans 'Зворотній зв’язок' %}</button></li>
+        <li class="nav-item"><a href="/feedback/" class="btn btn-outline-success">{% trans 'Зворотній зв’язок' %}</a></li>
     </ul>
 </footer>
-
-<div class="modal fade feedback-modal" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel">
-    <div class="modal-dialog modal-lg">
-        <div id="feedback-modal" class="modal-content"></div>
-    </div>
-</div>
-

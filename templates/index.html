@@ -3,10 +3,7 @@
 {% load post_extras events_extras cache %}
 
 {% block content %}
-{% index_carousel %}
-
-{% include "news/helpers/news_list.html" %}
-<p class="h4 text-muted"><strong>Останні публікації:</strong></p>
-{% include "posts/helpers/object_list.html" %}
-
+    {% index_carousel %}
+    <p class="h4 text-muted"><strong>Останні публікації:</strong></p>
+    {% include "posts/helpers/object_list.html" %}
 {% endblock %}
