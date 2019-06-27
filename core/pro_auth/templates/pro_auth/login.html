@@ -2,19 +2,17 @@
 {% load i18n %}
 
 {% block base_content_block %}
-     <div class="col-12 col-lg-4 mx-auto">
-       <div class="jumbotron">
-           <h1 class="text-success h3">Увійти за допомогою:</h1>
-       <ul class="nav nav-pills justify-content-center">
-                <li class="nav-item">
-                    <a class="nav-link text-danger" href="{% url 'social:begin' 'google-oauth2' %}"><i class="fa fa-google fa-3x"></i></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'social:begin' 'facebook' %}"><i class="fa fa-facebook fa-3x"></i></a>
-                </li>
-            </ul>
-        </div>
-    </form>
+    <div class="col-12">
+        <h1 class="text-success text-center h3">Увійти</h1>
+        <ul class="nav nav-pills justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link text-danger h1" href="{% url 'social:begin' 'google-oauth2' %}"><i
+                        class="icon-google"></i></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-primary h1" href="{% url 'social:begin' 'facebook' %}"><i
+                        class="icon-facebook"></i></a>
+            </li>
+        </ul>
     </div>
-     </div>
 {% endblock %}

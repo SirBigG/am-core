@@ -13,7 +13,7 @@
 {% block content %}
     <div class="row">
         <div class="col-12">
-            <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram <i class="fa fa-paper-plane fa-lg"></i></a>
+            <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary">Підписатись на новини в Telegram <i class="icon-paper-plane"></i></a>
         </div>
         {% for obj in object_list %}
             <div class="card m-3 col-12">
@@ -37,7 +37,7 @@
                                     <button class="btn text-success"
                                             onclick="window.open('{{ obj.data.link }}', '_blank')"
                                             style="text-decoration: none;outline: 0;">Докладніше <i
-                                            class="fa fa-arrow-right" aria-hidden="true"></i></button>
+                                            class="icon-right-big" aria-hidden="true"></i></button>
                                 </div>
                             </div>
                         </div>

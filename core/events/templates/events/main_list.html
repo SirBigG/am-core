@@ -9,7 +9,7 @@
             <a class="card-title" href="{{event.get_absolute_url}}" style="text-decoration: none;outline: 0;"><span class="h5 text-secondary">{{event.title}}</span></a> <span class="badge badge-success">{{event.type.title}}</span>
             <p class="card-subtitle mt-2 text-muted">{{event.location}}</p>
             <small class="card-subtitle mb-2 text-muted">{{event.start|date:"d F Y"}} - {{event.stop|date:"d F Y"}}</small>
-            <a class="btn text-success float-right" href="{{event.get_absolute_url}}" style="text-decoration: none;outline: 0;">Докладніше <i class="fa fa-arrow-right" aria-hidden="true"></i></a>
+            <a class="btn text-success float-right" href="{{event.get_absolute_url}}" style="text-decoration: none;outline: 0;">Докладніше <i class="icon-right-big" aria-hidden="true"></i></a>
         </div>
     </div>
 {% endfor %}
