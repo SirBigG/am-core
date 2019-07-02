@@ -1,25 +1,19 @@
 {% load post_extras %}
-
-<div>
-{#   todo: groups #}
-    {% for root in roots %}
+{% for root in roots %}
     <div class="card mb-3">
-        <div class="card-header" id="{{root.slug}}">
-            <h2 class="text-success h6">{{root.value}}</h2>
+        <div class="card-header" id="{{ root.slug }}">
+            <h2 class="text-success h6">{{ root.value }}</h2>
         </div>
         <div>
             <div class="card-body">
                 <ul class="list-group list-group-flush">
                     {% for child in root.get_children %}
-{#                        todo: remove text decoration#}
                         <a class="text-success" href="/{{ child.slug }}/">
-                    <li class="list-group-item">
-                        {{ child.value }}
-                    </li></a>
+                            <li class="list-group-item">{{ child.value }}</li>
+                        </a>
                     {% endfor %}
                 </ul>
             </div>
         </div>
     </div>
-    {% endfor %}
-</div>
+{% endfor %}
