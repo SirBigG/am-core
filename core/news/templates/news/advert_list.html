@@ -4,7 +4,15 @@
 
 {% block extra_meta %}
     <meta name="robots" content="noindex, nofollow">
+    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %} | AgroMega.in.ua"
+          property="og:title">
+    <meta content="Свіжі оголошення аграрної тематики {% if category %} в категорії {{ category.value }} {% endif %}."
+          property="og:description">
 {% endblock extra_meta %}
+
+{% block title %}
+    Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}
+{% endblock %}
 
 {% block page_title %}
     Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}
@@ -15,18 +23,15 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="alert alert-warning" role="alert">
-            Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що
-            Ви з нами!
-        </div>
-        <div class="col-md-4 col-sm-12">
-            {% cache 1800 'categories_filter_block' %}
-                {% categories_filter %}
-            {% endcache %}
-        </div>
+    <div class="alert alert-warning" role="alert">
+        Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що
+        Ви з нами!
     </div>
-
+    <div class="col-md-4 col-sm-12">
+        {% cache 1800 'categories_filter_block' %}
+            {% categories_filter %}
+        {% endcache %}
+    </div>
     {% for obj in object_list %}
         <div class="card m-3">
             <div class="row no-gutters">
@@ -61,10 +66,7 @@
                                 <p class="h6 text-success">{{ obj.data.price }}</p>
                             </div>
                             <div class="col-6">
-                                <button class="btn text-success"
-                                        onclick="ga('send', 'event', '{{ obj.link|get_domain }}', 'clicked'); window.open('{{ obj.link }}', '_blank')"
-                                        style="text-decoration: none;outline: 0;">Докладніше <i
-                                        class="icon-right-big" aria-hidden="true"></i></button>
+                                <button class="btn text-success" onclick="ga('send', 'event', '{{ obj.link|get_domain }}', 'clicked'); window.open('{{ obj.link }}', '_blank')">Докладніше <i class="icon-right-big" aria-hidden="true"></i></button>
                             </div>
                         </div>
                     </div>

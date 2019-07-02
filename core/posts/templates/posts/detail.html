@@ -49,7 +49,6 @@
 {% endblock %}
 
 {% block content %}
-    <div class="row">
     <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
         <div class="carousel-inner" role="listbox">
             {% for photo in object.photo.all %}
@@ -89,7 +88,7 @@
     </div>
 
     <hr>
-    <div class="row p-2">
+    <div class="m-1">
         {{ object.text|safe }}
         {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
         {% if object.source %}
@@ -110,20 +109,18 @@
                     <a class="nav-link" tabindex="-1" target="Share-in-facebook"
                        onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
                        href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
-                        <i class="icon-facebook fa-2x"></i>
+                        <i class="icon-facebook h4"></i>
                     </a>
                 </li>
             </ul>
         </div>
-    </div>
-
-    <div class="row">
-        <div class="col-12 mt-4 mb-4" id="useful__wrapper">
+        <div class="col-12 mb-4" id="useful__wrapper">
             <span class="h6 mr-4">Публікація корисна?</span>
             <button class="btn btn-success mr-2" id="useful">Так</button>
             <button class="btn btn-danger" id="notuseful">Ні</button>
         </div>
     </div>
+
     {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
         {% post_adverts object.rubric.parent %}
     {% endcache %}

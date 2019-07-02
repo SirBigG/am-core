@@ -4,17 +4,22 @@
 
 {% block extra_meta %}
     <meta name="robots" content="noindex,nofollow">
+    <meta content="Всі агроновини в одному місці | AgroMega.in.ua" property="og:title">
+    <meta content="Новини агросектору. Стрічка найсвіжіших агроновин бізнесу та сфери в цілому."
+          property="og:description">
 {% endblock extra_meta %}
+
+{% block title %}
+    Всі агроновини в одному місці
+{% endblock %}
 
 {% block page_title %}
     Всі агроновини в одному місці
 {% endblock %}
-{
+
 {% block content %}
-    <div class="row">
-        <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary mb-3">Підписатись
-            на новини в Telegram <i class="icon-paper-plane"></i></a>
-    </div>
+    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary mb-3 ml-1">Підписатись
+        на новини в Telegram <i class="icon-paper-plane"></i></a>
     {% for obj in object_list %}
         <div class="card mb-3">
             <div class="row no-gutters">
@@ -34,10 +39,7 @@
                                 <p class="h6 text-danger">{{ obj.data.link|get_domain }}</p>
                             </div>
                             <div class="col-6 align-self-center">
-                                <button class="btn text-success"
-                                        onclick="window.open('{{ obj.data.link }}', '_blank')"
-                                        style="text-decoration: none;outline: 0;">Докладніше <i
-                                        class="icon-right-big" aria-hidden="true"></i></button>
+                                <button class="btn text-success" onclick="window.open('{{ obj.data.link }}', '_blank')">Докладніше <i class="icon-right-big" aria-hidden="true"></i></button>
                             </div>
                         </div>
                     </div>
