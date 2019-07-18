@@ -5,13 +5,13 @@
     <div class="card mb-3">
         <div class="row no-gutters">
             <div class="col-md-4 col-12">
-                <img src="{%thumbnail post.photo.first 350 %}" alt="{{ post.photo.all.0.description }}"
+                <img src="{%thumbnail post.photo.all.0 350 %}" alt="{{ post.photo.all.0.description }}"
                      class="card-img">
             </div>
             <div class="col-md-8 col-12">
                 <div class="card-body">
                     <a href="{{ post.get_absolute_url }}" style="text-decoration: none;outline: 0;">
-                        <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.country.value}}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
+                        <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.rubric.value}}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
                     </a>
                     <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="row">
