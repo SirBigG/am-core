@@ -69,7 +69,7 @@ class PostSearchView(ListView):
                                               "search_phrase": self.request.GET.get('q')})
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
             'rubric').select_related('rubric__parent').prefetch_related('tags').annotate(
-            search=SearchVector('text')).filter(search=self.request.GET.get('q', ''))
+            search=SearchVector('text')).filter(text__search=self.request.GET.get('q', ''))
 
 
 class PostDetail(DetailView):
