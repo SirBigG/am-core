@@ -20,12 +20,12 @@
         <meta content="https://agromega.in.ua" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
-    <!-- For extra scripts inclusion -->
-    {% block extra_script %}{% endblock extra_script %}
     <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
     <link rel="stylesheet" href="{% static "posts/css/fontello.css" %}">
     <script src="{% static "js/jquery.min.js" %}"></script>
     <script async src="{% static "js/bootstrap.min.js" %}"></script>
+    <!-- For extra scripts inclusion -->
+    {% block extra_script %}{% endblock extra_script %}
 </head>
 {% block body_head_tag %}
     <body style="background-color:#eeeeee;">

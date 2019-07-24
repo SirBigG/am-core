@@ -233,6 +233,12 @@ MEDIA_ROOT = os.getenv("MEDIA_ROOT") or os.path.join(BASE_DIR, 'media')
 
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 
+CKEDITOR_CONFIGS = {
+    'default': {
+        'width': '100%',
+    }
+}
+
 # Multillect translator secrets
 MULTILLECT_ACCOUNT_ID = os.getenv("MULTILLECT_ACCOUNT_ID")
 MULTILLECT_SECRET_KEY = os.getenv("MULTILLECT_SECRET_KEY")

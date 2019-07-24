@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+{% block extra_script %}
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css"/>
+{% endblock %}
+
+{% block content %}
+    <h1>Додати подію</h1>
+    <form method="post" action="/events/create/" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            {% if field.name in "startstop" %}
+                <div class="form-group">
+                    <div class="input-group date" id="{{ field.name }}" data-target-input="nearest">
+                        {{ field.label }}
+                        <br/>
+                        <input type="text" name="{{ field.name }}" required class="form-control datetimepicker-input"
+                               data-target="#{{ field.name }}"/>
+                        <div class="input-group-append" data-target="#{{ field.name }}"
+                             data-toggle="datetimepicker">
+                            <div class="input-group-text"><i class="icon-calendar"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('#{{ field.name }}').datetimepicker({
+                            locale: 'uk',
+                            format: 'YYYY-MM-DD HH:mm',
+                            icons: {
+                                time: 'icon-clock',
+                                date: 'icon-calendar',
+                                up: 'icon-up-open',
+                                down: 'icon-down-open',
+                                previous: 'far fa-chevron-left',
+                                next: 'far fa-chevron-right',
+                                today: 'far fa-calendar-check-o',
+                                clear: 'far fa-trash',
+                                close: 'far fa-times'
+                            }
+                        });
+                    });
+                </script>
+            {% else %}
+                <div class="form-group">
+                    <label>{{ field.label }}</label>
+                    {% for error in field.errors %}
+                        <p class="text-danger">{{ error }}</p>
+                    {% endfor %}
+                    <div class="col-12">
+                        {{ field }}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        <button type="submit" class="btn btn-success mb-3">{% trans 'Додати' %}</button>
+    </form>
+    {{ form.media }}
+{% endblock %}
