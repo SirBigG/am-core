@@ -18,9 +18,10 @@
     Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}
 {% endblock %}
 
-{% block extra_script %}
+{% block scripts %}
     <script async src="{% static "js/popper.min.js" %}"></script>
-{% endblock %}
+    {{ block.super }}
+{% endblock scripts %}
 
 {% block content %}
     <div class="alert alert-warning" role="alert">
@@ -34,7 +35,7 @@
     </div>
     {% for obj in object_list %}
         <div class="row">
-            <div class="card mb-3">
+            <div class="card mb-3" style="width: 100%;">
                 <div class="row no-gutters">
                     <div class="col-md-4 col-12">
                         {% if obj.data.image %}
