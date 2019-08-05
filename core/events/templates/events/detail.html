@@ -28,6 +28,11 @@
 {% endblock %}
 
 {% block content %}
+    <div class="row m-3">
+        <a href="/events/create/" class="btn btn-success btn-lg">
+            Додати подію
+        </a>
+    </div>
     <div class="row">
         <div class="col-12 col-lg-6">
             <img alt="{{ object.title }}" src="{{ object.poster.url }}" class="img-rounded img-fluid" />
