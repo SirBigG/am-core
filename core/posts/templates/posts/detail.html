@@ -49,8 +49,7 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-12">
-        <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
+    <div id="post-carousel" class="carousel" data-ride="carousel" data-interval="false">
             <div class="carousel-inner" role="listbox">
                 {% for photo in object.photo.all %}
                     {% if photo == object.photo.first %}
@@ -58,7 +57,7 @@
                     {% else %}
                         <div class="carousel-item">
                     {% endif %}
-                <img alt="{{ object.title }}" src="{% thumbnail photo 800 %}" class="img-rounded img-fluid"/>
+                <img alt="{{ object.title }}" src="{% thumbnail photo 800 %}" class="d-block w-100"/>
                 {# Photo description #}
                 {% if photo.description %}
                     <div class="carousel-caption">
@@ -80,8 +79,8 @@
                     </a>
                 {% endif %}
             </div>
-
         </div>
+    <div class="col-12">
         <div class="h4">
             {% for tag in object.tags.all %}
                 <span class="badge badge-pill badge-success mt-3 mr-1">{{ tag.name }}</span>
