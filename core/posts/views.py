@@ -84,11 +84,14 @@ class SiteMap(TemplateView):
     template_name = 'sitemap.xml'
 
     def get_context_data(self, **kwargs):
+        from core.events.models import Event
         context = super(SiteMap, self).get_context_data(**kwargs)
         context['base'] = settings.HOST + '/'
         context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.select_related(
             'rubric').prefetch_related('rubric__parent').filter(status=1).exclude(rubric__slug__contains='-user')]
-        context['urls'].extend([
-            settings.HOST + "/" + slug + "/" for slug in Category.objects.filter(
-                level=1).exclude(slug__contains='-user').values_list('slug', flat=True)])
+        context['urls'].extend([f"{settings.HOST}/{slug}/" for slug in Category.objects.filter(
+            level=1).exclude(slug__contains='-user').values_list('slug', flat=True)])
+        context['urls'].extend([f"{settings.HOST}/events/{slug}.html" for slug in Event.objects.filter(
+            status=1).values_list('slug', flat=True)])
+        context["urls"].append(f"{settings.HOST}/events/")
         return context
