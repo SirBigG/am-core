@@ -3,13 +3,9 @@
 {% load staticfiles i18n %}
 {% load cache post_extras %}
 
-{% block title %}
-    {{ object.title }} |
-{% endblock title %}
+{% block title %}{{ object.title }} |{% endblock title %}
 
-{% block meta_description %}
-    {{ object.text|truncatechars:300|striptags|safe }}
-{% endblock %}
+{% block meta_description %}{{ object.text|truncatechars:300|striptags|safe }}{% endblock %}
 
 {% block extra_meta %}
     {% load post_extras %}

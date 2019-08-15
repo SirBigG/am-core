@@ -2,13 +2,9 @@
 
 {% load post_extras cache %}
 
-{% block title %}
-    {% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}
-{% endblock title %}
+{% block title %}{% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}{% endblock title %}
 
-{% block meta_description %}
-    {% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}
-{% endblock %}
+{% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}{% endblock %}
 
 
 {% block second_menu %}
