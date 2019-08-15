@@ -11,6 +11,7 @@ class EventTypeAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     form = EventForm
     readonly_fields = ('slug',)
+    list_display = ['title', 'start', 'stop', 'status']
 
 
 admin.site.register(Event, EventAdmin)
