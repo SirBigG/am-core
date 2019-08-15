@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import date
 
 from django.views.generic import ListView, DetailView, FormView
 
@@ -12,10 +12,8 @@ class EventList(ListView):
     """
     paginate_by = 20
     template_name = 'events/list.html'
-    ordering = '-start'
-
-    def get_queryset(self):
-        return Event.objects.filter(status=1, start__gte=datetime.now())
+    ordering = 'start'
+    queryset = Event.objects.filter(status=1, start__gte=date.today())
 
 
 class EventDetail(DetailView):
