@@ -12,7 +12,7 @@
 {% endblock scripts %}
 
 {% block content %}
-    <h1>Додати подію</h1>
+    <h1>Опублікувати подію</h1>
     <form method="post" action="/events/create/" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
@@ -61,7 +61,7 @@
             {% endif %}
         {% endfor %}
 
-        <button type="submit" class="btn btn-success mb-3">{% trans 'Додати' %}</button>
+        <button type="submit" class="btn btn-success mb-3">{% trans 'Опублікувати' %}</button>
     </form>
     {{ form.media }}
 {% endblock %}

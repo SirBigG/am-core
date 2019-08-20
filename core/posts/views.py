@@ -93,5 +93,5 @@ class SiteMap(TemplateView):
             level=1).exclude(slug__contains='-user').values_list('slug', flat=True)])
         context['urls'].extend([f"{settings.HOST}/events/{slug}.html" for slug in Event.objects.filter(
             status=1).values_list('slug', flat=True)])
-        context["urls"].append(f"{settings.HOST}/events/")
+        context["urls"].extend([f"{settings.HOST}/events/", f"{settings.HOST}/news/", f"{settings.HOST}/adverts/"])
         return context
