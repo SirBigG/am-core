@@ -13,7 +13,7 @@ class EventList(ListView):
     paginate_by = 20
     template_name = 'events/list.html'
     ordering = 'start'
-    queryset = Event.objects.filter(status=1, start__gte=date.today())
+    queryset = Event.objects.filter(status=1, stop__gte=date.today())
 
 
 class EventDetail(DetailView):
