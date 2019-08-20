@@ -11,7 +11,7 @@
             <div class="col-md-8 col-12">
                 <div class="card-body">
                     <a href="{{ post.get_absolute_url }}" style="text-decoration: none;outline: 0;">
-                        <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.rubric.value}}" alt="{{post.country.value}}" height="25px" width="35px" ></object>{% endwith %}{% endif %}</h2>
+                        <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.rubric.value}}" height="25px" width="35px" >{{post.country.value}}</object>{% endwith %}{% endif %}</h2>
                     </a>
                     <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="row">
