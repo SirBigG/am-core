@@ -236,7 +236,19 @@ CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 CKEDITOR_CONFIGS = {
     'default': {
         'width': '100%',
+    },
+    "public": {
+        'width': '100%',
+        'toolbar_Full': [
+            ['Format', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo',
+             '-', 'NumberedList', 'BulletedList'],
+            ['Table'],
+            ['TextColor', 'BGColor'],
+            ['SpecialChar'],
+        ],
+        'bodyClass': "col-12"
     }
+
 }
 
 # Multillect translator secrets

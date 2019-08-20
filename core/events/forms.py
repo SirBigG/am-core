@@ -1,6 +1,8 @@
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
+from ckeditor.widgets import CKEditorWidget
+
 from dal import autocomplete
 
 from core.classifier.models import Location
@@ -29,9 +31,6 @@ class EventAddForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = ["title", "text", "type", "poster", "address", "location", "start", "stop"]
-        # widgets = {
-        #     'title': forms.TextInput(attrs={'class': 'form-control input-lg'})
-        # }
 
         labels = {
             'title': _('Назва події'),
@@ -45,6 +44,7 @@ class EventAddForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["text"].widget = CKEditorWidget(config_name="public")
         for name, field in self.fields.items():
             if name != "location":
                 field.widget.attrs['class'] = "form-control"
