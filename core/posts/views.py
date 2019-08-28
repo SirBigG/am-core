@@ -1,7 +1,7 @@
 from django.views.generic import ListView, DetailView, TemplateView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.contrib.postgres.search import SearchVector
+from django.contrib.postgres.search import SearchQuery
 from django.http import Http404
 
 from core.posts.models import Post, SearchStatistic
@@ -14,7 +14,7 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').prefetch_related('tags').filter(status=1)[:10]
+            'rubric').select_related('rubric__parent').filter(status=1)[:10]
         return context
 
 
@@ -29,7 +29,7 @@ class ParentRubricView(TemplateView):
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['parent'])
         context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').select_related('rubric__meta').prefetch_related('tags').filter(
+            'rubric').select_related('rubric__parent').select_related('rubric__meta').filter(
             rubric__parent_id=context['category'].pk, status=1)[:4]
         return context
 
@@ -55,7 +55,7 @@ class PostList(ListView):
 
     def get_queryset(self):
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').select_related('rubric__meta').prefetch_related('tags').filter(
+            'rubric').select_related('rubric__parent').select_related('rubric__meta').filter(
             rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1)
 
 
@@ -68,8 +68,8 @@ class PostSearchView(ListView):
             SearchStatistic.objects.create(**{"fingerprint": "fingerprint",
                                               "search_phrase": self.request.GET.get('q')})
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').prefetch_related('tags').annotate(
-            search=SearchVector('text')).filter(text__search=self.request.GET.get('q', ''))
+            'rubric').select_related('rubric__parent').filter(text_search=SearchQuery(self.request.GET.get('q', ''),
+                                                              config='english'))
 
 
 class PostDetail(DetailView):

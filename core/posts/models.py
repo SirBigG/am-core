@@ -11,6 +11,8 @@ from django.utils import timezone
 from django.urls import reverse
 from django.core.files import File
 from django.conf import settings
+from django.contrib.postgres.search import SearchVectorField
+from django.contrib.postgres.indexes import GinIndex
 
 from core.pro_auth.models import User
 
@@ -60,11 +62,14 @@ class Post(models.Model):
 
     tags = TaggableManager()
 
+    text_search = SearchVectorField(null=True)
+
     class Meta:
         db_table = 'post'
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
         ordering = ['-publish_date']
+        indexes = [GinIndex(fields=["text_search"])]
 
     def __str__(self):
         return self.title

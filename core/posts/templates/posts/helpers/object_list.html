@@ -4,23 +4,13 @@
 <div class="row">
     <div class="card mb-3">
         <div class="row no-gutters">
-            <div class="col-md-4 col-12">
-                <img src="{%thumbnail post.photo.all.0 350 %}" alt="{{ post.photo.all.0.description }}"
-                     class="card-img">
-            </div>
+            <div class="col-md-4 col-12"><img src="{%thumbnail post.photo.all.0 350 %}" alt="{{ post.title }}" class="card-img"></div>
             <div class="col-md-8 col-12">
                 <div class="card-body">
-                    <a href="{{ post.get_absolute_url }}" style="text-decoration: none;outline: 0;">
-                        <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.rubric.value}}" height="25px" width="35px" >{{post.country.value}}</object>{% endwith %}{% endif %}</h2>
-                    </a>
+                    <h2 class="card-title text-secondary h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" aria-label="{{post.rubric.value}}" height="25px" width="35px" >{{post.country.value}}</object>{% endwith %}{% endif %}</h2>
                     <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
-                    <div class="row">
-                        {% for tag in post.tags.all %}
-                        <span class="badge badge-pill badge-success m-2">{{tag.name}}</span>
-                        {% endfor %}
-                    </div>
                     <div class="text-right mt-3">
-                        <a class="btn text-success" href="{{ post.get_absolute_url }}"
+                        <a class="btn text-success stretched-link" href="{{ post.get_absolute_url }}"
                            style="text-decoration: none;outline: 0;">Докладніше <i class="icon-right-big" aria-hidden="true"></i></a>
                     </div>
                 </div>
