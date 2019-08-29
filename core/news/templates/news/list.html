@@ -4,8 +4,8 @@
 
 {% block extra_meta %}
     <meta content="Всі агроновини в одному місці | AgroMega.in.ua" property="og:title">
-    <meta content="Новини агросектору. Стрічка найсвіжіших агроновин бізнесу та сфери в цілому."
-          property="og:description">
+    <meta content="Новини агросектору. Стрічка найсвіжіших агроновин бізнесу та сфери в цілому." property="og:description">
+    {% if request.GET.page %}<meta name="robots" content="noindex, nofollow">{% endif %}
 {% endblock extra_meta %}
 
 {% block title %}Всі агроновини в одному місці{% endblock %}

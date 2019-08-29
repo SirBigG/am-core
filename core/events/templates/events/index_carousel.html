@@ -7,10 +7,10 @@
             <div class="carousel-inner">
                 {% for event in object_list %}
                 <div class="carousel-item {% if forloop.counter == 1 %}active{% endif %}">
-                    <img src="{%thumbnail event 800 500 %}" class="d-block w-100" alt="{{event.title}}">
+                    <img src="{%thumbnail event 800 500 %}" class="d-block" alt="{{event.title}}">
                     <div class="carousel-caption">
                         <h5 class="text-success">{{event.title}}</h5>
-                        <a class="btn btn-success" href="{{ event.get_absolute_url }}">Читати далі</a>
+                        <a class="btn btn-success stretched-link" href="{{ event.get_absolute_url }}">Читати далі</a>
                     </div>
                 </div>
                 {% endfor %}
