@@ -12,7 +12,7 @@
 
 {% block content %}
     <div class="mb-3">
-        {% cache 3600 'index_menu' %}
+        {% cache 60 'index_menu' %}
             {% index_categories %}
         {% endcache %}
     </div>

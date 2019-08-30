@@ -1,19 +1,22 @@
 {% load post_extras %}
 {% for root in roots %}
-    <div class="card mb-3">
-        <div class="card-header" id="{{ root.slug }}">
-            <h2 class="text-success h6">{{ root.value }}</h2>
-        </div>
-        <div>
-            <div class="card-body">
-                <ul class="list-group list-group-flush">
-                    {% for child in root.get_children %}
-                        <a class="text-success" href="/{{ child.slug }}/">
-                            <li class="list-group-item">{{ child.value }}</li>
-                        </a>
-                    {% endfor %}
-                </ul>
+    <div class="row mt-3">
+        <div class="col"><h2 class="h4 text-secondary">{{ root.value }}</h2></div>
+    </div>
+    <div class="row">
+        {% for child in root.get_children %}
+            <div class="col-md-3 col-6 mb-2">
+                <div class="card text-white">
+                    {% if child.image %}
+                    <img src="{{ child.image.url }}" class="card-img" alt="{{ child.value }}">
+                    {% endif %}
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">{{ child.value }}</h5>
+                        <a class="stretched-link" href="/{{ child.slug }}/"></a>
+                    </div>
+                </div>
+
             </div>
-        </div>
+        {% endfor %}
     </div>
 {% endfor %}

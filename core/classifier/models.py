@@ -1,7 +1,12 @@
+from io import BytesIO
+
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.files import File
 
 from mptt.models import MPTTModel, TreeForeignKey
+
+from PIL import Image
 
 from core.services.models import MetaData
 
@@ -92,6 +97,8 @@ class Category(MPTTModel):
     is_for_user = models.BooleanField(default=False, verbose_name=_('user relation for post category'))
     is_active = models.BooleanField(default=True, verbose_name=_('for feel on off'))
 
+    image = models.ImageField(upload_to='categories', blank=True, null=True)
+
     meta = models.OneToOneField(MetaData, on_delete=models.CASCADE, blank=True, null=True,
                                 verbose_name=_('category meta data'), related_name='category-meta-data+')
 
@@ -105,3 +112,26 @@ class Category(MPTTModel):
 
     def get_absolute_url(self):
         return '/%s/' % '/'.join(self.get_ancestors(include_self=True).values_list('slug', flat=True)[1:])
+
+    def save(self, *args, **kwargs):
+        if self.image:
+            HEIGHT = 200
+            WIDTH = 300
+            img = Image.open(BytesIO(self.image.read()))
+            hsize = int(float(img.size[1]) * float(WIDTH) / float(img.size[0]))
+            if hsize >= HEIGHT:
+                img = img.resize((WIDTH, hsize), Image.ANTIALIAS)
+                delta = hsize - HEIGHT if hsize > HEIGHT else 0
+                img = img.crop((0, delta / 2, WIDTH, hsize - (delta / 2)))
+            elif hsize < HEIGHT:
+                wsize = int(float(img.size[0]) * float(HEIGHT) / float(img.size[1]))
+                img = img.resize((wsize, HEIGHT), Image.ANTIALIAS)
+                delta = wsize - WIDTH if wsize > WIDTH else 0
+                img = img.crop((delta / 2, 0, wsize - (delta / 2), HEIGHT))
+            else:
+                # If not height resize with auto height
+                img = img.resize((WIDTH, hsize), Image.ANTIALIAS)
+            output = BytesIO()
+            img.save(output, 'JPEG')
+            self.image = File(output, name=self.image.name)
+        super().save(*args, **kwargs)
