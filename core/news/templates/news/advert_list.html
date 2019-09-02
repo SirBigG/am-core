@@ -13,7 +13,7 @@
 {% block page_title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
 
 {% block scripts %}
-    <script async src="{% static "js/popper.min.js" %}"></script>
+    <script src="{% static "js/popper.min.js" %}"></script>
     {{ block.super }}
 {% endblock scripts %}
 
