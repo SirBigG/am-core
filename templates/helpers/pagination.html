@@ -2,7 +2,7 @@
 
 <nav>
   {% if paginator.num_pages > 1 %}
-    <ul class="pagination">
+    <ul class="pagination overflow-auto">
         {% if page_obj.has_previous %}
             <li class="page-item"><a class="page-link" href="{{ request.path }}?page={{ page_obj.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a></li>
         {% else %}
