@@ -53,10 +53,15 @@ class PostList(ListView):
         context['category'] = category
         return context
 
+    def get_ordering(self):
+        if self.request.GET.get("order"):
+            return "title"
+        return self.ordering
+
     def get_queryset(self):
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
             'rubric').select_related('rubric__parent').select_related('rubric__meta').filter(
-            rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1)
+            rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1).order_by(self.get_ordering())
 
 
 class PostSearchView(ListView):

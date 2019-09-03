@@ -1,3 +1,7 @@
+import logging
+
+import requests
+
 from urllib.parse import urlparse
 
 from django import template
@@ -16,8 +20,7 @@ def main_menu():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    roots = Category.objects.filter(level=0).order_by("value")
-    return {'roots': roots}
+    return {'roots': Category.objects.filter(level=0).order_by("value")}
 
 
 @register.inclusion_tag('posts/index_categories.html')
@@ -30,8 +33,7 @@ def index_categories():
 
 @register.inclusion_tag('posts/second_menu.html')
 def second_menu(parent_slug, current_slug=None):
-    parent = Category.objects.get(slug=parent_slug)
-    return {'menu_items': parent.get_children(), 'slug': current_slug}
+    return {'menu_items': Category.objects.get(slug=parent_slug).get_children(), 'slug': current_slug}
 
 
 @register.inclusion_tag('posts/breadcrumbs.html')
@@ -46,10 +48,12 @@ def post_adverts(category):
     Creating main page menu.
     :return: rubric roots queryset
     """
-    print(category)
-    import requests
-    response = requests.get(f'{settings.API_HOST}/adverts?category={category.id}')
     adverts = []
+    try:
+        response = requests.get(f'{settings.API_HOST}/adverts?category={category.id}')
+    except Exception as e:
+        logging.error(e)
+        return {'adverts': adverts, "link": "/"}
     if response.status_code == 200:
         adverts = response.json()["items"][:4]
     return {'adverts': adverts, "link": f"/adverts/{category.slug}/"}
@@ -67,9 +71,7 @@ def full_url(url):
 
 @register.simple_tag
 def thumbnail(photo_obj, width=300, height=None):
-    if photo_obj:
-        return photo_obj.thumbnail(width, height)
-    return ''
+    return photo_obj.thumbnail(width, height) if photo_obj else ""
 
 
 @register.simple_tag
@@ -82,7 +84,7 @@ def static_version(path):
     version = getattr(settings, 'MEDIA_VERSION', '')
     _path = static(path)
     if version:
-        _path = '{0}?{1}'.format(_path, version)
+        _path = f'{_path}?{version}'
     return _path
 
 
