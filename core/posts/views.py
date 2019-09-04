@@ -73,8 +73,8 @@ class PostSearchView(ListView):
             SearchStatistic.objects.create(**{"fingerprint": "fingerprint",
                                               "search_phrase": self.request.GET.get('q')})
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').filter(text_search=SearchQuery(self.request.GET.get('q', ''),
-                                                              config='english'))
+            'rubric').select_related('rubric__parent').exclude(status=False).filter(
+            text_search=SearchQuery(self.request.GET.get('q', ''), config='english'))
 
 
 class PostDetail(DetailView):
