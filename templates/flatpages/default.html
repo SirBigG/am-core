@@ -1,70 +1,13 @@
-{% load i18n %}
-{% load static post_extras events_extras %}
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#24A824">
-    <title>{{ flatpage.title }} | AgroMega.in.ua</title>
-    <meta name="description" content="{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}">
-    <!-- For extra meta tags -->
-    {% block extra_meta %}
-        <meta content="{{ flatpage.title }}} | AgroMega.in.ua" property="og:title">
-        <meta content="{% trans 'Все про аграрну сферу і навіть більше.' %}" property="og:description">
-        <meta content="" property="og:image">
-        <meta content="https://agromega.in.ua" property="og:url">
-        <meta content="AgroMega.in.ua" property="og:site_name">
-    {% endblock extra_meta %}
-    {% block scripts %}
-        <script src="{% static "js/popper.min.js" %}"></script>
-        <script src="{% static "js/jquery.min.js" %}"></script>
-        <link rel="stylesheet" href="{% static "css/bootstrap.min.css" %}">
-        <script src="{% static "js/bootstrap.min.js" %}"></script>
-    {% endblock scripts %}
-</head>
-<body>
-{% block header %}
-    {% include 'header.html' %}
-{% endblock header %}
-<div class="container">
-    <div class="row">
-        <div class="col-12">
-            <h1 class="text-center h3">{{ flatpage.title }}</h1>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-12 col-lg-12">
-            {{ flatpage.content }}
-        </div>
-    </div>
-</div>
+{% extends "base.html" %}
 
-{% block extra_body %}{% endblock extra_body %}
+{% block extra_meta %}
+    <meta content="{{ flatpage.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ flatpage.content|truncatechars:300|striptags|safe }}" property="og:description">
+    <meta content="{{ request.path }}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+{% endblock extra_meta %}
 
-{% block footer %}
-    {% include 'footer.html' %}
-{% endblock footer %}
 
-<!-- Google Analytics -->
-<script>
-    (function (i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-            m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', 'https://www.google-analytics.com/analytics.js', 'ga');
-    ga('create', 'UA-99575306-1', 'auto');
-    ga('send', 'pageview');
-</script>
-<!-- /Google Analytics -->
+{% block page_title %}{{ flatpage.title }}{% endblock %}
 
-<script src='{% static_version "bundles/main.js" %}'></script>
-</body>
-</html>
+{% block content %}{{ flatpage.content }}{% endblock %}
