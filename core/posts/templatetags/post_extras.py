@@ -20,7 +20,7 @@ def main_menu():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    return {'roots': Category.objects.filter(level=0).order_by("value")}
+    return {'roots': Category.objects.filter(level=0, is_active=True).order_by("value")}
 
 
 @register.inclusion_tag('posts/index_categories.html')
