@@ -75,12 +75,12 @@
         </div>
 
         <hr>
-        <div class="m-1">
+        <div class="mt-3">
             {{ object.text|safe }}
-            {% if object.author %}<h5>{{ object.author }}</h5>{% endif %}
+            {% if object.author %}<h5 class="mt-2">Автор: {{ object.author }}</h5>{% endif %}
             {% if object.source %}
-                <div class="post-source">
-                    <h5>{% trans 'Source: ' %}{{ object.source }}</h5>
+                <div class="post-source mt-2 mb-3">
+                    <h5>{% trans 'Джерело: ' %}{{ object.source }}</h5>
                 </div>
             {% endif %}
         </div>

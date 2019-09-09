@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^rosetta/', include('rosetta.urls')),
     url(r'^sitemap\.xml', views.SiteMap.as_view(), name='sitemap'),
     url(r'^categories/$', TemplateView.as_view(template_name="categories.html"), name='categories'),
+    url(r'^create/$', TemplateView.as_view(template_name="add.html"), name='add'),
     url(r'social/', include('social_django.urls', namespace='social')),
     url(r'^api-auth/', include('rest_framework.urls',
                                namespace='rest_framework')),

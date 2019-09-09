@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% load i18n %}
+
+
+{% block content %}
+    <div class="col-12">
+        <h1 class="text-success">Додати публікацію</h1>
+    </div>
+    <form method="post" action="/publication/create/" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="form-group">
+                <div class="col-12">
+                    <label>{{ field.label }}</label>
+                </div>
+                {% for error in field.errors %}
+                    <div class="col-12">
+                        <p class="text-danger">{{ error }}</p>
+                    </div>
+                {% endfor %}
+                <div class="col-12">
+                    {{ field }}
+                </div>
+            </div>
+        {% endfor %}
+        <div class="col-12">
+            <button type="submit" class="btn btn-success mb-3">{% trans 'Опублікувати' %}</button>
+        </div>
+    </form>
+    {{ form.media }}
+{% endblock %}

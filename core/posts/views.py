@@ -1,10 +1,12 @@
-from django.views.generic import ListView, DetailView, TemplateView
+from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchQuery
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 
 from core.posts.models import Post, SearchStatistic
+from core.posts.forms import PostForm
+
 from core.classifier.models import Category
 
 
@@ -85,6 +87,15 @@ class PostDetail(DetailView):
     template_name = 'posts/detail.html'
 
 
+class PostFormView(FormView):
+    form_class = PostForm
+    template_name = "posts/form.html"
+
+    def form_valid(self, form):
+        instance = form.save()
+        return HttpResponseRedirect(instance.get_absolute_url())
+
+
 class SiteMap(TemplateView):
     template_name = 'sitemap.xml'
 
@@ -95,7 +106,7 @@ class SiteMap(TemplateView):
         context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.select_related(
             'rubric').prefetch_related('rubric__parent').filter(status=1).exclude(rubric__slug__contains='-user')]
         context['urls'].extend([f"{settings.HOST}/{slug}/" for slug in Category.objects.filter(
-            level=1).exclude(slug__contains='-user').values_list('slug', flat=True)])
+            level=1, is_active=True).exclude(slug__contains='-user').values_list('slug', flat=True)])
         context['urls'].extend([f"{settings.HOST}/events/{slug}.html" for slug in Event.objects.filter(
             status=1).values_list('slug', flat=True)])
         context["urls"].extend([f"{settings.HOST}/events/", f"{settings.HOST}/news/", f"{settings.HOST}/adverts/"])
