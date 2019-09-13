@@ -12,11 +12,6 @@
 
 {% block page_title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
 
-{% block scripts %}
-    <script src="{% static "js/popper.min.js" %}"></script>
-    {{ block.super }}
-{% endblock scripts %}
-
 {% block content %}
     <div class="alert alert-warning" role="alert">
         Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що
