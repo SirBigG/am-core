@@ -13,11 +13,15 @@
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
     <link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fingerprintjs2/2.0.6/fingerprint2.min.js"></script>
     {% if "-user" in object.rubric.slug %}
         <meta name="robots" content="noindex, nofollow">
     {% endif %}
 {% endblock extra_meta %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-detail.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/detail.css" %}">
+{% endblock scripts %}
 
 {% block second_menu %}
     {% cache 3600 'second_menu' view.kwargs.parent category.slug %}
@@ -25,7 +29,7 @@
     {% endcache %}
 {% endblock second_menu %}
 
-{% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}{% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="30px" width="45px">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
+{% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}{% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="25px" width="35px">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
 
 {% block breadcrumbs %}
     {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
@@ -84,29 +88,26 @@
                 </div>
             {% endif %}
         </div>
-        <div class="row">
-            <div class="col-12">
-                <ul class="nav nav-pills float-left">
-                    <li class="nav-item"><span class="text-success h5"><i
-                            class="icon-eye"></i> {{ object.hits }}</span>
-                    </li>
-                </ul>
-                <ul class="nav nav-pills float-right">
-                    <li class="nav-item">
-                        <a class="nav-link" tabindex="-1" target="Share-in-facebook"
+
+            <div class="col-12 d-flex justify-content-between mb-3">
+                        <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
+                        <a class="h5" tabindex="-1" target="Share-in-facebook"
                            onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
                            href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
-                            <i class="icon-facebook h4"></i>
+                            <i class="icon-facebook"></i>
                         </a>
-                    </li>
-                </ul>
             </div>
-            <div class="col-12 mb-4" id="useful__wrapper">
-                <span class="h6 mr-4">Публікація корисна?</span>
-                <button class="btn btn-success mr-2" id="useful">Так</button>
+            <div class="post_id_value" id="{{ object.id }}"></div>
+            <div class="col-12 mb-3" id="useful__wrapper">
+                <div class="row d-flex justify-content-center">
+                <span class="h5">Публікація корисна?</span>
+                    </div>
+                <div class="row d-flex justify-content-center">
+                <button class="btn btn-success mr-3" id="useful">Так</button>
                 <button class="btn btn-danger" id="notuseful">Ні</button>
+                    </div>
             </div>
-        </div>
+
 
         {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
             {% post_adverts object.rubric.parent %}
@@ -115,75 +116,3 @@
         {{ obj.link|get_domain }}
     </div>
 {% endblock content %}
-
-
-{% block extra_footerscript %}
-    <script type="text/javascript">
-        function getCookie(name) {
-            var matches = document.cookie.match(new RegExp(
-                "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-            ));
-            return matches ? decodeURIComponent(matches[1]) : undefined;
-        }
-
-        function usefull(status) {
-            Fingerprint2.get(function (components) {
-                const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) {
-                    return pair.value;
-                }).join(), 31);
-                $.ajax({
-                    type: 'POST',
-                    beforeSend: function (request) {
-                        request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
-                    },
-                    url: '/api/post/useful/',
-                    contentType: "application/json; charset=utf-8",
-                    data: JSON.stringify({
-                        "fingerprint": fingerprint,
-                        "post_id": {{ object.id }},
-                        "is_useful": status
-                    }),
-                    success: function (res) {
-                        $('#useful__wrapper').html('<span className="h6 text-success">Дякуємо за відгук! Ваш голос буде враховано при публікації контенту.</span>');
-                    },
-                    error: function (res) {
-                        console.log(res)
-                    }
-                });
-            });
-        }
-
-        $('body').on('click', '#useful', function () {
-            "use strict";
-            usefull(true)
-        });
-        $('body').on('click', '#notuseful', function () {
-            "use strict";
-            usefull(false)
-        });
-        window.onload = Fingerprint2.get(function (components) {
-            "use strict";
-            const fingerprint = Fingerprint2.x64hash128(components.map(function (pair) {
-                return pair.value;
-            }).join(), 31);
-            $.ajax({
-                type: 'POST',
-                url: '/api/post/view/',
-                beforeSend: function (request) {
-                    request.setRequestHeader("X-CSRFToken", getCookie("csrftoken"),);
-                },
-                contentType: "application/json; charset=utf-8",
-                data: JSON.stringify({
-                    "fingerprint": fingerprint,
-                    "post_id": {{ object.id }}
-                }),
-                success: function (res) {
-                    console.log("success view");
-                },
-                error: function (res) {
-                    console.log(res);
-                }
-            });
-        });
-    </script>
-{% endblock %}

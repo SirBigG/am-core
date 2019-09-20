@@ -2,6 +2,11 @@
 
 {% load post_extras events_extras cache %}
 
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/add.css" %}">
+{% endblock scripts %}
+
 {% block content %}
     <div class="row">
         <div class="col-md-6 col-12">

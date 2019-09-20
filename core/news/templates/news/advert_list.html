@@ -2,6 +2,11 @@
 
 {% load cache post_extras news_extras static %}
 
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock scripts %}
+
 {% block extra_meta %}
     <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %} | AgroMega.in.ua" property="og:title">
     <meta content="Свіжі оголошення аграрної тематики {% if category %} в категорії {{ category.value }} {% endif %}." property="og:description">
@@ -13,7 +18,7 @@
 {% block page_title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
 
 {% block content %}
-    <div class="alert alert-warning" role="alert">
+    <div class="alert alert-success" role="alert">
         Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що
         Ви з нами!
     </div>

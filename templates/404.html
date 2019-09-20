@@ -1,6 +1,11 @@
 {% extends "base.html" %}
 
-{% load i18n %}
+{% load i18n post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/main.css" %}">
+{% endblock scripts %}
 
 {% block content %}
     <h1 class="text-center">404</h1>

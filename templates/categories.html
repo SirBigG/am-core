@@ -10,6 +10,11 @@
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
 
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/categories.css" %}">
+{% endblock scripts %}
+
 {% block content %}
     <div class="mb-3">
         {% cache 60 'index_menu' %}

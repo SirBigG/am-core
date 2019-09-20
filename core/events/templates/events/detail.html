@@ -3,6 +3,11 @@
 {% load staticfiles i18n %}
 {% load cache post_extras %}
 
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/detail.css" %}">
+{% endblock scripts %}
+
 {% block title %}{{ object.title }} |{% endblock title %}
 
 {% block meta_description %}{{ object.text|truncatechars:300|striptags|safe }}{% endblock %}

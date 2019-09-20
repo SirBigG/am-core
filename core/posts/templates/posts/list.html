@@ -1,5 +1,12 @@
 {% extends "posts/parent_index.html" %}
 
+{% load post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock scripts %}
+
 {% block extra_meta %}
     {% if "-user" in category.slug %}
         <meta name="robots" content="noindex, nofollow">

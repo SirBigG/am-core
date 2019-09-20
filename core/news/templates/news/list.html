@@ -2,6 +2,11 @@
 
 {% load post_extras %}
 
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock scripts %}
+
 {% block extra_meta %}
     <meta content="Всі агроновини в одному місці | AgroMega.in.ua" property="og:title">
     <meta content="Новини агросектору. Стрічка найсвіжіших агроновин бізнесу та сфери в цілому." property="og:description">
