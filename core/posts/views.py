@@ -1,8 +1,9 @@
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
-from django.contrib.postgres.search import SearchQuery
+from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.http import Http404, HttpResponseRedirect
+from django.db.models import F
 
 from core.posts.models import Post, SearchStatistic
 from core.posts.forms import PostForm
@@ -75,8 +76,9 @@ class PostSearchView(ListView):
             SearchStatistic.objects.create(**{"fingerprint": "fingerprint",
                                               "search_phrase": self.request.GET.get('q')})
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').exclude(status=False).filter(
-            text_search=SearchQuery(self.request.GET.get('q', ''), config='english'))
+            'rubric').select_related('rubric__parent').exclude(status=False).annotate(
+            rank=SearchRank(F('text_search'), SearchQuery(self.request.GET.get('q', ''),
+                                                          config='english'))).filter(rank__gte=0.03).order_by('-rank')
 
 
 class PostDetail(DetailView):
