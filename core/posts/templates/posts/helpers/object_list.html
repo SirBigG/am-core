@@ -10,8 +10,7 @@
                     <h2 class="card-title h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="20px" width="30px" >{{post.country.value}}</object>{% endwith %}{% endif %}</h2>
                     <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="text-right mt-3">
-                        <a class="btn text-success stretched-link" href="{{ post.get_absolute_url }}"
-                           style="text-decoration: none;outline: 0;">Докладніше</a>
+                        <a class="text-success stretched-link no-decoration" href="{{ post.get_absolute_url }}">Докладніше</a>
                     </div>
                 </div>
             </div>

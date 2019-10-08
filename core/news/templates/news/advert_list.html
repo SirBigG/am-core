@@ -29,7 +29,7 @@
     </div>
     {% for obj in object_list %}
         <div class="row">
-            <div class="card mb-3" style="width: 100%;">
+            <div class="card mb-3 w-100">
                 <div class="row no-gutters">
                     <div class="col-md-4 col-12">
                         {% if obj.data.image %}
@@ -63,7 +63,7 @@
                                 <div class="col-6">
                                     <button class="btn text-success"
                                             onclick="ga('send', 'event', '{{ obj.link|get_domain }}', 'clicked'); window.open('{{ obj.link }}', '_blank')">
-                                        Докладніше <i class="icon-right-big" aria-hidden="true"></i></button>
+                                        Докладніше</button>
                                 </div>
                             </div>
                         </div>

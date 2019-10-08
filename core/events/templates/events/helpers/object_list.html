@@ -9,16 +9,12 @@
             </div>
             <div class="col-md-8">
                 <div class="card-body">
-                    <a href="{{ event.get_absolute_url }}" style="text-decoration: none;outline: 0;">
-
-
+                    <a href="{{ event.get_absolute_url }}" class="no-decoration">
                         <h2 class="card-title text-success text-center h4">{{ event.title }}</h2>
-
                     </a>
                     <div class="card-text">{{ event.text|striptags|safe|truncatechars:200 }}</div>
                     <div class="text-right mt-3">
-                        <a class="btn btn-outline-success" href="{{ event.get_absolute_url }}"
-                           style="text-decoration: none;outline: 0;">Читати далі <i class="icon-right-big" aria-hidden="true"></i></a>
+                        <a class="text-success stretched-link no-decoration" href="{{ event.get_absolute_url }}">Докладніше</a>
                     </div>
                 </div>
             </div>

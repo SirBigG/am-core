@@ -22,7 +22,7 @@
         на новини в Telegram <i class="icon-paper-plane"></i></a>
     {% for obj in object_list %}
         <div class="row">
-            <div class="card mb-3" style="width: 100%;">
+            <div class="card mb-3 w-100">
                 <div class="row no-gutters">
                     <div class="col-md-4 col-12">
                         {% if obj.data.image %}
@@ -41,8 +41,7 @@
                                 </div>
                                 <div class="col-6 align-self-center">
                                     <button class="btn text-success"
-                                            onclick="window.open('{{ obj.data.link }}', '_blank')">Докладніше <i
-                                            class="icon-right-big" aria-hidden="true"></i></button>
+                                            onclick="window.open('{{ obj.data.link }}', '_blank')">Докладніше</button>
                                 </div>
                             </div>
                         </div>
