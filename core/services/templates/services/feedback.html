@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
-{% load i18n %}
+{% load i18n post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/form.css" %}">
+{% endblock scripts %}
 
 {% block content %}
 <h2 class="text-secondary">{% trans 'Зв’яжіться з нами' %}</h2>

@@ -23,15 +23,21 @@
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-success" href="/feedback/">Зворотний зв'язок</a>
                 <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/page/about/">Про нас</a>
                 <a class="dropdown-item" href="/page/privacy_policy/">Конфіденційність</a>
             </div>
         </div>
     </div>
 </div>
 <footer class="navbar navbar-light d-none d-sm-block">
-    <ul class="nav d-flex justify-content-around">
-        <li class="nav-item"><p>© 2019 AgroMega</p></li>
-        <li class="nav-item"><a href="/page/privacy_policy/" class="btn">{% trans "Політика конфіденційності" %}</a>
-        </li>
+    <ul class="nav">
+        <div class="col-6 d-flex justify-content-center">
+            <li class="nav-item"><p>© 2019 AgroMega</p></li>
+        </div>
+        <div class="col-6 d-flex justify-content-center">
+            <li class="nav-item"><a href="/page/about/" class="btn">{% trans "Про нас" %}</a></li>
+            <li class="nav-item"><a href="/page/privacy_policy/" class="btn">{% trans "Політика конфіденційності" %}</a></li>
+            <li class="nav-item"><a href="/feedback/" class="btn">{% trans "Зворотній зв'язок" %}</a></li>
+        </div>
     </ul>
 </footer>

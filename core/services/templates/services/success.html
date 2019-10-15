@@ -1,3 +1,12 @@
-{% load i18n %}
+{% extends "base.html" %}
 
-<h2 class="text-center text-success">{% trans 'Повідомлення відправлено! Дякуємо!' %}</h2>
+{% load i18n post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/main.css" %}">
+{% endblock scripts %}
+
+{% block content %}
+    <h2 class="text-center text-success">{% trans 'Повідомлення відправлено! Дякуємо!' %}</h2>
+{% endblock content %}
