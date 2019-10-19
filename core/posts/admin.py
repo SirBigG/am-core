@@ -3,7 +3,7 @@ from django import forms
 from django.utils import six
 from django.db.models import Count
 
-from .models import Post, Photo, Comment, ParsedMap, Link, ParsedPost, PostView, UsefulStatistic, SearchStatistic
+from .models import Post, Photo, ParsedMap, Link, ParsedPost, PostView, UsefulStatistic, SearchStatistic
 
 from core.classifier.models import Category
 
@@ -188,7 +188,6 @@ class SearchStatisticAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin)
-admin.site.register(Comment)
 admin.site.register(ParsedMap, ParsedMapAdmin)
 admin.site.register(ParsedPost, ParsedPostAdmin)
 admin.site.register(Link, LinkAdmin)

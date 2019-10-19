@@ -3,8 +3,7 @@ import os
 from django.test import TestCase
 from django.conf import settings
 
-from core.utils.tests.factories import PostFactory, PhotoFactory, CommentFactory, \
-    CategoryFactory
+from core.utils.tests.factories import PostFactory, PhotoFactory, CategoryFactory
 
 from core.classifier.models import Category
 
@@ -70,12 +69,3 @@ class PhotoDeleteTest(TestCase):
         import os
         with self.assertRaises(FileNotFoundError):
             os.remove(path)
-
-
-class CommentTests(TestCase):
-
-    def setUp(self):
-        self.comment = CommentFactory()
-
-    def test_str_representation(self):
-        self.assertEqual(str(self.comment), 'John')

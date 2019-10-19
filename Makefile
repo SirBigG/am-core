@@ -11,10 +11,10 @@ update:
 test: test_core test_api flake
 
 test_core:
-	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test --settings=$(TEST_SETTINGS)
+	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(TEST_SETTINGS) ./$(MANAGE) test --settings=$(TEST_SETTINGS)
 
 test_api:
-	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) test api --settings=$(TEST_SETTINGS)
+	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(TEST_SETTINGS) ./$(MANAGE) test api --settings=$(TEST_SETTINGS)
 
 flake:
 	flake8 --exclude '*migrations*' core api

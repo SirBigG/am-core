@@ -3,9 +3,7 @@ from django.contrib.flatpages.admin import FlatPageAdmin
 from django.contrib.flatpages.models import FlatPage
 from django.utils.translation import gettext_lazy as _
 
-from core.services.models import Feedback, MetaData, Comments, Reviews
-
-from mptt.admin import DraggableMPTTAdmin
+from core.services.models import Feedback, MetaData, Reviews
 
 
 class FeedbackAdmin(admin.ModelAdmin):
@@ -31,5 +29,4 @@ admin.site.unregister(FlatPage)
 admin.site.register(FlatPage, FlatPageAdmin)
 admin.site.register(Feedback, FeedbackAdmin)
 admin.site.register(MetaData)
-admin.site.register(Comments, DraggableMPTTAdmin)
 admin.site.register(Reviews)

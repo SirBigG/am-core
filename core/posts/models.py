@@ -162,22 +162,6 @@ class Photo(models.Model):
         os.remove(path)
 
 
-class Comment(models.Model):
-    """Post comments model."""
-    post = models.ForeignKey(Post, on_delete=models.CASCADE, verbose_name=_('post of comment'))
-    text = models.TextField(verbose_name=_('comment text'))
-    date = models.DateTimeField(_('comment date'), default=timezone.now)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('comment owner'))
-
-    class Meta:
-        db_table = 'comment'
-        verbose_name = _('Comment')
-        verbose_name_plural = _('Comments')
-
-    def __str__(self):
-        return str(self.user)
-
-
 class ParsedMap(models.Model):
     host = models.CharField(max_length=255)
     link = models.CharField(max_length=500)

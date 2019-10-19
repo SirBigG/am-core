@@ -1,10 +1,9 @@
 import factory
 
 from core.pro_auth.models import User
-from core.classifier.models import Location, Country, Region, \
-    Area, Category
-from core.posts.models import Post, Photo, Comment
-from core.services.models import Feedback, MetaData, Comments, Reviews
+from core.classifier.models import Location, Country, Region, Area, Category
+from core.posts.models import Post, Photo
+from core.services.models import Feedback, MetaData, Reviews
 from core.events.models import Event, EventType
 from core.news.models import News
 
@@ -129,16 +128,6 @@ class PhotoFactory(BaseFactory):
     post = factory.SubFactory(PostFactory)
 
 
-class CommentFactory(BaseFactory):
-    """Creation comments for posts."""
-    class Meta:
-        model = Comment
-
-    post = factory.SubFactory(PostFactory)
-    text = u'Коментарій'
-    user = factory.SubFactory(UserFactory)
-
-
 # ##################   Services factories     ####################### #
 
 
@@ -159,13 +148,6 @@ class MetaDataFactory(BaseFactory):
     title = 'title'
     description = 'description'
     h1 = 'h1'
-
-
-class CommentsFactory(BaseFactory):
-    class Meta:
-        model = Comments
-
-    text = 'comment text'
 
 
 class ReviewsFactory(BaseFactory):
