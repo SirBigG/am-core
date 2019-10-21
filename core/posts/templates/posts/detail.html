@@ -2,13 +2,17 @@
 
 {% load staticfiles i18n cache post_extras %}
 
-{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}{% endblock title %}
+{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
+{% endif %}{% endblock title %}
 
-{% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}{% endblock %}
+{% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}
+    {{ object.text|truncatechars:300|striptags|safe }}{% endif %}{% endblock %}
 
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
-    <meta content="{% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}" property="og:description">
+    <meta content="
+            {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}"
+          property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
@@ -29,7 +33,10 @@
     {% endcache %}
 {% endblock second_menu %}
 
-{% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}{% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="25px" width="35px">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
+{% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}
+    {% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}
+        <object type="image/svg+xml" data="{% static flag_static %}" height="25px"
+                width="35px">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
 
 {% block breadcrumbs %}
     {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
@@ -72,13 +79,8 @@
         </div>
     </div>
     <div class="col-md-8 col-12">
-        <div class="h4">
-            {% for tag in object.tags.all %}
-                <span class="badge badge-pill badge-success mt-3 mr-1">{{ tag.name }}</span>
-            {% endfor %}
-        </div>
-
-        <hr>
+        <div class="h4">{% for tag in object.tags.all %}
+            <span class="badge badge-pill badge-success mt-3 mr-1">{{ tag.name }}</span>{% endfor %}</div>
         <div class="mt-3">
             {{ object.text|safe }}
             {% if object.author %}<h5 class="mt-2">Автор: {{ object.author }}</h5>{% endif %}
@@ -89,30 +91,29 @@
             {% endif %}
         </div>
 
-            <div class="col-12 d-flex justify-content-between mb-3">
-                        <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
-                        <a class="h5" tabindex="-1" target="Share-in-facebook"
-                           onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                           href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
-                            <i class="icon-facebook"></i>
-                        </a>
-            </div>
-            <div class="post_id_value" id="{{ object.id }}"></div>
-            <div class="col-12 mb-3" id="useful__wrapper">
-                <div class="row d-flex justify-content-center">
+        <div class="col-12 d-flex justify-content-between mb-3">
+            <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
+            <a class="h5" tabindex="-1" target="Share-in-facebook"
+               onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+               href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+                <i class="icon-facebook"></i>
+            </a>
+        </div>
+        <div class="post_id_value" id="{{ object.id }}"></div>
+        <div class="col-12 mb-3" id="useful__wrapper">
+            <div class="row d-flex justify-content-center">
                 <span class="h5">Публікація корисна?</span>
-                    </div>
-                <div class="row d-flex justify-content-center">
+            </div>
+            <div class="row d-flex justify-content-center">
                 <button class="btn btn-success mr-3" id="useful">Так</button>
                 <button class="btn btn-danger" id="notuseful">Ні</button>
-                    </div>
             </div>
-
-
+        </div>
+        {% cache 300 'relative_list' object.rubric.slug %}
+            {% relative_posts object.rubric %}
+        {% endcache %}
         {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
             {% post_adverts object.rubric.parent %}
         {% endcache %}
-
-        {{ obj.link|get_domain }}
     </div>
 {% endblock content %}

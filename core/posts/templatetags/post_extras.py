@@ -10,6 +10,8 @@ from django.templatetags.static import static
 
 from core.classifier.models import Category
 
+from core.posts.models import Post
+
 
 register = template.Library()
 
@@ -57,6 +59,12 @@ def post_adverts(category):
     if response.status_code == 200:
         adverts = response.json()["items"][:4]
     return {'adverts': adverts, "link": f"/adverts/{category.slug}/"}
+
+
+@register.inclusion_tag('posts/relative_posts.html')
+def relative_posts(category):
+    return {"posts": Post.objects.prefetch_related('photo').select_related(
+            'rubric').select_related('rubric__parent').filter(rubric=category, status=1).order_by("?")[:4]}
 
 
 @register.simple_tag
