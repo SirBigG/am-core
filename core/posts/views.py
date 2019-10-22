@@ -78,7 +78,7 @@ class PostSearchView(ListView):
         return Post.objects.select_related('country').prefetch_related('photo').select_related(
             'rubric').select_related('rubric__parent').exclude(status=False).annotate(
             rank=SearchRank(F('text_search'), SearchQuery(self.request.GET.get('q', ''),
-                                                          config='english'))).filter(rank__gte=0.03).order_by('-rank')
+                                                          config='english'))).filter(rank__gt=0).order_by('-rank')
 
 
 class PostDetail(DetailView):
