@@ -18,7 +18,7 @@ mccabe==0.5.1
 pep8==1.7.0
 phonenumbers==7.5.1
 phonenumberslite==7.5.1
-Pillow==5.0.0
+Pillow==6.2.0
 polib==1.0.7
 psycopg2==2.6.2
 pycodestyle==2.0.0
