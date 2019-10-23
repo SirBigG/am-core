@@ -92,7 +92,7 @@ class PostAdmin(admin.ModelAdmin):
         PhotoInLine,
     ]
     list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', 'tag_list', 'has_photo')
-    readonly_fields = ('slug', 'hits',)
+    readonly_fields = ('slug', 'hits', 'absolute_url',)
     raw_id_fields = ('publisher',)
     list_filter = (CategoryFilter, HasPhotoFilter, 'status')
     actions = [activate_posts]
@@ -109,7 +109,7 @@ class PostAdmin(admin.ModelAdmin):
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('work_status', 'author', 'source', 'publisher', 'publish_date', 'hits', 'slug'),
+            'fields': ('work_status', 'author', 'source', 'publisher', 'publish_date', 'hits', 'slug', 'absolute_url'),
         }),
     )
 

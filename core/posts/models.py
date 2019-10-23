@@ -60,6 +60,8 @@ class Post(models.Model):
     country = models.ForeignKey(Country, on_delete=models.CASCADE, blank=True, null=True,
                                 verbose_name=_('post country'))
 
+    absolute_url = models.CharField(max_length=512, default="")
+
     tags = TaggableManager()
 
     text_search = SearchVectorField(null=True)
@@ -93,8 +95,14 @@ class Post(models.Model):
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
-        return reverse('post-detail', args=(self.rubric.parent.slug, self.rubric.slug,
-                                            self.slug, self.pk,))
+        if self.absolute_url:
+            return self.absolute_url
+        # Set absolute url value for quick get
+        # Upgrade absolute url if not set
+        self.absolute_url = reverse('post-detail', args=(self.rubric.parent.slug, self.rubric.slug,
+                                                         self.slug, self.pk,))
+        self.save()
+        return self.absolute_url
 
 
 class Photo(models.Model):
