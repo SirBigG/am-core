@@ -16,8 +16,7 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').filter(status=1)[:10]
+        context['object_list'] = Post.objects.select_objects().active()[:10]
         return context
 
 
@@ -31,9 +30,8 @@ class ParentRubricView(TemplateView):
         """
         context = super().get_context_data(**kwargs)
         context['category'] = get_object_or_404(Category, slug=self.kwargs['parent'])
-        context['object_list'] = Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').select_related('rubric__meta').filter(
-            rubric__parent_id=context['category'].pk, status=1)[:4]
+        context['object_list'] = Post.objects.select_objects().filter(
+            rubric__parent_id=context['category'].pk).active()[:4]
         return context
 
 
@@ -62,9 +60,8 @@ class PostList(ListView):
         return self.ordering
 
     def get_queryset(self):
-        return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').select_related('rubric__meta').filter(
-            rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id, status=1).order_by(self.get_ordering())
+        return Post.objects.select_objects().filter(
+            rubric_id=get_object_or_404(Category, slug=self.kwargs['child']).id).active().order_by(self.get_ordering())
 
 
 class PostSearchView(ListView):
@@ -75,8 +72,7 @@ class PostSearchView(ListView):
         if self.request.GET.get('q', ''):
             SearchStatistic.objects.create(**{"fingerprint": "fingerprint",
                                               "search_phrase": self.request.GET.get('q')})
-        return Post.objects.select_related('country').prefetch_related('photo').select_related(
-            'rubric').select_related('rubric__parent').exclude(status=False).annotate(
+        return Post.objects.select_objects().active().annotate(
             rank=SearchRank(F('text_search'), SearchQuery(self.request.GET.get('q', ''),
                                                           config='english'))).filter(rank__gt=0).order_by('-rank')
 

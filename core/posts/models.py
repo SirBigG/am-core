@@ -32,6 +32,15 @@ WORK_STATUS = (
 )
 
 
+class PostQuerySet(models.QuerySet):
+    def select_objects(self):
+        return self.select_related('country').prefetch_related('photo').select_related(
+            'rubric').select_related('rubric__parent').select_related('rubric__meta')
+
+    def active(self):
+        return self.filter(status=True)
+
+
 class Post(models.Model):
     """Posts model."""
     title = models.CharField(max_length=500, verbose_name=_('post title'))
@@ -65,6 +74,8 @@ class Post(models.Model):
     tags = TaggableManager()
 
     text_search = SearchVectorField(null=True)
+
+    objects = PostQuerySet.as_manager()
 
     class Meta:
         db_table = 'post'

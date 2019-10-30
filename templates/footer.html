@@ -29,15 +29,37 @@
         </div>
     </div>
 </div>
-<footer class="navbar navbar-light d-none d-sm-block">
-    <ul class="nav">
-        <div class="col-6 d-flex justify-content-center">
-            <li class="nav-item"><p>© 2019 AgroMega</p></li>
+<footer class="page-footer bg-dark d-none d-sm-block">
+    <div class="container">
+        <div class="row">
+        <div class="col-4 mx-auto">
+            <h5 class="font-weight-bold text-uppercase text-white mt-3 mb-4">Про нас</h5>
+            <ul class="list-unstyled">
+                <li class="mb-1"><a href="/page/about/" class="no-decoration text-white">{% trans "Про нас" %}</a></li>
+                <li class="mb-1"><a href="/page/privacy_policy/" class="no-decoration text-white">{% trans "Політика конфіденційності" %}</a></li>
+                <li class="mb-1"><a href="/feedback/" class="no-decoration text-white">{% trans "Зворотній зв'язок" %}</a></li>
+            </ul>
         </div>
-        <div class="col-6 d-flex justify-content-center">
-            <li class="nav-item"><a href="/page/about/" class="btn">{% trans "Про нас" %}</a></li>
-            <li class="nav-item"><a href="/page/privacy_policy/" class="btn">{% trans "Політика конфіденційності" %}</a></li>
-            <li class="nav-item"><a href="/feedback/" class="btn">{% trans "Зворотній зв'язок" %}</a></li>
+        <hr class="clearfix w-100 d-md-none">
+        <div class="col-4 mx-auto">
+            <h5 class="font-weight-bold text-uppercase text-white mt-3 mb-4">Почитати</h5>
+            <ul class="list-unstyled">
+                <li class="mb-1"><a class="no-decoration text-white" href="/categories/">Публікації</a></li>
+                <li class="mb-1"><a class="no-decoration text-white" href="/news/">Новини</a></li>
+                <li class="mb-1"><a class="no-decoration text-white" href="/adverts/">Оголошення</a></li>
+                <li class="mb-1"><a class="no-decoration text-white" href="/events/">Події</a></li>
+            </ul>
         </div>
-    </ul>
+        <hr class="clearfix w-100 d-md-none">
+        <div class="col-4 mx-auto">
+            <h5 class="font-weight-bold text-uppercase text-white mt-3 mb-4">Соцмережі</h5>
+            <ul class="list-unstyled">
+                <li><a href="https://www.facebook.com/agromega.in.ua/" class="h5 text-primary"><i class="icon-facebook"></i></a></li>
+            </ul>
+        </div>
+    </div>
+        </div>
+    <div class="footer-copyright text-center text-success py-3">
+        © 2019 AgroMega
+    </div>
 </footer>

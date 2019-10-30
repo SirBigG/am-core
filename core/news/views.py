@@ -71,9 +71,6 @@ class AdvertListView(TemplateView):
             context["object_list"] = []
             return context
 
-        # qs = News.objects.all()
-        # if self.request.GET.get("from"):
-        #    qs = qs.filter(date__gte=datetime.fromtimestamp(int(self.request.GET.get("from"))))
         adverts = response.json()
         _has_previous = False
         _has_next = False
