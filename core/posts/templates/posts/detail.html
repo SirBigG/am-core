@@ -46,7 +46,7 @@
 
 {% block content %}
     <div class="row">
-        <img alt="{{ object.title }}" src="{% thumbnail object.photo.all.0 800 %}" class="d-block w-100 img-fluid"/>
+        <img alt="{{ object.title }}" src="{% thumbnail object.photo.all.0 800 %}" class="img-fluid"/>
     </div>
     <div class="col-12 p-0">
         <div class="h4">{% for tag in object.tags.all %}
