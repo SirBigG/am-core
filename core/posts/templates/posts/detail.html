@@ -54,7 +54,7 @@
     </div>
     <div class="col-12 p-0 mt-2">
         {% if object.photo.count > 1 %}<a href="/gallery/{{ object.id }}/" class="btn btn-success">Всі фото</a>{% endif %}
-        <a href="/gallery/add/{{ object.id }}/" class="btn btn-success">Завантажити фото</a>
+        <a href="/gallery/add/{{ object.id }}/" class="btn btn-success">Завантажити фото публікації</a>
     </div>
     <div class="col-12 p-0">
         <div>{% for tag in object.tags.all %}

@@ -12,7 +12,7 @@
 {% block base_content_block %}
     <div class="col-12">
         <a href="{{ post.get_absolute_url }}" class="btn btn-link mb-3">До публікації</a>
-        <a href="/gallery/add/{{ post.id }}/" class="btn btn-success btn-sm mb-3">Завантажити фото</a>
+        <a href="/gallery/add/{{ post.id }}/" class="btn btn-success btn-sm mb-3">Завантажити фото публікації</a>
     </div>
     <div class="col-12">
         {% for photo in object_list %}
