@@ -5,8 +5,8 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.http import Http404, HttpResponseRedirect
 from django.db.models import F
 
-from core.posts.models import Post, SearchStatistic
-from core.posts.forms import PostForm
+from core.posts.models import Post, SearchStatistic, Photo
+from core.posts.forms import PostForm, PhotoForm
 
 from core.classifier.models import Category
 
@@ -109,3 +109,28 @@ class SiteMap(TemplateView):
             status=1).values_list('slug', flat=True)])
         context["urls"].extend([f"{settings.HOST}/events/", f"{settings.HOST}/news/", f"{settings.HOST}/adverts/"])
         return context
+
+
+class GalleryView(ListView):
+    paginate_by = 48
+    template_name = 'posts/gallery.html'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(object_list=object_list, **kwargs)
+        context['post'] = Post.objects.filter(pk=self.kwargs.get('post_id')).first()
+        return context
+
+    def get_queryset(self):
+        return Photo.objects.filter(post_id=self.kwargs.get('post_id'))
+
+
+class AddPhotoView(FormView):
+    form_class = PhotoForm
+    template_name = 'posts/photo_form.html'
+
+    def get_initial(self):
+        return {'post_id': self.kwargs.get('post_id')}
+
+    def form_valid(self, form):
+        instance = form.save()
+        return HttpResponseRedirect(instance.post.get_absolute_url())

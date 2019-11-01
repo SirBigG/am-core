@@ -48,3 +48,26 @@ class PostForm(forms.ModelForm):
             for i in images:
                 Photo.objects.create(image=i, post=instance)
         return instance
+
+
+class PhotoForm(forms.ModelForm):
+    post_id = forms.IntegerField(widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            field.widget.attrs['class'] = "form-control"
+
+    class Meta:
+        model = Photo
+        fields = ['image', 'description', 'author', 'post_id']
+
+        labels = {
+            'image': _("Фото (обов'язкове)"),
+            'description': _('Короткий опис'),
+            'author': _('Автор'),
+        }
+
+    def save(self, commit=True):
+        self.instance.post_id = self.initial.get('post_id')
+        return super().save()

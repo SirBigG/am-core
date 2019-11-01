@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-gallery.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/gallery.css" %}">
+{% endblock scripts %}
+
+{% block page_title %}{{ post.title }} фото{% endblock %}
+
+{% block base_content_block %}
+    <div class="col-12">
+        <a href="{{ post.get_absolute_url }}" class="btn btn-link mb-3">До публікації</a>
+        <a href="/gallery/add/{{ post.id }}/" class="btn btn-success btn-sm mb-3">Завантажити фото</a>
+    </div>
+    <div class="col-12">
+        {% for photo in object_list %}
+            <a href="{% thumbnail photo 800 %}" class="js-smartPhoto"
+               data-id="{{ photo.id }}" data-group="photo"/>
+            <img alt="{{ photo.id }}" width="350" height="250" src="{% thumbnail photo 350 %}" class="img-fluid mb-1"/>
+            </a>
+        {% endfor %}
+{#        {% include "helpers/pagination.html" %}#}
+    </div>
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+        (adsbygoogle = window.adsbygoogle || []).push({
+            google_ad_client: "ca-pub-4522526101011449",
+            enable_page_level_ads: true
+        });
+    </script>
+{% endblock base_content_block %}

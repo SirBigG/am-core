@@ -4,7 +4,7 @@
 <div class="row">
     <div class="card mb-3">
         <div class="row no-gutters">
-            <div class="col-md-4 col-12">{% if post.photo.all.0 %}<img src="{%thumbnail post.photo.all.0 350 %}" alt="{{post.rubric.value}} {{ post.title }}" class="card-img">{% endif %}</div>
+            <div class="col-md-4 col-12">{% if post.photo.first %}<img src="{%thumbnail post.photo.first 350 %}" alt="{{post.rubric.value}} {{ post.title }}" class="card-img">{% endif %}</div>
             <div class="col-md-8 col-12">
                 <div class="card-body">
                     <h2 class="card-title h4">{{ post.title }} {% if post.country %}{% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}<object type="image/svg+xml" data="{% static flag_static %}" height="20px" width="30px" >{{post.country.value}}</object>{% endwith %}{% endif %}</h2>
