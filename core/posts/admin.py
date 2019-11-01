@@ -187,10 +187,25 @@ class SearchStatisticAdmin(admin.ModelAdmin):
     list_display = ('fingerprint', 'search_phrase')
 
 
+class PhotoAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'description',)
+    raw_id_fields = ('post',)
+
+    def title(self, obj):
+        return obj.post.title
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 admin.site.register(Post, PostAdmin)
 admin.site.register(ParsedMap, ParsedMapAdmin)
 admin.site.register(ParsedPost, ParsedPostAdmin)
 admin.site.register(Link, LinkAdmin)
 admin.site.register(PostView, PostViewAdmin)
+admin.site.register(Photo, PhotoAdmin)
 admin.site.register(UsefulStatistic, UsefulStatisticAdmin)
 admin.site.register(SearchStatistic, SearchStatisticAdmin)
