@@ -1,0 +1,41 @@
+{% extends "posts/parent_index.html" %}
+
+{% load post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock scripts %}
+
+{% block extra_meta %}
+{% endblock extra_meta %}
+
+{% block page_title %}
+    {% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="row mb-3">
+      <div class="col-12 d-flex justify-content-end">
+      <div class="btn-group btn-group-sm" role="group" aria-label="List types">
+        <button type="button" class="btn btn-success disabled" aria-disabled="true"><i class="icon-align-justify"></i></button>
+        <button type="button" class="btn btn-success" onclick="location.href='{{ request.path }}list/'"><i class="icon-th-list"></i></button>
+      </div>
+      </div>
+    </div>
+    {% for group in posts|group_by:2 %}
+        <div class="row">
+        {% for key, list in group %}
+        <div class="col-md-6 col-12 mt-3">
+            <h3 class="text-secondary">{{ key }}</h3>
+        <ul class="list-unstyled">
+        {% for post in list %}
+            <li><a class="text-success no-decoration" href="/{{ post.rubric__parent__slug }}/{{ post.rubric__slug }}/{{ post.slug }}-{{ post.id }}.html">{{ post.title }}</a></li>
+            {% endfor %}
+        </ul>
+        </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+{% endblock content %}

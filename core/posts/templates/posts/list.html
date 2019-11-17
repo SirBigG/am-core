@@ -8,11 +8,7 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    {% if "-user" in category.slug %}
-        <meta name="robots" content="noindex, nofollow">
-    {% elif page_obj.number > 1 %}
-        <meta name="robots" content="noindex, follow">
-    {% endif %}
+    <meta name="robots" content="noindex, follow">
 {% endblock extra_meta %}
 
 {% block page_title %}
@@ -23,7 +19,10 @@
 
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-end">
-        <a class="btn btn-success btn-sm {% if request.GET.order %}disabled{% endif %}" href="{{ request.path }}?order=1" tabindex="-1" role="button" {% if request.GET.order %}aria-disabled="true"{% endif %}>За алфавітом</a>
+      <div class="btn-group btn-group-sm" role="group" aria-label="List types">
+        <button type="button" class="btn btn-success" onclick="location.href='/{{ category.parent.slug }}/{{ category.slug }}/'"><i class="icon-align-justify"></i></button>
+        <button type="button" class="btn btn-success disabled" aria-disabled="true"><i class="icon-th-list"></i></button>
+      </div>
       </div>
     </div>
 

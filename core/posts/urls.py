@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from core.posts.views import ParentRubricView, PostList, PostDetail, PostSearchView, PostFormView, GalleryView, \
-    AddPhotoView
+    AddPhotoView, PostListView
 
 from taggit.models import TagBase
 from transliterate import slugify
@@ -24,7 +24,8 @@ urlpatterns = [
     url(r'^gallery/add/(?P<post_id>[\w-]+)/$', AddPhotoView.as_view(), name="add-photo"),
     url(r'^gallery/(?P<post_id>[\w-]+)/$', GalleryView.as_view(), name="gallery"),
     url(r'^(?P<parent>[\w-]+)/$', ParentRubricView.as_view(), name='parent-category-index'),
-    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/$', PostList.as_view(), name='posts-list-child'),
+    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/$', PostListView.as_view(), name='posts-list-view'),
+    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/list/$', PostList.as_view(), name='posts-list-child'),
     url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/(?P<slug>[\w-]+)-(?P<id>[\w-]+).html$',
         PostDetail.as_view(), name='post-detail'),
 ]

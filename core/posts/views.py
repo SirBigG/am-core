@@ -1,4 +1,6 @@
-from django.views.generic import ListView, DetailView, TemplateView, FormView
+from itertools import groupby
+
+from django.views.generic import ListView, DetailView, TemplateView, FormView, View
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchQuery, SearchRank
@@ -35,11 +37,28 @@ class ParentRubricView(TemplateView):
         return context
 
 
+class PostListView(TemplateView):
+    template_name = "posts/list_order.html"
+
+    def get_context_data(self, **kwargs):
+        category = Category.objects.select_related('meta').filter(slug=self.kwargs['child']).first()
+        if category is None:
+            raise Http404
+        posts = Post.objects.filter(rubric_id=category.id).values('id', 'title', 'slug',
+                                                                  'rubric__slug', 'rubric__parent__slug')
+        posts = [[key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]),
+                                                      key=lambda x: x['title'][0])]
+        return {"posts": posts,
+                "category": category,
+                "view": self,
+                "request": self.request}
+
+
 class PostList(ListView):
     """
     View for list of posts by category.
     """
-    paginate_by = 20
+    paginate_by = 50
     template_name = 'posts/list.html'
     ordering = '-publish_date'
 

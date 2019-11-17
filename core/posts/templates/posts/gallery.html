@@ -16,8 +16,7 @@
     </div>
     <div class="col-12">
         {% for photo in object_list %}
-            <a href="{% thumbnail photo 800 %}" class="js-smartPhoto"
-               data-id="{{ photo.id }}" data-group="photo"/>
+            <a href="{% thumbnail photo 800 %}" class="js-smartPhoto" data-id="{{ photo.id }}" data-group="photo">
             <img alt="{{ photo.id }}" width="350" height="250" src="{% thumbnail photo 350 %}" class="img-fluid mb-1"/>
             </a>
         {% endfor %}
