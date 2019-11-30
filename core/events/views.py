@@ -23,6 +23,11 @@ class EventDetail(DetailView):
     model = Event
     template_name = 'events/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["ended"] = False if self.object.stop.date() >= date.today() else True
+        return context
+
 
 class EventFormView(FormView):
     form_class = EventAddForm

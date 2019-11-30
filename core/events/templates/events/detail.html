@@ -31,6 +31,11 @@
         <a href="/events/create/" class="btn btn-success btn-lg">Опублікувати подію</a>
     </div>
     <div class="row">
+        {% if ended %}
+            <div class="col-12 mb-3 mt-3">
+                <div class="alert alert-danger text-center" role="alert"><span class="h5">Закінчилась</span></div>
+            </div>
+        {% endif %}
         <div class="col-12 col-lg-6">
             <img alt="{{ object.title }}" src="{{ object.poster.url }}" class="img-rounded img-fluid" />
         </div>
