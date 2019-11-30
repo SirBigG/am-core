@@ -11,6 +11,7 @@
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="
+
             {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}"
           property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
@@ -48,13 +49,16 @@
     <div class="row">
         <div class="col-12 p-0">
             {% if object.photo.first %}
-            <img alt="{{ object.title }}" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
+                <img alt="{{ object.title }}" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
             {% endif %}
+            <div class="img-overlay">
+                <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"><i
+                        class="icon-plus"></i></a>
+                {% if object.photo.count > 1 %}
+                    <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-lg"><i
+                            class="icon-eye"></i></a>{% endif %}
+            </div>
         </div>
-    </div>
-    <div class="col-12 p-0 mt-2">
-        {% if object.photo.count > 1 %}<a href="/gallery/{{ object.id }}/" class="btn btn-success">Всі фото</a>{% endif %}
-        <a href="/gallery/add/{{ object.id }}/" class="btn btn-success">Завантажити фото публікації</a>
     </div>
     <div class="col-12 p-0">
         <div>{% for tag in object.tags.all %}

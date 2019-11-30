@@ -18,7 +18,7 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.select_objects().active()[:10]
+        context['object_list'] = Post.objects.select_objects().active().order_by('-hits')[:10]
         return context
 
 
@@ -146,6 +146,11 @@ class GalleryView(ListView):
 class AddPhotoView(FormView):
     form_class = PhotoForm
     template_name = 'posts/photo_form.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["post"] = Post.objects.get(id=self.kwargs.get('post_id'))
+        return context
 
     def get_initial(self):
         return {'post_id': self.kwargs.get('post_id')}
