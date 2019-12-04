@@ -8,13 +8,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#24a824">
     <title>{% block title %}{% trans 'Агропортал України' %} |{% endblock title %} AgroMega.in.ua</title>
-    <meta name="description" content="{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}">
-    <link rel="shortcut icon" type="image/x-icon" href="{% static "posts/favicon.ico" %}"/>
+    <meta name="description"
+          content="{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}">
+    <link rel="shortcut icon" type="image/x-icon" href="{% static "favicon.ico" %}"/>
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
     {# For extra meta tags#}
     {% block extra_meta %}
         <meta content="{% trans 'Агропортал України' %} | AgroMega.in.ua" property="og:title">
         <meta content="{% trans 'Все про аграрну сферу і навіть більше.' %}" property="og:description">
-{#        <meta content="" property="og:image">#}
+        {#        <meta content="" property="og:image">#}
         <meta content="{{ request.path }}" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
@@ -84,6 +86,14 @@
     ga('send', 'pageview');
 </script>
 {#/Google Analytics#}
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('{% static "service-worker.js" %}')
+            .then(function () {
+                console.log('Service Worker Registered');
+            });
+    }
+</script>
 {% block extra_footerscript %}{% endblock %}
 </body>
 </html>
