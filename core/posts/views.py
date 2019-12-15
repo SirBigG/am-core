@@ -18,7 +18,9 @@ class IndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['object_list'] = Post.objects.select_objects().active().order_by('-hits')[:10]
+        context['categories'] = Category.objects.filter(
+            id__in=Post.objects.order_by('-hits').values_list('rubric__parent_id')[:8])
+        context['object_list'] = Post.objects.select_objects().active().order_by('-publish_date')[:5]
         return context
 
 

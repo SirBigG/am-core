@@ -32,38 +32,41 @@
     {% include 'header.html' %}
 {% endblock header %}
 <main>
-    <div class="container">
-        <div class="row justify-content-md-center">
-            <div class="col-md-8 col-12 mb-3">
-                {% block second_menu %}{% endblock %}
+    {% block main %}
+        <div class="container">
+            <div class="row justify-content-md-center">
+                <div class="col-md-8 col-12 mb-3">
+                    {% block second_menu %}{% endblock %}
+                </div>
             </div>
-        </div>
-        <div class="row justify-content-md-center">
-            <div class="col-md-8 col-12">
-                <h1 class="h2">{% block page_title %}{% endblock %}</h1>
-            </div>
-        </div>
-        <div class="row justify-content-md-center">
-            <div class="col-md-8 col-12 mb-3 p-0">
-                {% block breadcrumbs %}{% endblock %}
-            </div>
-        </div>
-        <div class="row justify-content-md-center">
-            {% block base_content_block %}
+            <div class="row justify-content-md-center">
                 <div class="col-md-8 col-12">
-                    {% block content %}{% endblock content %}
+                    <h1 class="h2">{% block page_title %}{% endblock %}</h1>
                 </div>
-                <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({
-                        google_ad_client: "ca-pub-4522526101011449",
-                        enable_page_level_ads: true
-                    });
-                </script>
+            </div>
+            <div class="row justify-content-md-center">
+                <div class="col-md-8 col-12 mb-3 p-0">
+                    {% block breadcrumbs %}{% endblock %}
                 </div>
-            {% endblock base_content_block %}
-    </div>
-    </div>
+            </div>
+            <div class="row justify-content-md-center">
+                {% block base_content_block %}
+                    <div class="col-md-8 col-12">
+                        {% block content %}{% endblock content %}
+                    </div>
+                {% endblock base_content_block %}
+                {% block adverts %}
+                    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+                    <script>
+                        (adsbygoogle = window.adsbygoogle || []).push({
+                            google_ad_client: "ca-pub-4522526101011449",
+                            enable_page_level_ads: true
+                        });
+                    </script>
+                {% endblock %}
+            </div>
+        </div>
+    {% endblock main %}
 
     {% block extra_body %}{% endblock extra_body %}
 </main>
