@@ -1,11 +1,10 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 
 
 urlpatterns = [
-    url(r'^', include('api.v1.classifiers.urls')),
-    url(r'^', include('api.v1.posts.urls')),
-    url(r'^', include('api.v1.pro_auth.urls')),
-    url(r'^', include('api.v1.services.urls')),
-    url(r'^', include('api.v1.events.urls')),
-    url(r'^', include('api.v1.news.urls')),
+    path('', include('api.v1.classifiers.urls')),
+    path('', include('api.v1.posts.urls')),
+    path('', include('api.v1.pro_auth.urls')),
+    path('', include('api.v1.services.urls')),
+    path('', include('api.v1.events.urls')),
 ]

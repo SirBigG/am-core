@@ -87,22 +87,11 @@ class Post(models.Model):
     def __str__(self):
         return self.title
 
-    def _save_category(self):
-        if self.rubric.is_for_user:
-            try:
-                category = Category.objects.get(slug=self.slug, parent=self.rubric)
-                if category.value != self.title:
-                    category.value = self.title
-                    category.save()
-            except Category.DoesNotExist:
-                Category.objects.create(slug=self.slug, parent=self.rubric, value=self.title)
-
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title.lower(), get_language()[:2])
             if self.__class__.objects.filter(slug=self.slug).first():
-                self.slug = self.slug + ''.join(random.choice(string.ascii_lowercase) for i in range(4))
-        # self._save_category()
+                self.slug = self.slug + ''.join(random.choice(string.ascii_lowercase) for _ in range(4))
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):

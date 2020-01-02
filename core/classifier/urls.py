@@ -1,12 +1,10 @@
-from __future__ import unicode_literals
-
-from django.conf.urls import url
+from django.urls import path
 
 from core.classifier.views import LocationAutocomplete, TagAutocomplete
 
 
 urlpatterns = [
-    url(r'^location-autocomplete/$', LocationAutocomplete.as_view(),
+    path('location-autocomplete/', LocationAutocomplete.as_view(),
         name='location-autocomplete'),
-    url(r'^taggit-autocomplete/$', TagAutocomplete.as_view(), name='taggit-autocomplete'),
+    path('taggit-autocomplete/', TagAutocomplete.as_view(), name='taggit-autocomplete'),
 ]

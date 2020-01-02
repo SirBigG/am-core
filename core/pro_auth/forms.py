@@ -13,7 +13,7 @@ from phonenumber_field.formfields import PhoneNumberField
 
 from dal import autocomplete
 
-from captcha.fields import ReCaptchaField
+# from captcha.fields import ReCaptchaField
 
 
 class AdminUserCreationForm(forms.ModelForm):
@@ -68,10 +68,10 @@ class AdminUserCreationForm(forms.ModelForm):
 
 
 class UserCreationForm(AdminUserCreationForm):
-    captcha = ReCaptchaField(label=_("Captcha"))
+    # captcha = ReCaptchaField(label=_("Captcha"))
 
     class Meta(AdminUserCreationForm.Meta):
-        fields = ['email', 'phone1', 'location', 'password1', 'password2', 'captcha']
+        fields = ['email', 'phone1', 'location', 'password1', 'password2']  # , 'captcha']
 
 
 class AdminUserChangeForm(forms.ModelForm):

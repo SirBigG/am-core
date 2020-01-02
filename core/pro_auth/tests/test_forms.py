@@ -58,19 +58,19 @@ class UserCreationFormTests(TestCase):
                                  "The two password fields didn't match.")
         self.assertRaises(ValidationError, form1.clean_password2())
 
-    def test_form_invalid_captcha(self):
-        os.environ['RECAPTCHA_TESTING'] = 'False'
-        location = LocationFactory()
-        data = {'email': 'test@test.com',
-                'password1': '11111',
-                'password2': '11111',
-                'phone1': '+380991234567',
-                'location': location.pk,
-                'recaptcha_response_field': 'PASSED'
-                }
-        form = UserCreationForm(data=data)
-        self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'captcha': ['Incorrect, please try again.']})
+    # def test_form_invalid_captcha(self):
+    #     os.environ['RECAPTCHA_TESTING'] = 'False'
+    #     location = LocationFactory()
+    #     data = {'email': 'test@test.com',
+    #             'password1': '11111',
+    #             'password2': '11111',
+    #             'phone1': '+380991234567',
+    #             'location': location.pk,
+    #             'recaptcha_response_field': 'PASSED'
+    #             }
+    #     form = UserCreationForm(data=data)
+    #     self.assertFalse(form.is_valid())
+    #     self.assertEqual(form.errors, {'captcha': ['Incorrect, please try again.']})
 
     def tearDown(self):
         try:

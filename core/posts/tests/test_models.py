@@ -27,12 +27,6 @@ class PostTests(TestCase):
         post = PostFactory(title='Тест автоідентифікатор', slug=None)
         self.assertEqual(post.slug, 'test-avtoidentyfikator')
 
-    def test_category_created(self):
-        rubric = CategoryFactory(value='breeds', is_for_user=True, is_active=True)
-        post = PostFactory(rubric=rubric, title='Породи голубів', slug=None)
-        self.assertEqual(post.slug, 'porody-holubiv')
-        self.assertTrue(Category.objects.get(slug=post.slug))
-
 
 class PhotoTests(TestCase):
 

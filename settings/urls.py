@@ -13,7 +13,7 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
-from django.conf.urls import include, url
+from django.urls import path, include
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
@@ -24,29 +24,28 @@ from core.posts import views
 from core.news.views import AdvertListView
 from core.services.views import FeedbackView
 
-
 urlpatterns = [
-    url(r'^$', views.IndexView.as_view(), name='index'),
-    url(r'^admin/', admin.site.urls),
-    url(r'^rosetta/', include('rosetta.urls')),
-    url(r'^sitemap\.xml', views.SiteMap.as_view(), name='sitemap'),
-    url(r'^categories/$', TemplateView.as_view(template_name="categories.html"), name='categories'),
-    url(r'^create/$', TemplateView.as_view(template_name="add.html"), name='add'),
-    url(r'social/', include('social_django.urls', namespace='social')),
-    url(r'^api-auth/', include('rest_framework.urls',
-                               namespace='rest_framework')),
-    url('^page/', include('django.contrib.flatpages.urls')),
-    url(r'^i18n/', include('django.conf.urls.i18n')),
-    url(r'feedback/$', FeedbackView.as_view(), name="feedback-form"),
-    url(r'^service/', include('core.services.urls')),
-    url(r'^api/', include('api.v1.urls')),
-    url(r'^events/', include('core.events.urls', namespace='events')),
-    url(r'^news/', include('core.news.urls', namespace='news')),
-    url(r'adverts/(?P<category>[\w-]+)/$', AdvertListView.as_view(), name="adverts-list"),
-    url(r'adverts/$', AdvertListView.as_view(), name="adverts-list"),
-    url(r'^', include('core.classifier.urls')),
-    url(r'^', include('core.pro_auth.urls', namespace='pro_auth')),
-    url(r'^', include('core.posts.urls')),
+    path('', views.IndexView.as_view(), name='index'),
+    path('admin/', admin.site.urls),
+    path('rosetta/', include('rosetta.urls')),
+    path('sitemap.xml', views.SiteMap.as_view(), name='sitemap'),
+    path('categories/', TemplateView.as_view(template_name="categories.html"), name='categories'),
+    path('create/', TemplateView.as_view(template_name="add.html"), name='add'),
+    path('social/', include('social_django.urls', namespace='social')),
+    path('api-auth/', include('rest_framework.urls',
+                              namespace='rest_framework')),
+    path('page/', include('django.contrib.flatpages.urls')),
+    path('i18n/', include('django.conf.urls.i18n')),
+    path('feedback/', FeedbackView.as_view(), name="feedback-form"),
+    path('service/', include('core.services.urls')),
+    path('api/', include('api.v1.urls')),
+    path('events/', include('core.events.urls', namespace='events')),
+    path('news/', include('core.news.urls', namespace='news')),
+    path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
+    path('adverts/', AdvertListView.as_view(), name="adverts-list"),
+    path('', include('core.classifier.urls')),
+    path('', include('core.pro_auth.urls', namespace='pro_auth')),
+    path('', include('core.posts.urls')),
 ]
 
 # For returning errors pages. Need to be the last.

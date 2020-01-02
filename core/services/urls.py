@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from core.services.views import ReviewInfoView, ReviewsList
 
@@ -7,9 +7,8 @@ app_name = 'services'
 
 
 urlpatterns = [
-    url(r'^reviews/is-reviewed/$', ReviewInfoView.as_view(), name='review-is-reviewed'),
-    url(r'^reviews/$', ReviewsList.as_view(), name='review-all-list'),
-    url(r'^reviews/(?P<category>[\w-]+)/$', ReviewsList.as_view(), name='review-category-list'),
-    url(r'^reviews/(?P<category>[\w-]+)/(?P<slug>[\w-]+)-(?P<object_id>\d+)/$', ReviewsList.as_view(),
-        name='review-slug-list'),
+    path('reviews/is-reviewed/', ReviewInfoView.as_view(), name='review-is-reviewed'),
+    path('reviews/', ReviewsList.as_view(), name='review-all-list'),
+    path('reviews/<str:category>/', ReviewsList.as_view(), name='review-category-list'),
+    path('reviews/<str:category>/<str:slug>-<int:object_id>/', ReviewsList.as_view(), name='review-slug-list'),
 ]

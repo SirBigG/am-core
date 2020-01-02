@@ -1,3 +1,5 @@
+import logging
+
 from django.utils.translation import get_language
 
 from core.posts.models import Post, PostView as PostViewModel, UsefulStatistic
@@ -58,8 +60,14 @@ class PostView(APIView):
 
     def post(self, request, *args, **kwargs):
         if request.data and 'fingerprint' in request.data:
-            if PostViewModel.objects.filter(**request.data).exists() is False:
-                PostViewModel.objects.create(**request.data)
+            # todo: ref this with serializers usage or check keys not secure with kwargs.
+            try:
+                data = request.data.dict()
+            except Exception as e:
+                logging.error(e)
+                data = request.data
+            if PostViewModel.objects.filter(**data).exists() is False:
+                PostViewModel.objects.create(**data)
                 post = Post.objects.get(pk=request.data.get('post_id'))
                 post.hits += 1
                 post.save()

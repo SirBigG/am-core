@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from core.posts.views import ParentRubricView, PostList, PostDetail, PostSearchView, PostFormView, GalleryView, \
     AddPhotoView, PostListView
@@ -19,13 +19,12 @@ TagBase.slugify = custom_slugify
 
 
 urlpatterns = [
-    url(r'^search/$', PostSearchView.as_view(), name='post-search-list'),
-    url(r'^publication/create/$', PostFormView.as_view(), name='post-add'),
-    url(r'^gallery/add/(?P<post_id>[\w-]+)/$', AddPhotoView.as_view(), name="add-photo"),
-    url(r'^gallery/(?P<post_id>[\w-]+)/$', GalleryView.as_view(), name="gallery"),
-    url(r'^(?P<parent>[\w-]+)/$', ParentRubricView.as_view(), name='parent-category-index'),
-    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/$', PostListView.as_view(), name='posts-list-view'),
-    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/list/$', PostList.as_view(), name='posts-list-child'),
-    url(r'^(?P<parent>[\w-]+)/(?P<child>[\w-]+)/(?P<slug>[\w-]+)-(?P<id>[\w-]+).html$',
-        PostDetail.as_view(), name='post-detail'),
+    path('search/', PostSearchView.as_view(), name='post-search-list'),
+    path('publication/create/', PostFormView.as_view(), name='post-add'),
+    path('gallery/add/<int:post_id>/', AddPhotoView.as_view(), name="add-photo"),
+    path('gallery/<int:post_id>/', GalleryView.as_view(), name="gallery"),
+    path('<str:parent>/', ParentRubricView.as_view(), name='parent-category-index'),
+    path('<str:parent>/<str:child>/', PostListView.as_view(), name='posts-list-view'),
+    path('<str:parent>/<str:child>/list/', PostList.as_view(), name='posts-list-child'),
+    path('<str:parent>/<str:child>/<str:slug>-<int:id>.html', PostDetail.as_view(), name='post-detail'),
 ]

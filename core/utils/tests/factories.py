@@ -5,7 +5,6 @@ from core.classifier.models import Location, Country, Region, Area, Category
 from core.posts.models import Post, Photo
 from core.services.models import Feedback, MetaData, Reviews
 from core.events.models import Event, EventType
-from core.news.models import News
 
 from django.contrib.auth.hashers import make_password
 from django.utils import timezone
@@ -179,13 +178,3 @@ class EventFactory(BaseFactory):
     type = factory.SubFactory(EventTypeFactory)
     location = factory.SubFactory(LocationFactory)
     poster = factory.django.ImageField(color='green', width=300, height=200)
-
-
-# ##################   News factories     ####################### #
-
-class NewsFactory(BaseFactory):
-    class Meta:
-        model = News
-
-    title = "Title"
-    link = "http://aaa.aa/aaa"

@@ -1,11 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 app_name = 'events'
 
 urlpatterns = [
-    url(r'^$', views.EventList.as_view(), name='event-list'),
-    url(r'^create/$', views.EventFormView.as_view(), name='event-form'),
-    url(r'^(?P<slug>[\w-]+).html$', views.EventDetail.as_view(), name='event-detail'),
+    path('', views.EventList.as_view(), name='event-list'),
+    path('create/', views.EventFormView.as_view(), name='event-form'),
+    path('<str:slug>.html', views.EventDetail.as_view(), name='event-detail'),
 ]

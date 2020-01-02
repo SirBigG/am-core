@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block main %}
-    <!-- Hero Area Start -->
+{#    <!-- Hero Area Start -->#}
     <div id="hero-area">
         <div class="overlay"></div>
         <div class="container">
@@ -17,7 +17,7 @@
                     <div class="contents">
                         <h1 class="head-title">Вітаємо Вас на <span class="year">AgroMega</span></h1>
                         <p>Ми проект який забезпечує інформаційну підтримку агробізнесу. Ви отримаєте інформацію від публікацій до подій та багато корисного.
-                        Ви стимулюєте нас розвиватись тому вже скоро багато нового та прогресивного.</p>
+                        Ви стимулюєте нас розвиватись тому вже скоро багато нового.</p>
                         <div class="search-bar">
                             <fieldset>
                                 <form class="search-form" action="/search/" method="get">
@@ -35,8 +35,8 @@
             </div>
         </div>
     </div>
-    <!-- Hero Area End -->
-    <!-- Trending Categories Section Start -->
+{#    <!-- Hero Area End -->#}
+{#    <!-- Trending Categories Section Start -->#}
     <section class="trending-cat section-padding">
         <div class="container">
             <h2 class="section-title">Популярні категорії</h2>
@@ -46,7 +46,9 @@
                         <a href="{{ category.slug }}">
                             <div class="box">
                                 <div class="icon">
+                                    {% if category.image %}
                                     <img class="img-fluid" src="{{ category.image.url }}" alt="{{ category.value }}">
+                                    {% endif %}
                                 </div>
                                 <h4>{{ category.value }}</h4>
 {#                                <strong>189 Ads</strong>#}
@@ -57,14 +59,14 @@
             </div>
         </div>
     </section>
-    <!-- Trending Categories Section End -->
-
-    <!-- Services Section Start -->
+{#    <!-- Trending Categories Section End -->#}
+{##}
+{#    <!-- Services Section Start -->#}
     <section class="services section-padding">
       <div class="container">
           <h2 class="section-title">Продукти</h2>
         <div class="row">
-          <!-- Services item -->
+{#          <!-- Services item -->#}
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="services-item wow fadeInRight" data-wow-delay="0.2s">
               <div class="icon">
@@ -76,7 +78,7 @@
               </div>
             </div>
           </div>
-          <!-- Services item -->
+{#          <!-- Services item -->#}
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="services-item wow fadeInRight" data-wow-delay="0.4s">
               <div class="icon">
@@ -84,11 +86,11 @@
               </div>
               <div class="services-content">
                 <h3><a href="/events/">Події</a></h3>
-                <p>Список найближчих агроподій щоб Ви не пропустили нічого важливого.</p>
+                <p>Список найближчих агроподій щоб Ви не пропустили нічого важливого. Також Ви зможете підписатись на отримання нових та найближчих подій у Telegram.</p>
               </div>
             </div>
           </div>
-          <!-- Services item -->
+{#          <!-- Services item -->#}
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="services-item wow fadeInRight" data-wow-delay="0.6s">
               <div class="icon">
@@ -96,11 +98,11 @@
               </div>
               <div class="services-content">
                 <h3><a href="/news/">Новини</a></h3>
-                <p>Будь в курсі останнях новини з нашим Telegram ботом або ж просто зайшовши на сайт.</p>
+                <p>Будьте в курсі останніх новини з нашим Telegram ботом або ж просто зайшовши на сайт Ви зможете ознайомитись з агротрендами.</p>
               </div>
             </div>
           </div>
-          <!-- Services item -->
+{#          <!-- Services item -->#}
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="services-item wow fadeInRight" data-wow-delay="0.8s">
               <div class="icon">
@@ -112,7 +114,7 @@
               </div>
             </div>
           </div>
-           <!-- Services item -->
+{#           <!-- Services item -->#}
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="services-item wow fadeInRight" data-wow-delay="1s">
               <div class="icon">
@@ -139,16 +141,26 @@
         </div>
       </div>
     </section>
-    <!-- Services Section End -->
-    <section>
-    <div class="container">
-{#        {% index_carousel %}#}
-        <h2 class="section-title">Нещодавно додане:</h2>
-        <div class="row">
-            <div class="col-md-8 col-12">
-        {% include "posts/helpers/object_list.html" %}
-                </div>
+{#    <!-- Services Section End -->#}
+    <section class="trending-cat section-padding">
+        <div class="container">
+            <h2 class="section-title">Нещодавно додане</h2>
+            <div class="row">
+                {% for post in object_list %}
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                        <a href="{{ post.get_absolute_url }}">
+                            <div class="box">
+                                <div class="icon">
+                                    {% if post.photo.first %}
+                                    <img class="img-fluid" src="{%thumbnail post.photo.first 350 %}" alt="{{post.rubric.value}} {{ post.title }}">
+                                    {% endif %}
+                                </div>
+                                <h4>{{ post.title }}</h4>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-    </div>
     </section>
 {% endblock %}

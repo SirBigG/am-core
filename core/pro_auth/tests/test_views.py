@@ -29,19 +29,19 @@ class AuthTests(TestCase):
         self.assertTrue(context_data['view'].request.user.is_authenticated)
         self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
-    def test_login_ajax(self):
-        response = client.post('/login/', data={'username': self.user.email,
-                                                'password': '12345'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()['user'], self.user.pk)
-        self.assertEqual(response.json()['status'], 'ok')
-        response = client.get('/login/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        self.assertEqual(response.status_code, 200)
-        context_data = response.context_data
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pro_auth/login_form.html')
-        self.assertTrue(context_data['view'].request.user.is_authenticated)
-        self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
+    # def test_login_ajax(self):
+    #     response = client.post('/login/', data={'username': self.user.email,
+    #                                             'password': '12345'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertEqual(response.json()['user'], self.user.pk)
+    #     self.assertEqual(response.json()['status'], 'ok')
+    #     response = client.get('/login/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #     self.assertEqual(response.status_code, 200)
+    #     context_data = response.context_data
+    #     self.assertEqual(response.status_code, 200)
+    #     self.assertTemplateUsed(response, 'pro_auth/login_form.html')
+    #     self.assertTrue(context_data['view'].request.user.is_authenticated)
+    #     self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     def test_logout(self):
         client.login(username=self.user.email, password='12345')

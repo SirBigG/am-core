@@ -1,11 +1,7 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase, Client, RequestFactory
 
 from core.utils.tests.factories import PostFactory, CategoryFactory, MetaDataFactory
 from core.utils.tests.utils import HtmlTestCaseMixin
-
-from factory import build_batch
 
 
 client = Client()
@@ -16,16 +12,19 @@ request = RequestFactory()
 class MainPageTest(TestCase):
 
     def test_response(self):
-        PostFactory.create_batch(3)
+        parent = CategoryFactory()
+        rubric = CategoryFactory(parent=parent)
+        PostFactory.create_batch(3, rubric=rubric)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertIn('object_list', response.context)
         self.assertTemplateUsed(response, 'index.html')
-        self.assertTemplateUsed(response, 'posts/helpers/object_list.html')
 
     def test_active_status_filter(self):
-        PostFactory.create_batch(2)
-        PostFactory.create_batch(2, status=0)
+        parent = CategoryFactory()
+        rubric = CategoryFactory(parent=parent)
+        PostFactory.create_batch(2, rubric=rubric)
+        PostFactory.create_batch(2, status=0, rubric=rubric)
         response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 2)
@@ -49,44 +48,27 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         response = client.get('/unknown/')
         self.assertEqual(response.status_code, 404)
 
-    def test_child_list(self):
+    def test_child_list_grouped(self):
         slug = self.post.rubric.slug
         response = client.get('/%s/%s/' % (self.parent.slug, slug))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'posts/list_order.html')
+
+    def test_child_list(self):
+        slug = self.post.rubric.slug
+        response = client.get('/%s/%s/list/' % (self.parent.slug, slug))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'posts/list.html')
         self.assertEqual(len(response.context['object_list']), 1)
         PostFactory(rubric=self.post.rubric)
         PostFactory(rubric=self.post.rubric)
-        response = client.get('/%s/%s/' % (self.parent.slug, slug))
+        response = client.get('/%s/%s/list/' % (self.parent.slug, slug))
         self.assertEqual(len(response.context['object_list']), 3)
         self.assertEqual(response.context['category'], self.post.rubric)
 
     def test_child_list_404(self):
         response = client.get('/%s/unknown/' % self.parent.slug)
         self.assertEqual(response.status_code, 404)
-
-    def test_list_pagination(self):
-        build_batch(PostFactory, 21, rubric=self.category)
-        response = client.get('/%s/%s/' % (self.parent.slug, self.category.slug))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'posts/list.html')
-        self.assertTemplateUsed(response, 'helpers/pagination.html')
-        self.assertTrue(response.context['page_obj'].has_next())
-        self.assertFalse(response.context['page_obj'].has_previous())
-        self.assertEqual(response.context['page_obj'].next_page_number(), 2)
-        self.assertEqual(response.context['page_obj'].number, 1)
-        self.assertEqual(response.context['paginator'].num_pages, 2)
-        self.assertIn(b'pagination', response.content)
-        response = client.get('/%s/%s/?page=2' % (self.parent.slug, self.category.slug))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'posts/list.html')
-        self.assertTemplateUsed(response, 'helpers/pagination.html')
-        self.assertFalse(response.context['page_obj'].has_next())
-        self.assertTrue(response.context['page_obj'].has_previous())
-        self.assertEqual(response.context['page_obj'].previous_page_number(), 1)
-        self.assertEqual(response.context['page_obj'].number, 2)
-        self.assertMetaTagIn(response.content, 'robots')
-        self.assertIn(b'pagination', response.content)
 
     def test_meta_data(self):
         meta = MetaDataFactory()
@@ -133,7 +115,7 @@ class SiteMapTests(TestCase):
         response = client.get('/sitemap.xml')
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['base'], 'localhost:8000/')
-        self.assertEqual(len(response.context['urls']), 6)
+        self.assertEqual(len(response.context['urls']), 9)
         self.assertTemplateUsed(response, 'sitemap.xml')
 
 

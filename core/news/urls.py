@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
@@ -7,5 +7,5 @@ app_name = 'news'
 
 
 urlpatterns = [
-    url(r'^$', views.NewsListView.as_view(), name='news-list'),
+    path('', views.NewsListView.as_view(), name='news-list'),
 ]
