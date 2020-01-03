@@ -1,32 +1,32 @@
-FROM python:3.6.4-alpine
-
-RUN apk --no-cache add autoconf automake postgresql-dev gcc python3-dev musl-dev
+FROM python:3.7.6-alpine
 
 ENV PYTHONUNBUFFERED 1
 
-RUN mkdir /am-core
+ENV PROJECT_DIR /am-core
 
-WORKDIR /am-core
+ADD requirements.txt $PROJECT_DIR/
 
-RUN apk --no-cache add g++ \
-                       libxml2-dev \
+WORKDIR $PROJECT_DIR
+
+RUN apk --no-cache add autoconf \
+                       automake \
+                       postgresql-dev \
+                       gcc \
+                       python3-dev \
+                       musl-dev \
+                       g++ \
                        libxslt-dev \
                        jpeg-dev \
                        zlib-dev \
                        freetype-dev \
                        lcms2-dev \
-                       openjpeg-dev \
-                       tiff-dev \
-                       tk-dev \
-                       tcl-dev \
                        build-base \
                        linux-headers \
                        pcre-dev \
-                       git
-
-ADD requirements.txt /am-core/
-
-RUN pip install -r requirements.txt && pip3 install uwsgi && mkdir /am-core/tmp && \
+                       git && \
+   pip install -r requirements.txt && \
+   pip3 install uwsgi && \
+   mkdir /am-core/tmp && \
    mkdir /am-core/docker && touch /am-core/tmp/uwsgi.log
 
 ADD docker/uwsgi.ini /am-core/docker/
