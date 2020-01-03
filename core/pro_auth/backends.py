@@ -7,7 +7,7 @@ from django.contrib.auth.models import Permission
 
 class AuthBackend(object):
     # TODO: add tests for permission methods
-    def authenticate(self, username=None, password=None, **kwargs):
+    def authenticate(self, request, username=None, password=None, **kwargs):
         if username is None:
             username = kwargs.get(User.USERNAME_FIELD)
         try:

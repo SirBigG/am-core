@@ -19,6 +19,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView
+from django.contrib.auth.decorators import login_required
 
 from core.posts import views
 from core.news.views import AdvertListView
@@ -43,6 +44,9 @@ urlpatterns = [
     path('news/', include('core.news.urls', namespace='news')),
     path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
     path('adverts/', AdvertListView.as_view(), name="adverts-list"),
+    # Rendering index page for all urls starts with /profile/ for personal page.
+    path('profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
+         name='personal-index'),
     path('', include('core.classifier.urls')),
     path('', include('core.pro_auth.urls', namespace='pro_auth')),
     path('', include('core.posts.urls')),

@@ -130,6 +130,7 @@ LOGGING = {
     'loggers': {
         'django.db.backends': {
             'level': 'DEBUG',
+            'filters': ['require_debug_true'],
             'handlers': ['console'],
         },
         'django': {

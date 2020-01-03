@@ -1,15 +1,10 @@
-import os
-
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.contrib.auth.forms import AuthenticationForm
 from django.conf import settings
 from django.urls import reverse
 
-from core.utils.tests.factories import UserFactory, LocationFactory
+from core.utils.tests.factories import UserFactory
 from core.utils.tests.utils import HtmlTestCaseMixin
-
-
-client = Client()
 
 
 class AuthTests(TestCase):
@@ -18,11 +13,11 @@ class AuthTests(TestCase):
         self.user = UserFactory()
 
     def test_login(self):
-        response = client.post('/login/', data={'username': self.user.email,
+        response = self.client.post('/login/', data={'username': self.user.email,
                                                 'password': '12345'})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], '/')
-        response = client.get('/login/')
+        response = self.client.get('/login/')
         context_data = response.context_data
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'pro_auth/login.html')
@@ -30,12 +25,12 @@ class AuthTests(TestCase):
         self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     # def test_login_ajax(self):
-    #     response = client.post('/login/', data={'username': self.user.email,
-    #                                             'password': '12345'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #     response = self.client.post('/login/', data={'username': self.user.email,
+    #                                                  'password': '12345'}, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     #     self.assertEqual(response.status_code, 200)
     #     self.assertEqual(response.json()['user'], self.user.pk)
     #     self.assertEqual(response.json()['status'], 'ok')
-    #     response = client.get('/login/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    #     response = self.client.get('/login/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     #     self.assertEqual(response.status_code, 200)
     #     context_data = response.context_data
     #     self.assertEqual(response.status_code, 200)
@@ -44,29 +39,26 @@ class AuthTests(TestCase):
     #     self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     def test_logout(self):
-        client.login(username=self.user.email, password='12345')
-        response = client.get('/', {'user': self.user})
+        self.client.login(username=self.user.email, password='12345')
+        response = self.client.get('/', {'user': self.user})
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context['request'].user.is_authenticated)
-        response = client.get('/logout/')
+        response = self.client.get('/logout/')
         self.assertEqual(response.status_code, 302)
-        response = client.get('/')
+        response = self.client.get('/')
         self.assertEqual(response.status_code, 200)
 
 
 class PersonalIndexViewTests(HtmlTestCaseMixin, TestCase):
     def test_response_ok(self):
         user = UserFactory()
-        client.login(username=user.email, password='12345')
-        response = client.get('/profile/')
+        self.client.force_login(user)
+        response = self.client.get(reverse('personal-index'))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'personal/personal_index.html')
-        response = client.get('/profile/update/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIdIn('root', response.content)
 
     def test_user_not_login(self):
-        response = client.get('/profile/')
+        response = self.client.get(reverse('personal-index'))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/profile/')
 

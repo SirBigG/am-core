@@ -1,4 +1,4 @@
-from settings.settings import *
+from settings.settings import *  # noqa
 
 HOST = "localhost:8000"
 
@@ -20,11 +20,11 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': "test_db",
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT'),
+        'USER': os.getenv('POSTGRES_USER'),  # noqa
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),  # noqa
+        'HOST': os.getenv('POSTGRES_HOST'),  # noqa
+        'PORT': os.getenv('POSTGRES_PORT'),  # noqa
     }
 }
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media/test')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media/test')  # noqa

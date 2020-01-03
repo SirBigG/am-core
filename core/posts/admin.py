@@ -60,7 +60,8 @@ activate_posts.short_description = "Activate selected posts"
 
 class TestTaggit(autocomplete.TaggitSelect2):
     def format_value(self, value):
-        print(value)
+        if not value:
+            return []
         values = set()
         for v in value:
             if not v:

@@ -17,7 +17,7 @@ test_api:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(TEST_SETTINGS) ./$(MANAGE) test api --settings=$(TEST_SETTINGS)
 
 flake:
-	flake8 --exclude '*migrations*' core api
+	flake8
 
 migrate:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) migrate

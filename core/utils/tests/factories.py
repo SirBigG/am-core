@@ -15,11 +15,7 @@ class BaseFactory(factory.django.DjangoModelFactory):
     Base factory for all project factories.
     You need inherit it in your factory.
     """
-    @classmethod
-    def _create(cls, model_class, *args, **kwargs):
-        obj = model_class(*args, **kwargs)
-        obj.save()
-        return obj
+    pass
 
 
 # ###############   Classifier factories     #################### #
