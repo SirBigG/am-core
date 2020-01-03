@@ -1,6 +1,3 @@
-from __future__ import unicode_literals
-
-
 from core.utils.tests.factories import UserFactory
 
 from rest_framework.test import APIClient, APITestCase

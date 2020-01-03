@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django import forms
-from django.utils import six
 from django.db.models import Count
 
 from .models import Post, Photo, ParsedMap, Link, ParsedPost, PostView, UsefulStatistic, SearchStatistic
@@ -71,7 +70,7 @@ class TestTaggit(autocomplete.TaggitSelect2):
     def options(self, name, value, attrs=None):
         """Return only select options."""
         # When the data hasn't validated, we get the raw input
-        if isinstance(value, six.text_type):
+        if isinstance(value, str):
             value = value.split(',')
 
         for v in value:

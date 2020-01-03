@@ -11,7 +11,8 @@ class ProfileRouter(SimpleRouter):
                 'delete': 'destroy'
             },
             name='{basename}-detail',
-            initkwargs={'suffix': 'Instance'}
+            initkwargs={'suffix': 'Instance'},
+            detail=True
         )]
 
     def get_lookup_regex(self, viewset, lookup_prefix=''):

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm
@@ -12,8 +10,6 @@ from core.classifier.models import Location
 from phonenumber_field.formfields import PhoneNumberField
 
 from dal import autocomplete
-
-# from captcha.fields import ReCaptchaField
 
 
 class AdminUserCreationForm(forms.ModelForm):
@@ -68,10 +64,9 @@ class AdminUserCreationForm(forms.ModelForm):
 
 
 class UserCreationForm(AdminUserCreationForm):
-    # captcha = ReCaptchaField(label=_("Captcha"))
 
     class Meta(AdminUserCreationForm.Meta):
-        fields = ['email', 'phone1', 'location', 'password1', 'password2']  # , 'captcha']
+        fields = ['email', 'phone1', 'location', 'password1', 'password2']
 
 
 class AdminUserChangeForm(forms.ModelForm):

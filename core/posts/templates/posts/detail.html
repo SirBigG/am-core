@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load staticfiles i18n cache post_extras %}
+{% load static i18n cache post_extras %}
 
 {% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
 {% endif %}{% endblock title %}

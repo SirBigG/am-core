@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from core.utils.tests.factories import PostFactory, CategoryFactory, PhotoFactory, \
     UserFactory
 from core.utils.tests.utils import make_image

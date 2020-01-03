@@ -1,7 +1,3 @@
-from __future__ import unicode_literals
-
-import os
-
 from django.test import TestCase
 
 from core.utils.tests.factories import LocationFactory, UserFactory
@@ -16,14 +12,12 @@ from django.forms import ValidationError
 class UserCreationFormTests(TestCase):
 
     def test_form_valid(self):
-        os.environ['RECAPTCHA_TESTING'] = 'True'
         location = LocationFactory()
         data = {'email': 'test@test.com',
                 'password1': '11111',
                 'password2': '11111',
                 'phone1': '+380991234567',
                 'location': location.pk,
-                'recaptcha_response_field': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertTrue(form.is_valid())
@@ -33,14 +27,12 @@ class UserCreationFormTests(TestCase):
         self.assertEqual(User.objects.count(), 1)
 
     def test_invalid_phone(self):
-        os.environ['RECAPTCHA_TESTING'] = 'True'
         location = LocationFactory()
         data = {'email': 'test@test.com',
                 'password1': '11111',
                 'password2': '11111',
                 'phone1': '0991234567',
                 'location': location.pk,
-                'recaptcha_response_field': 'PASSED'
                 }
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())
@@ -56,27 +48,6 @@ class UserCreationFormTests(TestCase):
         form1.is_valid()
         self.assertRaisesMessage(form1.clean_password2(),
                                  "The two password fields didn't match.")
-        self.assertRaises(ValidationError, form1.clean_password2())
-
-    # def test_form_invalid_captcha(self):
-    #     os.environ['RECAPTCHA_TESTING'] = 'False'
-    #     location = LocationFactory()
-    #     data = {'email': 'test@test.com',
-    #             'password1': '11111',
-    #             'password2': '11111',
-    #             'phone1': '+380991234567',
-    #             'location': location.pk,
-    #             'recaptcha_response_field': 'PASSED'
-    #             }
-    #     form = UserCreationForm(data=data)
-    #     self.assertFalse(form.is_valid())
-    #     self.assertEqual(form.errors, {'captcha': ['Incorrect, please try again.']})
-
-    def tearDown(self):
-        try:
-            del os.environ['RECAPTCHA_TESTING']
-        except KeyError:
-            pass
 
 
 class AdminUserChangeFormTest(TestCase):

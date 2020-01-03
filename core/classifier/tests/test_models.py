@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.test import TestCase
 
 from core.utils.tests.factories import LocationFactory, CountryFactory, \

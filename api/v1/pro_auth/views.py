@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from core.pro_auth.models import User
 
 from api.v1.pro_auth.serializers import UserSerializer

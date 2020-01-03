@@ -71,8 +71,6 @@ INSTALLED_APPS = [
     'mptt',
     # For nice working with text https://github.com/django-ckeditor/django-ckeditor
     'ckeditor',
-    # For google ReCaptcha using: https://github.com/praekelt/django-recaptcha
-    'captcha',
     # For social authentication: https://github.com/python-social-auth/social-app-django
     'social_django',
     # Simple tags https://github.com/jazzband/django-taggit
@@ -207,7 +205,7 @@ LOGIN_REDIRECT_URL = '/'
 LANGUAGE_CODE = 'uk-Uk'
 
 LANGUAGES = [
-    ('uk', _('Ukrainian')),
+    ('uk-Uk', _('Ukrainian')),
     ('en', _('English')),
 ]
 
@@ -273,11 +271,6 @@ EMAIL_USE_TLS = True
 
 SERVER_EMAIL = os.getenv("SERVER_EMAIL")
 ADMINS = [i.split(",") for i in os.getenv("ADMINS").split(":")] if os.getenv("ADMINS") else []
-
-# ################################# Google captcha ###################################### #
-RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY")
-RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY")
-NOCAPTCHA = True
 
 # Media version for browser cache refresh
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
