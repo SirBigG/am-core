@@ -1,7 +1,6 @@
 from django.test import TestCase, Client, RequestFactory
 
 from core.utils.tests.factories import PostFactory, CategoryFactory, MetaDataFactory
-from core.utils.tests.utils import HtmlTestCaseMixin
 
 
 client = Client()
@@ -30,7 +29,7 @@ class MainPageTest(TestCase):
         self.assertEqual(response.context['object_list'].count(), 2)
 
 
-class PostListTests(HtmlTestCaseMixin, TestCase):
+class PostListTests(TestCase):
 
     def setUp(self):
         self.parent = CategoryFactory()
@@ -70,19 +69,8 @@ class PostListTests(HtmlTestCaseMixin, TestCase):
         response = client.get('/%s/unknown/' % self.parent.slug)
         self.assertEqual(response.status_code, 404)
 
-    def test_meta_data(self):
-        meta = MetaDataFactory()
-        self.parent.meta = meta
-        self.parent.save()
-        response = client.get('/%s/' % self.parent.slug)
-        self.assertEqual(response.status_code, 200)
-        self.assertMetaDataIn(response.content)
-        self.assertH1(response.content)
-        self.assertEqualTitleValue(response.content, 'title | AgroMega.in.ua')
-        self.assertEqualMetaTagContent(response.content, 'description', 'description')
 
-
-class PostDetailTests(HtmlTestCaseMixin, TestCase):
+class PostDetailTests(TestCase):
 
     def setUp(self):
         self.parent = CategoryFactory()
@@ -96,12 +84,6 @@ class PostDetailTests(HtmlTestCaseMixin, TestCase):
         self.assertTemplateUsed(response, 'posts/detail.html')
         self.assertIn('object', response.context)
         self.assertEqual(len(response.context['menu_items']), 1)
-
-    def test_meta_data(self):
-        response = client.get(self.post.get_absolute_url())
-        self.assertEqual(response.status_code, 200)
-        self.assertMetaDataIn(response.content)
-        self.assertH1(response.content)
 
 
 class SiteMapTests(TestCase):

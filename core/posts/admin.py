@@ -7,8 +7,6 @@ from .models import Post, Photo, ParsedMap, Link, ParsedPost, PostView, UsefulSt
 
 from core.classifier.models import Category
 
-from core.posts.parser.handler import ParseHandler
-
 from dal import autocomplete
 
 
@@ -155,25 +153,8 @@ class ParsedPostAdmin(admin.ModelAdmin):
         return form
 
 
-def parse_links(modelsadmin, request, queryset):
-    for i in queryset:
-        ParseHandler(i).create_links()
-
-
-parse_links.short_description = "Parse links from map"
-
-
-def parse_posts(modelsadmin, request, queryset):
-    for i in queryset:
-        ParseHandler(i).create_posts()
-
-
-parse_posts.short_description = "Parse posts from map"
-
-
 class ParsedMapAdmin(admin.ModelAdmin):
     list_display = ('host', 'link', 'type')
-    actions = [parse_links, parse_posts]
 
 
 class PostViewAdmin(admin.ModelAdmin):

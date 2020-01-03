@@ -1,6 +1,6 @@
 from itertools import groupby
 
-from django.views.generic import ListView, DetailView, TemplateView, FormView, View
+from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchQuery, SearchRank

@@ -4,7 +4,6 @@ from django.conf import settings
 from django.urls import reverse
 
 from core.utils.tests.factories import UserFactory
-from core.utils.tests.utils import HtmlTestCaseMixin
 
 
 class AuthTests(TestCase):
@@ -49,7 +48,7 @@ class AuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class PersonalIndexViewTests(HtmlTestCaseMixin, TestCase):
+class PersonalIndexViewTests(TestCase):
     def test_response_ok(self):
         user = UserFactory()
         self.client.force_login(user)
