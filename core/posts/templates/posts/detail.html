@@ -2,25 +2,17 @@
 
 {% load static i18n cache post_extras %}
 
-{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
-{% endif %}{% endblock title %}
+{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}{% endblock title %}
 
-{% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}
-    {{ object.text|truncatechars:300|striptags|safe }}{% endif %}{% endblock %}
+{% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}{% endblock %}
 
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
-    <meta content="
-
-            {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}"
-          property="og:description">
+    <meta content="{% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|truncatechars:300|striptags|safe }}{% endif %}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
     <link href="{% full_url object.photo.first.image.url %}" rel="image_src"/>
-    {% if "-user" in object.rubric.slug %}
-        <meta name="robots" content="noindex, nofollow">
-    {% endif %}
 {% endblock extra_meta %}
 
 {% block scripts %}

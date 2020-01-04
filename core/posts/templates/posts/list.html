@@ -11,9 +11,7 @@
     <meta name="robots" content="noindex, follow">
 {% endblock extra_meta %}
 
-{% block page_title %}
-    {% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}
-{% endblock %}
+{% block page_title %}{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}{% endblock %}
 
 {% block content %}
 

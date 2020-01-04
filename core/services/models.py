@@ -10,7 +10,7 @@ from ckeditor.fields import RichTextField
 
 class Feedback(models.Model):
     title = models.CharField(max_length=255, verbose_name=_('Заголовок'))
-    email = models.EmailField(verbose_name=_('Email'))
+    email = models.EmailField(blank=True, null=True, verbose_name=_("Email (необов'язково)"))
     text = models.TextField(verbose_name=_('Текст'))
 
     class Meta:

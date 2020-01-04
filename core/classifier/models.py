@@ -23,6 +23,7 @@ class Country(models.Model):
         db_table = 'country'
         verbose_name = _('country')
         verbose_name_plural = _('countries')
+        ordering = ["value"]
 
     def __str__(self):
         return self.value
