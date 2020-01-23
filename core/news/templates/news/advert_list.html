@@ -18,10 +18,6 @@
 {% block page_title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
 
 {% block content %}
-    <div class="alert alert-success" role="alert">
-        Вже зовсім скоро більше ресурсів з оголошеннями та магазів. Всі корисні фільтри та пошук. Дякуємо за те що
-        Ви з нами!
-    </div>
     <div class="col-md-4 col-sm-12 mb-3">
         {% cache 1800 'categories_filter_block' %}
             {% categories_filter %}
