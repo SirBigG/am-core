@@ -6,7 +6,8 @@ from urllib.parse import urlparse
 
 from django import template
 from django.conf import settings
-from django.templatetags.static import static
+
+from django_http2_push.templatetags.static_push import StaticPushNode
 
 from core.classifier.models import Category
 
@@ -82,18 +83,24 @@ def thumbnail(photo_obj, width=300, height=None):
     return photo_obj.thumbnail(width, height) if photo_obj else ""
 
 
-@register.simple_tag
-def static_version(path):
+class StaticVersionNode(StaticPushNode):
+
+    def render(self, context):
+        url = super().render(context)
+        version = getattr(settings, 'MEDIA_VERSION', '')
+        if version:
+            url = f'{url}?{version}'
+        return url
+
+
+@register.tag('static_version')
+def do_static_version(parser, token):
     """
     Add version end to static path.
-    :param path: path to static file
+    # :param path: path to static file
     :return: full static file path with version
     """
-    version = getattr(settings, 'MEDIA_VERSION', '')
-    _path = static(path)
-    if version:
-        _path = f'{_path}?{version}'
-    return _path
+    return StaticVersionNode.handle_token(parser, token)
 
 
 # ####################    Filters    ################### #

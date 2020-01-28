@@ -75,6 +75,8 @@ INSTALLED_APPS = [
     'social_django',
     # Simple tags https://github.com/jazzband/django-taggit
     'taggit',
+    # http2 support https://github.com/ricardochaves/django_http2_push
+    "django_http2_push",
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -83,6 +85,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "django_http2_push.middleware.PushHttp2Middleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
