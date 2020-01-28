@@ -55,15 +55,4 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col-lg-12 col-12 mt-4">
-        {# Random posts block. #}
-        <div class="h5">{% trans 'Більше статтей тут:' %}</div>
-        <div id="random-post-list"></div>
-        {# Comments block. #}
-        <div id="comment" class="{{ object.id }}"></div>
-      </div>
-    </div>
-
-    <script src="{% static_version 'bundles/detail.js' %}"></script>
 {% endblock content %}
