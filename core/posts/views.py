@@ -1,4 +1,5 @@
 from itertools import groupby
+from datetime import date
 
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
@@ -17,9 +18,12 @@ class IndexView(TemplateView):
     template_name = 'index.html'
 
     def get_context_data(self, **kwargs):
+        from core.events.models import Event
         context = super().get_context_data(**kwargs)
         context['categories'] = Category.objects.filter(
             id__in=Post.objects.order_by('-hits').values_list('rubric__parent_id')[:8])
+        context['events'] = Event.objects.select_related('location').filter(
+            status=1, start__gte=date.today()).order_by('start')[:4]
         context['object_list'] = Post.objects.select_objects().active().order_by('-publish_date')[:8]
         return context
 

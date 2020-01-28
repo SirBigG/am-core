@@ -35,6 +35,30 @@
         </div>
     </div>
 {#    <!-- Hero Area End -->#}
+    {#    <!-- Events Section Start -->#}
+    {% if events %}
+    <section class="trending-cat section-padding">
+        <div class="container">
+            <h2 class="section-title">Найближчі події</h2>
+            <div class="row">
+                {% for event in events %}
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                        <a href="{{ event.get_absolute_url }}">
+                            <div class="box">
+                                <div class="icon">
+                                    <img class="img-fluid" src="{% thumbnail event 350 280 %}" alt="{{event.title}}">
+                                </div>
+                                <h4>{{event.title}}</h4>
+                                <strong>{{ event.start|date:"d E Y  H:i" }}</strong>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    {% endif %}
+{#    <!-- Events Section End -->#}
 {#    <!-- Trending Categories Section Start -->#}
     <section class="trending-cat section-padding">
         <div class="container">
