@@ -93,8 +93,9 @@ class Post(models.Model):
             if self.__class__.objects.filter(slug=self.slug).first():
                 self.slug = self.slug + ''.join(random.choice(string.ascii_lowercase) for _ in range(4))
         # always upgrade absolute url on save
-        self.absolute_url = reverse('post-detail', args=(self.rubric.parent.slug, self.rubric.slug,
-                                                         self.slug, self.pk,))
+        if self.pk:
+            self.absolute_url = reverse('post-detail', args=(self.rubric.parent.slug, self.rubric.slug,
+                                                             self.slug, self.pk,))
         super().save(*args, **kwargs)
 
     def get_absolute_url(self):
