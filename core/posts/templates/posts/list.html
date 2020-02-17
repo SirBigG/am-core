@@ -14,7 +14,6 @@
 {% block page_title %}{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{%else%}{{category.value}}{% endif %}{% endblock %}
 
 {% block content %}
-
     <div class="row mb-3">
       <div class="col-12 d-flex justify-content-end">
       <div class="btn-group btn-group-sm" role="group" aria-label="List types">
@@ -22,6 +21,9 @@
         <button type="button" class="btn btn-success disabled" aria-disabled="true"><i class="icon-th-list"></i></button>
       </div>
       </div>
+    </div>
+    <div class="row mb-3">
+        <h6 class="text-danger">Не знайшли публікації про сорт чи породу яку шукали? Напишіть у <a href="/feedback/">форму зворотнього зв'язку</a> і ми обов'язково знайдемо інформацію для Вас.</h6>
     </div>
 
     {% include "posts/helpers/object_list.html" %}

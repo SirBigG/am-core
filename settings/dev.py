@@ -37,3 +37,8 @@ CACHES = {
 
 STATIC_ROOT = '/static'
 MEDIA_ROOT = '/media'
+
+# MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
+#
+# CORS_ORIGIN_ALLOW_ALL = True
+# CORS_ORIGIN_WHITELIST = []

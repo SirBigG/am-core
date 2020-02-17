@@ -178,6 +178,7 @@ AUTHENTICATION_BACKENDS = [
 
 SOCIAL_AUTH_FIELDS_STORED_IN_SESSION = []  # ['state', ]
 SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 180
 
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',

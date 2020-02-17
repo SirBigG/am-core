@@ -21,6 +21,9 @@
       </div>
       </div>
     </div>
+    <div class="row mb-3">
+        <h6 class="text-danger">Не знайшли публікації про сорт чи породу яку шукали? Напишіть у <a href="/feedback/">форму зворотнього зв'язку</a> і ми обов'язково знайдемо інформацію для Вас.</h6>
+    </div>
     {% for group in posts|group_by:2 %}
         <div class="row">
             {% for key, list in group %}
@@ -28,7 +31,7 @@
                     <h3 class="text-secondary">{{ key }}</h3>
                     <ul class="list-unstyled">
                     {% for post in list %}
-                        <li><a class="text-success no-decoration" href="/{{ post.rubric__parent__slug }}/{{ post.rubric__slug }}/{{ post.slug }}-{{ post.id }}.html">{{ post.title }}</a></li>
+                        <li class="mb-2"><a class="text-success no-decoration" href="/{{ post.rubric__parent__slug }}/{{ post.rubric__slug }}/{{ post.slug }}-{{ post.id }}.html">{{ post.title }}</a></li>
                     {% endfor %}
                     </ul>
                 </div>
