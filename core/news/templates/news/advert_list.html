@@ -8,66 +8,66 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %} | AgroMega.in.ua" property="og:title">
-    <meta content="Свіжі оголошення аграрної тематики {% if category %} в категорії {{ category.value }} {% endif %}." property="og:description">
-    {% if request.GET.page %}<meta name="robots" content="noindex, nofollow">{% endif %}
+    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}| AgroMega.in.ua" property="og:title">
+    <meta content="Свіжі оголошення аграрної тематики{% if category %} в категорії {{ category.value }}{% endif %}." property="og:description">
+    {% if request.GET.page %}
+        <meta name="robots" content="noindex, nofollow">{% endif %}
 {% endblock extra_meta %}
 
-{% block title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
+{% block title %}Всі аграрні оголошення{% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
 
-{% block page_title %}Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
+{% block page_title %}Всі аграрні оголошення{% if category %} в категорії {{ category.value }}
+{% endif %}{% endblock %}
 
-{% block content %}
-    <div class="col-md-4 col-sm-12 mb-3">
-        {% cache 1800 'categories_filter_block' %}
-            {% categories_filter %}
-        {% endcache %}
-    </div>
-    {% for obj in object_list %}
-        <div class="row">
-            <div class="card mb-3 w-100">
-                <div class="row no-gutters">
-                    <div class="col-md-4 col-12">
-                        {% if obj.data.image %}
-                            <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">
-                        {% endif %}
-                        <span class="badge badge-pill badge-success"
-                                 style="position: absolute; top: 20px; right: 20px;">{{ obj.link|get_domain }}</span>
-                    </div>
-                    <div class="col-md-8 col-12">
-                        <div class="card-body">
-                            <h5 class="card-title">{{ obj.data.title }}</h5>
-                            {% if obj.data.description %}
-                                <button class="btn btn-link" type="button" data-toggle="collapse"
-                                        data-target="#advert{{ forloop.counter }}" aria-expanded="false"
-                                        aria-controls="collapseExample"
-                                        onclick="ga('send', 'event', 'description', 'clicked')">Опис
-                                </button>
-                                <div class="collapse" id="advert{{ forloop.counter }}">
-                                    <div class="card-text">{{ obj.data.description }}</div>
-                                </div>
+{% block base_content_block %}
+    <div class="col-12">
+        <div class="col-md-4 col-12 mb-3">
+            {% cache 1800 'categories_filter_block' %}
+                {% categories_filter %}
+            {% endcache %}
+        </div>
+        {% for group in object_list|group_by:4 %}
+            <div class="card-group mb-2">
+            {% with external_loop_counter=forloop.counter %}
+                {% for obj in group %}
+                    <div class="col-md-3 col-12 mb-2">
+                        <div class="card">
+                            {% if obj.data.image %}
+                                <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">
+                                {% else %}
+                                <div class="card-img" style="width: 100%; height: 180px; background-color: white;"></div>
                             {% endif %}
-                            <div class="row mt-3">
-                                <div class="col-12 align-self-center">
-                                    <p class="h6 text-secondary">{{ obj.data.location }}</p>
+                               <span class="badge badge-pill badge-success" style="position: absolute; top: 10px; left: 10px;">{{ obj.link|get_domain }}</span>
+                            <div class="card-body">
+                                <h6 class="card-title">{{ obj.data.title }}</h6>
+                                <div class="row mt-3">
+                                    <div class="col-12 align-self-center">
+                                        <p class="h6 text-secondary">{{ obj.data.location }}</p>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="row mt-3">
-                                <div class="col-6">
-                                    <p class="h6 text-success">{{ obj.data.price }}</p>
-                                </div>
-                                <div class="col-6">
-                                    <button class="btn text-success"
-                                            onclick="ga('send', 'event', '{{ obj.link|get_domain }}', 'clicked'); window.open('{{ obj.link }}', '_blank')">
-                                        Докладніше</button>
+                                {% if obj.data.description %}
+                                    <p class="card-text collapse" id="advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}">{{ obj.data.description }}</p>
+                                    <button class="btn btn-link pl-0" type="button" data-toggle="collapse"
+                                            data-target="#advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}" aria-expanded="false"
+                                            onclick="ga('send', 'event', 'description', 'clicked');">Читати опис</button>
+                                {% endif %}
+                            <div class="row align-content-between">
+                                    <div class="col-6 p-0"><span class="btn text-success">{{ obj.data.price }}</span></div>
+                                    <div class="col-6 p-0">
+                                        <button class="btn text-success"
+                                                onclick="ga('send', 'event', '{{ obj.link|get_domain }}', 'clicked'); window.open('{{ obj.link }}?ref=agromega.in.ua', '_blank')">
+                                            Докладніше
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                {% endfor %}
+            {% endwith %}
             </div>
-        </div>
-    {% endfor %}
+        {% endfor %}
 
-    {% include "helpers/pagination_short.html" %}
-{% endblock content %}
+        {% include "helpers/pagination_short.html" %}
+    </div>
+{% endblock base_content_block %}

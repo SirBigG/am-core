@@ -20,3 +20,8 @@ def categories_filter():
     else:
         categories = Category.objects.none()
     return {'categories': categories}
+
+
+@register.filter
+def multiply(value, arg):
+    return value * arg
