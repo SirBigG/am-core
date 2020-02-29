@@ -20,7 +20,7 @@
 {% endif %}{% endblock %}
 
 {% block base_content_block %}
-    <div class="col-12">
+    <div class="col-12 p-0">
         <div class="col-md-4 col-12 mb-3">
             {% cache 1800 'categories_filter_block' %}
                 {% categories_filter %}
@@ -30,7 +30,7 @@
             <div class="card-group mb-2">
             {% with external_loop_counter=forloop.counter %}
                 {% for obj in group %}
-                    <div class="col-md-3 col-12 mb-2">
+                    <div class="col-md-3 col-12 mb-3">
                         <div class="card">
                             {% if obj.data.image %}
                                 <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">

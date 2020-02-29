@@ -1,4 +1,4 @@
-<ul class="nav nav-fill second-menu pt-3">
+<ul class="nav nav-fill second-menu p-3">
     {% for item in menu_items %}
       {% if slug and slug == item.slug %}
           <li class="nav-item"><a class="nav-link active" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a></li>
