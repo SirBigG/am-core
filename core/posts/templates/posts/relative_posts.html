@@ -7,11 +7,11 @@
             <div class="col-6 col-lg-3">
                 <a href="{{ item.get_absolute_url }}">
                     {% if item.photo.all.0 %}
-                        <img src="{%thumbnail item.photo.all.0 200 150 %}" class="img-fluid img-rounded" alt="{{ item.title }}">
+                        <img src="{%thumbnail item.photo.all.0 200 150 %}" class="img-fluid rounded" alt="{{ item.title }}">
                     {% endif %}
                 </a>
-                <h5 class="text-center" style="overflow: auto;">
-                    <a href="{{ item.get_absolute_url }}">{{ item.title }}</a>
+                <h5 class="text-center m-3" style="overflow: auto;">
+                    <a class="text-success" href="{{ item.get_absolute_url }}">{{ item.title }}</a>
                 </h5>
             </div>
         {% endfor %}
