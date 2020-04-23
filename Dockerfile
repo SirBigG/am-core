@@ -1,4 +1,4 @@
-FROM python:3.8.1-alpine
+FROM python:3.8.2-alpine
 
 ENV PYTHONUNBUFFERED 1
 
@@ -22,6 +22,7 @@ RUN apk --no-cache add autoconf \
                        lcms2-dev \
                        build-base \
                        linux-headers \
+                       libffi-dev \
                        pcre-dev \
                        git && \
    pip install -r requirements.txt && \
