@@ -1,4 +1,4 @@
-Django==3.0.2
+Django==3.0.5
 django-autocomplete-light==3.5.0
 django-ckeditor==5.8.0
 django-mptt==0.10.0
@@ -11,7 +11,7 @@ ipaddress==1.0.16
 MarkupSafe==0.23
 phonenumbers==7.5.1
 phonenumberslite==7.5.1
-Pillow==6.2.1
+Pillow==6.2.2
 psycopg2-binary==2.8.4
 python-dateutil==2.5.3
 pytz==2016.6.1
