@@ -190,3 +190,8 @@ admin.site.register(PostView, PostViewAdmin)
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(UsefulStatistic, UsefulStatisticAdmin)
 admin.site.register(SearchStatistic, SearchStatisticAdmin)
+
+
+# setup admin site headers
+admin.site.site_header = 'AgroMega'
+admin.site.site_title = 'AgroMega'
