@@ -1,13 +1,15 @@
 <nav class="navbar second-menu-container mb-2">
-        <div class="container">
-<div class="nav nav-fill d-inline-flex flex-rows second-menu p-2">
-    {% for item in menu_items %}
-      {% if slug and slug == item.slug %}
-          <a class="nav-item nav-link active" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a>
-      {% else %}
-          <a class="nav-item nav-link" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span class="h5">{{ item.value }}</span></a>
-      {% endif %}
-    {% endfor %}
-</div>
+    <div class="container">
+        <div class="nav nav-fill d-inline-flex flex-rows second-menu p-2">
+            {% for item in menu_items %}
+                {% if slug and slug == item.slug %}
+                    <a class="nav-item nav-link active" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span
+                            class="h5">{{ item.value }}</span></a>
+                {% else %}
+                    <a class="nav-item nav-link" href="/{{ item.parent.slug }}/{{ item.slug }}/"><span
+                            class="h5">{{ item.value }}</span></a>
+                {% endif %}
+            {% endfor %}
         </div>
+    </div>
 </nav>
