@@ -77,6 +77,8 @@ INSTALLED_APPS = [
     'taggit',
     # http2 support https://github.com/ricardochaves/django_http2_push
     "django_http2_push",
+    # https://github.com/praekelt/django-recaptcha
+    'captcha',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy
@@ -282,3 +284,6 @@ MEDIA_VERSION = os.getenv("MEDIA_VERSION")
 API_HOST = os.getenv('API_HOST')
 
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+
+RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY", "")
+RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY", "")

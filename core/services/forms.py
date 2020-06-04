@@ -1,9 +1,13 @@
 from django import forms
 
+from captcha.fields import ReCaptchaField
+
 from core.services.models import Feedback
 
 
 class FeedbackForm(forms.ModelForm):
+    captcha = ReCaptchaField()
+
     class Meta:
         model = Feedback
         fields = '__all__'
