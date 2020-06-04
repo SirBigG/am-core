@@ -2,6 +2,14 @@
 
 {% load post_extras %}
 
+{% block extra_meta %}
+    <meta content="{{ post.title }} фото галерея | AgroMega.in.ua" property="og:title">
+    <meta content="Всі фото {{ post.title }}." property="og:description">
+        {#        <meta content="" property="og:image">#}
+        <meta content="{{ request.path }}" property="og:url">
+        <meta content="AgroMega.in.ua" property="og:site_name">
+    {% endblock extra_meta %}
+
 {% block scripts %}
     <script src="{% static_version "posts/j-gallery.js" %}"></script>
     <link rel="stylesheet" href="{% static_version "posts/gallery.css" %}">
