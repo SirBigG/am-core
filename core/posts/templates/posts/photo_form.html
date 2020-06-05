@@ -2,12 +2,22 @@
 
 {% load i18n post_extras %}
 
+{% block extra_meta %}
+    <meta content="Поділитись фото {{ post.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей." property="og:description">
+        {#        <meta content="" property="og:image">#}
+        <meta content="{{ request.path }}" property="og:url">
+        <meta content="AgroMega.in.ua" property="og:site_name">
+    {% endblock extra_meta %}
+
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
 {% endblock scripts %}
 
 {% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock %}
+{% block title %}Поділитись фото {{ post.title }} |{% endblock %}
+{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей.{% endblock %}
 
 {% block content %}
     <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
