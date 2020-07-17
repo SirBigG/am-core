@@ -53,7 +53,7 @@
     </div>
     <div class="row">
     <div class="col-12 p-0">
-        <div class="m-3">
+        <div class="m-3 post-wrapper">
             {{ object.text|safe }}
             {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
             {% if object.source %}<div class="post-source mt-2 mb-3"><h6 style="overflow-y: auto;">{% trans 'Джерело: ' %}{{ object.source }}</h6></div>{% endif %}
