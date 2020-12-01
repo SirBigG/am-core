@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% load post_extras %}
+
+{% block scripts %}
+    <script src="{% static_version "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock scripts %}
+
+{% block extra_meta %}
+    <meta name="robots" content="noindex, follow">
+{% endblock extra_meta %}
+
+{% block page_title %}Оголошення{% endblock %}
+
+{% block content %}
+    {% include "adverts/helpers/object_list.html" %}
+
+    {% include "helpers/pagination.html" %}
+{% endblock content %}

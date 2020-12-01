@@ -1,0 +1,19 @@
+{% load post_extras static_push %}
+
+{% for advert in object_list %}
+<div class="row">
+    <div class="card mb-3 w-100">
+        <div class="row no-gutters">
+            <div class="col-md-4 col-12"><img src="{{ advert.image.path }}" alt="{{advert.category.value}} {{ advert.title }}" class="card-img"></div>
+            <div class="col-md-8 col-12">
+                <div class="card-body">
+                    <h2 class="card-title h4">{{ advert.title }}</h2>
+                    <div class="card-text">{{ advert.description|safe }}</div>
+                    {% if advert.author %}<div class="card-text">Автор: {{ advert.author }}</div>{% endif %}
+                    <div class="card-text"><strong>{{ advert.contact }}</strong></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

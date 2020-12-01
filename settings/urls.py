@@ -42,8 +42,9 @@ urlpatterns = [
     path('api/', include('api.v1.urls')),
     path('events/', include('core.events.urls', namespace='events')),
     path('news/', include('core.news.urls', namespace='news')),
-    path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
-    path('adverts/', AdvertListView.as_view(), name="adverts-list"),
+    path('adverts/', include("core.adverts.urls", namespace='adverts')),
+    # path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
+    # path('adverts/', AdvertListView.as_view(), name="adverts-list"),
     # Rendering index page for all urls starts with /profile/ for personal page.
     path('profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
          name='personal-index'),
