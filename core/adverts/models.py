@@ -21,6 +21,9 @@ class Advert(models.Model):
     image = models.ImageField(upload_to='adverts/images', verbose_name=_('image'))
     author = models.CharField(max_length=512, blank=True, null=True)
     contact = models.CharField(max_length=512)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    location = models.ForeignKey('classifier.Location', blank=True, null=True,
+                                 on_delete=models.SET_NULL, verbose_name=_('user location'))
     created = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -8,9 +8,11 @@
             <div class="col-md-8 col-12">
                 <div class="card-body">
                     <h2 class="card-title h4">{{ advert.title }}</h2>
-                    <div class="card-text">{{ advert.description|safe }}</div>
-                    {% if advert.author %}<div class="card-text">Автор: {{ advert.author }}</div>{% endif %}
-                    <div class="card-text"><strong>{{ advert.contact }}</strong></div>
+                    <div class="card-text mb-1">{{ advert.description|safe }}</div>
+                    {% if advert.author %}<div class="card-text mb-1">Автор: {{ advert.author }}</div>{% endif %}
+                    <div class="card-text mb-1"><strong>Контакти: {{ advert.contact }}</strong></div>
+                    {% if advert.location %}<div class="card-text mb-1"><strong>{{ advert.location }}</strong></div>{% endif %}
+                    <div class="card-text h5"><strong>Ціна: {{ advert.price }} грн.</strong></div>
                 </div>
             </div>
         </div>
