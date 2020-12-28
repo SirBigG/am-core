@@ -8,23 +8,6 @@ ADD requirements.txt $PROJECT_DIR/
 
 WORKDIR $PROJECT_DIR
 
-#RUN apk --no-cache add autoconf \
-#                       automake \
-#                       postgresql-dev \
-#                       gcc \
-#                       python3-dev \
-#                       musl-dev \
-#                       g++ \
-#                       libxslt-dev \
-#                       jpeg-dev \
-#                       zlib-dev \
-#                       freetype-dev \
-#                       lcms2-dev \
-#                       build-base \
-#                       linux-headers \
-#                       libffi-dev \
-#                       pcre-dev \
-#                       git && \
 RUN apt-get update && \
     apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev && \
     apt-get clean && \
