@@ -270,14 +270,14 @@ CKEDITOR_CONFIGS = {
 MULTILLECT_ACCOUNT_ID = os.getenv("MULTILLECT_ACCOUNT_ID")
 MULTILLECT_SECRET_KEY = os.getenv("MULTILLECT_SECRET_KEY")
 
-EMAIL_HOST = os.getenv("EMAIL_HOST")
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT")) if os.getenv("EMAIL_PORT") else None
-EMAIL_USE_TLS = True
-
-SERVER_EMAIL = os.getenv("SERVER_EMAIL")
-ADMINS = [i.split(",") for i in os.getenv("ADMINS").split(":")] if os.getenv("ADMINS") else []
+# EMAIL_HOST = os.getenv("EMAIL_HOST")
+# EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
+# EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
+# EMAIL_PORT = int(os.getenv("EMAIL_PORT")) if os.getenv("EMAIL_PORT") else None
+# EMAIL_USE_TLS = True
+#
+# SERVER_EMAIL = os.getenv("SERVER_EMAIL")
+# ADMINS = [i.split(",") for i in os.getenv("ADMINS").split(":")] if os.getenv("ADMINS") else []
 
 # Media version for browser cache refresh
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
