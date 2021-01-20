@@ -126,8 +126,6 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
             'class': 'logging.StreamHandler',
         }
     },
@@ -138,7 +136,7 @@ LOGGING = {
             'handlers': ['console'],
         },
         'django': {
-            'level': 'DEBUG',
+            'level': 'INFO',
             'handlers': ['console'],
         },
     }
