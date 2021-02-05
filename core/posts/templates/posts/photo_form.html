@@ -4,11 +4,10 @@
 
 {% block extra_meta %}
     <meta content="Поділитись фото {{ post.title }} | AgroMega.in.ua" property="og:title">
-    <meta content="Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей." property="og:description">
-        {#        <meta content="" property="og:image">#}
-        <meta content="{{ request.path }}" property="og:url">
-        <meta content="AgroMega.in.ua" property="og:site_name">
-    {% endblock extra_meta %}
+    <meta content="Поділіться фото ваших улюбленців {{ post.title }} з іншими користувачами" property="og:description">
+    <meta content="{{ request.path }}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+{% endblock extra_meta %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -17,23 +16,24 @@
 
 {% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock %}
 {% block title %}Поділитись фото {{ post.title }} |{% endblock %}
-{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей.{% endblock %}
+{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато
+    людей.{% endblock %}
 
 {% block content %}
     <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">
-            {% if field.name != "post_id" %}
-                <div class="col-12">
-                    <label>{{ field.label }}</label>
-                </div>
-                {% for error in field.errors %}
+                {% if field.name != "post_id" %}
                     <div class="col-12">
-                        <p class="text-danger">{{ error }}</p>
+                        <label>{{ field.label }}</label>
                     </div>
-                {% endfor %}
-            {% endif %}
+                    {% for error in field.errors %}
+                        <div class="col-12">
+                            <p class="text-danger">{{ error }}</p>
+                        </div>
+                    {% endfor %}
+                {% endif %}
                 <div class="col-12">
                     {{ field }}
                 </div>
