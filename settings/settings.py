@@ -80,6 +80,8 @@ INSTALLED_APPS = [
     "django_http2_push",
     # https://github.com/praekelt/django-recaptcha
     'captcha',
+    # https://github.com/radi85/Comment
+    'comment',
 
     # additional apps
     # Package for testing falling data in models https://github.com/rbarrois/factory_boy

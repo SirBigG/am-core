@@ -13,6 +13,9 @@ from django.core.files import File
 from django.conf import settings
 from django.contrib.postgres.search import SearchVectorField
 from django.contrib.postgres.indexes import GinIndex
+from django.contrib.contenttypes.fields import GenericRelation
+
+from comment.models import Comment
 
 from core.pro_auth.models import User
 
@@ -72,6 +75,8 @@ class Post(models.Model):
     absolute_url = models.CharField(max_length=512, default="")
 
     tags = TaggableManager()
+
+    comments = GenericRelation(Comment)
 
     text_search = SearchVectorField(null=True)
 

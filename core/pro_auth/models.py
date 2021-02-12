@@ -127,4 +127,9 @@ class User(AbstractBaseUser, PermissionsMixin):
         """
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
-    backend = settings.AUTHENTICATION_BACKENDS
+    @property
+    def username(self):
+        return self.get_full_name()
+
+
+backend = settings.AUTHENTICATION_BACKENDS

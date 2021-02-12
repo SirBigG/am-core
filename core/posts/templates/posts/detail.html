@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static_push i18n cache post_extras %}
+{% load static_push i18n cache post_extras comment_tags %}
 
 {% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |{% endif %}{% endblock title %}
 
@@ -81,6 +81,9 @@
                 <button class="btn btn-danger" id="notuseful">Ні</button>
             </div>
         </div>
+{#        Comments block#}
+        {% render_comments object request %}
+{#    {% include_bootstrap %}#}
         {% cache 300 'relative_list' object.rubric.slug %}
             {% relative_posts object.rubric %}
         {% endcache %}

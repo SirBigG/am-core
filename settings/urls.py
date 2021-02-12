@@ -29,6 +29,8 @@ urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
     path('admin/', admin.site.urls),
     path('rosetta/', include('rosetta.urls')),
+    path('comment/', include('comment.urls')),
+    path('api/', include('comment.api.urls')),
     path('sitemap.xml', views.SiteMap.as_view(), name='sitemap'),
     path('categories/', TemplateView.as_view(template_name="categories.html"), name='categories'),
     path('create/', TemplateView.as_view(template_name="add.html"), name='add'),
