@@ -66,11 +66,9 @@ class PostView(APIView):
             except Exception as e:
                 logging.error(e)
                 data = request.data
-            if PostViewModel.objects.filter(**data).exists() is False:
-                PostViewModel.objects.create(**data)
-                post = Post.objects.get(pk=request.data.get('post_id'))
-                post.hits += 1
-                post.save()
+            post = Post.objects.get(pk=request.data.get('post_id'))
+            post.hits += 1
+            post.save()
         return Response({"code": 200, "message": "Success"})
 
 
