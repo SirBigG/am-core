@@ -60,12 +60,6 @@ class PostView(APIView):
 
     def post(self, request, *args, **kwargs):
         if request.data and 'fingerprint' in request.data:
-            # todo: ref this with serializers usage or check keys not secure with kwargs.
-            try:
-                data = request.data.dict()
-            except Exception as e:
-                logging.error(e)
-                data = request.data
             post = Post.objects.get(pk=request.data.get('post_id'))
             post.hits += 1
             post.save()
