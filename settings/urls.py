@@ -48,8 +48,8 @@ urlpatterns = [
     # path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
     # path('adverts/', AdvertListView.as_view(), name="adverts-list"),
     # Rendering index page for all urls starts with /profile/ for personal page.
-    path('profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
-         name='personal-index'),
+    # path('profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
+    #      name='personal-index'),
     path('', include('core.classifier.urls')),
     path('', include('core.pro_auth.urls', namespace='pro_auth')),
     path('', include('core.posts.urls')),

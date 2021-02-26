@@ -1,10 +1,12 @@
-from django.views.generic import FormView, View
+from django.views.generic import FormView, View, TemplateView, UpdateView
 from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.urls import reverse
 
 
-from core.pro_auth.forms import LoginForm
+from core.pro_auth.forms import LoginForm, UserChangeForm
+from core.posts.models import Post
+from core.posts.forms import UpdatePostForm
 
 
 class Login(FormView):
@@ -39,3 +41,42 @@ class IsAuthenticate(View):
         if request.is_ajax():
             return JsonResponse({'is_authenticate': 1 if request.user.is_authenticated else 0})
         raise Http404
+
+
+class ChangeProfileView(FormView):
+    form_class = UserChangeForm
+    template_name = "pro_auth/profile/change_profile.html"
+    success_url = "/profile/change"
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(instance=self.request.user, **self.get_form_kwargs())
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
+
+
+class ProfilePostView(TemplateView):
+    template_name = "pro_auth/profile/posts.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data()
+        context["posts"] = Post.objects.filter(publisher=self.request.user)
+        return context
+
+
+class UpdateProfilePostView(UpdateView):
+    form_class = UpdatePostForm
+    template_name = "pro_auth/profile/posts_update.html"
+
+    def get_queryset(self):
+        return Post.objects.filter(publisher=self.request.user)
+
+    def get_success_url(self):
+        return self.get_object().get_absolute_url()
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)

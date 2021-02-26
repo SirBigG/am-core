@@ -50,6 +50,26 @@ class PostForm(forms.ModelForm):
         return instance
 
 
+class UpdatePostForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ["title", "text", "author", "source"]
+
+    labels = {
+        'title': _('Заголовок'),
+        'text': _('Текст'),
+        'author': _('Автор'),
+        'source': _('Джерело'),
+    }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["text"].widget = CKEditorWidget(config_name="public")
+        for name, field in self.fields.items():
+            if name != "location":
+                field.widget.attrs['class'] = "form-control"
+
+
 class PhotoForm(forms.ModelForm):
     post_id = forms.IntegerField(widget=forms.HiddenInput)
 

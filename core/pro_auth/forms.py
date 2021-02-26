@@ -64,7 +64,6 @@ class AdminUserCreationForm(forms.ModelForm):
 
 
 class UserCreationForm(AdminUserCreationForm):
-
     class Meta(AdminUserCreationForm.Meta):
         fields = ['email', 'phone1', 'location', 'password1', 'password2']
 
@@ -99,16 +98,31 @@ class AdminUserChangeForm(forms.ModelForm):
 
 
 class UserChangeForm(forms.ModelForm):
-    location = forms.ModelChoiceField(queryset=Location.objects.all(),
-                                      widget=autocomplete.ModelSelect2(url='location-autocomplete',
-                                                                       attrs={'class': 'form-control'}),
-                                      help_text=_("Please select city from list."),
-                                      label=_("City"))
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.all(),
+        widget=autocomplete.ModelSelect2(url='location-autocomplete',
+                                         attrs={'class': 'form-control'}),
+        help_text=_("Please select city from list."),
+        label=_("City")
+    )
 
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'last_name', 'phone1', 'location',
-                  'birth_date', 'avatar',)
+        fields = (
+            'email',
+            'first_name',
+            'last_name',
+            'phone1',
+            'location',
+            'birth_date',
+            'avatar',
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name, field in self.fields.items():
+            if name != "location":
+                field.widget.attrs['class'] = "form-control"
 
 
 class EmailConfirmForm(forms.Form):
