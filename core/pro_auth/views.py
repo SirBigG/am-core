@@ -6,7 +6,7 @@ from django.urls import reverse
 
 from core.pro_auth.forms import LoginForm, UserChangeForm
 from core.posts.models import Post
-from core.posts.forms import UpdatePostForm
+from core.posts.forms import UpdatePostForm, ProfileAddPostForm
 
 
 class Login(FormView):
@@ -80,3 +80,17 @@ class UpdateProfilePostView(UpdateView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class CreateProfilePostView(FormView):
+    form_class = ProfileAddPostForm
+    template_name = "pro_auth/profile/post_create.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(form.instance.get_absolute_url())

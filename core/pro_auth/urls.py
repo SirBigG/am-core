@@ -10,6 +10,7 @@ from core.pro_auth.views import (
     ChangeProfileView,
     ProfilePostView,
     UpdateProfilePostView,
+    CreateProfilePostView
 )
 
 
@@ -20,6 +21,7 @@ urlpatterns = [
     path('profile/', login_required(TemplateView.as_view(template_name='pro_auth/profile/dashboard.html')),
          name='dashboard'),
     path('profile/posts/update/<int:pk>', login_required(UpdateProfilePostView.as_view()), name='profile-posts-update'),
+    path('profile/posts/create', login_required(CreateProfilePostView.as_view()), name='profile-posts-create'),
     path('profile/posts', login_required(ProfilePostView.as_view()), name='profile-posts'),
     path('profile/change', login_required(ChangeProfileView.as_view()), name="change-profile"),
     path('login/', Login.as_view(), name='login'),

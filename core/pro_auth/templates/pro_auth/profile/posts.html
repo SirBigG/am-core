@@ -3,7 +3,7 @@
 {% block profile_content %}
     <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
     <h1 class="text-success">Мої публікації</h1>
-    <a class="btn btn-success btn-sm text-white"><i class="fas fa-plus"></i>Додати</a>
+    <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-posts-create' %}"><i class="fas fa-plus"></i> Додати</a>
     </div>
     {% if posts %}
         <div class="row">
