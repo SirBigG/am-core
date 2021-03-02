@@ -1,0 +1,18 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+
+{% block profile_content %}
+    <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
+    <h1 class="text-success">Мої щоденники</h1>
+    <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-diary-add' %}"><i class="fas fa-plus"></i> Додати</a>
+    </div>
+    <div class="row">
+    {% for object in object_list %}
+        <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-1">
+                <a href="{% url 'pro_auth:profile-diary-detail' pk=object.id %}">{{ object.title }}</a><a class="btn btn-warning btn-sm" href="{% url 'pro_auth:profile-diary-update' pk=object.id %}"><i class="fas fa-pencil-alt text-white"></i></a>
+            </div>
+        {{ object.description|safe }}
+        </div>
+    {% endfor %}
+    </div>
+{% endblock %}

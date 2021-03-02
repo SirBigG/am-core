@@ -1,0 +1,6 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+
+{% block profile_content %}
+    <h1 class="text-success">{{ object.title }}</h1>
+    {{ object.description|safe }}
+{% endblock %}

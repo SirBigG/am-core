@@ -1,4 +1,4 @@
-from django.views.generic import FormView, View, TemplateView, UpdateView
+from django.views.generic import FormView, View, TemplateView, UpdateView, ListView, DetailView
 from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.urls import reverse
@@ -7,6 +7,8 @@ from django.urls import reverse
 from core.pro_auth.forms import LoginForm, UserChangeForm
 from core.posts.models import Post
 from core.posts.forms import UpdatePostForm, ProfileAddPostForm
+from core.diary.forms import DiaryForm
+from core.diary.models import Diary
 
 
 class Login(FormView):
@@ -94,3 +96,53 @@ class CreateProfilePostView(FormView):
     def form_valid(self, form):
         form.save()
         return HttpResponseRedirect(form.instance.get_absolute_url())
+
+
+class AddDiaryView(FormView):
+    form_class = DiaryForm
+    template_name = "pro_auth/profile/add_diary.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(form.instance.get_profile_absolute_url())
+
+
+class ProfileDiaryListView(ListView):
+    template_name = "pro_auth/profile/diary_list.html"
+    model = Diary
+
+    def get_queryset(self):
+        return Diary.objects.filter(user=self.request.user)
+
+
+class ProfileDiaryDetailView(DetailView):
+    model = Diary
+    template_name = "pro_auth/profile/diary_detail.html"
+
+    def get_queryset(self):
+        return Diary.objects.filter(user=self.request.user)
+
+
+class UpdateProfileDiaryView(UpdateView):
+    form_class = DiaryForm
+    template_name = "pro_auth/profile/diary_update.html"
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    def get_queryset(self):
+        return Diary.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        return self.get_object().get_profile_absolute_url()
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
