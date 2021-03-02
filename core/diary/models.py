@@ -2,6 +2,8 @@ import os
 from PIL import Image
 from io import BytesIO
 
+from datetime import date
+
 from django.db import models
 from django.core.files import File
 from django.urls import reverse
@@ -24,10 +26,14 @@ class Diary(models.Model):
 
 
 class DiaryItem(models.Model):
-    diary = models.ForeignKey(Diary, on_delete=models.CASCADE)
+    diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="diary_items")
     description = RichTextField(verbose_name="Опис")
     image = models.ImageField(upload_to='diaries/images', verbose_name="Фото")
+    date = models.DateField(default=date.today, verbose_name="Дата")
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ("-date",)
 
     def save(self, *args, **kwargs):
         """Cut image before save."""

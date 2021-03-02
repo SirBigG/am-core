@@ -7,7 +7,7 @@ from django.urls import reverse
 from core.pro_auth.forms import LoginForm, UserChangeForm
 from core.posts.models import Post
 from core.posts.forms import UpdatePostForm, ProfileAddPostForm
-from core.diary.forms import DiaryForm
+from core.diary.forms import DiaryForm, DiaryItemForm
 from core.diary.models import Diary
 
 
@@ -146,3 +146,22 @@ class UpdateProfileDiaryView(UpdateView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class AddDiaryItemView(FormView):
+    form_class = DiaryItemForm
+    template_name = "pro_auth/profile/add_diary_item.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AddDiaryItemView, self).get_context_data(**kwargs)
+        context["diary"] = Diary.objects.get(pk=self.kwargs["diary_id"])
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["diary"] = Diary.objects.get(pk=self.kwargs["diary_id"])
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(reverse('pro_auth:profile-diary-detail', kwargs={"pk": self.kwargs["diary_id"]}))

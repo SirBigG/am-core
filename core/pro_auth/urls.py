@@ -15,6 +15,7 @@ from core.pro_auth.views import (
     ProfileDiaryListView,
     ProfileDiaryDetailView,
     UpdateProfileDiaryView,
+    AddDiaryItemView,
 )
 
 
@@ -26,6 +27,8 @@ urlpatterns = [
          name='dashboard'),
     path('profile/posts/update/<int:pk>', login_required(UpdateProfilePostView.as_view()), name='profile-posts-update'),
     path('profile/posts/create', login_required(CreateProfilePostView.as_view()), name='profile-posts-create'),
+    path('profile/diary/item/add/<int:diary_id>', login_required(AddDiaryItemView.as_view()),
+         name="profile-diary-item-add"),
     path('profile/diary/<int:pk>', login_required(ProfileDiaryDetailView.as_view()), name="profile-diary-detail"),
     path('profile/diary/update/<int:pk>', login_required(UpdateProfileDiaryView.as_view()),
          name="profile-diary-update"),
