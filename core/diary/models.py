@@ -24,6 +24,9 @@ class Diary(models.Model):
     def get_profile_absolute_url(self):
         return reverse('pro_auth:profile-diary-detail', kwargs={"pk": self.pk})
 
+    def get_absolute_url(self):
+        return reverse('diary:detail', kwargs={"pk": self.pk})
+
 
 class DiaryItem(models.Model):
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="diary_items")

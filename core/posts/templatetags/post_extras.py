@@ -13,6 +13,8 @@ from core.classifier.models import Category
 
 from core.posts.models import Post
 
+from core.adverts.models import Advert
+
 
 register = template.Library()
 
@@ -51,15 +53,7 @@ def post_adverts(category):
     Creating main page menu.
     :return: rubric roots queryset
     """
-    adverts = []
-    try:
-        response = requests.get(f'{settings.API_HOST}/adverts?category={category.id}')
-    except Exception as e:
-        logging.error(e)
-        return {'adverts': adverts, "link": "/"}
-    if response.status_code == 200:
-        adverts = response.json()["items"][:4]
-    return {'adverts': adverts, "link": f"/adverts/{category.slug}/"}
+    return {'adverts': Advert.objects.all().order_by('-created')[:4], "link": f"/adverts/{category.slug}/"}
 
 
 @register.inclusion_tag('posts/relative_posts.html')

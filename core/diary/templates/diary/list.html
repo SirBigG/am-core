@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% load post_extras %}
+
+
+{% block title %}Щоденники користувачів{% endblock %}
+{% block meta_description %}Щоденники користувачів по вирощування рослин та догляду за тваринами{% endblock %}
+
+
+{% block scripts %}
+    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+{% endblock %}
+
+{% block page_title %}Щоденники користувачів{% endblock %}
+
+
+{% block content %}
+    <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
+        <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-diary-add' %}"><i
+                class="fas fa-plus"></i> Додати</a>
+    </div>
+    <div class="row">
+        {% for object in object_list %}
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <a href="{% url 'diaries:detail' pk=object.id %}">{{ object.title }}</a>
+                </div>
+                {{ object.description|safe }}
+            </div>
+        {% endfor %}
+    </div>
+    {% include "helpers/pagination.html" %}
+{% endblock %}
