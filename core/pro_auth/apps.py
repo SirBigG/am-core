@@ -2,4 +2,4 @@ from django.apps import AppConfig
 
 
 class AuthConfig(AppConfig):
-    name = 'pro_auth'
+    name = 'core.pro_auth'

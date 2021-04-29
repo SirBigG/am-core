@@ -90,6 +90,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = (
+    'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django_http2_push.middleware.PushHttp2Middleware",
     'django.middleware.common.CommonMiddleware',

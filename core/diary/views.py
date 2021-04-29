@@ -18,4 +18,4 @@ class DiaryDetailView(DetailView):
     template_name = "diary/detail.html"
 
     def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
+        return Diary.objects.filter(id=self.kwargs["pk"])
