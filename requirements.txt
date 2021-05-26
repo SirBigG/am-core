@@ -1,4 +1,4 @@
-Django==3.2
+Django==3.2.3
 django-autocomplete-light==3.8.2
 django-ckeditor==6.0.0
 django-mptt==0.12.0
@@ -9,8 +9,8 @@ factory-boy
 flake8
 ipaddress==1.0.23
 MarkupSafe==1.1.1
-phonenumbers==8.12.21
-phonenumberslite==8.12.21
+phonenumbers==8.12.22
+phonenumberslite==8.12.22
 Pillow==8.2.0
 psycopg2==2.8.6
 python-dateutil==2.8.1

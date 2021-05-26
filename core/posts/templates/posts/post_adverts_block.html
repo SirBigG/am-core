@@ -1,5 +1,5 @@
 {% if adverts %}
-    <h5>Останні оголошення:</h5>
+    <h2 class="h5">Останні оголошення:</h2>
     <div class="row mt-3 mb-3">
         {% for item in adverts %}
             <div class="col-6 col-lg-3">
@@ -8,11 +8,11 @@
                         <img src="{{ item.image.url }}" class="img-fluid rounded" alt="{{ item.title }}">
                     {% endif %}
 
-                <h5 class="text-center m-3" style="overflow: auto;">
+                <h3 class="text-center h5 m-3" style="overflow: auto;">
                     <a href="{{ link }}" style="text-decoration: none; outline: 0;">
                     <p class="text-success">{{ item.title }}</p>
                     </a>
-                </h5>
+                </h3>
             </div>
         {% endfor %}
     </div>

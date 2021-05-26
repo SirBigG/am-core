@@ -1,7 +1,3 @@
-import logging
-
-import requests
-
 from urllib.parse import urlparse
 
 from django import template

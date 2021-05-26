@@ -38,7 +38,7 @@
 {% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}
     {% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}
         <object type="image/svg+xml" data="{% static_push flag_static %}" height="25px"
-                width="35px">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
+                width="35px" alt="{{ object.country.value }}">{{ object.country.value }}</object>{% endwith %}{% endif %}{% endblock %}
 
 {% block breadcrumbs %}
     {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
@@ -54,9 +54,9 @@
                 <img alt="{{ object.title }}" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
             {% endif %}
             <div class="img-overlay">
-                <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"><i class="icon-plus"></i></a>
+                <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2" aria-label="Додати фото до публікації"><i class="icon-plus"></i></a>
                 {% if object.photo.count > 1 %}
-                    <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-lg"><i class="icon-eye"></i></a>{% endif %}
+                    <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-lg" aria-label="Більше фото"><i class="icon-eye"></i></a>{% endif %}
             </div>
         </div>
     </div>
@@ -72,7 +72,7 @@
             <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
             <a class="h5" tabindex="-1" target="Share-in-facebook"
                onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-               href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}">
+               href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}" aria-label="Опублікувати у фейсбук">
                 <i class="icon-facebook"></i>
             </a>
         </div>
