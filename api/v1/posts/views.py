@@ -1,8 +1,6 @@
-import logging
-
 from django.utils.translation import get_language
 
-from core.posts.models import Post, PostView as PostViewModel, UsefulStatistic
+from core.posts.models import Post, UsefulStatistic
 
 from api.v1.posts.serializers import UserPostSerializer, ShortPostListSerializer
 from api.v1.posts.permissions import UserPostPermissions
@@ -59,10 +57,9 @@ class PostView(APIView):
     permission_classes = []
 
     def post(self, request, *args, **kwargs):
-        if request.data and 'fingerprint' in request.data:
-            post = Post.objects.get(pk=request.data.get('post_id'))
-            post.hits += 1
-            post.save()
+        post = Post.objects.get(pk=request.data.get('post_id'))
+        post.hits += 1
+        post.save()
         return Response({"code": 200, "message": "Success"})
 
 
