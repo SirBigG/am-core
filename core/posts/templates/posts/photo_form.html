@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block extra_meta %}
     <meta content="Поділитись фото {{ post.title }} | AgroMega.in.ua" property="og:title">
@@ -40,7 +40,7 @@
             </div>
         {% endfor %}
         <div class="col-12">
-            <button type="submit" class="btn btn-success mb-3">{% trans 'Опублікувати' %}</button>
+            <button type="submit" class="btn btn-success mb-3">Опублікувати</button>
         </div>
     </form>
     {{ form.media }}

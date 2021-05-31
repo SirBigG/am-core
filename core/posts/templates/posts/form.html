@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -30,7 +30,7 @@
             </div>
         {% endfor %}
         <div class="col-12">
-            <button type="submit" class="btn btn-success mb-3">{% trans 'Опублікувати' %}</button>
+            <button type="submit" class="btn btn-success mb-3">Опублікувати</button>
         </div>
     </form>
     {{ form.media }}

@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block content %}
-<h3 class="text-secondary mb-3">{% trans 'Зв’яжіться з нами' %}</h3>
+<h3 class="text-secondary mb-3">Зв’яжіться з нами</h3>
     <h6 class="text-warning mb-3">Сюди можна задати будь-які запиттаня. Будемо раді вислухати всі зауваження та пропозиції так як робимо все для Вас і хочемо ставати кращими.
         Якщо пишете якісь зауваження до контенту обов'язково вказуйте конкретну публікацію або посилання щоб було зрозуміло.</h6>
 
@@ -27,6 +27,6 @@
         </div>
     {% endfor %}
 
-    <button type="submit" class="btn btn-success">{% trans 'Відправити' %}</button>
+    <button type="submit" class="btn btn-success">Відправити</button>
 </form>
 {% endblock content %}

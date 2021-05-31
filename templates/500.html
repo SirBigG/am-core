@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -9,5 +9,5 @@
 
 {% block content %}
     <h1 class="text-center">500</h1>
-    <h2 class="text-center">{% trans "Упс. Сталась помилка або сторінка в розробці. Вибачте за незручності." %} Напишіть нам у форму <a href="/feedback/">зворотнього зв'язку</a> і ми вирішимо проблему найближчим часом.</h2>
+    <h2 class="text-center">Упс. Сталась помилка або сторінка в розробці. Вибачте за незручності. Напишіть нам у форму <a href="/feedback/">зворотнього зв'язку</a> і ми вирішимо проблему найближчим часом.</h2>
 {% endblock content %}

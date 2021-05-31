@@ -1,6 +1,6 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 
 {% block profile_content %}
@@ -23,7 +23,7 @@
             </div>
         {% endfor %}
         <div class="col-12">
-            <button type="submit" class="btn btn-success mb-3">{% trans 'Зберегти' %}</button>
+            <button type="submit" class="btn btn-success mb-3">Зберегти</button>
         </div>
     </form>
     {{ form.media }}

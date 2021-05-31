@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 
-{% load i18n %}
 {% load cache post_extras %}
 
 {% block scripts %}
@@ -42,8 +41,8 @@
         <div class="col-12 col-lg-6">
              <p class="text-muted">{{object.location}}</p>
              <p>{{object.address}}</p>
-            <p class="text-muted"><strong>{% trans "Початок" %}:</strong> {{object.start|date:"d E Y  H:i"}}</p>
-            <p class="text-muted"><strong>{% trans "Завершення" %}:</strong> {{object.stop|date:"d E Y  H:i"}}</p>
+            <p class="text-muted"><strong>Початок:</strong> {{object.start|date:"d E Y  H:i"}}</p>
+            <p class="text-muted"><strong>Завершення:</strong> {{object.stop|date:"d E Y  H:i"}}</p>
         </div>
     </div>
 

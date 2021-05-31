@@ -1,4 +1,4 @@
-{% load i18n cache %}
+{% load cache %}
 {% load post_extras %}
 
 <header class="navbar bg-dark navbar-expand-lg">
@@ -6,37 +6,37 @@
         <a class="navbar-brand text-success h4" href="/">Agro Mega</a>
         <div class="collapse navbar-collapse justify-content-center" id="main-menu-collapse">
               <ul class="navbar-nav">
-                  <li class="nav-item"><a class="nav-link text-white" href="/categories/">{% trans "Публікації" %}</a></li>
-                  <li class="nav-item"><a class="nav-link text-white" href="/news/">{% trans "Новини" %}</a></li>
-                  <li class="nav-item"><a class="nav-link text-white" href="/adverts/">{% trans "Оголошення" %}</a></li>
-                  <li class="nav-item"><a class="nav-link text-white" href="/events/">{% trans "Події" %}</a></li>
-                  <li class="nav-item"><a class="nav-link text-white" href="/diaries/">{% trans "Щоденники" %}</a></li>
+                  <li class="nav-item"><a class="nav-link text-white" href="/categories/">Публікації</a></li>
+                  <li class="nav-item"><a class="nav-link text-white" href="/news/">Новини</a></li>
+                  <li class="nav-item"><a class="nav-link text-white" href="/adverts/">Оголошення</a></li>
+                  <li class="nav-item"><a class="nav-link text-white" href="/events/">Події</a></li>
+                  <li class="nav-item"><a class="nav-link text-white" href="/diaries/">Щоденники</a></li>
               </ul>
         </div>
         <div class="navbar-nav d-inline-flex flex-row auth-block">
             <div class="nav-item m-1">
-                <button id="search-button" onclick="location.href='/search/'"  class="btn btn-success btn-sm" role="presentation" title="{% trans 'Пошук' %}">
+                <button id="search-button" onclick="location.href='/search/'"  class="btn btn-success btn-sm" role="presentation" title="Пошук">
                     <i class="icon-search"></i>
                 </button>
             </div>
             <div class="nav-item m-1">
-                <button id="add-button" onclick="location.href='/create/'"  class="btn btn-success btn-sm" role="presentation" title="{% trans 'Додати' %}">
+                <button id="add-button" onclick="location.href='/create/'"  class="btn btn-success btn-sm" role="presentation" title="Додати">
                     <i class="icon-plus"></i>
                 </button>
             </div>            {% if user.is_authenticated %}
                 <div class="nav-item m-1">
-                  <button onclick="location.href='/profile/'" class="btn btn-success btn-sm" title="{% trans 'Особистий кабінет' %}">
+                  <button onclick="location.href='/profile/'" class="btn btn-success btn-sm" title="Особистий кабінет">
                     <i class="icon-user-circle"></i>
                   </button>
                 </div>
                 <div class="nav-item m-1">
-                  <button onclick="location.href='/logout/'" class="btn btn-danger btn-sm" title="{% trans 'Вийти' %}">
+                  <button onclick="location.href='/logout/'" class="btn btn-danger btn-sm" title="Вийти">
                      <i class="icon-logout"></i>
                   </button>
                 </div>
             {% else %}
                 <div class="nav-item m-1">
-                  <button onclick="location.href='/login/'" class="btn btn-success btn-sm" title="{% trans 'Увійти' %}">
+                  <button onclick="location.href='/login/'" class="btn btn-success btn-sm" title="Увійти">
                      <i class="icon-login"></i>
                   </button>
                 </div>

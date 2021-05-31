@@ -1,4 +1,3 @@
-{% load i18n %}
 {% load static_push post_extras events_extras %}
 <!DOCTYPE html>
 <html lang="uk">
@@ -20,17 +19,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#24a824">
-    <title>{% block title %}{% trans 'Агропортал України' %} |{% endblock title %} AgroMega.in.ua</title>
+    <title>{% block title %}Агропортал України |{% endblock title %} AgroMega.in.ua</title>
     <meta name="description"
-          content="{% block meta_description %}{% trans 'Все про аграрну сферу і навіть більше.' %}{% endblock %}">
+          content="{% block meta_description %}Все про аграрну сферу і навіть більше.{% endblock %}">
     <link rel="shortcut icon" type="image/x-icon" href="{% static_push "favicon.ico" %}"/>
     <link rel="manifest" href="{% static_push 'site.webmanifest' %}">
     <link rel="apple-touch-icon" href="{% static_push 'apple-touch-icon.png' %}">
     <link rel="icon" sizes="192x192" href="{% static_push 'android-chrome-192x192.png' %}">
     {# For extra meta tags#}
     {% block extra_meta %}
-        <meta content="{% trans 'Агропортал України' %} | AgroMega.in.ua" property="og:title">
-        <meta content="{% trans 'Все про аграрну сферу і навіть більше.' %}" property="og:description">
+        <meta content="Агропортал України | AgroMega.in.ua" property="og:title">
+        <meta content="Все про аграрну сферу і навіть більше." property="og:description">
         {#        <meta content="" property="og:image">#}
         <meta content="{{ request.path }}" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">

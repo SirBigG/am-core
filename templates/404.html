@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -9,5 +9,5 @@
 
 {% block content %}
     <h1 class="text-center">404</h1>
-    <h1 class="text-center">{% trans "Такої сторінки не існує." %}</h1>
+    <h1 class="text-center">Такої сторінки не існує.</h1>
 {% endblock content %}

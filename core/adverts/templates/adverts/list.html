@@ -1,15 +1,15 @@
 {% extends "base.html" %}
 
-{% load post_extras i18n %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
 {% endblock scripts %}
 
-{% block title %}{% trans 'Аграрні оголошення України' %} |{% endblock %}
+{% block title %}Аграрні оголошення України |{% endblock %}
 {% block meta_description %}
-    {% trans 'Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті' %}{% endblock %}
+    Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті{% endblock %}
 
 {% block extra_meta %}
     {% if paginator.num_pages > 1 %}

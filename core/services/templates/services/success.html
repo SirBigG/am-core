@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load i18n post_extras %}
+{% load post_extras %}
 
 {% block scripts %}
     <script src="{% static_version "posts/j-index.js" %}"></script>
@@ -8,5 +8,5 @@
 {% endblock scripts %}
 
 {% block content %}
-    <h2 class="text-center text-success">{% trans 'Повідомлення відправлено! Дякуємо!' %}</h2>
+    <h2 class="text-center text-success">Повідомлення відправлено! Дякуємо!</h2>
 {% endblock content %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static_push i18n cache post_extras comment_tags %}
+{% load static_push cache post_extras comment_tags %}
 
 {% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
 {% endif %}{% endblock title %}
@@ -71,7 +71,7 @@
                     {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
                     {% if object.source %}
                         <div class="post-source mt-2 mb-3"><h6 style="overflow-y: auto;">
-                            {% trans 'Джерело: ' %}{{ object.source }}</h6></div>{% endif %}
+                            Джерело: {{ object.source }}</h6></div>{% endif %}
                 </div>
 
                 <div class="col-12 d-flex justify-content-between mb-3">
