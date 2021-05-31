@@ -13,13 +13,15 @@ from .models import Advert
 
 
 class AdvertForm(forms.ModelForm):
-    author = forms.CharField(required=False)
-    category = forms.ModelChoiceField(queryset=Category.objects.filter(level=1).order_by("value"), required=False)
+    author = forms.CharField(required=False, label=_("ПІБ"))
+    category = forms.ModelChoiceField(queryset=Category.objects.filter(level=1).order_by("value"),
+                                      required=False,
+                                      label=_("Категорія"))
     location = forms.ModelChoiceField(queryset=Location.objects.all(),
                                       widget=autocomplete.ModelSelect2(url='location-autocomplete',
                                                                        attrs={'class': 'form-control'}),
                                       help_text=_("Please select city from list."),
-                                      label=_("City"),
+                                      label=_("Місто/Село"),
                                       required=False)
 
     class Meta:
@@ -28,7 +30,7 @@ class AdvertForm(forms.ModelForm):
 
         labels = {
             'title': _('Заголовок'),
-            'description': _('Текст'),
+            'description': _('Короткий опис'),
             'author': _('Автор'),
             'contact': _('Контакти'),
             'image': _('Картинка'),
