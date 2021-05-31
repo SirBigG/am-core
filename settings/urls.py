@@ -27,7 +27,7 @@ from core.services.views import FeedbackView
 
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    path('admin/', admin.site.urls),
+    path(f'admin{settings.ADMIN_HASH}/', admin.site.urls),
     path('rosetta/', include('rosetta.urls')),
     path('comment/', include('comment.urls')),
     path('api/', include('comment.api.urls')),

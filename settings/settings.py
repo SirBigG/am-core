@@ -31,6 +31,8 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv('ALLOWED_HOST
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 
+ADMIN_HASH = os.getenv("ADMIN_HASH", "")
+
 # https settings
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 # SECURE_SSL_REDIRECT = True
