@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% load cache post_extras %}
+{% load cache post_extras static %}
 
 {% block scripts %}
-    <script src="{% static_version "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static_version "posts/detail.css" %}">
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock scripts %}
 
 {% block title %}{{ object.title }} |{% endblock title %}

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load post_extras cache %}
+{% load post_extras cache static %}
 
 {% block extra_meta %}
     <meta content="Категорії | AgroMega.in.ua" property="og:title">
@@ -11,8 +11,8 @@
 {% endblock extra_meta %}
 
 {% block scripts %}
-    <script src="{% static_version "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static_version "posts/categories.css" %}">
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/categories.css" %}">
 {% endblock scripts %}
 
 {% block content %}

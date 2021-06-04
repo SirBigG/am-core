@@ -10,7 +10,7 @@ class LocationAutocomplete(autocomplete.Select2QuerySetView):
     Return locations queryset.
     """
     def get_queryset(self):
-        qs = Location.objects.all()
+        qs = Location.objects.prefetch_related("region", "area").all()
         if self.q:
             qs = qs.filter(value__istartswith=self.q)
         return qs

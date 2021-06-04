@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load post_extras static %}
 
 {% block extra_meta %}
     <meta content="Поділитись фото {{ post.title }} | AgroMega.in.ua" property="og:title">
@@ -10,8 +10,8 @@
 {% endblock extra_meta %}
 
 {% block scripts %}
-    <script src="{% static_version "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
 
 {% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock %}

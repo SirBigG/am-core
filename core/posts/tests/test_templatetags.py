@@ -1,10 +1,9 @@
-from django.test import TestCase, override_settings
-from django.conf import settings
+from django.test import TestCase
 
 from core.utils.tests.factories import CategoryFactory
 
-from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu, \
-    static_version, index_categories, get_domain
+from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu,\
+    index_categories
 
 
 class PostExtrasTests(TestCase):
@@ -47,11 +46,3 @@ class PostExtrasTests(TestCase):
         CategoryFactory(parent=parent)
         CategoryFactory(parent=parent)
         self.assertEqual(len(second_menu('parent')['menu_items']), 2)
-
-    @override_settings(MEDIA_VERSION='')
-    def test_static_version_without_settings(self):
-        self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css' % settings.STATIC_URL)
-
-    @override_settings(MEDIA_VERSION='1.0')
-    def test_static_version_with_setting(self):
-        self.assertEqual(static_version('path/to/file.css'), '%spath/to/file.css?1.0' % settings.STATIC_URL)

@@ -1,9 +1,9 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load post_extras static %}
 
 {% block scripts %}
-    <link rel="stylesheet" href="{% static_version "posts/main.css" %}">
+    <link rel="stylesheet" href="{% static "posts/main.css" %}">
     <script
   src="https://code.jquery.com/jquery-3.4.1.min.js"
   integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="

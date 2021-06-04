@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load post_extras static %}
 
 {% block scripts %}
-    <script src="{% static_version "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
 
 {% block extra_meta %}

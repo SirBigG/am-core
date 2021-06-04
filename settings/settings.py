@@ -162,6 +162,8 @@ DATABASES = {
     }
 }
 
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
@@ -245,6 +247,7 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = os.getenv("STATIC_ROOT", BASE_DIR + '/static/')
+STATICFILES_STORAGE = "core.utils.storage.VersionedStaticFilesStorage"
 
 # Media files (uploads)
 MEDIA_URL = '/media/'

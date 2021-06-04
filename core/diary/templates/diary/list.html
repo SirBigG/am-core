@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load post_extras %}
+{% load post_extras static %}
 
 
 {% block title %}Щоденники користувачів{% endblock %}
@@ -8,7 +8,7 @@
 
 
 {% block scripts %}
-    <link rel="stylesheet" href="{% static_version "posts/list.css" %}">
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock %}
 
 {% block page_title %}Щоденники користувачів{% endblock %}
