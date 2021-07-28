@@ -8,6 +8,11 @@
 {% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}
     {{ object.text|striptags|truncatechars:160|safe }}{% endif %}{% endblock %}
 
+{% block scripts %}
+    <script src="{% static "posts/j-detail.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
+{% endblock %}
+
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="
@@ -105,6 +110,4 @@
             {% post_adverts object.rubric.parent %}
         {% endcache %}
     </div>
-    <script src="{% static "posts/j-detail.js" %}"></script>
-    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock content %}

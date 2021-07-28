@@ -34,7 +34,6 @@
         <meta content="{{ request.path }}" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
-
     {% block scripts %}{% endblock scripts %}
 </head>
 {% block body_head_tag %}
@@ -80,10 +79,7 @@
 
     {% block extra_body %}{% endblock extra_body %}
 </main>
-{% block footer %}
-    {% include 'footer.html' %}
-{% endblock footer %}
-
+{% block footer %}{% include 'footer.html' %}{% endblock footer %}
 <script>
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('{% static_push "service-worker.js" %}')
