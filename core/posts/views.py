@@ -99,7 +99,7 @@ class PostSearchView(ListView):
                                               "search_phrase": self.request.GET.get('q')})
         return Post.objects.select_objects().active().annotate(
             rank=SearchRank(F('text_search'), SearchQuery(self.request.GET.get('q', ''),
-                                                          config='english'))).filter(rank__gt=0).order_by('-rank')
+                                                          config='english'))).filter(rank__gt=0.3).order_by('-rank')
 
 
 class PostDetail(DetailView):

@@ -1,0 +1,14 @@
+User-agent: *
+
+Disallow: /admin/
+Disallow: /rosetta/
+
+Disallow: /user
+Disallow: /service/feedback
+
+Disallow: /register
+Disallow: /login
+Disallow: /logout
+Disallow: /confirm/email
+
+Sitemap: https://agromega.in.ua/sitemap.xml
