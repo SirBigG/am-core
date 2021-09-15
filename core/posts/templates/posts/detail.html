@@ -58,7 +58,7 @@
         <div class="row">
             <div class="col-12 p-0">
                 {% if object.photo.first %}
-                    <img alt="{{ object.title }}" width="800" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
+                    <img alt="{{ object.title }}" width="800" height="500" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
                 {% endif %}
                 <div class="img-overlay">
                     <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"
