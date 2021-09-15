@@ -7,7 +7,7 @@
             <div class="col-6 col-lg-3">
                 <a href="{{ item.get_absolute_url }}">
                     {% if item.photo.all.0 %}
-                        <img src="{%thumbnail item.photo.all.0 200 150 %}" loading="lazy" class="img-fluid rounded" alt="{{ item.title }}">
+                        <img src="{%thumbnail item.photo.all.0 200 150 %}" loading="lazy" class="img-fluid" alt="{{ item.title }}">
                     {% endif %}
                 </a>
                 <h3 class="text-center h6 m-3" style="overflow: auto;">
