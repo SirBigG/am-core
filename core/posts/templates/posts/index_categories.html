@@ -6,16 +6,24 @@
     <div class="row">
         {% for child in root.get_children %}
             <div class="col-md-3 col-6 mb-2">
-                <div class="card text-white">
+                <div class="card">
                     {% if child.image %}
-                    <img src="{{ child.image.url }}" class="card-img" alt="{{ child.value }}">
+                        <img src="{{ child.image.url }}" class="card-img" alt="{{ child.value }}">
                     {% endif %}
                     <div class="card-img-overlay">
-                        <h5 class="card-title">{{ child.value }}</h5>
+                        <h5 class="card-title text-white">{{ child.value }}</h5>
                         <a class="stretched-link" href="/{{ child.slug }}/"></a>
                     </div>
                 </div>
-
+                <div class="card">
+                    <ul class="list-group list-group-flush">
+                        {% for ch in child.get_children %}
+                            <li class="list-group-item">
+                                <a class="text-success no-decoration text-small" href="/{{ child.slug }}/{{ ch.slug }}/">{{ ch.value }}</a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         {% endfor %}
     </div>
