@@ -29,10 +29,8 @@ HOST = os.getenv("HOST") or 'localhost:8000'
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv('ALLOWED_HOSTS') else ['localhost:8000']
 
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.agromega.in.ua',
-    'http://localhost:8000',
-]
+CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",") if os.getenv(
+    'CSRF_TRUSTED_ORIGINS') else ['http://localhost:8000']
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 
