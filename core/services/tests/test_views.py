@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.test import TestCase, Client
 from django.contrib.contenttypes.models import ContentType
 
@@ -13,11 +15,13 @@ class FeedbackViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'services/feedback.html')
 
-    def test_post_success_response(self):
+    @patch("captcha.fields.client.submit")
+    def test_post_success_response(self, mock_submit):
         response = client.post('/feedback/', {'title': 'feed title', 'email': 'test@test.com',
-                                              'text': 'feed text'})
+                                              'text': 'feed text', "g-recaptcha-response": "PASSED"})
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'services/success.html')
+        mock_submit.assert_called_once()
 
 
 class IsReviewedTests(TestCase):

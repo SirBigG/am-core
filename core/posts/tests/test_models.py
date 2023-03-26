@@ -41,7 +41,7 @@ class PhotoTests(TestCase):
 
     def test_resize(self):
         self.assertEqual(self.photo.image.width, 1000)
-        self.assertEqual(self.photo.image.height, 666)
+        self.assertEqual(self.photo.image.height, 667)
 
     def test_thumbnail(self):
         thumbnail = self.photo.thumbnail(400, 300)

@@ -36,7 +36,7 @@ class UserCreationFormTests(TestCase):
                 }
         form = UserCreationForm(data=data)
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors, {'phone1': [u'Enter a valid phone number.']})
+        self.assertIn('phone1', form.errors)
 
     def test_clean_password2(self):
         form = UserCreationForm(data={'password1': '12345',

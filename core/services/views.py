@@ -20,7 +20,7 @@ class FeedbackView(FormView):
 
 class ReviewInfoView(View):
     def get(self, request):
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             if not request.user.is_authenticated:
                 return HttpResponseForbidden()
             if request.GET.get('slug', None):

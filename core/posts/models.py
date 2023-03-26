@@ -6,7 +6,7 @@ import random
 import string
 
 from django.db import models
-from django.utils.translation import get_language, ugettext_lazy as _
+from django.utils.translation import get_language, gettext_lazy as _
 from django.utils import timezone
 from django.urls import reverse
 from django.core.files import File

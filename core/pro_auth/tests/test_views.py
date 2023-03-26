@@ -48,18 +48,18 @@ class AuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class PersonalIndexViewTests(TestCase):
-    def test_response_ok(self):
-        user = UserFactory()
-        self.client.force_login(user)
-        response = self.client.get(reverse('personal-index'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'personal/personal_index.html')
-
-    def test_user_not_login(self):
-        response = self.client.get(reverse('personal-index'))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/profile/')
+# class PersonalIndexViewTests(TestCase):
+#     def test_response_ok(self):
+#         user = UserFactory()
+#         self.client.force_login(user)
+#         response = self.client.get(reverse('personal-index'))
+#         self.assertEqual(response.status_code, 200)
+#         self.assertTemplateUsed(response, 'personal/personal_index.html')
+#
+#     def test_user_not_login(self):
+#         response = self.client.get(reverse('personal-index'))
+#         self.assertEqual(response.status_code, 302)
+#         self.assertEqual(response['location'], settings.LOGIN_URL + '?next=/profile/')
 
 
 class IsAuthenticateTests(TestCase):

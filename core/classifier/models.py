@@ -1,7 +1,7 @@
 from io import BytesIO
 
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.core.files import File
 
 from mptt.models import MPTTModel, TreeForeignKey

@@ -3,7 +3,6 @@ from django.contrib.auth import login, logout
 from django.http import HttpResponseRedirect, Http404, JsonResponse
 from django.urls import reverse
 
-
 from core.pro_auth.forms import LoginForm, UserChangeForm
 from core.posts.models import Post
 from core.posts.forms import UpdatePostForm, ProfileAddPostForm
@@ -39,8 +38,9 @@ class Logout(View):
 
 class IsAuthenticate(View):
     """Check current session authentication."""
+
     def get(self, request):
-        if request.is_ajax():
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'is_authenticate': 1 if request.user.is_authenticated else 0})
         raise Http404
 

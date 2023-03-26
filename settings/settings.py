@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import os
 
@@ -28,6 +28,11 @@ DEBUG = False
 HOST = os.getenv("HOST") or 'localhost:8000'
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv('ALLOWED_HOSTS') else ['localhost:8000']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://*.agromega.in.ua',
+    'http://localhost:8000',
+]
 
 WSGI_APPLICATION = 'settings.wsgi.application'
 

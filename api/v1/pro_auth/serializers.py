@@ -5,7 +5,7 @@ from core.classifier.models import Location
 
 from phonenumber_field.validators import validate_international_phonenumber
 
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext_lazy as _
 
 
 class LocationPKRelatedField(serializers.RelatedField):

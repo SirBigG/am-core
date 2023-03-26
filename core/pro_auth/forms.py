@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from core.pro_auth.models import User
 
@@ -50,7 +50,7 @@ class AdminUserCreationForm(forms.ModelForm):
                 self.error_messages['password_mismatch'],
                 code='password_mismatch',
             )
-        self.instance.username = self.cleaned_data.get('username')
+        # self.instance.username = self.cleaned_data.get('username')
         password_validation.validate_password(self.cleaned_data.get('password2'), self.instance)
         return password2
 
