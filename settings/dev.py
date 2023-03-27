@@ -1,6 +1,5 @@
 from settings.settings import *  # noqa
 
-
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -42,3 +41,5 @@ MEDIA_ROOT = '/media'
 #
 # CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ORIGIN_WHITELIST = []
+
+SITE_ID = 1

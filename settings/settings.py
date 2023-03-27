@@ -32,7 +32,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv('ALLOWED_HOST
 CSRF_TRUSTED_ORIGINS = os.getenv("CSRF_TRUSTED_ORIGINS").split(",") if os.getenv(
     'CSRF_TRUSTED_ORIGINS') else ['http://localhost:8000']
 
-WSGI_APPLICATION = 'settings.wsgi.application'
+ASGI_APPLICATION = 'settings.asgi.application'
 
 ADMIN_HASH = os.getenv("ADMIN_HASH", "")
 
