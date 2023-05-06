@@ -16,7 +16,7 @@ class AdvertFormView(FormView):
 
 
 class AdvertListView(ListView):
-    paginate_by = 50
+    paginate_by = 25
     template_name = "adverts/list.html"
     queryset = Advert.objects.all()
     ordering = "-created"

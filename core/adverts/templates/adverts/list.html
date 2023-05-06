@@ -9,7 +9,8 @@
 
 {% block title %}Аграрні оголошення України |{% endblock %}
 {% block meta_description %}
-    Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті{% endblock %}
+    Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись
+    оголошення ви можете на нашому сайті{% endblock %}
 
 {% block extra_meta %}
     {% if paginator.num_pages > 1 %}
@@ -18,11 +19,10 @@
 {% endblock extra_meta %}
 
 {% block page_title %}Оголошення{% endblock %}
+{% block page_title_right %}
+    <a href="/adverts/create/" class="btn btn-success btn-sm"><i class="icon-plus"></i> Оголошення</a>{% endblock %}
 
 {% block content %}
-    <div class="row m-3">
-        <a href="/adverts/create/" class="btn btn-success btn-lg"><i class="icon-plus"></i> Оголошення</a>
-    </div>
     {% include "adverts/helpers/object_list.html" %}
 
     {% include "helpers/pagination.html" %}

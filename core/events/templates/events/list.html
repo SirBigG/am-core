@@ -9,19 +9,16 @@
 {% block second_menu %}
 {% endblock %}
 
-{% block page_title %}
-Агроподії
-{% endblock %}
+{% block page_title %}Агроподії{% endblock %}
+{% block page_title_right %}
+    <a href="/events/create/" class="btn btn-success btn-sm"><i class="icon-plus"></i> Опублікувати подію</a>{% endblock %}
 
 {% block breadcrumbs %}
 {% endblock %}
 
 {% block content %}
-    <div class="row m-3">
-        <a href="/events/create/" class="btn btn-success btn-lg"><i class="icon-plus"></i> Опублікувати подію</a>
-    </div>
 
-{% include "events/helpers/object_list.html" %}
+    {% include "events/helpers/object_list.html" %}
 
-{% include "helpers/pagination.html" %}
+    {% include "helpers/pagination.html" %}
 {% endblock content %}

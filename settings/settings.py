@@ -111,7 +111,7 @@ ROOT_URLCONF = 'settings.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [os.path.join(BASE_DIR, 'templates'), os.path.join(BASE_DIR + 'core/templates/ckeditor')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -258,9 +258,12 @@ MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, 'media'))
 
 CKEDITOR_UPLOAD_PATH = '/media/ckeditor/'
 
+CKEDITOR_BASEPATH = '/static/ckeditor/ckeditor/'
+
 CKEDITOR_CONFIGS = {
     'default': {
         'width': '100%',
+        'language': 'uk',
     },
     "public": {
         'width': '100%',

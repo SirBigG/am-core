@@ -1,6 +1,5 @@
 var cacheName = '-page';
 var filesToCache = [
-  '/',
 ];
 self.addEventListener('install', function(e) {
   console.log('[ServiceWorker] Install');
