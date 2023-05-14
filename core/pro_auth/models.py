@@ -47,8 +47,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         blank=True, null=True,
         help_text=_('Required. You use it at every entrance to the site.'),
         error_messages={
-                'unique': _("A user with that email already exists."),
-                },
+            'unique': _("A user with that email already exists."),
+        },
         verbose_name=_('user email'), )
     # Social auth extra data field
     details = models.TextField(blank=True, null=True)
@@ -95,6 +95,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = ['phone1']
 
     class Meta:

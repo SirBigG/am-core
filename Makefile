@@ -49,3 +49,8 @@ coverage_api:
 
 pull:
 	git pull origin master
+
+
+release:
+	docker build --platform linux/x86_64 -t sirbigg/am-core:latest .
+	docker push sirbigg/am-core:latest
