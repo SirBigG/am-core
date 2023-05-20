@@ -7,7 +7,7 @@
 {% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}{% endblock %}
 
 {% block scripts %}
-    <script src="{% static "posts/j-index.js" %}"></script>
+    <script async src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
 

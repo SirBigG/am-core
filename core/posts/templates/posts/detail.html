@@ -9,7 +9,7 @@
     {{ object.text|striptags|truncatechars:160|safe }}{% endif %}{% endblock %}
 
 {% block scripts %}
-    <script src="{% static "posts/j-detail.js" %}"></script>
+    <script async src="{% static "posts/j-detail.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock %}
 
