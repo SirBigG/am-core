@@ -1,5 +1,5 @@
 Django==4.2.1
-django-autocomplete-light==3.9.4
+django-autocomplete-light==3.9.7
 django-ckeditor==6.5.1
 django-mptt==0.14.0
 django-phonenumber-field==7.1.0

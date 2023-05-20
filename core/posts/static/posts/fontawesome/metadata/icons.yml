@@ -7821,7 +7821,7 @@ font:
     - 5.0.0
     - 5.9.0
     - 5.10.2
-  label: font
+  label: fonts
   search:
     terms:
       - alphabet
@@ -10897,7 +10897,7 @@ italic:
     terms:
       - edit
       - emphasis
-      - font
+      - fonts
       - format
       - text
       - type
@@ -15434,7 +15434,7 @@ remove-format:
   search:
     terms:
       - cancel
-      - font
+      - fonts
       - format
       - remove
       - style
@@ -18061,7 +18061,7 @@ strikethrough:
     terms:
       - cancel
       - edit
-      - font
+      - fonts
       - format
       - text
       - type
@@ -18148,7 +18148,7 @@ subscript:
   search:
     terms:
       - edit
-      - font
+      - fonts
       - format
       - text
       - type
@@ -18250,7 +18250,7 @@ superscript:
     terms:
       - edit
       - exponential
-      - font
+      - fonts
       - format
       - text
       - type
@@ -18750,7 +18750,7 @@ text-height:
   search:
     terms:
       - edit
-      - font
+      - fonts
       - format
       - text
       - type
@@ -18768,7 +18768,7 @@ text-width:
   search:
     terms:
       - edit
-      - font
+      - fonts
       - format
       - text
       - type

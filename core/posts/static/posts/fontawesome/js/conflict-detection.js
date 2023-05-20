@@ -110,7 +110,7 @@
     var conflictsCount = Object.keys(nodesTested.conflict).length;
 
     if (conflictsCount > 0) {
-      console.info("%cConflict".concat(conflictsCount > 1 ? 's' : '', " found:"), 'color: darkred; font-size: large');
+      console.info("%cConflict".concat(conflictsCount > 1 ? 's' : '', " found:"), 'color: darkred; fonts-size: large');
       var data = {};
 
       for (var _key in nodesTested.conflict) {
@@ -128,7 +128,7 @@
     var noConflictsCount = Object.keys(nodesTested.noConflict).length;
 
     if (noConflictsCount > 0) {
-      console.info("%cNo conflict".concat(noConflictsCount > 1 ? 's' : '', " found with ").concat(noConflictsCount == 1 ? 'this' : 'these', ":"), 'color: green; font-size: large');
+      console.info("%cNo conflict".concat(noConflictsCount > 1 ? 's' : '', " found with ").concat(noConflictsCount == 1 ? 'this' : 'these', ":"), 'color: green; fonts-size: large');
       var _data = {};
 
       for (var _key2 in nodesTested.noConflict) {
@@ -146,7 +146,7 @@
     var timeOutCount = Object.keys(timedOutTests).length;
 
     if (timeOutCount > 0) {
-      console.info("%cLeftovers--we timed out before collecting test results for ".concat(timeOutCount == 1 ? 'this' : 'these', ":"), 'color: blue; font-size: large');
+      console.info("%cLeftovers--we timed out before collecting test results for ".concat(timeOutCount == 1 ? 'this' : 'these', ":"), 'color: blue; fonts-size: large');
       var _data2 = {};
 
       for (var _key3 in timedOutTests) {
@@ -892,14 +892,14 @@
     console.group('Font Awesome Detector');
 
     if (testCount === 0) {
-      console.info('%cAll Good!', 'color: green; font-size: large');
+      console.info('%cAll Good!', 'color: green; fonts-size: large');
       console.info('We didn\'t find anything that needs testing for conflicts. Ergo, no conflicts.');
     } else {
       console.info("Testing ".concat(testCount, " possible conflicts."));
       console.info("We'll wait about ".concat(Math.round(WINDOW.FontAwesomeDetection.timeout / 10) / 100, " seconds while testing these and\n") + "then up to another ".concat(Math.round(WINDOW.FontAwesomeDetection.resultsCollectionMaxWait / 10) / 100, " to allow the browser time\n") + "to accumulate the results. But we'll probably be outta here way before then.\n\n");
       console.info("You can adjust those durations by assigning values to these attributes on the <script> element that loads this detection:");
-      console.info("\t%c".concat(timeoutAttr, "%c: milliseconds to wait for each test before deciding whether it's a conflict."), 'font-weight: bold;', 'font-size: normal;');
-      console.info("\t%c".concat(resultsCollectionMaxWaitAttr, "%c: milliseconds to wait for the browser to accumulate test results before giving up."), 'font-weight: bold;', 'font-size: normal;');
+      console.info("\t%c".concat(timeoutAttr, "%c: milliseconds to wait for each test before deciding whether it's a conflict."), 'fonts-weight: bold;', 'fonts-size: normal;');
+      console.info("\t%c".concat(resultsCollectionMaxWaitAttr, "%c: milliseconds to wait for the browser to accumulate test results before giving up."), 'fonts-weight: bold;', 'fonts-size: normal;');
       pollUntil({
         // Give this overall timer a little extra cushion
         maxDuration: masterTimeout,
