@@ -44,7 +44,7 @@
 {% block page_title %}{% if object.meta and obj.meta.h1 %}{{ object.meta.h1 }}{% else %}{{ object.title }}{% endif %}
     {% if object.country %}{% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}
         <object type="image/svg+xml" data="{% static_push flag_static %}" height="25px"
-                width="35px" >{{ object.country.value }}</object>{% endwith %}
+                width="35px" aria-label="{{ object.country.value }}">{{ object.country.value }}</object>{% endwith %}
     {% endif %}{% endblock %}
 
 {% block breadcrumbs %}

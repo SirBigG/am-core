@@ -139,7 +139,7 @@ class Photo(models.Model):
         path = Path(('%s/%s/' % (str(path), width)).replace('//', '/'))
         if path.is_dir() is False:
             path.mkdir()
-        return '%s/%s' % (str(path), path_dict[-1])
+        return '%s/%s' % (str(path), path_dict[-1].split('.')[0] + '.webp')
 
     def thumbnail(self, width=300, height=None):
         """
@@ -156,7 +156,7 @@ class Photo(models.Model):
                 if height is None:
                     height = int((float(im.size[1]) * float(width / float(im.size[0]))))
                 im = im.resize((width, height), Image.ANTIALIAS)
-                im.save(thumb_path, format='JPEG', quality=80)
+                im.save(thumb_path, format='webp', quality=80)
             return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
 
     def save(self, *args, **kwargs):
