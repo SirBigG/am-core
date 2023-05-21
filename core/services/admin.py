@@ -8,7 +8,7 @@ from core.services.models import Feedback, MetaData, Reviews
 
 class FeedbackAdmin(admin.ModelAdmin):
     model = Feedback
-    list_display = ('title', 'email', 'text')
+    list_display = ('title', 'email', 'text', 'created')
 
 
 class FlatPageAdmin(FlatPageAdmin):

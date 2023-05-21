@@ -12,6 +12,7 @@ class Feedback(models.Model):
     title = models.CharField(max_length=255, verbose_name=_('Заголовок'))
     email = models.EmailField(blank=True, null=True, verbose_name=_("Email (необов'язково)"))
     text = models.TextField(verbose_name=_('Текст'))
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('Дата створення'))
 
     class Meta:
         db_table = 'feedback'
@@ -49,6 +50,7 @@ class Reviews(models.Model):
     mark = models.IntegerField(choices=MARKS, verbose_name=_('Mark'))
     description = models.TextField(verbose_name=_('Review description'))
     date = models.DateTimeField(auto_now_add=True, verbose_name=_('Review date'))
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_('Created'))
 
     class Meta:
         verbose_name = _('Review')

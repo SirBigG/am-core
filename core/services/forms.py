@@ -10,7 +10,7 @@ class FeedbackForm(forms.ModelForm):
 
     class Meta:
         model = Feedback
-        fields = '__all__'
+        fields = ('title', 'email', 'text', 'captcha')
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control input-lg'}),
             'email': forms.TextInput(attrs={'class': 'form-control input-lg'}),

@@ -157,15 +157,15 @@ class ParsedMapAdmin(admin.ModelAdmin):
 
 
 class PostViewAdmin(admin.ModelAdmin):
-    list_display = ('fingerprint', 'post_id', 'user_id')
+    list_display = ('fingerprint', 'post_id', 'user_id', 'created')
 
 
 class UsefulStatisticAdmin(admin.ModelAdmin):
-    list_display = ('fingerprint', 'post_id', 'user_id', 'is_useful')
+    list_display = ('fingerprint', 'post_id', 'user_id', 'is_useful', 'created')
 
 
 class SearchStatisticAdmin(admin.ModelAdmin):
-    list_display = ('fingerprint', 'search_phrase')
+    list_display = ('fingerprint', 'search_phrase', 'created')
 
 
 class PhotoAdmin(admin.ModelAdmin):
