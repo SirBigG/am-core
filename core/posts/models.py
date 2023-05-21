@@ -28,7 +28,6 @@ from transliterate import slugify
 
 from taggit.managers import TaggableManager
 
-
 WORK_STATUS = (
     (1, _('Translate')),
     (2, _('Publish')),
@@ -167,8 +166,8 @@ class Photo(models.Model):
                 im = im.convert('RGB')
             im.thumbnail((1000, 800), Image.ANTIALIAS)
             output = BytesIO()
-            im.save(output, format='JPEG', quality=85)
-            self.image = File(output, self.image.name)
+            im.save(output, format='webp', quality=85)
+            self.image = File(output, self.image.name.split('.')[0] + '.webp')
         super().save(*args, **kwargs)
 
     def delete(self, using=None, keep_parents=False):
