@@ -18,17 +18,17 @@
 {% endblock %}
 
 {% block content %}
-        <form class="form-inline" action="/search/" method="get">
-            <div class="form-group m-2">
-                <input class="form-control" name="q" type="text" placeholder="Текст пошуку">
-            </div>
-            <button type="submit" class="btn btn-success m-2"><i class="icon-search"></i></button>
-
-        </form>
+    <form class="form-inline" action="/search/" method="get">
+        <div class="form-group m-2">
+            <input class="form-control form-control-lg" name="q" type="text" placeholder="Текст пошуку">
+        </div>
+        <button type="submit" class="btn btn-bg btn-success m-2"><i class="icon-search"></i></button>
+    </form>
     {% if object_list %}
         {% include "posts/helpers/object_list.html" %}
     {% else %}
-        <p class="h5 text-danger">Не знайшли того чого шукали? Напишіть нам у форму <a href="/feedback/">зворотнього зв'язку</a> і ми додаму інформацію найближчим часом.</p>
+        <p class="text-danger">Не знайшли того чого шукали? Напишіть нам у форму <a href="/feedback/">зворотнього
+            зв'язку</a> і ми додаму інформацію найближчим часом.</p>
     {% endif %}
 
     {% include "helpers/pagination_short.html" %}
