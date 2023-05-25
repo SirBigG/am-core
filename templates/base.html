@@ -35,6 +35,10 @@
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
     {% block scripts %}{% endblock scripts %}
+    {% block adverts %}
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
+     crossorigin="anonymous"></script>
+    {% endblock adverts %}
 </head>
 {% block body_head_tag %}
     <body>
@@ -67,15 +71,6 @@
                         {% block content %}{% endblock content %}
                     </div>
                 {% endblock base_content_block %}
-                {% block adverts %}
-                    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                    <script>
-                        (adsbygoogle = window.adsbygoogle || []).push({
-                            google_ad_client: "ca-pub-4522526101011449",
-                            enable_page_level_ads: true
-                        });
-                    </script>
-                {% endblock %}
             </div>
         </div>
     {% endblock main %}
