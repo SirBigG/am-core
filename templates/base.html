@@ -20,6 +20,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#24a824">
     <title>{% block title %}Агропортал України |{% endblock title %} AgroMega.in.ua</title>
+    {% block cannonical %}{% endblock cannonical %}
     <meta name="description"
           content="{% block meta_description %}Все про аграрну сферу і навіть більше.{% endblock %}">
     <link rel="shortcut icon" type="image/x-icon" href="{% static_push "favicon.ico" %}"/>
@@ -36,13 +37,12 @@
     {% endblock extra_meta %}
     {% block scripts %}{% endblock scripts %}
     {% block adverts %}
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
-     crossorigin="anonymous"></script>
+        <script async
+                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
+                crossorigin="anonymous"></script>
     {% endblock adverts %}
 </head>
-{% block body_head_tag %}
-    <body>
-{% endblock %}
+<body>
 {% block header %}
     {% include 'header.html' %}
 {% endblock header %}
