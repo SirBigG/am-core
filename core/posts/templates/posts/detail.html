@@ -62,10 +62,10 @@
                 {% endif %}
                 <div class="img-overlay">
                     <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"
-                       aria-label="Додати фото до публікації"><i class="icon-plus"></i></a>
+                       aria-label="Додати фото до публікації" rel="nofollow"><i class="icon-plus"></i></a>
                     {% if object.photo.count > 1 %}
                         <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-lg"
-                           aria-label="Більше фото"><i class="icon-eye"></i></a>{% endif %}
+                           aria-label="Більше фото" rel="nofollow"><i class="icon-eye"></i></a>{% endif %}
                 </div>
             </div>
         </div>
