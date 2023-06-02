@@ -3,6 +3,7 @@
 {% load post_extras static %}
 
 {% block extra_meta %}
+    <meta name="robots" content="noindex, nofollow">
     <meta content="Поділитись фото {{ post.title }} | AgroMega.in.ua" property="og:title">
     <meta content="Поділіться фото ваших улюбленців {{ post.title }} з іншими користувачами" property="og:description">
     <meta content="{{ request.path }}" property="og:url">
@@ -16,8 +17,7 @@
 
 {% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock %}
 {% block title %}Поділитись фото {{ post.title }} |{% endblock %}
-{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато
-    людей.{% endblock %}
+{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей.{% endblock %}
 
 {% block content %}
     <form method="post" action="{{ request.path }}" enctype="multipart/form-data">

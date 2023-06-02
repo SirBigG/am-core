@@ -8,14 +8,15 @@
 {% endblock scripts %}
 
 {% block title %}Аграрні оголошення України |{% endblock %}
-{% block meta_description %}
-    Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись
-    оголошення ви можете на нашому сайті{% endblock %}
+{% block meta_description %}Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті{% endblock %}
+
+{% block cannonical %}
+    {% if request.GET.page or request.GET.order %}
+        <link rel="canonical" href="https://agromega.in.ua{{ request.path }}"/>
+    {% endif %}
+{% endblock cannonical %}
 
 {% block extra_meta %}
-    {% if paginator.num_pages > 1 %}
-        <meta name="robots" content="noindex, follow">
-    {% endif %}
 {% endblock extra_meta %}
 
 {% block page_title %}Оголошення{% endblock %}
