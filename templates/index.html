@@ -4,7 +4,7 @@
 
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static "posts/index.css" %}">
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{% static "posts/index.css" %}">
     <link rel="canonical" href="https://agromega.in.ua">
 {% endblock scripts %}
 
