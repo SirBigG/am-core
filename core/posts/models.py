@@ -56,6 +56,7 @@ class Post(models.Model):
 
     publisher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_('post publisher'))
     publish_date = models.DateTimeField(_('date of publish'), default=timezone.now)
+    update_date = models.DateTimeField(_('date of update'), auto_now=True)
 
     hits = models.IntegerField(default=0, verbose_name=_('count of views'))
 

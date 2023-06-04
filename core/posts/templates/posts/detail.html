@@ -10,12 +10,14 @@
 
 {% block scripts %}
     <script async src="{% static "posts/j-detail.js" %}"></script>
-    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{% static "posts/detail.css" %}">
+    <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
+          href="{% static "posts/detail.css" %}">
 {% endblock %}
 
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="
+
             {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
           property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
@@ -24,8 +26,7 @@
     <meta content="AgroMega.in.ua" property="og:site_name">
 
     <meta content="{{ object.title }} | AgroMega.in.ua" property="twitter:title">
-    <meta content="
-            {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
+    <meta content="{% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
           property="twitter:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="twitter:image">
     <meta content="{{ object.title }}" property="twitter:image:alt">
@@ -58,7 +59,8 @@
         <div class="row">
             <div class="col-12 p-0">
                 {% if object.photo.first %}
-                    <img alt="{{ object.title }}" width="800" height="500" src="{% thumbnail object.photo.first 800 %}" class="img-fluid"/>
+                    <img alt="{{ object.title }}" width="800" height="500" src="{% thumbnail object.photo.first 800 %}"
+                         class="img-fluid"/>
                 {% endif %}
                 <div class="img-overlay">
                     <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"
@@ -76,7 +78,10 @@
                     {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
                     {% if object.source %}
                         <div class="post-source mt-2 mb-3"><h6 style="overflow-y: auto;">
-                            Джерело: {{ object.source }}</h6></div>{% endif %}
+                            Джерело: {{ object.source }}</h6></div>
+                    {% endif %}
+                    <p>Дата публікації: {{ object.publish_date|date:"d b Y" }}</p>
+                    <p>Оновлено: {{ object.update_date|date:"d b Y" }}</p>
                 </div>
                 <div class="col-12 d-flex justify-content-between mb-3">
                     <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
@@ -102,7 +107,7 @@
             </div>
         </div>
         {# Comments block #}
-{#        {% render_comments object request %}#}
+        {#        {% render_comments object request %}#}
         {% cache 300 'relative_list' object.rubric.slug %}
             {% relative_posts object.rubric %}
         {% endcache %}
