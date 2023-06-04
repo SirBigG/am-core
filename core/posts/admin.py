@@ -175,12 +175,6 @@ class PhotoAdmin(admin.ModelAdmin):
     def title(self, obj):
         return obj.post.title
 
-    def has_add_permission(self, request):
-        return False
-
-    def has_delete_permission(self, request, obj=None):
-        return False
-
 
 admin.site.register(Post, PostAdmin)
 admin.site.register(ParsedMap, ParsedMapAdmin)
