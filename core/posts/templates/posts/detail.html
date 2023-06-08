@@ -108,11 +108,7 @@
         </div>
         {# Comments block #}
         {#        {% render_comments object request %}#}
-        {% cache 300 'relative_list' object.rubric.slug %}
             {% relative_posts object.rubric %}
-        {% endcache %}
-        {% cache 900 'advert_detail_list' object.rubric.parent.slug %}
             {% post_adverts object.rubric.parent %}
-        {% endcache %}
     </div>
 {% endblock content %}
