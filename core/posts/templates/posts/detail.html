@@ -9,7 +9,7 @@
     {{ object.text|striptags|truncatechars:160|safe }}{% endif %}{% endblock %}
 
 {% block scripts %}
-    <script async src="{% static "posts/j-detail.js" %}"></script>
+    <script src="{% static "posts/j-detail.js" %}"></script>
     <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'"
           href="{% static "posts/detail.css" %}">
 {% endblock %}
@@ -17,6 +17,7 @@
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
     <meta content="
+
 
             {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
           property="og:description">
@@ -26,7 +27,8 @@
     <meta content="AgroMega.in.ua" property="og:site_name">
 
     <meta content="{{ object.title }} | AgroMega.in.ua" property="twitter:title">
-    <meta content="{% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
+    <meta content="
+            {% if object.meta_description %}{{ object.meta_description }}{% else %}{{ object.text|striptags|truncatechars:160|safe }}{% endif %}"
           property="twitter:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="twitter:image">
     <meta content="{{ object.title }}" property="twitter:image:alt">
@@ -59,15 +61,22 @@
         <div class="row">
             <div class="col-12 p-0">
                 {% if object.photo.first %}
-                    <img alt="{{ object.title }}" width="800" height="500" src="{% thumbnail object.photo.first 800 %}"
-                         class="img-fluid"/>
+                    <div class="card">
+                        <img alt="{{ object.title }}" width="800" height="500"
+                             src="{% thumbnail object.photo.first 800 %}"
+                             class="card-img img-fluid"/>
+                        <div class="card-body text-end m-1">
+                            <a href="/gallery/add/{{ object.id }}/"
+                               class="btn btn-success btn-circle btn-circle-sm mr-2"
+                               aria-label="Додати фото до публікації" rel="nofollow"><i class="icon-plus"></i></a>
+                            {% if object.photo.count > 1 %}
+                                <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-sm"
+                                   aria-label="Більше фото" rel="nofollow"><i class="icon-eye"></i></a>{% endif %}
+                        </div>
+                    </div>
                 {% endif %}
                 <div class="img-overlay">
-                    <a href="/gallery/add/{{ object.id }}/" class="btn btn-success btn-circle btn-circle-lg mr-2"
-                       aria-label="Додати фото до публікації" rel="nofollow"><i class="icon-plus"></i></a>
-                    {% if object.photo.count > 1 %}
-                        <a href="/gallery/{{ object.id }}/" class="btn btn-primary btn-circle btn-circle-lg"
-                           aria-label="Більше фото" rel="nofollow"><i class="icon-eye"></i></a>{% endif %}
+
                 </div>
             </div>
         </div>
@@ -95,20 +104,20 @@
             </div>
         </div>
     </div>
-    <div class="col-12 p-0">
+    <div class="col-12">
         <div class="post_id_value" id="{{ object.id }}"></div>
         <div class="col-12 mt-3 mb-3" id="useful__wrapper">
-            <div class="row d-flex justify-content-center">
+            <div class="d-flex flex-row justify-content-center">
                 <span class="pb-2">Публікація корисна?</span>
             </div>
-            <div class="row d-flex justify-content-center">
-                <button class="btn btn-outline-success mr-3" id="useful">Так</button>
-                <button class="btn btn-outline-danger" id="notuseful">Ні</button>
+            <div class="d-flex flex-row justify-content-center">
+                <button class="btn btn-outline-success m-3" id="useful">Так</button>
+                <button class="btn btn-outline-danger m-3" id="notuseful">Ні</button>
             </div>
         </div>
         {# Comments block #}
         {#        {% render_comments object request %}#}
-            {% relative_posts object.rubric %}
-            {% post_adverts object.rubric.parent %}
+        {% relative_posts object.rubric %}
+        {% post_adverts object.rubric.parent %}
     </div>
 {% endblock content %}

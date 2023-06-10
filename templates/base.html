@@ -15,6 +15,12 @@
 
         gtag('config', 'G-0V6Q0F65LP');
     </script>
+<style>
+   .btn-success {
+  --bs-btn-color: #fff !important;
+  --bs-btn-hover-color: #fff !important;
+}
+</style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -42,7 +48,7 @@
                 crossorigin="anonymous"></script>
     {% endblock adverts %}
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 {% block header %}
     {% include 'header.html' %}
 {% endblock header %}
@@ -52,7 +58,7 @@
         {% block second_menu %}{% endblock %}
         {# end second menu navbar #}
         <div class="container">
-            <div class="row m-2 justify-content-around">
+            <div class="row justify-content-around">
                 <div class="col-md-6 col-8">
                     <h1 class="h2">{% block page_title %}{% endblock %}</h1>
                 </div>
@@ -61,7 +67,7 @@
                 </div>
             </div>
             <div class="row justify-content-md-center">
-                <div class="col-md-8 col-12 mb-3 p-0">
+                <div class="col-md-8 col-12">
                     {% block breadcrumbs %}{% endblock %}
                 </div>
             </div>
