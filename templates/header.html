@@ -14,12 +14,12 @@
         </div>
         <div class="navbar-nav d-inline-flex flex-row auth-block">
             <div class="nav-item m-1">
-                <button id="search-button" onclick="location.href='/search/'"  class="btn btn-success btn-sm" role="presentation" title="Пошук">
+                <button id="search-button" onclick="location.href='/search/'" class="btn btn-success btn-sm" role="button" title="Пошук">
                     <i class="icon-search"></i>
                 </button>
             </div>
             <div class="nav-item m-1">
-                <button id="add-button" onclick="location.href='/create/'"  class="btn btn-success btn-sm" role="presentation" title="Додати">
+                <button id="add-button" onclick="location.href='/create/'" class="btn btn-success btn-sm" role="button" title="Додати">
                     <i class="icon-plus"></i>
                 </button>
             </div>            {% if user.is_authenticated %}

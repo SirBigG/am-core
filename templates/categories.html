@@ -10,6 +10,14 @@
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
 
+{% block title %}
+    Публікації за категоріями
+{% endblock title %}
+
+{% block page_title %}
+    Публікації за категоріями
+{% endblock %}
+
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'" href="{% static "posts/categories.css" %}">
