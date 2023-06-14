@@ -60,7 +60,7 @@ class Post(models.Model):
 
     hits = models.IntegerField(default=0, verbose_name=_('count of views'))
 
-    status = models.BooleanField(default=1, verbose_name=_('post status'))
+    status = models.BooleanField(default=True, verbose_name=_('post status'))
 
     rubric = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_('post category'))
 

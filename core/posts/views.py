@@ -126,13 +126,18 @@ class SiteMap(TemplateView):
         from core.events.models import Event
         context = super(SiteMap, self).get_context_data(**kwargs)
         context['base'] = settings.HOST + '/'
-        context['urls'] = [settings.HOST + p.get_absolute_url() for p in Post.objects.select_related(
-            'rubric').prefetch_related('rubric__parent').filter(status=1)]
-        context['urls'].extend([f"{settings.HOST}/{slug}/" for slug in Category.objects.filter(
+        context['urls'] = [{"loc": settings.HOST + p.get_absolute_url(),
+                            "lastmod": p.update_date} for p in Post.objects.select_related(
+            'rubric').prefetch_related('rubric__parent').filter(status=True)]
+        context['urls'].extend([{"loc": f"{settings.HOST}/{slug}/"} for slug in Category.objects.filter(
             level=1, is_active=True).values_list('slug', flat=True)])
-        context['urls'].extend([f"{settings.HOST}/events/{slug}.html" for slug in Event.objects.filter(
+        context['urls'].extend([{"loc": f"{settings.HOST}/events/{slug}.html"} for slug in Event.objects.filter(
             status=1).values_list('slug', flat=True)])
-        context["urls"].extend([f"{settings.HOST}/events/", f"{settings.HOST}/news/", f"{settings.HOST}/adverts/"])
+        context["urls"].extend([
+            {"loc": f"{settings.HOST}/events/"},
+            {"loc": f"{settings.HOST}/news/"},
+            {"loc": f"{settings.HOST}/adverts/"},
+        ])
         return context
 
 
