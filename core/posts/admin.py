@@ -89,7 +89,7 @@ class PostAdmin(admin.ModelAdmin):
     inlines = [
         PhotoInLine,
     ]
-    list_display = ('title', 'publisher', 'publish_date', 'hits', 'status', 'tag_list', 'has_photo')
+    list_display = ('title', 'publisher', 'hits', 'publish_date', 'update_date', 'status', 'has_photo')
     readonly_fields = ('slug', 'hits', 'absolute_url',)
     raw_id_fields = ('publisher',)
     list_filter = (CategoryFilter, HasPhotoFilter, 'status')
@@ -103,11 +103,12 @@ class PostAdmin(admin.ModelAdmin):
            'fields': ('tags',)
         }),
         ("Extra data", {
-           'fields': ('country', 'meta', 'meta_description')
+           'fields': ('country', 'update_date', 'meta', 'meta_description')
         }),
         ('Advanced options', {
             'classes': ('collapse',),
-            'fields': ('work_status', 'author', 'source', 'publisher', 'publish_date', 'hits', 'slug', 'absolute_url'),
+            'fields': ('work_status', 'author', 'source', 'publisher',
+                       'publish_date', 'hits', 'slug', 'absolute_url'),
         }),
     )
 
