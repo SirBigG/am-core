@@ -1,3 +1,4 @@
+import logging
 from itertools import groupby
 from datetime import date
 
@@ -108,6 +109,21 @@ class PostDetail(DetailView):
     """
     model = Post
     template_name = 'posts/detail.html'
+
+    def get_context_data(self, **kwargs):
+        """
+        Get extra context for classifier to view.
+        """
+        context = super().get_context_data(**kwargs)
+        try:
+            context['main_photo_object'] = context['object'].photo.first()
+        except Exception as e:
+            logging.error(e)
+            context['main_photo_object'] = None
+        context['photo_count'] = context['object'].photo.count()
+        context['category'] = context['object'].rubric
+        context['publisher_name'] = context['object'].publisher.get_full_name()
+        return context
 
 
 class PostFormView(FormView):
