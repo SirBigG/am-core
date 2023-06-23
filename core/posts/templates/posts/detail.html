@@ -90,9 +90,6 @@
                         </div>
                     </div>
                 {% endif %}
-                <div class="img-overlay">
-
-                </div>
             </div>
         </div>
         <div class="row">
@@ -101,7 +98,7 @@
                     {{ object.text|safe }}
                     {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
                     {% if object.source %}
-                        <p class="m-0"><span class="h6" style="overflow-y: auto;">Джерело: {{ object.source }}</span>
+                        <p class="m-0" style="overflow-y: auto;"><span class="h6">Джерело: {{ object.source }}</span>
                         </p>
                     {% endif %}
                     <p class="m-0"><span class="h6">Дата публікації: {{ object.publish_date|date:"d b Y" }}</span></p>
