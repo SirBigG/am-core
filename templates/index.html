@@ -5,11 +5,10 @@
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/index.css" %}">
-    <link rel="canonical" href="https://agromega.in.ua">
 {% endblock scripts %}
 
 {% block main %}
-{#    <!-- Hero Area Start -->#}
+    {#    <!-- Hero Area Start -->#}
     <div id="hero-area">
         <div class="overlay"></div>
         <div class="container">
@@ -17,8 +16,9 @@
                 <div class="col-12 text-center">
                     <div class="contents">
                         <h1 class="head-title">Вітаємо Вас на <span class="year">AgroMega</span></h1>
-                        <p>Ми проект який забезпечує інформаційну підтримку агробізнесу. Ви отримаєте інформацію від публікацій до подій та багато корисного.
-                        Ви стимулюєте нас розвиватись тому вже скоро багато нового.</p>
+                        <p>Ми проект який забезпечує інформаційну підтримку агробізнесу. Ви отримаєте інформацію від
+                            публікацій до подій та багато корисного.
+                            Ви стимулюєте нас розвиватись тому вже скоро багато нового.</p>
                         <div class="search-bar">
                             <fieldset>
                                 <form class="search-form" action="/search/" method="get">
@@ -26,7 +26,8 @@
                                         <input type="text" name="q" class="form-control"
                                                placeholder="Пошук">
                                     </div>
-                                    <button class="btn btn-common btn-success" type="submit"><i class="icon-search"></i></button>
+                                    <button class="btn btn-common btn-success" type="submit"><i class="icon-search"></i>
+                                    </button>
                                 </form>
                             </fieldset>
                         </div>
@@ -35,32 +36,33 @@
             </div>
         </div>
     </div>
-{#    <!-- Hero Area End -->#}
+    {#    <!-- Hero Area End -->#}
     {#    <!-- Events Section Start -->#}
     {% if events %}
-    <section class="trending-cat section-padding">
-        <div class="container">
-            <h2 class="section-title">Найближчі події</h2>
-            <div class="row">
-                {% for event in events %}
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <a href="{{ event.get_absolute_url }}">
-                            <div class="box">
-                                <div class="icon">
-                                    <img class="img-fluid" src="{% thumbnail event 350 280 %}" alt="{{event.title}}">
+        <section class="trending-cat section-padding">
+            <div class="container">
+                <h2 class="section-title">Найближчі події</h2>
+                <div class="row">
+                    {% for event in events %}
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                            <a href="{{ event.get_absolute_url }}">
+                                <div class="box">
+                                    <div class="icon">
+                                        <img class="img-fluid" src="{% thumbnail event 350 280 %}"
+                                             alt="{{ event.title }}">
+                                    </div>
+                                    <h4>{{ event.title }}</h4>
+                                    <strong>{{ event.start|date:"d E Y  H:i" }}</strong>
                                 </div>
-                                <h4>{{event.title}}</h4>
-                                <strong>{{ event.start|date:"d E Y  H:i" }}</strong>
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
     {% endif %}
-{#    <!-- Events Section End -->#}
-{#    <!-- Trending Categories Section Start -->#}
+    {#    <!-- Events Section End -->#}
+    {#    <!-- Trending Categories Section Start -->#}
     <section class="trending-cat section-padding">
         <div class="container">
             <h2 class="section-title">Популярні категорії</h2>
@@ -71,11 +73,12 @@
                             <div class="box">
                                 <div class="icon">
                                     {% if category.image %}
-                                    <img class="img-fluid" src="{{ category.image.url }}" alt="{{ category.value }}">
+                                        <img class="img-fluid" src="{{ category.image.url }}"
+                                             alt="{{ category.value }}">
                                     {% endif %}
                                 </div>
                                 <h4>{{ category.value }}</h4>
-{#                                <strong>189 Ads</strong>#}
+                                {#                                <strong>189 Ads</strong>#}
                             </div>
                         </a>
                     </div>
@@ -83,77 +86,83 @@
             </div>
         </div>
     </section>
-{#    <!-- Trending Categories Section End -->#}
+    {#    <!-- Trending Categories Section End -->#}
 
-{#    <!-- Services Section Start -->#}
+    {#    <!-- Services Section Start -->#}
     <section class="services section-padding">
-      <div class="container">
-          <h2 class="section-title">Продукти</h2>
-        <div class="row">
-{#          <!-- Services item -->#}
-          <div class="col-md-6 col-lg-4 col-xs-12">
-            <div class="services-item wow fadeInRight" data-wow-delay="0.2s">
-              <div class="icon">
-                <i class="lni-book"></i>
-              </div>
-              <div class="services-content">
-                <h3><a href="/categories/">Публікації</a></h3>
-                <p>Публікації у всіх аграрних категоріях. Про рослин тварин та інших улюбленцях та їх доглядом можна прочитавши обравши категорію.</p>
-              </div>
+        <div class="container">
+            <h2 class="section-title">Продукти</h2>
+            <div class="row">
+                {#          <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="0.2s">
+                        <div class="icon">
+                            <i class="lni-book"></i>
+                        </div>
+                        <div class="services-content">
+                            <h3><a href="/categories/">Публікації</a></h3>
+                            <p>Публікації у всіх аграрних категоріях. Про рослин тварин та інших улюбленцях та їх
+                                доглядом можна прочитавши обравши категорію.</p>
+                        </div>
+                    </div>
+                </div>
+                {#          <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="0.4s">
+                        <div class="icon">
+                            <i class="lni-leaf"></i>
+                        </div>
+                        <div class="services-content">
+                            <h3><a href="/events/">Події</a></h3>
+                            <p>Список найближчих агроподій щоб Ви не пропустили нічого важливого. Також Ви зможете
+                                підписатись на отримання нових та найближчих подій у Telegram.</p>
+                        </div>
+                    </div>
+                </div>
+                {#          <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="0.6s">
+                        <div class="icon">
+                            <i class="lni-cog"></i>
+                        </div>
+                        <div class="services-content">
+                            <h3><a href="/news/">Новини</a></h3>
+                            <p>Будьте в курсі останніх новини з нашим Telegram ботом або ж просто зайшовши на сайт Ви
+                                зможете ознайомитись з агротрендами.</p>
+                        </div>
+                    </div>
+                </div>
+                {#          <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="0.8s">
+                        <div class="icon">
+                            <i class="lni-spray"></i>
+                        </div>
+                        <div class="services-content">
+                            <h3><a href="/adverts/">Оголошення</a></h3>
+                            <p>Ми збираємо оголошення для того щоб Вам було зручно шукати потрібні. Ми не збираємо
+                                контактів користувачів, лише інформативні дані.</p>
+                        </div>
+                    </div>
+                </div>
+                {#           <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="1s">
+                        <div class="icon">
+                            <i class="lni-emoji-smile"></i>
+                        </div>
+                        <div class="services-content">
+                            <h3><a href="https://telegram.me/wn_world_news_bot?start=1" rel="noreferrer"
+                                   target="_blank">Telegram</a></h3>
+                            <p>Наш телеграм бот завжди триматиме вас у курсі найсвіжіших новин. Скоро буде підтримка
+                                фільтрування по категоріях та підтримка оголошень.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-          </div>
-{#          <!-- Services item -->#}
-          <div class="col-md-6 col-lg-4 col-xs-12">
-            <div class="services-item wow fadeInRight" data-wow-delay="0.4s">
-              <div class="icon">
-                <i class="lni-leaf"></i>
-              </div>
-              <div class="services-content">
-                <h3><a href="/events/">Події</a></h3>
-                <p>Список найближчих агроподій щоб Ви не пропустили нічого важливого. Також Ви зможете підписатись на отримання нових та найближчих подій у Telegram.</p>
-              </div>
-            </div>
-          </div>
-{#          <!-- Services item -->#}
-          <div class="col-md-6 col-lg-4 col-xs-12">
-            <div class="services-item wow fadeInRight" data-wow-delay="0.6s">
-              <div class="icon">
-                <i class="lni-cog"></i>
-              </div>
-              <div class="services-content">
-                <h3><a href="/news/">Новини</a></h3>
-                <p>Будьте в курсі останніх новини з нашим Telegram ботом або ж просто зайшовши на сайт Ви зможете ознайомитись з агротрендами.</p>
-              </div>
-            </div>
-          </div>
-{#          <!-- Services item -->#}
-          <div class="col-md-6 col-lg-4 col-xs-12">
-            <div class="services-item wow fadeInRight" data-wow-delay="0.8s">
-              <div class="icon">
-                <i class="lni-spray"></i>
-              </div>
-              <div class="services-content">
-                <h3><a href="/adverts/">Оголошення</a></h3>
-                <p>Ми збираємо оголошення для того щоб Вам було зручно шукати потрібні. Ми не збираємо контактів користувачів, лише інформативні дані.</p>
-              </div>
-            </div>
-          </div>
-{#           <!-- Services item -->#}
-          <div class="col-md-6 col-lg-4 col-xs-12">
-            <div class="services-item wow fadeInRight" data-wow-delay="1s">
-              <div class="icon">
-                <i class="lni-emoji-smile"></i>
-              </div>
-              <div class="services-content">
-                <h3><a href="https://telegram.me/wn_world_news_bot?start=1" rel="noreferrer" target="_blank">Telegram</a></h3>
-                <p>Наш телеграм бот завжди триматиме вас у курсі найсвіжіших новин. Скоро буде підтримка фільтрування по категоріях та підтримка оголошень.</p>
-              </div>
-            </div>
-          </div>
         </div>
-      </div>
     </section>
-{#    <!-- Services Section End -->#}
+    {#    <!-- Services Section End -->#}
     <section class="trending-cat section-padding">
         <div class="container">
             <h2 class="section-title">Нещодавно додане</h2>
@@ -164,7 +173,8 @@
                             <div class="box">
                                 <div class="icon">
                                     {% if post.photo.first %}
-                                    <img class="img-fluid" src="{%thumbnail post.photo.first 350 %}" alt="{{post.rubric.value}} {{ post.title }}">
+                                        <img class="img-fluid" src="{% thumbnail post.photo.first 350 %}"
+                                             alt="{{ post.rubric.value }} {{ post.title }}">
                                     {% endif %}
                                 </div>
                                 <h4>{{ post.title }}</h4>

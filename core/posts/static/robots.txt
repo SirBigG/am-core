@@ -8,7 +8,6 @@ Disallow: /service/feedback/
 Disallow: /feedback/
 
 Disallow: /register/
-Disallow: /login/
 Disallow: /logout/
 Disallow: /confirm/email/
 

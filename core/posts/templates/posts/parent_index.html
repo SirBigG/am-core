@@ -4,11 +4,11 @@
 
 {% block title %}{% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}{% endblock title %}
 
-{% block cannonical %}
-    {% if request.GET.page or request.GET.order %}
+{% block canonical %}
+    {% if request.GET %}
         <link rel="canonical" href="https://agromega.in.ua{{ request.path }}" />
     {% endif %}
-{% endblock cannonical %}
+{% endblock canonical %}
 
 {% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }} AgroMega.in.ua{% endif %}{% endblock %}
 

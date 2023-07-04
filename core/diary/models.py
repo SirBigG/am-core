@@ -44,7 +44,7 @@ class DiaryItem(models.Model):
             im = Image.open(BytesIO(self.image.read()))
             if im.mode != 'RGB':
                 im = im.convert('RGB')
-            im = im.resize((WIDTH, int((float(im.size[1]) * float(WIDTH / float(im.size[0]))))), Image.ANTIALIAS)
+            im = im.resize((WIDTH, int((float(im.size[1]) * float(WIDTH / float(im.size[0]))))), Image.LANCZOS)
             output = BytesIO()
             im.save(output, format='JPEG', quality=85)
             self.image = File(output, self.image.name)

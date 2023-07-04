@@ -6,16 +6,27 @@
     <link rel="stylesheet" href="{% static "posts/add.css" %}">
 {% endblock scripts %}
 
+{% block title %}Увійти в обліковий запис | {% endblock title %}
+
+{% block meta_description %}Здійсніть вхід до системи, щоб отримати доступ до персоналізованого досвіду
+    користувача.{% endblock %}
+
+{% block canonical %}
+    {% if request.GET %}
+        <link rel="canonical" href="https://agromega.in.ua{{ request.path }}"/>
+    {% endif %}
+{% endblock canonical %}
+
 {% block base_content_block %}
     <div class="col-12 min-vh-100">
-        <h1 class="text-success text-center h3">Увійти</h1>
+        <h1 class="text-success text-center h3">Увійти в обліковий запис</h1>
         <ul class="nav nav-pills justify-content-center">
             <li class="nav-item">
-                <a class="nav-link text-danger h1" href="{% url 'social:begin' 'google-oauth2' %}"><i
+                <a class="nav-link text-danger h1" href="{% url 'social:begin' 'google-oauth2' %}" rel="nofollow"><i
                         class="icon-google"></i></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-primary h1" href="{% url 'social:begin' 'facebook' %}"><i
+                <a class="nav-link text-primary h1" href="{% url 'social:begin' 'facebook' %}" rel="nofollow"><i
                         class="icon-facebook"></i></a>
             </li>
         </ul>

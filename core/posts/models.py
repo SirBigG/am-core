@@ -155,7 +155,7 @@ class Photo(models.Model):
                     return
                 if height is None:
                     height = int((float(im.size[1]) * float(width / float(im.size[0]))))
-                im = im.resize((width, height), Image.ANTIALIAS)
+                im = im.resize((width, height), Image.LANCZOS)
                 im.save(thumb_path, format='webp', quality=80)
             return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
 
@@ -165,7 +165,7 @@ class Photo(models.Model):
             im = Image.open(BytesIO(self.image.read()))
             if im.mode != 'RGB':
                 im = im.convert('RGB')
-            im.thumbnail((1000, 800), Image.ANTIALIAS)
+            im.thumbnail((1000, 800), Image.LANCZOS)
             output = BytesIO()
             im.save(output, format='webp', quality=85)
             self.image = File(output, self.image.name.split('.')[0] + '.webp')

@@ -121,17 +121,17 @@ class Category(MPTTModel):
             img = Image.open(BytesIO(self.image.read()))
             hsize = int(float(img.size[1]) * float(WIDTH) / float(img.size[0]))
             if hsize >= HEIGHT:
-                img = img.resize((WIDTH, hsize), Image.ANTIALIAS)
+                img = img.resize((WIDTH, hsize), Image.LANCZOS)
                 delta = hsize - HEIGHT if hsize > HEIGHT else 0
                 img = img.crop((0, delta / 2, WIDTH, hsize - (delta / 2)))
             elif hsize < HEIGHT:
                 wsize = int(float(img.size[0]) * float(HEIGHT) / float(img.size[1]))
-                img = img.resize((wsize, HEIGHT), Image.ANTIALIAS)
+                img = img.resize((wsize, HEIGHT), Image.LANCZOS)
                 delta = wsize - WIDTH if wsize > WIDTH else 0
                 img = img.crop((delta / 2, 0, wsize - (delta / 2), HEIGHT))
             else:
                 # If not height resize with auto height
-                img = img.resize((WIDTH, hsize), Image.ANTIALIAS)
+                img = img.resize((WIDTH, hsize), Image.LANCZOS)
             output = BytesIO()
             img.save(output, 'JPEG')
             self.image = File(output, name=self.image.name)

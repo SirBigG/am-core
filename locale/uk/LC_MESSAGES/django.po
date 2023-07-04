@@ -8,260 +8,410 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-18 21:04+0000\n"
-"PO-Revision-Date: 2016-06-18 21:06+0000\n"
-"Last-Translator: b'  <gotsandriy@gmail.com>'\n"
+"POT-Creation-Date: 2023-07-04 10:02+0000\n"
+"PO-Revision-Date: 2023-07-04 10:04+0000\n"
+"Last-Translator: Andrii Hots <gotsandriy@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: \n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Translated-Using: django-rosetta 0.7.11\n"
+"X-Translated-Using: django-rosetta 0.9.9\n"
 
-#: agro_portal/settings.py:149
-msgid "Ukrainian"
-msgstr "Українська мова"
-
-#: agro_portal/settings.py:150
-msgid "English"
-msgstr "Англійська мова"
-
-#: appl/classifier/models.py:13 appl/classifier/models.py:30
-#: appl/classifier/models.py:48 appl/classifier/models.py:66
-#: appl/classifier/models.py:87 appl/posts/models.py:27
-msgid "transliteration value"
-msgstr "транслітераційне значення"
-
-#: appl/classifier/models.py:14
-msgid "short slug"
-msgstr "коротка мітка"
-
-#: appl/classifier/models.py:15
-msgid "country value"
-msgstr "назва країни"
-
-#: appl/classifier/models.py:19 appl/classifier/models.py:68
-msgid "country"
-msgstr "країна"
-
-#: appl/classifier/models.py:20
-msgid "countries"
-msgstr "країни"
-
-#: appl/classifier/models.py:31
-msgid "region value"
-msgstr "назва області"
-
-#: appl/classifier/models.py:33
-msgid "region country"
-msgstr "область країна"
-
-#: appl/classifier/models.py:37 appl/classifier/models.py:38
-#: appl/classifier/models.py:69
-msgid "region"
-msgstr "область"
-
-#: appl/classifier/models.py:49
-msgid "area value"
-msgstr "назва району"
-
-#: appl/classifier/models.py:51
-msgid "area region"
-msgstr "район область"
-
-#: appl/classifier/models.py:55 appl/classifier/models.py:56
-#: appl/classifier/models.py:70
-msgid "area"
-msgstr "район"
-
-#: appl/classifier/models.py:67
-msgid "location value"
-msgstr "назва локації (місто, село)"
-
-#: appl/classifier/models.py:71
-msgid "location longitude"
-msgstr "географічна довгота"
-
-#: appl/classifier/models.py:72
-msgid "location latitude"
-msgstr "географічна широта"
-
-#: appl/classifier/models.py:76
-msgid "location"
-msgstr "локація"
-
-#: appl/classifier/models.py:77
-msgid "locations"
-msgstr "локації"
-
-#: appl/classifier/models.py:88
-msgid "category value"
-msgstr "назва категорії"
-
-#: appl/classifier/models.py:89
-msgid "category icon"
-msgstr "іконка категорії"
-
-#: appl/classifier/models.py:91
-msgid "category parent"
-msgstr "предок категорії"
-
-#: appl/classifier/models.py:92
-msgid "user relation for post category"
-msgstr "зв’язок користувача із категорією публікації"
-
-#: appl/classifier/models.py:96
-msgid "Categories"
-msgstr "Категорії"
-
-#: appl/posts/models.py:16
-msgid "Translate"
-msgstr "Переклад"
-
-#: appl/posts/models.py:17
-msgid "Publish"
-msgstr "Публікація"
-
-#: appl/posts/models.py:25
-msgid "post title"
-msgstr "заголовок публікації"
-
-#: appl/posts/models.py:26
-msgid "post text"
-msgstr "текст публікації"
-
-#: appl/posts/models.py:30
-msgid "status of author work"
-msgstr "статус роботи"
-
-#: appl/posts/models.py:31
-msgid "post author"
-msgstr "автор публікації"
-
-#: appl/posts/models.py:32
-msgid "post source"
-msgstr "джерело публікації"
-
-#: appl/posts/models.py:34
-msgid "post publisher"
-msgstr "видавець"
-
-#: appl/posts/models.py:35
-msgid "date of publish"
-msgstr "дата публікації"
-
-#: appl/posts/models.py:37
-msgid "count of views"
-msgstr "кількість переглядів"
-
-#: appl/posts/models.py:39
-msgid "post status"
-msgstr "статус публікації"
-
-#: appl/posts/models.py:41
-msgid "post category"
-msgstr "рубрика публікації"
-
-#: appl/posts/models.py:43
-#, fuzzy
-#| msgid "photo describing"
-msgid "meta description"
-msgstr ""
-
-#: appl/posts/models.py:47
-msgid "Post"
-msgstr "Публікація"
-
-#: appl/posts/models.py:48
-msgid "Posts"
-msgstr "Публікації"
-
-#: appl/posts/models.py:67
-msgid "image"
-msgstr "зображення"
-
-#: appl/posts/models.py:68
-msgid "photo describing"
-msgstr "опис фотографії"
-
-#: appl/posts/models.py:69
-msgid "post of photo"
-msgstr "публікація фотографії"
-
-#: appl/posts/models.py:70
-msgid "author of photo"
-msgstr "автор фото"
-
-#: appl/posts/models.py:71
-msgid "photo source"
-msgstr "джерело фото"
-
-#: appl/posts/models.py:75
-msgid "Photo"
-msgstr "Фотографія"
-
-#: appl/posts/models.py:76
-msgid "Photos"
-msgstr "Фотографії"
-
-#: appl/posts/models.py:98
-msgid "post of comment"
-msgstr "коментарій публіуації"
-
-#: appl/posts/models.py:99
-msgid "comment text"
-msgstr "текст коментаря"
-
-#: appl/posts/models.py:100
-msgid "comment date"
-msgstr "дата коментаря"
-
-#: appl/posts/models.py:101
-msgid "comment owner"
-msgstr "власник коментаря"
-
-#: appl/posts/models.py:105
-msgid "Comment"
-msgstr "Коментар"
-
-#: appl/posts/models.py:106
-msgid "Comments"
-msgstr "Коментарі"
-
-#: appl/pro_auth/admin.py:23
-msgid "Phones"
-msgstr "Телефони"
-
-#: appl/pro_auth/admin.py:24
-msgid "Personal info"
-msgstr "Персональна інформація"
-
-#: appl/pro_auth/admin.py:26
-msgid "Permissions"
-msgstr "Доступи"
-
-#: appl/pro_auth/forms.py:23
-msgid "The two password fields didn't match."
-msgstr "Два поля паролів не співпадають."
-
-#: appl/pro_auth/forms.py:25
-msgid "Password"
-msgstr "Пароль"
-
-#: appl/pro_auth/forms.py:27
-msgid "Password confirmation"
-msgstr "Підтвердження пароля"
-
-#: appl/pro_auth/forms.py:29
-msgid "Enter the same password as before, for verification."
-msgstr "Введіть такий самий пароль як в попередньому для підтвердження."
-
-#: appl/pro_auth/forms.py:30
+#: api/v1/pro_auth/serializers.py:23 api/v1/pro_auth/serializers.py:24
+#: api/v1/pro_auth/serializers.py:26 core/pro_auth/forms.py:27
 msgid "Phone"
 msgstr "Телефон"
 
-#: appl/pro_auth/forms.py:31
+#: core/adverts/forms.py:16
+msgid "ПІБ"
+msgstr ""
+
+#: core/adverts/forms.py:19 core/posts/forms.py:70
+msgid "Категорія"
+msgstr ""
+
+#: core/adverts/forms.py:23 core/events/forms.py:17 core/events/forms.py:28
+#: core/pro_auth/forms.py:35 core/pro_auth/forms.py:80
+#: core/pro_auth/forms.py:105
+msgid "Please select city from list."
+msgstr "Будь-ласка виберіть місто із списку."
+
+#: core/adverts/forms.py:24
+msgid "Місто/Село"
+msgstr ""
+
+#: core/adverts/forms.py:32 core/posts/forms.py:24 core/posts/forms.py:71
+#: core/posts/forms.py:99 core/services/models.py:12
+msgid "Заголовок"
+msgstr ""
+
+#: core/adverts/forms.py:33 core/posts/forms.py:127
+msgid "Короткий опис"
+msgstr ""
+
+#: core/adverts/forms.py:34 core/posts/forms.py:26 core/posts/forms.py:73
+#: core/posts/forms.py:101 core/posts/forms.py:128
+msgid "Автор"
+msgstr ""
+
+#: core/adverts/forms.py:35
+msgid "Контакти"
+msgstr ""
+
+#: core/adverts/forms.py:36
+msgid "Картинка"
+msgstr ""
+
+#: core/adverts/forms.py:37
+msgid "Місто/село"
+msgstr ""
+
+#: core/adverts/forms.py:38
+msgid "Ціна"
+msgstr ""
+
+#: core/adverts/models.py:21 core/posts/models.py:119
+msgid "image"
+msgstr "зображення"
+
+#: core/adverts/models.py:26 core/pro_auth/models.py:66
+msgid "user location"
+msgstr "місцезнаходження користувача"
+
+#: core/classifier/models.py:18 core/classifier/models.py:36
+#: core/classifier/models.py:54 core/classifier/models.py:72
+#: core/classifier/models.py:93 core/posts/models.py:50
+msgid "transliteration value"
+msgstr "транслітераційне значення"
+
+#: core/classifier/models.py:19
+msgid "short slug"
+msgstr "коротка мітка"
+
+#: core/classifier/models.py:20
+msgid "country value"
+msgstr "назва країни"
+
+#: core/classifier/models.py:24 core/classifier/models.py:74
+msgid "country"
+msgstr "країна"
+
+#: core/classifier/models.py:25
+msgid "countries"
+msgstr "країни"
+
+#: core/classifier/models.py:37
+msgid "region value"
+msgstr "назва області"
+
+#: core/classifier/models.py:39
+msgid "region country"
+msgstr "область країна"
+
+#: core/classifier/models.py:43 core/classifier/models.py:44
+#: core/classifier/models.py:75
+msgid "region"
+msgstr "область"
+
+#: core/classifier/models.py:55
+msgid "area value"
+msgstr "назва району"
+
+#: core/classifier/models.py:57
+msgid "area region"
+msgstr "район область"
+
+#: core/classifier/models.py:61 core/classifier/models.py:62
+#: core/classifier/models.py:76
+msgid "area"
+msgstr "район"
+
+#: core/classifier/models.py:73
+msgid "location value"
+msgstr "назва локації (місто, село)"
+
+#: core/classifier/models.py:77
+msgid "location longitude"
+msgstr "географічна довгота"
+
+#: core/classifier/models.py:78
+msgid "location latitude"
+msgstr "географічна широта"
+
+#: core/classifier/models.py:82
+msgid "location"
+msgstr "локація"
+
+#: core/classifier/models.py:83
+msgid "locations"
+msgstr "локації"
+
+#: core/classifier/models.py:94
+msgid "category value"
+msgstr "назва категорії"
+
+#: core/classifier/models.py:95
+msgid "category icon"
+msgstr "іконка категорії"
+
+#: core/classifier/models.py:97
+msgid "category parent"
+msgstr "предок категорії"
+
+#: core/classifier/models.py:98
+msgid "user relation for post category"
+msgstr "зв’язок користувача із категорією публікації"
+
+#: core/classifier/models.py:99
+msgid "for feel on off"
+msgstr ""
+
+#: core/classifier/models.py:104
+msgid "category meta data"
+msgstr "мета дані категорії"
+
+#: core/classifier/models.py:108
+msgid "Category"
+msgstr "Категорії"
+
+#: core/classifier/models.py:109
+msgid "Categories"
+msgstr "Категорії"
+
+#: core/events/forms.py:18 core/pro_auth/forms.py:36 core/pro_auth/forms.py:81
+#: core/pro_auth/forms.py:106
+msgid "City"
+msgstr "Місто"
+
+#: core/events/forms.py:29
+msgid "Населений пункт"
+msgstr ""
+
+#: core/events/forms.py:36
+msgid "Назва події"
+msgstr ""
+
+#: core/events/forms.py:38
+msgid "Тип"
+msgstr ""
+
+#: core/events/forms.py:39
+msgid "Картка події"
+msgstr ""
+
+#: core/events/forms.py:40
+msgid "Адреса"
+msgstr ""
+
+#: core/events/forms.py:41
+msgid "Дата початку"
+msgstr ""
+
+#: core/events/forms.py:42
+msgid "Дата закінчення"
+msgstr ""
+
+#: core/posts/forms.py:12 core/posts/forms.py:60
+msgid "Фото"
+msgstr ""
+
+#: core/posts/forms.py:13
+msgid "Фото 2"
+msgstr ""
+
+#: core/posts/forms.py:14
+msgid "Фото 3"
+msgstr ""
+
+#: core/posts/forms.py:15
+msgid "Фото 4"
+msgstr ""
+
+#: core/posts/forms.py:25 core/posts/forms.py:72 core/posts/forms.py:100
+#: core/services/models.py:14
+msgid "Текст"
+msgstr ""
+
+#: core/posts/forms.py:27 core/posts/forms.py:74 core/posts/forms.py:102
+msgid "Джерело"
+msgstr ""
+
+#: core/posts/forms.py:126
+msgid "Фото (обов'язкове)"
+msgstr ""
+
+#: core/posts/models.py:32
+msgid "Translate"
+msgstr "Переклад"
+
+#: core/posts/models.py:33
+msgid "Publish"
+msgstr "Публікація"
+
+#: core/posts/models.py:48
+msgid "post title"
+msgstr "заголовок публікації"
+
+#: core/posts/models.py:49
+msgid "post text"
+msgstr "текст публікації"
+
+#: core/posts/models.py:53
+msgid "status of author work"
+msgstr "статус роботи"
+
+#: core/posts/models.py:54
+msgid "post author"
+msgstr "автор публікації"
+
+#: core/posts/models.py:55
+msgid "post source"
+msgstr "джерело публікації"
+
+#: core/posts/models.py:57 core/posts/models.py:213
+msgid "post publisher"
+msgstr "видавець"
+
+#: core/posts/models.py:58
+msgid "date of publish"
+msgstr "дата публікації"
+
+#: core/posts/models.py:59
+msgid "date of update"
+msgstr "дата народження"
+
+#: core/posts/models.py:61
+msgid "count of views"
+msgstr "кількість переглядів"
+
+#: core/posts/models.py:63
+msgid "post status"
+msgstr "статус публікації"
+
+#: core/posts/models.py:65 core/posts/models.py:211
+msgid "post category"
+msgstr "рубрика публікації"
+
+#: core/posts/models.py:67 core/services/models.py:29
+msgid "meta description"
+msgstr "мета опис"
+
+#: core/posts/models.py:70
+msgid "post meta data"
+msgstr "мета дані публікації"
+
+#: core/posts/models.py:73
+msgid "post country"
+msgstr "країна публікації"
+
+#: core/posts/models.py:87
+msgid "Post"
+msgstr "Публікація"
+
+#: core/posts/models.py:88
+msgid "Posts"
+msgstr "Публікації"
+
+#: core/posts/models.py:120
+msgid "photo describing"
+msgstr "опис фотографії"
+
+#: core/posts/models.py:121
+msgid "post of photo"
+msgstr "публікація фотографії"
+
+#: core/posts/models.py:122
+msgid "author of photo"
+msgstr "автор фото"
+
+#: core/posts/models.py:123
+msgid "photo source"
+msgstr "джерело фото"
+
+#: core/posts/models.py:127
+msgid "Photo"
+msgstr "Фотографія"
+
+#: core/posts/models.py:128
+msgid "Photos"
+msgstr "Фотографії"
+
+#: core/posts/models.py:199
+msgid "Link"
+msgstr "Посилання"
+
+#: core/posts/models.py:200
+msgid "Links"
+msgstr "Посилання"
+
+#: core/posts/models.py:207
+msgid "parsed title"
+msgstr "зпаршений заголовок"
+
+#: core/posts/models.py:208
+msgid "parsed text"
+msgstr "зпаршений текст"
+
+#: core/posts/models.py:209
+msgid "translated title"
+msgstr "перекладений тайтл"
+
+#: core/posts/models.py:210
+msgid "translated text"
+msgstr "перекладений текст"
+
+#: core/posts/models.py:235 core/posts/models.py:245 core/posts/models.py:256
+#: core/posts/models.py:257
+msgid "fingerprint"
+msgstr ""
+
+#: core/posts/models.py:236 core/posts/models.py:246
+msgid "post identifier"
+msgstr "ідентифікатор публікації"
+
+#: core/posts/models.py:237 core/posts/models.py:247
+msgid "user identifier"
+msgstr "ідентифікатор користувача"
+
+#: core/posts/models.py:238 core/posts/models.py:249 core/posts/models.py:258
+msgid "created"
+msgstr "створено"
+
+#: core/posts/models.py:248
+msgid "is useful post"
+msgstr "чи публікація корисна"
+
+#: core/pro_auth/admin.py:22
+msgid "Phones"
+msgstr "Телефони"
+
+#: core/pro_auth/admin.py:23
+msgid "Personal info"
+msgstr "Персональна інформація"
+
+#: core/pro_auth/admin.py:25
+msgid "Permissions"
+msgstr "Доступи"
+
+#: core/pro_auth/forms.py:20
+msgid "The two password fields didn't match."
+msgstr "Два поля паролів не співпадають."
+
+#: core/pro_auth/forms.py:22 core/pro_auth/forms.py:73
+msgid "Password"
+msgstr "Пароль"
+
+#: core/pro_auth/forms.py:24
+msgid "Password confirmation"
+msgstr "Підтвердження пароля"
+
+#: core/pro_auth/forms.py:26
+msgid "Enter the same password as before, for verification."
+msgstr "Введіть такий самий пароль як в попередньому для підтвердження."
+
+#: core/pro_auth/forms.py:28
 msgid ""
 "Enter phone in International format. Example: '+380991234567'.This field is "
 "required."
@@ -269,75 +419,73 @@ msgstr ""
 "Введіть телефон в інтернаціональному форматі. Приклад: '+380991234567'. Це "
 "поле обов’язкове."
 
-#: appl/pro_auth/forms.py:38
-msgid "Please select city from list."
-msgstr "Будь-ласка виберіть місто із списку."
+#: core/pro_auth/forms.py:74
+msgid ""
+"Raw passwords are not stored, so there is no way to see this user's "
+"password, but you can change the password using <a "
+"href=\"../password/\">this form</a>."
+msgstr ""
+"Необроблені паролі не зберігаються, тому немає можливості побачити пароль "
+"цього користувача, але ви можете змінити пароль за допомогою <a "
+"href=\"../password/\">ця форму</a>."
 
-#: appl/pro_auth/forms.py:39
-msgid "City"
-msgstr "Місто"
+#: core/pro_auth/forms.py:132
+msgid "Sorry, but user with this email does not found!"
+msgstr "Вибачте, але користувача з цією електронною адресою не знайдено!"
 
-#: appl/pro_auth/forms.py:40
-msgid "Captcha"
-msgstr "Підтвердження"
-
-#: appl/pro_auth/models.py:56
+#: core/pro_auth/models.py:48
 msgid "Required. You use it at every entrance to the site."
 msgstr "Обов’язковий. Ви будете використовувати це при кожному вході на сайт."
 
-#: appl/pro_auth/models.py:58
+#: core/pro_auth/models.py:50
 msgid "A user with that email already exists."
 msgstr "Користувач з таким email вже існує."
 
-#: appl/pro_auth/models.py:60
+#: core/pro_auth/models.py:52
 msgid "user email"
 msgstr "email користувача"
 
-#: appl/pro_auth/models.py:61
+#: core/pro_auth/models.py:56
 msgid "first name"
 msgstr "ім’я"
 
-#: appl/pro_auth/models.py:62
+#: core/pro_auth/models.py:57
 msgid "last name"
 msgstr "прізвище"
 
-#: appl/pro_auth/models.py:64
+#: core/pro_auth/models.py:59
 msgid "main phone"
 msgstr "головний телефон"
 
-#: appl/pro_auth/models.py:66 appl/pro_auth/models.py:68
+#: core/pro_auth/models.py:61 core/pro_auth/models.py:63
 msgid "extra phone"
 msgstr "додатковий телефон"
 
-#: appl/pro_auth/models.py:71
-msgid "user location"
-msgstr "місцезнаходження користувача"
-
-#: appl/pro_auth/models.py:73
+#: core/pro_auth/models.py:68
 msgid "date of birth"
 msgstr "дата народження"
 
-#: appl/pro_auth/models.py:76
+#: core/pro_auth/models.py:71
 msgid "mail validation key"
 msgstr "ключ валідації email"
 
-#: appl/pro_auth/models.py:80
+#: core/pro_auth/models.py:75
 msgid "relation with posts"
 msgstr "зв’язок із публікаціями"
 
-#: appl/pro_auth/models.py:83
+#: core/pro_auth/models.py:78
 msgid "staff status"
 msgstr "статус персоналу"
 
-#: appl/pro_auth/models.py:85
+#: core/pro_auth/models.py:80
 msgid "Designates whether the user can log into this admin site."
 msgstr "Визначає, чи може цей користувач увійти на адміністративний сайт."
 
-#: appl/pro_auth/models.py:88
+#: core/pro_auth/models.py:83
 msgid "active"
 msgstr "активний"
 
-#: appl/pro_auth/models.py:91
+#: core/pro_auth/models.py:86
 msgid ""
 "Designates whether this user should be treated as active. Unselect this "
 "instead of deleting accounts."
@@ -345,108 +493,148 @@ msgstr ""
 "Визначає, чи повинен цей користувач розглядатись як активний. Скасуйте це "
 "замість того, щоб видаляти обліковий запис."
 
-#: appl/pro_auth/models.py:95
+#: core/pro_auth/models.py:90
 msgid "date joined"
 msgstr "дата приєднання"
 
-#: appl/pro_auth/models.py:98
+#: core/pro_auth/models.py:93
 msgid "avatar"
 msgstr "аватар"
 
-#: appl/pro_auth/models.py:107
+#: core/pro_auth/models.py:103
 msgid "custom user"
 msgstr "Кастомний користувач"
 
-#: appl/pro_auth/models.py:108
+#: core/pro_auth/models.py:104
 msgid "custom users"
 msgstr "Кастомні користувачі"
 
-#: appl/pro_auth/views.py:25
-msgid "Confirmation of user email."
-msgstr "Підтвердження електронної пошти користувача."
+#: core/services/admin.py:17
+msgid "Advanced options"
+msgstr "Розширені опції"
 
-#: appl/services/models.py:8
-msgid "feedback topic"
-msgstr "заголовок"
-
-#: appl/services/models.py:9
-msgid "feedback email"
-msgstr "email"
-
-#: appl/services/models.py:10
-msgid "feedback body"
-msgstr "текст"
-
-#: templates/404.html:7
-msgid "Такої сторінки не існує."
+#: core/services/models.py:13
+msgid "Email (необов'язково)"
 msgstr ""
 
-#: templates/500.html:7
-msgid ""
-"Упс. Сталась помилка або сторінка в розробці. Вибачте за незручності. Ми "
-"працюємо на цією проблемою."
+#: core/services/models.py:15
+msgid "Дата створення"
 msgstr ""
 
-#: templates/base.html:14 templates/base.html:15
-msgid "Текст головного мета тега."
-msgstr "Текст головного мета тега."
+#: core/services/models.py:19
+msgid "Feedback"
+msgstr "Текст"
 
-#: templates/footer.html:7
-msgid "Зворотній зв’язок"
-msgstr ""
+#: core/services/models.py:20
+msgid "Feedbacks"
+msgstr "Текст"
 
-#: templates/header.html:21
-msgid "Вийти"
-msgstr ""
+#: core/services/models.py:28
+msgid "meta title"
+msgstr "мета назва"
 
-#: templates/header.html:23
-msgid "Увійти"
-msgstr ""
+#: core/services/models.py:30
+msgid "h1 tag"
+msgstr "h1 тег"
 
-#: templates/header.html:24
-msgid "Зареєструватись"
-msgstr ""
+#: core/services/models.py:31
+msgid "meta text"
+msgstr "метатекст"
 
-#: templates/posts/detail.html:59
-#| msgid "Source "
-msgid "Source: "
-msgstr "Джерело: "
+#: core/services/models.py:35 core/services/models.py:36
+msgid "meta data"
+msgstr "метадані"
 
-#: templates/posts/detail.html:60
-msgid "Share with friends: "
-msgstr "Поділитись із друзями:"
+#: core/services/models.py:49
+msgid "Review owner."
+msgstr "Відгук власника."
 
-#: templates/posts/detail.html:73
-msgid "Більше статтей тут:"
-msgstr ""
+#: core/services/models.py:50
+msgid "Mark"
+msgstr "Марка"
 
-#: templates/pro_auth/confirmation_email.html:3
-msgid ""
-"Для того щоб підтвердити реєстрацію на сайті AgroMega.in.ua перейдіть за "
-"цією ссилкою"
-msgstr ""
+#: core/services/models.py:51
+msgid "Review description"
+msgstr "Опис огляду"
 
-#: templates/pro_auth/confirmation_email.html:4
-msgid "зареєструватись."
-msgstr ""
+#: core/services/models.py:52
+msgid "Review date"
+msgstr "Дата огляду"
 
-#: templates/pro_auth/login.html:20 templates/pro_auth/register.html:20
-#: templates/services/feedback.html:23
-msgid "Закрити"
-msgstr ""
+#: core/services/models.py:53
+msgid "Created"
+msgstr "Створено"
 
-#: templates/pro_auth/login.html:21 templates/pro_auth/register.html:21
-#: templates/services/feedback.html:24
-msgid "Відправити"
-msgstr ""
+#: core/services/models.py:56
+msgid "Review"
+msgstr "Огляд"
 
-#: templates/services/feedback.html:4
-msgid "Зв’яжіться з нами"
-msgstr ""
+#: core/services/models.py:57
+msgid "Reviews"
+msgstr "Відгуки"
 
-#: templates/services/success.html:3
-msgid "Повідомлення відправлено! Дякуємо!"
-msgstr ""
+#: settings/settings.py:225
+msgid "Ukrainian"
+msgstr "Українська мова"
+
+#: settings/settings.py:226
+msgid "English"
+msgstr "Англійська мова"
+
+#: templates/comment/comments/create_comment.html:20
+msgid "Reply"
+msgstr "Відповісти"
+
+#: templates/comment/comments/create_comment.html:20
+msgid "Comment"
+msgstr "Коментар"
+
+#: templates/comment/comments/create_comment.html:31
+msgid "Comment Anonymously or"
+msgstr "Прокоментувати Анонімно або"
+
+#: templates/comment/comments/create_comment.html:33
+#: templates/comment/comments/create_comment.html:40
+msgid "Login"
+msgstr "Логін"
+
+#: templates/comment/comments/create_comment.html:35
+msgid "to keep your conversations intact"
+msgstr "щоб зберегти ваші розмови недоторканими"
+
+#: templates/comment/comments/create_comment.html:42
+msgid "to join the discussion"
+msgstr "приєднатися до обговорення"
+
+#~ msgid "post of comment"
+#~ msgstr "коментарій публіуації"
+
+#~ msgid "comment owner"
+#~ msgstr "власник коментаря"
+
+#~ msgid "Comments"
+#~ msgstr "Коментарі"
+
+#~ msgid "Captcha"
+#~ msgstr "Підтвердження"
+
+#~ msgid "Confirmation of user email."
+#~ msgstr "Підтвердження електронної пошти користувача."
+
+#~ msgid "feedback topic"
+#~ msgstr "заголовок"
+
+#~ msgid "feedback email"
+#~ msgstr "email"
+
+#~ msgid "Текст головного мета тега."
+#~ msgstr "Текст головного мета тега."
+
+#~ msgid "Source: "
+#~ msgstr "Джерело: "
+
+#~ msgid "Share with friends: "
+#~ msgstr "Поділитись із друзями:"
 
 #~ msgid "Phone 2"
 #~ msgstr "Телефон 2"

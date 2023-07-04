@@ -71,7 +71,7 @@ class Event(models.Model):
                     im = Image.open(self.poster.path)
                 except FileNotFoundError:
                     return
-                im = im.resize((width, height), Image.ANTIALIAS)
+                im = im.resize((width, height), Image.LANCZOS)
                 im.save(thumb_path, format='JPEG', quality=80)
             return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
 
@@ -82,7 +82,7 @@ class Event(models.Model):
             im = Image.open(BytesIO(self.poster.read()))
             if im.mode != 'RGB':
                 im = im.convert('RGB')
-            im.thumbnail((1000, 800), Image.ANTIALIAS)
+            im.thumbnail((1000, 800), Image.LANCZOS)
             output = BytesIO()
             im.save(output, format='JPEG', quality=85)
             self.poster = File(output, self.poster.name)

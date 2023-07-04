@@ -98,6 +98,7 @@ MIDDLEWARE = (
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django_http2_push.middleware.PushHttp2Middleware",
+    'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -218,10 +219,10 @@ LOGIN_REDIRECT_URL = '/'
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
 # ========================================================================================
 
-LANGUAGE_CODE = 'uk-Uk'
+LANGUAGE_CODE = 'uk'
 
 LANGUAGES = [
-    ('uk-Uk', _('Ukrainian')),
+    ('uk', _('Ukrainian')),
     ('en', _('English')),
 ]
 
@@ -297,3 +298,5 @@ API_HOST = os.getenv('API_HOST')
 
 RECAPTCHA_PUBLIC_KEY = os.getenv("RECAPTCHA_PUBLIC_KEY", "")
 RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY", "")
+
+COMMENT_ALLOW_TRANSLATION = True

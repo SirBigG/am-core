@@ -29,14 +29,14 @@
         {% if is_anonymous_allowed %}
             <p class="text-muted{% if comment %} h7{% endif %}">
                 {% trans "Comment Anonymously or" %}
-                <a class="text-success" href="{{login_url}}?next={{request.path}}" rel="nofollow">
+                <a class="text-success" href="{{login_url}}" rel="nofollow">
                     <em>{% trans "Login" %}</em>
                 </a>
                 {% trans "to keep your conversations intact" %}
             </p>
         {% else %}
             <p class="text-muted {% if comment %}h7{% endif %}">
-                <a class="text-success" href="{{login_url}}?next={{request.path}}" rel="nofollow">
+                <a class="text-success" href="{{login_url}}" rel="nofollow">
                     <em>{% trans "Login" %}</em>
                 </a>
                 {% trans "to join the discussion" %}
