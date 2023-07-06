@@ -94,7 +94,7 @@ class Post(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title.lower(), get_language()[:2])
+            self.slug = slugify(self.title.lower(), get_language())
             if self.__class__.objects.filter(slug=self.slug).first():
                 self.slug = self.slug + ''.join(random.choice(string.ascii_lowercase) for _ in range(4))
         # always upgrade absolute url on save

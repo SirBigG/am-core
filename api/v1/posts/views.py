@@ -48,7 +48,7 @@ class UserPostsViewSet(ModelViewSet):
 
     def perform_create(self, serializer):
         """Adding some extra data to created object."""
-        _lang = get_language()[:2]
+        _lang = get_language()
         slug = slugify(self.request.data.get('title'), _lang)
         serializer.save(publisher=self.request.user, slug=slug)
 

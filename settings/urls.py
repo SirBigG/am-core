@@ -20,12 +20,13 @@ from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
+from django.conf.urls.i18n import i18n_patterns
 
 from core.posts import views
 from core.news.views import AdvertListView
 from core.services.views import FeedbackView
 
-urlpatterns = [
+urlpatterns = i18n_patterns(
     path('', views.IndexView.as_view(), name='index'),
     path(f'admin{settings.ADMIN_HASH}/', admin.site.urls),
     path('rosetta/', include('rosetta.urls')),
@@ -54,7 +55,8 @@ urlpatterns = [
     path('', include('core.classifier.urls')),
     path('', include('core.pro_auth.urls', namespace='pro_auth')),
     path('', include('core.posts.urls')),
-]
+    prefix_default_language=False
+)
 
 # For returning errors pages. Need to be the last.
 handler404 = "django.views.defaults.page_not_found"

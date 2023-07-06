@@ -25,7 +25,7 @@ class EventType(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title.lower(), get_language()[:2])
+            self.slug = slugify(self.title.lower(), get_language())
         super().save(*args, **kwargs)
 
 
@@ -77,7 +77,7 @@ class Event(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify('{} {}'.format(self.title.lower(), self.location.slug), get_language()[:2])
+            self.slug = slugify('{} {}'.format(self.title.lower(), self.location.slug), get_language())
         if self.poster:
             im = Image.open(BytesIO(self.poster.read()))
             if im.mode != 'RGB':

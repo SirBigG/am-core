@@ -1,4 +1,5 @@
 from django.urls import path
+from django.utils.translation import get_language
 
 from core.posts.views import ParentRubricView, PostList, PostDetail, PostSearchView, PostFormView, GalleryView, \
     AddPhotoView, PostListView
@@ -9,14 +10,13 @@ from transliterate import slugify
 
 # TODO: Updated this hack contribute to library
 def custom_slugify(self, tag, i=None):
-    slug = slugify(tag)
+    slug = slugify(tag, language_code=get_language())
     if i is not None:
         slug += "_%d" % i
     return slug
 
 
 TagBase.slugify = custom_slugify
-
 
 urlpatterns = [
     path('search/', PostSearchView.as_view(), name='post-search-list'),

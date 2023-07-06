@@ -9,7 +9,7 @@ ADD requirements.txt $PROJECT_DIR/
 WORKDIR $PROJECT_DIR
 
 RUN apt-get update && \
-    apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev && \
+    apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev gettext  && \
     apt-get clean && \
     pip install -r requirements.txt
 
