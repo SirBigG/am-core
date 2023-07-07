@@ -11,6 +11,10 @@
 {% block meta_description %}Здійсніть вхід до системи, щоб отримати доступ до персоналізованого досвіду
     користувача.{% endblock %}
 
+{% block extra_meta %}
+    <meta name="robots" content="noindex">
+{% endblock extra_meta %}
+
 {% block canonical %}
     {% if request.GET %}
         <link rel="canonical" href="https://agromega.in.ua{{ request.path }}"/>

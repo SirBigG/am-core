@@ -142,11 +142,13 @@ class SiteMap(TemplateView):
         from core.events.models import Event
         context = super(SiteMap, self).get_context_data(**kwargs)
         context['base'] = settings.HOST + '/'
-        context['urls'] = [{"loc": settings.HOST + p.get_absolute_url(),
-                            "lastmod": p.update_date} for p in Post.objects.select_related(
-            'rubric').prefetch_related('rubric__parent').filter(status=True)]
+        context['urls'] = [{"loc": f'{settings.HOST}{p["absolute_url"]}',
+                            "lastmod": p["update_date"]} for p in Post.objects.filter(
+            status=True).values('update_date', 'absolute_url')]
         context['urls'].extend([{"loc": f"{settings.HOST}/{slug}/"} for slug in Category.objects.filter(
             level=1, is_active=True).values_list('slug', flat=True)])
+        context['urls'].extend([{"loc": f"{settings.HOST}{c.get_absolute_url()}"} for c in Category.objects.filter(
+            level=2, is_active=True)])
         context['urls'].extend([{"loc": f"{settings.HOST}/events/{slug}.html"} for slug in Event.objects.filter(
             status=1).values_list('slug', flat=True)])
         context["urls"].extend([
