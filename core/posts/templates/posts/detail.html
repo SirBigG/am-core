@@ -66,9 +66,9 @@
     {% endif %}{% endblock %}
 
 {% block breadcrumbs %}
-    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}
+{#    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}#}
         {% breadcrumbs category object.title %}
-    {% endcache %}
+{#    {% endcache %}#}
 {% endblock %}
 
 {% block content %}
@@ -78,7 +78,7 @@
                 {% if main_photo_object %}
                     <div class="card">
                         <img alt="{{ object.title }}" width="1000" height="500"
-                             src="{% thumbnail main_photo_object 1000 %}"
+                             src="{% thumbnail main_photo_object 1520 %}"
                              class="card-img img-fluid"/>
                         <div class="card-body text-end m-1">
                             <a href="/gallery/add/{{ object.id }}/"
@@ -129,7 +129,7 @@
         </div>
         {# Comments block #}
         {% render_comments object request %}
-        {% relative_posts category %}
-        {% post_adverts category.parent %}
+        {% relative_posts category.id %}
+        {% post_adverts %}
     </div>
 {% endblock content %}

@@ -19,11 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView
-from django.contrib.auth.decorators import login_required
+# from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 
 from core.posts import views
-from core.news.views import AdvertListView
+# from core.news.views import AdvertListView
 from core.services.views import FeedbackView
 
 urlpatterns = i18n_patterns(
@@ -64,3 +64,6 @@ handler500 = "django.views.defaults.server_error"
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()
+
+if settings.DEBUG:
+    urlpatterns = [path('silk/', include('silk.urls', namespace='silk')),] + urlpatterns

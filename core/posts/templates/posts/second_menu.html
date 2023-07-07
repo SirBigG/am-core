@@ -3,9 +3,9 @@
         <div class="nav second-menu">
             {% for item in menu_items %}
                 {% if slug and slug == item.slug %}
-                    <a class="nav-item nav-link active" href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a>
+                    <a class="nav-item nav-link active" href="{{ item.absolute_url }}">{{ item.value }}</a>
                 {% else %}
-                    <a class="nav-item nav-link" href="/{{ item.parent.slug }}/{{ item.slug }}/">{{ item.value }}</a>
+                    <a class="nav-item nav-link" href="{{ item.absolute_url }}">{{ item.value }}</a>
                 {% endif %}
             {% endfor %}
         </div>

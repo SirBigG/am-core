@@ -94,7 +94,7 @@ INSTALLED_APPS = [
     'factory',
 ]
 
-MIDDLEWARE = (
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "django_http2_push.middleware.PushHttp2Middleware",
@@ -105,7 +105,7 @@ MIDDLEWARE = (
     # 'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
+]
 
 ROOT_URLCONF = 'settings.urls'
 
@@ -140,11 +140,11 @@ LOGGING = {
         }
     },
     'loggers': {
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'filters': ['require_debug_true'],
-            'handlers': ['console'],
-        },
+        # 'django.db.backends': {
+        #     'level': 'DEBUG',
+        #     'filters': ['require_debug_true'],
+        #     'handlers': ['console'],
+        # },
         'django': {
             'level': 'INFO',
             'handlers': ['console'],

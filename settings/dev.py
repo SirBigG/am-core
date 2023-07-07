@@ -43,3 +43,9 @@ MEDIA_ROOT = '/media'
 # CORS_ORIGIN_WHITELIST = []
 
 SITE_ID = 1
+
+INSTALLED_APPS += [
+    'silk',
+]
+MIDDLEWARE += ['silk.middleware.SilkyMiddleware', ]
+SILKY_PYTHON_PROFILER = True

@@ -26,5 +26,5 @@ urlpatterns = [
     path('<str:parent>/', ParentRubricView.as_view(), name='parent-category-index'),
     path('<str:parent>/<str:child>/', PostListView.as_view(), name='posts-list-view'),
     path('<str:parent>/<str:child>/list/', PostList.as_view(), name='posts-list-child'),
-    path('<str:parent>/<str:child>/<str:slug>-<int:id>.html', PostDetail.as_view(), name='post-detail'),
+    path('<str:parent>/<str:child>/<str:slug>-<int:pk>.html', PostDetail.as_view(), name='post-detail'),
 ]

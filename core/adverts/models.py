@@ -10,7 +10,6 @@ from django.utils.translation import gettext_lazy as _
 
 from core.classifier.models import Category
 
-
 WIDTH = 350
 
 
@@ -25,6 +24,14 @@ class Advert(models.Model):
     location = models.ForeignKey('classifier.Location', blank=True, null=True,
                                  on_delete=models.SET_NULL, verbose_name=_('user location'))
     created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('advert')
+        verbose_name_plural = _('adverts')
+        ordering = ['created']
+        indexes = [
+            models.Index(fields=['created']),
+        ]
 
     def __str__(self):
         return self.title

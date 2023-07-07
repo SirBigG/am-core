@@ -98,6 +98,8 @@ class Category(MPTTModel):
     is_for_user = models.BooleanField(default=False, verbose_name=_('user relation for post category'))
     is_active = models.BooleanField(default=True, verbose_name=_('for feel on off'))
 
+    absolute_url = models.CharField(max_length=1000, blank=True, null=True, verbose_name=_('absolute url'))
+
     image = models.ImageField(upload_to='categories', blank=True, null=True)
 
     meta = models.OneToOneField(MetaData, on_delete=models.CASCADE, blank=True, null=True,
@@ -135,4 +137,5 @@ class Category(MPTTModel):
             output = BytesIO()
             img.save(output, 'JPEG')
             self.image = File(output, name=self.image.name)
+        self.absolute_url = self.get_absolute_url()
         super().save(*args, **kwargs)

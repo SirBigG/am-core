@@ -3,16 +3,12 @@
     <div class="row mt-3 mb-3">
         {% for item in adverts %}
             <div class="col-6 col-lg-3">
-
+                <a href="{{ link }}" style="text-decoration: none; outline: 0;">
                     {% if item.image %}
-                        <img src="{{ item.image.url }}" loading="lazy" class="img-fluid" alt="{{ item.title }}">
+                        <img src="{{ item.image }}" width="200" height="150" loading="lazy" class="img-fluid" alt="{{ item.title }}">
                     {% endif %}
-
-                <h3 class="text-center h6 m-3" style="overflow: auto;">
-                    <a href="{{ link }}" style="text-decoration: none; outline: 0;">
-                    <p class="text-success">{{ item.title }}</p>
-                    </a>
-                </h3>
+                    <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ item.title }}</p>
+                </a>
             </div>
         {% endfor %}
     </div>
