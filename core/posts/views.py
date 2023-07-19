@@ -51,8 +51,7 @@ class PostListView(TemplateView):
         category = Category.objects.select_related('meta').filter(slug=self.kwargs['child']).first()
         if category is None:
             raise Http404
-        posts = Post.objects.filter(rubric_id=category.id).values('id', 'title', 'slug',
-                                                                  'rubric__slug', 'rubric__parent__slug')
+        posts = Post.objects.filter(rubric_id=category.id).values('title', 'absolute_url').active()
         posts = [[key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]),
                                                       key=lambda x: x['title'][0])]
         return {"posts": posts,
