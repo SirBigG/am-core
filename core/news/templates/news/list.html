@@ -8,14 +8,14 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    <meta content="Всі агроновини в одному місці | AgroMega.in.ua" property="og:title">
-    <meta content="Новини агросектору. Стрічка найсвіжіших агроновин бізнесу та сфери в цілому." property="og:description">
+    <meta content="Аграрні новини України | AgroMega.in.ua" property="og:title">
+    <meta content="Останні новини з аграрної сфери України." property="og:description">
     {% if request.GET.page %}<meta name="robots" content="noindex, nofollow">{% endif %}
 {% endblock extra_meta %}
 
-{% block title %}Всі агроновини в одному місці{% endblock %}
+{% block title %}Аграрні новини України{% endblock %}
 
-{% block page_title %}Всі агроновини в одному місці{% endblock %}
+{% block page_title %}Aграрні новини України{% endblock %}
 {% block page_title_right %}<a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram <i class="icon-paper-plane"></i></a>{% endblock %}
 
 {% block content %}
@@ -23,26 +23,23 @@
         <div class="row">
             <div class="card mb-3 w-100">
                 <div class="row no-gutters">
-                    <div class="col-md-4 col-12 p-0">
+                    <div class="col-md-3 col-12 p-0">
                         {% if obj.data.image %}
                             {% if "http" in obj.data.image %}
                                 <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">
                             {% endif %}
                         {% endif %}
                     </div>
-                    <div class="col-md-8 col-12">
+                    <div class="col-md-9 col-12">
                         <div class="card-body">
-                            <h5 class="card-title">{{ obj.data.title }}</h5>
-                            {% if obj.data.description %}
-                                <div class="card-text">{{ obj.data.description }}</div>
-                            {% endif %}
-                            <div class="row mt-3">
-                                <div class="col-6 align-self-center">
-                                    <p class="h6 text-danger">{{ obj.created }}</p>
+                            <p class="card-title h6">{{ obj.data.title }}</p>
+                            <div class="row justify-content-around">
+                                <div class="col-4">
+                                    <p class="text-danger pt-1">{{ obj.created }}</p>
                                 </div>
-                                <div class="col-6 align-self-center">
-                                    <button class="btn text-success"
-                                            onclick="window.open('{{ obj.data.link }}', '_blank')">{{ obj.data.link|get_domain }}</button>
+                                <div class="col-8">
+                                    <p><button class="btn text-success pt-1"
+                                               onclick="window.open('{{ obj.data.link }}', '_blank')">{{ obj.data.link|get_domain }}</button></p>
                                 </div>
                             </div>
                         </div>
