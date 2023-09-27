@@ -23,34 +23,35 @@
                         <div class="mt-3">
                             <h4>{{ request.user.get_full_name }}</h4>
                             <a class="btn btn-success btn-sm" href="{% url 'pro_auth:dashboard' %}">Профіль</a>
-                            <a class="btn btn-warning btn-sm" href="{% url 'pro_auth:change-profile' %}"><i class="fas fa-edit"></i></a>
+                            <a class="btn btn-warning btn-sm" href="{% url 'pro_auth:change-profile' %}"><i
+                                    class="fas fa-edit"></i></a>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card mt-3">
                 <ul class="list-group list-group-flush">
-                    <a href="{% url 'pro_auth:profile-posts' %}">
-                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                    <h6 class="mb-0 text-success"><i class="fas fa-seedling"></i></h6>
-                    <span class="text-secondary">Публікації</span>
-                  </li>
+                    <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                       href="{% url 'pro_auth:profile-posts' %}">
+                        <h6 class="mb-0 text-success"><i class="fas fa-seedling"></i></h6>
+                        <span class="text-secondary">Публікації</span>
                     </a>
-                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                    <h6 class="mb-0 text-success"><i class="fas fa-bullhorn"></i></h6>
-                    <span class="text-secondary">Оголошення</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                    <h6 class="mb-0 text-success"><i class="far fa-calendar-alt"></i></h6>
-                    <span class="text-secondary">Події</span>
-                  </li>
-                  <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
-                    <h6 class="mb-0 text-success"><i class="fab fa-microblog"></i></h6>
-                    <span class="text-secondary">Блог</span>
-                  </li>
+                    <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                       href="{% url 'pro_auth:profile-adverts' %}">
+                        <h6 class="mb-0 text-success"><i class="fas fa-bullhorn"></i></h6>
+                        <span class="text-secondary">Оголошення</span>
+                    </a>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <h6 class="mb-0 text-success"><i class="far fa-calendar-alt"></i></h6>
+                        <span class="text-secondary">Події</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">
+                        <h6 class="mb-0 text-success"><i class="fab fa-microblog"></i></h6>
+                        <span class="text-secondary">Блог</span>
+                    </li>
                 </ul>
-              </div>
             </div>
+        </div>
         <div class="col-md-8 col-12">
             {% block profile_content %}{% endblock %}
         </div>

@@ -28,6 +28,7 @@ class IsReviewedTests(TestCase):
     def setUp(self):
         self.user = UserFactory()
         self.category = CategoryFactory(slug='test_slug')
+        self.category.save()
 
     def test_response_not_authorized(self):
         response = self.client.get('/service/reviews/is-reviewed/', data={'slug': 'test_slug'},
@@ -66,6 +67,7 @@ class IsReviewedTests(TestCase):
 class ReviewsListsViewTests(TestCase):
     def test_list_response(self):
         category = CategoryFactory(slug='list_slug')
+        category.save()
         ReviewsFactory.create_batch(3, object_id=category.pk, content_type=ContentType.objects.get(model='category'),
                                     user=UserFactory())
         response = self.client.get('/service/reviews/category/list_slug-%s/' % category.pk)
@@ -79,7 +81,9 @@ class ReviewsListsViewTests(TestCase):
     def test_all_reviews(self):
         user = UserFactory()
         category = CategoryFactory(slug='list_slug')
+        category.save()
         category2 = CategoryFactory(slug='list_slug2')
+        category2.save()
         ReviewsFactory.create_batch(3, object_id=category.pk, content_type=ContentType.objects.get(model='category'),
                                     user=user)
         ReviewsFactory.create_batch(3, object_id=category2.pk, content_type=ContentType.objects.get(model='category'),

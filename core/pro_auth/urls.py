@@ -16,8 +16,10 @@ from core.pro_auth.views import (
     ProfileDiaryDetailView,
     UpdateProfileDiaryView,
     AddDiaryItemView,
+    ProfileAdvertListView,
+    ProfileAdvertAddView,
+    UpdateProfileAdvertsView,
 )
-
 
 app_name = 'pro_auth'
 
@@ -36,6 +38,10 @@ urlpatterns = [
     path('profile/diary', login_required(ProfileDiaryListView.as_view()), name="profile-diary-list"),
     path('profile/posts', login_required(ProfilePostView.as_view()), name='profile-posts'),
     path('profile/change', login_required(ChangeProfileView.as_view()), name="change-profile"),
+    path('profile/adverts/create', login_required(ProfileAdvertAddView.as_view()), name='profile-adverts-create'),
+    path('profile/adverts/update/<int:pk>', login_required(UpdateProfileAdvertsView.as_view()),
+         name='profile-adverts-update'),
+    path('profile/adverts', login_required(ProfileAdvertListView.as_view()), name="profile-adverts"),
     path('login/', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
     path('is-authenticate/', IsAuthenticate.as_view(), name='is_authenticate'),

@@ -8,6 +8,8 @@ from core.posts.models import Post
 from core.posts.forms import UpdatePostForm, ProfileAddPostForm
 from core.diary.forms import DiaryForm, DiaryItemForm
 from core.diary.models import Diary
+from core.adverts.forms import AdvertForm
+from core.adverts.models import Advert
 
 
 class Login(FormView):
@@ -60,13 +62,13 @@ class ChangeProfileView(FormView):
         return super().form_valid(form)
 
 
-class ProfilePostView(TemplateView):
+class ProfilePostView(ListView):
+    paginate_by = 25
+    ordering = "-updated"
     template_name = "pro_auth/profile/posts.html"
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data()
-        context["posts"] = Post.objects.filter(publisher=self.request.user)
-        return context
+    def get_queryset(self):
+        return Post.objects.filter(publisher=self.request.user)
 
 
 class UpdateProfilePostView(UpdateView):
@@ -165,3 +167,36 @@ class AddDiaryItemView(FormView):
     def form_valid(self, form):
         form.save()
         return HttpResponseRedirect(reverse('pro_auth:profile-diary-detail', kwargs={"pk": self.kwargs["diary_id"]}))
+
+
+class ProfileAdvertListView(ListView):
+    template_name = "pro_auth/profile/advert_list.html"
+    model = Advert
+    ordering = "-updated"
+
+    def get_queryset(self):
+        return Advert.objects.filter(user=self.request.user)
+
+
+class ProfileAdvertAddView(FormView):
+    form_class = AdvertForm
+    template_name = "pro_auth/profile/advert_add.html"
+
+    def form_valid(self, form):
+        form.save()
+        return HttpResponseRedirect(reverse('pro_auth:profile-adverts'))
+
+
+class UpdateProfileAdvertsView(UpdateView):
+    form_class = AdvertForm
+    template_name = "pro_auth/profile/advert_update.html"
+
+    def get_queryset(self):
+        return Advert.objects.filter(user=self.request.user)
+
+    def get_success_url(self):
+        return reverse('pro_auth:profile-adverts')
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)

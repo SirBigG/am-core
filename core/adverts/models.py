@@ -14,6 +14,13 @@ WIDTH = 350
 
 
 class Advert(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='adverts',
+        null=True,
+        blank=True
+    )
     title = models.CharField(max_length=512)
     description = models.TextField()
     category = models.ForeignKey(Category, blank=True, null=True, on_delete=models.SET_NULL)
@@ -24,6 +31,7 @@ class Advert(models.Model):
     location = models.ForeignKey('classifier.Location', blank=True, null=True,
                                  on_delete=models.SET_NULL, verbose_name=_('user location'))
     created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = _('advert')
@@ -38,6 +46,12 @@ class Advert(models.Model):
 
     def save(self, *args, **kwargs):
         """Cut image before save."""
+        # do not cut if image is not changed
+        if self.pk is not None:
+            orig = Advert.objects.get(pk=self.pk)
+            if orig.image == self.image:
+                super().save(*args, **kwargs)
+                return
         if self.image:
             im = Image.open(BytesIO(self.image.read()))
             if im.mode != 'RGB':

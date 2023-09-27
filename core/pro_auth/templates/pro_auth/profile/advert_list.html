@@ -2,23 +2,22 @@
 
 {% block profile_content %}
     <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
-        <h1 class="text-success">Мої публікації</h1>
-        <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-posts-create' %}"><i
+        <h1 class="text-success">Мої оголошення</h1>
+        <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-adverts-create' %}"><i
                 class="fas fa-plus"></i> Додати</a>
     </div>
     {% if object_list %}
         <div class="row">
-            {% for post in object_list %}
+            {% for advert in object_list %}
                 <div class="col-12 d-flex justify-content-between align-items-center mb-1">
-                    <a class="no-decoration text-success" href="{{ post.get_absolute_url }}">{{ post.title }}</a><a
-                        class="btn btn-warning btn-sm"
-                        href="{% url 'pro_auth:profile-posts-update' pk=post.id %}"><i
+                    <p>{{ advert.title }}</p><a class="btn btn-warning btn-sm"
+                                                href="{% url 'pro_auth:profile-adverts-update' pk=advert.id %}"><i
                         class="fas fa-pencil-alt text-white"></i></a>
                 </div>
             {% endfor %}
         </div>
         {% include "helpers/pagination_short.html" %}
     {% else %}
-        <p class="text-warning">У Вас поки немає публікацій</p>
+        <p class="text-warning">У Вас поки немає оголошень</p>
     {% endif %}
 {% endblock %}

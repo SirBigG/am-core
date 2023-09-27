@@ -137,5 +137,5 @@ class Category(MPTTModel):
             output = BytesIO()
             img.save(output, 'JPEG')
             self.image = File(output, name=self.image.name)
-        self.absolute_url = self.get_absolute_url()
         super().save(*args, **kwargs)
+        Category.objects.filter(pk=self.pk).update(absolute_url=self.get_absolute_url())

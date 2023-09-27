@@ -1,4 +1,4 @@
-Django==4.2.4
+Django==4.2.5
 django-autocomplete-light==3.9.7
 django-ckeditor==6.7.0
 django-mptt==0.14.0
@@ -9,13 +9,13 @@ factory-boy
 flake8
 ipaddress==1.0.23
 MarkupSafe==2.1.3
-phonenumbers==8.13.19
-phonenumberslite==8.13.19
-Pillow==10.0.0
-psycopg[c]==3.1.10
+phonenumbers==8.13.21
+phonenumberslite==8.13.21
+Pillow==10.0.1
+psycopg[c]==3.1.12
 python-dateutil==2.8.2
 requests==2.31.0
-social-auth-app-django[openidconnect]==5.2.0
+social-auth-app-django[openidconnect]==5.3.0
 transliterate==1.10.2
 django-taggit==4.0.0
 coverage
@@ -25,4 +25,4 @@ django-recaptcha==3.0.0
 django-comments-dab==2.8.0
 daphne==4.0.0
 python-jose==3.3.0
-django-silk==5.0.3
+django-silk==5.0.4
