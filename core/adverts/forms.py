@@ -21,7 +21,7 @@ class AdvertForm(forms.ModelForm):
                                       widget=autocomplete.ModelSelect2(url='location-autocomplete',
                                                                        attrs={'class': 'form-control'}),
                                       help_text=_("Please select city from list."),
-                                      label=_("Місто/Село"),
+                                      label=_("Локація"),
                                       required=False)
 
     class Meta:

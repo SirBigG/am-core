@@ -1,13 +1,13 @@
 {% if adverts %}
-    <h2 class="h5">Останні оголошення:</h2>
+    <p class="h5">Оголошення:</p>
     <div class="row mt-3 mb-3">
-        {% for item in adverts %}
+        {% for advert_item in adverts %}
             <div class="col-6 col-lg-3">
-                <a href="{{ link }}" style="text-decoration: none; outline: 0;">
-                    {% if item.image %}
-                        <img src="{{ item.image }}" width="200" height="150" loading="lazy" class="img-fluid" alt="{{ item.title }}">
+                <a href="{{ advert_item.url }}" style="text-decoration: none; outline: 0;">
+                    {% if advert_item.image %}
+                        <img src="{{ advert_item.image }}" width="200" height="150" loading="lazy" class="img-fluid" alt="{{ advert_item.title }}">
                     {% endif %}
-                    <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ item.title }}</p>
+                    <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ advert_item.title }}</p>
                 </a>
             </div>
         {% endfor %}

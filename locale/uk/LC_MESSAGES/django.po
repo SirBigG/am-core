@@ -3,20 +3,22 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: core/events/forms.py:37
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-07-04 10:02+0000\n"
-"PO-Revision-Date: 2023-07-04 10:04+0000\n"
+"POT-Creation-Date: 2023-11-08 21:50+0000\n"
+"PO-Revision-Date: 2023-11-08 21:48+0000\n"
 "Last-Translator: Andrii Hots <gotsandriy@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Translated-Using: django-rosetta 0.9.9\n"
 
 #: api/v1/pro_auth/serializers.py:23 api/v1/pro_auth/serializers.py:24
@@ -39,7 +41,7 @@ msgid "Please select city from list."
 msgstr "Будь-ласка виберіть місто із списку."
 
 #: core/adverts/forms.py:24
-msgid "Місто/Село"
+msgid "Локація"
 msgstr ""
 
 #: core/adverts/forms.py:32 core/posts/forms.py:24 core/posts/forms.py:71
@@ -72,13 +74,21 @@ msgstr ""
 msgid "Ціна"
 msgstr ""
 
-#: core/adverts/models.py:21 core/posts/models.py:119
+#: core/adverts/models.py:27 core/posts/models.py:119
 msgid "image"
 msgstr "зображення"
 
-#: core/adverts/models.py:26 core/pro_auth/models.py:66
+#: core/adverts/models.py:32 core/pro_auth/models.py:66
 msgid "user location"
 msgstr "місцезнаходження користувача"
+
+#: core/adverts/models.py:38
+msgid "advert"
+msgstr "оголошення"
+
+#: core/adverts/models.py:39
+msgid "adverts"
+msgstr "оголошення"
 
 #: core/classifier/models.py:18 core/classifier/models.py:36
 #: core/classifier/models.py:54 core/classifier/models.py:72
@@ -168,15 +178,19 @@ msgstr "зв’язок користувача із категорією пуб�
 msgid "for feel on off"
 msgstr ""
 
-#: core/classifier/models.py:104
+#: core/classifier/models.py:101
+msgid "absolute url"
+msgstr ""
+
+#: core/classifier/models.py:106
 msgid "category meta data"
 msgstr "мета дані категорії"
 
-#: core/classifier/models.py:108
+#: core/classifier/models.py:110
 msgid "Category"
 msgstr "Категорії"
 
-#: core/classifier/models.py:109
+#: core/classifier/models.py:111
 msgid "Categories"
 msgstr "Категорії"
 
@@ -422,12 +436,12 @@ msgstr ""
 #: core/pro_auth/forms.py:74
 msgid ""
 "Raw passwords are not stored, so there is no way to see this user's "
-"password, but you can change the password using <a "
-"href=\"../password/\">this form</a>."
+"password, but you can change the password using <a href=\"../password/"
+"\">this form</a>."
 msgstr ""
 "Необроблені паролі не зберігаються, тому немає можливості побачити пароль "
-"цього користувача, але ви можете змінити пароль за допомогою <a "
-"href=\"../password/\">ця форму</a>."
+"цього користувача, але ви можете змінити пароль за допомогою <a href=\"../"
+"password/\">ця форму</a>."
 
 #: core/pro_auth/forms.py:132
 msgid "Sorry, but user with this email does not found!"
@@ -523,11 +537,11 @@ msgstr ""
 
 #: core/services/models.py:19
 msgid "Feedback"
-msgstr "Текст"
+msgstr "Зворотній зв'язок"
 
 #: core/services/models.py:20
 msgid "Feedbacks"
-msgstr "Текст"
+msgstr "Зворотній зв'язки"
 
 #: core/services/models.py:28
 msgid "meta title"

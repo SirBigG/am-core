@@ -10,8 +10,9 @@
         <div class="row">
             {% for advert in object_list %}
                 <div class="col-12 d-flex justify-content-between align-items-center mb-1">
-                    <p>{{ advert.title }}</p><a class="btn btn-warning btn-sm"
-                                                href="{% url 'pro_auth:profile-adverts-update' pk=advert.id %}"><i
+                    <a class="no-decoration text-success" href="{{ advert.get_absolute_url }}">{{ advert.title }}</a><a
+                        class="btn btn-warning btn-sm"
+                        href="{% url 'pro_auth:profile-adverts-update' pk=advert.id %}"><i
                         class="fas fa-pencil-alt text-white"></i></a>
                 </div>
             {% endfor %}

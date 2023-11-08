@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from django.views.generic import FormView, ListView
+from django.views.generic import FormView, ListView, DetailView
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
 
@@ -24,3 +24,8 @@ class AdvertListView(ListView):
     template_name = "adverts/list.html"
     queryset = Advert.objects.filter(updated__gte=datetime.now() - timedelta(days=14))
     ordering = "-updated"
+
+
+class AdvertDetailView(DetailView):
+    model = Advert
+    template_name = "adverts/detail.html"

@@ -4,6 +4,7 @@ from urllib.parse import urlparse
 from PIL import Image
 from django import template
 from django.conf import settings
+from django.urls import reverse
 
 from core.classifier.models import Category
 
@@ -50,8 +51,9 @@ def post_adverts():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.objects.values("title", "image").order_by('-created')[:4], "link": f"/adverts/"}
+    context = {'adverts': Advert.objects.values("title", "image", "pk")[:4]}
     for advert in context["adverts"]:
+        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"]})
         if advert["image"]:
             advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
     return context

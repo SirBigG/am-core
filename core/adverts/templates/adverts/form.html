@@ -3,7 +3,7 @@
 {% load post_extras static %}
 
 {% block scripts %}
-   <script src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
+    <script src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
@@ -13,6 +13,12 @@
     <div class="col-12">
         <h1 class="text-success">Додати оголошення</h1>
     </div>
+    {% if not request.user.is_authenticated %}
+        <div class="col-12">
+            <p class="text-warning">Будь ласка, розміщуйте ваше оголошення як зареєстрований користувач, щоб отримати
+                можливість керування активністю оголошення, включаючи його деактивацію. <a href="/login/">Увійти</a></p>
+        </div>
+    {% endif %}
     <form method="post" action="/adverts/create/" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
