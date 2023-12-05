@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% load post_extras static %}
+
+{% block scripts %}
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
+{% endblock scripts %}
+
+{% block extra_meta %}
+    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.description|truncatechars:160 }}" property="og:description">
+    {% if request.GET.page %}
+        <meta name="robots" content="noindex, nofollow">{% endif %}
+{% endblock extra_meta %}
+
+{% block title %}Аграрні новини України{% endblock %}
+
+{% block page_title %}{{ object.title }}{% endblock %}
+{% block page_title_right %}
+    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram
+        <i class="icon-paper-plane"></i></a>{% endblock %}
+
+{% block content %}
+    <div class="post-content">
+        <div class="row">
+            <div class="col-12 p-0">
+                <div class="m-3 post-wrapper">
+                    {{ object.description|safe }}
+                </div>
+            </div>
+            <p class="m-0"><span class="h6">Дата публікації: {{ object.created }}</span></p>
+        </div>
+    </div>
+
+{% endblock content %}

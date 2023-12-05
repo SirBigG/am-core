@@ -10,13 +10,16 @@
 {% block extra_meta %}
     <meta content="Аграрні новини України | AgroMega.in.ua" property="og:title">
     <meta content="Останні новини з аграрної сфери України." property="og:description">
-    {% if request.GET.page %}<meta name="robots" content="noindex, nofollow">{% endif %}
+    {% if request.GET.page %}
+        <meta name="robots" content="noindex, nofollow">{% endif %}
 {% endblock extra_meta %}
 
 {% block title %}Аграрні новини України{% endblock %}
 
 {% block page_title %}Aграрні новини України{% endblock %}
-{% block page_title_right %}<a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram <i class="icon-paper-plane"></i></a>{% endblock %}
+{% block page_title_right %}
+    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram
+        <i class="icon-paper-plane"></i></a>{% endblock %}
 
 {% block content %}
     {% for obj in object_list %}
@@ -38,8 +41,15 @@
                                     <p class="text-danger pt-1">{{ obj.created }}</p>
                                 </div>
                                 <div class="col-8">
-                                    <p><button class="btn text-success pt-1"
-                                               onclick="window.open('{{ obj.data.link }}', '_blank')">{{ obj.data.link|get_domain }}</button></p>
+                                    <p>
+                                        {% if "agromega" in obj.data.link %}
+                                            <a class="btn text-success pt-1"
+                                               href="{{ obj.data.link }}">{{ obj.data.link|get_domain }}</a>
+                                        {% else %}
+                                            <button class="btn text-success pt-1"
+                                                    onclick="window.open('{{ obj.data.link }}', '_blank')">{{ obj.data.link|get_domain }}</button>
+                                        {% endif %}
+                                    </p>
                                 </div>
                             </div>
                         </div>

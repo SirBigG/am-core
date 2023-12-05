@@ -1,3 +1,6 @@
+import http
+
+from django.http import Http404
 from django.views.generic import TemplateView
 from django.conf import settings
 
@@ -44,6 +47,26 @@ class NewsListView(TemplateView):
         return context
 
 
+class NewsDetailView(TemplateView):
+    template_name = "news/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        _slug = kwargs.get("slug")
+        _id = kwargs.get("pk")
+        _url = f"{settings.API_HOST}/news/{_id}"
+        response = requests.get(_url)
+        if response.status_code == http.HTTPStatus.NOT_FOUND:
+            raise Http404
+
+        if response.status_code != 200:
+            context["object"] = None
+            return context
+
+        context["object"] = response.json()
+        return context
+
+
 class AdvertListView(TemplateView):
     template_name = "news/advert_list.html"
 
@@ -55,6 +78,7 @@ class AdvertListView(TemplateView):
                 class Cat:
                     id = 0
                     value = "Інше"
+
                 _category = Cat
             else:
                 _category = Category.objects.get(slug=_category)
