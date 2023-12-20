@@ -1,5 +1,7 @@
+import logging
 from pathlib import Path
 from urllib.parse import urlparse
+from datetime import datetime, timedelta
 
 from PIL import Image
 from django import template
@@ -8,7 +10,7 @@ from django.urls import reverse
 
 from core.classifier.models import Category
 
-from core.posts.models import Post, Photo
+from core.posts.models import Post
 
 from core.adverts.models import Advert
 
@@ -51,7 +53,23 @@ def post_adverts():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.objects.values("title", "image", "pk")[:4]}
+    context = {'adverts': Advert.objects.filter(
+        updated__gte=datetime.now() - timedelta(days=14)).values("title", "image", "pk")[:4]}
+    for advert in context["adverts"]:
+        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"]})
+        if advert["image"]:
+            advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
+    return context
+
+
+@register.inclusion_tag('posts/post_adverts_block.html')
+def random_adverts():
+    """
+    Creating main page menu.
+    :return: rubric roots queryset
+    """
+    context = {'adverts': Advert.objects.filter(
+        updated__gte=datetime.now() - timedelta(days=14)).order_by("?").values("title", "image", "pk")[:4]}
     for advert in context["adverts"]:
         advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"]})
         if advert["image"]:
@@ -63,6 +81,16 @@ def post_adverts():
 def relative_posts(category_id):
     context = {"posts": Post.objects.filter(
         rubric_id=category_id, status=True).values("id", "title", "absolute_url", "photo__image").order_by("?")[:4]}
+    for post in context["posts"]:
+        if post["photo__image"]:
+            post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
+    return context
+
+
+@register.inclusion_tag('posts/random_posts.html')
+def random_posts():
+    context = {"posts": Post.objects.filter(
+        status=True).values("id", "title", "absolute_url", "photo__image").order_by("?")[:4]}
     for post in context["posts"]:
         if post["photo__image"]:
             post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
@@ -150,6 +178,7 @@ def thumbnail_from_path(photo_path, width=300, height=None):
         try:
             im = Image.open(photo_path)
         except FileNotFoundError:
+            logging.error('File not found: %s' % photo_path)
             return
         if height is None:
             height = int((float(im.size[1]) * float(width / float(im.size[0]))))

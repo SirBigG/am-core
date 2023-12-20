@@ -165,7 +165,7 @@
     {#    <!-- Services Section End -->#}
     <section class="trending-cat section-padding">
         <div class="container">
-            <h2 class="section-title">Нещодавно додане</h2>
+            <h2 class="section-title">Нещодавно додане:</h2>
             <div class="row">
                 {% for post in object_list %}
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
@@ -177,7 +177,51 @@
                                              alt="{{ post.rubric.value }} {{ post.title }}">
                                     {% endif %}
                                 </div>
-                                <h4>{{ post.title }}</h4>
+                                <p class="h4">{{ post.title }}</p>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <section class="trending-cat section-padding">
+        <div class="container">
+            <h2 class="section-title">Цікавинки на Додачу:</h2>
+            <div class="row">
+                {% for post in random_posts %}
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                        <a href="{{ post.get_absolute_url }}">
+                            <div class="box">
+                                <div class="icon">
+                                    {% if post.photo.first %}
+                                        <img class="img-fluid" src="{% thumbnail post.photo.first 350 %}"
+                                             alt="{{ post.rubric.value }} {{ post.title }}">
+                                    {% endif %}
+                                </div>
+                                <p class="h4">{{ post.title }}</p>
+                            </div>
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    <section class="trending-cat section-padding">
+        <div class="container">
+            <h2 class="section-title">Oголошення:</h2>
+            <div class="row">
+                {% for advert in random_adverts %}
+                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                        <a href="{{ advert.get_absolute_url }}">
+                            <div class="box">
+                                <div class="icon">
+                                    {% if advert.image.path %}
+                                        <img class="img-fluid" src="{{ advert.image.path }}"
+                                             alt="{{ advert.title }}">
+                                    {% endif %}
+                                </div>
+                                <p class="h4">{{ advert.title }}</p>
                             </div>
                         </a>
                     </div>

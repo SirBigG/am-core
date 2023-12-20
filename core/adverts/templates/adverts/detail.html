@@ -12,7 +12,7 @@
 {% endblock %}
 
 {% block extra_meta %}
-<meta content="{% if object.meta %}{{ object.meta.title }}
+    <meta content="{% if object.meta %}{{ object.meta.title }}
 {% else %}{{ object.title }} | {{ category.value }}{% endif %} | AgroMega.in.ua" property="og:title">
     <meta content="{{ object.description|striptags|truncatechars:160 }}"
           property="og:description">
@@ -58,16 +58,22 @@
                     {% endif %}
                     <div class="card-text mb-1"><strong>Оновлено: {{ object.updated|date:"d b Y" }}</strong></div>
                 </div>
-                                <div class="col-12 d-flex justify-content-between p-3">
-{#                                    <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>#}
-                                    <a class="h5 text-primary" tabindex="-1" target="Share-in-facebook"
-                                       onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                                       href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
-                                       aria-label="Опублікувати у фейсбук">
-                                        <i class="icon-facebook"></i>
-                                    </a>
-                                </div>
+                <div class="col-12 d-flex justify-content-between p-3">
+                    {#                                    <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>#}
+                    <a class="h5 text-primary" tabindex="-1" target="Share-in-facebook"
+                       onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+                       href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
+                       aria-label="Опублікувати у фейсбук">
+                        <i class="icon-facebook"></i>
+                    </a>
+                </div>
             </div>
         </div>
+    </div>
+    <div class="col-12 mt-3">
+        {% random_adverts %}
+    </div>
+    <div class="col-12">
+        {% random_posts %}
     </div>
 {% endblock content %}

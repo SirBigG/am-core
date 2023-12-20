@@ -1,6 +1,6 @@
 import logging
 from itertools import groupby
-from datetime import date
+from datetime import date, datetime, timedelta
 
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
@@ -9,10 +9,10 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.http import Http404, HttpResponseRedirect
 from django.db.models import F
 
+from core.adverts.models import Advert
+from core.classifier.models import Category
 from core.posts.models import Post, SearchStatistic, Photo
 from core.posts.forms import PostForm, PhotoForm
-
-from core.classifier.models import Category
 
 
 class IndexView(TemplateView):
@@ -26,6 +26,9 @@ class IndexView(TemplateView):
         context['events'] = Event.objects.select_related('location').filter(
             status=1, start__gte=date.today()).order_by('start')[:4]
         context['object_list'] = Post.objects.select_objects().active().order_by('-publish_date')[:8]
+        context['random_posts'] = Post.objects.select_objects().active().order_by('?')[:8]
+        context['random_adverts'] = Advert.objects.filter(
+            updated__gte=datetime.now() - timedelta(days=14)).order_by('?')[:8]
         return context
 
 
