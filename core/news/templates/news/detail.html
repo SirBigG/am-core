@@ -4,7 +4,7 @@
 
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
-    <link rel="stylesheet" href="{% static "posts/list.css" %}">
+    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock scripts %}
 
 {% block extra_meta %}
@@ -27,10 +27,13 @@
             <div class="col-12 p-0">
                 <div class="m-3 post-wrapper">
                     {{ object.description|safe }}
+                    <p class="m-0"><span class="h6">Дата публікації: {{ object.created }}</span></p>
                 </div>
             </div>
-            <p class="m-0"><span class="h6">Дата публікації: {{ object.created }}</span></p>
         </div>
+    </div>
+    <div class="col-12 mt-3">
+        {% post_adverts %}
     </div>
 
 {% endblock content %}
