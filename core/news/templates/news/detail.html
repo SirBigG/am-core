@@ -9,12 +9,13 @@
 
 {% block extra_meta %}
     <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
-    <meta content="{{ object.description|truncatechars:160 }}" property="og:description">
-    {% if request.GET.page %}
-        <meta name="robots" content="noindex, nofollow">{% endif %}
+    <meta content="{{ object.description|striptags|truncatechars:160 }}" property="og:description">
+    <meta content="{{ object.url }}" property="og:url">
+    <meta content="article" property="og:type">
+    <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
 
-{% block title %}Аграрні новини України{% endblock %}
+{% block title %}{{ object.title }}{% endblock %}
 
 {% block page_title %}{{ object.title }}{% endblock %}
 {% block page_title_right %}

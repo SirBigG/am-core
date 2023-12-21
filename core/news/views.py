@@ -62,8 +62,9 @@ class NewsDetailView(TemplateView):
         if response.status_code != 200:
             context["object"] = None
             return context
-
-        context["object"] = response.json()
+        data = response.json()
+        data["url"] = f"{settings.HOST}/news/{_slug}-{_id}.html"
+        context["object"] = data
         return context
 
 
