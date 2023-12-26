@@ -165,8 +165,11 @@ class SitemapIndexView(TemplateView):
     template_name = 'sitemap_index.xml'
 
     def get_context_data(self, **kwargs):
-        from core.events.models import Event
         context = super(SitemapIndexView, self).get_context_data(**kwargs)
+        try:
+            advert_lastmod = Advert.active_objects.latest('updated').updated
+        except Advert.DoesNotExist:
+            advert_lastmod = datetime.now()
         context['urls'] = [
             {
                 "loc": f"{settings.HOST}/sitemap-main.xml",
@@ -174,7 +177,11 @@ class SitemapIndexView(TemplateView):
             },
             {
                 "loc": f"{settings.HOST}/sitemap-adverts.xml",
-                "lastmod": Advert.active_objects.latest('updated').updated
+                "lastmod": advert_lastmod
+            },
+            {
+                "loc": f"{settings.HOST}/sitemap-news.xml",
+                "lastmod": datetime.now()
             },
         ]
         return context

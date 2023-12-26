@@ -24,6 +24,7 @@ from django.conf.urls.i18n import i18n_patterns
 from core.posts import views
 from core.services.views import FeedbackView
 from core.adverts.views import AdvertSitemap
+from core.news.views import NewsSitemapView
 
 urlpatterns = i18n_patterns(
     path('', views.IndexView.as_view(), name='index'),
@@ -34,6 +35,7 @@ urlpatterns = i18n_patterns(
     path('sitemap.xml', views.SitemapIndexView.as_view(), name='sitemap'),
     path('sitemap-main.xml', views.SiteMap.as_view(), name='sitemap'),
     path('sitemap-adverts.xml', AdvertSitemap.as_view(), name='sitemap-adverts'),
+    path('sitemap-news.xml', NewsSitemapView.as_view(), name='sitemap-news'),
     path('categories/', TemplateView.as_view(template_name="categories.html"), name='categories'),
     path('create/', TemplateView.as_view(template_name="add.html"), name='add'),
     path('social/', include('social_django.urls', namespace='social')),

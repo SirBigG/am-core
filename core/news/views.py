@@ -1,4 +1,5 @@
 import http
+from datetime import datetime
 
 from django.http import Http404
 from django.views.generic import TemplateView
@@ -114,4 +115,20 @@ class AdvertListView(TemplateView):
                                "has_next": _has_next}
         context["paginator"] = {"num_pages": 2}
         context["category"] = _category
+        return context
+
+
+class NewsSitemapView(TemplateView):
+    template_name = "sitemap.xml"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        _url = f"{settings.API_HOST}/news/sitemap"
+        response = requests.get(_url)
+        if response.status_code != 200:
+            context["urls"] = []
+            return context
+        news = response.json()
+        context["urls"] = [{
+            "loc": item["loc"], "lastmod": datetime.fromisoformat(item["lastmod"])} for item in news["items"]]
         return context
