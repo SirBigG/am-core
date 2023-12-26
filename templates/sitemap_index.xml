@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    {% for url in urls %}
+        <sitemap>
+            <loc>{{ url.loc }}</loc>
+            {% if lastmod %}
+                <lastmod>{{ url.lastmod|date:"Y-m-d" }}</lastmod>
+            {% endif %}
+        </sitemap>
+    {% endfor %}
+</sitemapindex>

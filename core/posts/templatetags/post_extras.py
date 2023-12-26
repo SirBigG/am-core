@@ -1,7 +1,6 @@
 import logging
 from pathlib import Path
 from urllib.parse import urlparse
-from datetime import datetime, timedelta
 
 from PIL import Image
 from django import template
@@ -53,10 +52,9 @@ def post_adverts():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.objects.filter(
-        updated__gte=datetime.now() - timedelta(days=14)).values("title", "image", "pk")[:4]}
+    context = {'adverts': Advert.active_objects.values("title", "image", "pk", "slug")[:4]}
     for advert in context["adverts"]:
-        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"]})
+        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"], 'slug': advert["slug"]})
         if advert["image"]:
             advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
     return context
@@ -68,10 +66,9 @@ def random_adverts():
     Creating main page menu.
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.objects.filter(
-        updated__gte=datetime.now() - timedelta(days=14)).order_by("?").values("title", "image", "pk")[:4]}
+    context = {'adverts': Advert.active_objects.order_by("?").values("title", "image", "pk", "slug")[:4]}
     for advert in context["adverts"]:
-        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"]})
+        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"], 'slug': advert["slug"]})
         if advert["image"]:
             advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
     return context

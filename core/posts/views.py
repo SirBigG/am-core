@@ -161,6 +161,25 @@ class SiteMap(TemplateView):
         return context
 
 
+class SitemapIndexView(TemplateView):
+    template_name = 'sitemap_index.xml'
+
+    def get_context_data(self, **kwargs):
+        from core.events.models import Event
+        context = super(SitemapIndexView, self).get_context_data(**kwargs)
+        context['urls'] = [
+            {
+                "loc": f"{settings.HOST}/sitemap-main.xml",
+                "lastmod": Post.objects.filter(status=True).latest('update_date').update_date
+            },
+            {
+                "loc": f"{settings.HOST}/sitemap-adverts.xml",
+                "lastmod": Advert.active_objects.latest('updated').updated
+            },
+        ]
+        return context
+
+
 class GalleryView(ListView):
     paginate_by = 48
     template_name = 'posts/gallery.html'

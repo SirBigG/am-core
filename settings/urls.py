@@ -19,12 +19,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.views.generic import TemplateView
-# from django.contrib.auth.decorators import login_required
 from django.conf.urls.i18n import i18n_patterns
 
 from core.posts import views
-# from core.news.views import AdvertListView
 from core.services.views import FeedbackView
+from core.adverts.views import AdvertSitemap
 
 urlpatterns = i18n_patterns(
     path('', views.IndexView.as_view(), name='index'),
@@ -32,7 +31,9 @@ urlpatterns = i18n_patterns(
     path('rosetta/', include('rosetta.urls')),
     path('comment/', include('comment.urls')),
     path('api/', include('comment.api.urls')),
-    path('sitemap.xml', views.SiteMap.as_view(), name='sitemap'),
+    path('sitemap.xml', views.SitemapIndexView.as_view(), name='sitemap'),
+    path('sitemap-main.xml', views.SiteMap.as_view(), name='sitemap'),
+    path('sitemap-adverts.xml', AdvertSitemap.as_view(), name='sitemap-adverts'),
     path('categories/', TemplateView.as_view(template_name="categories.html"), name='categories'),
     path('create/', TemplateView.as_view(template_name="add.html"), name='add'),
     path('social/', include('social_django.urls', namespace='social')),
@@ -66,4 +67,4 @@ urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()
 
 if settings.DEBUG:
-    urlpatterns = [path('silk/', include('silk.urls', namespace='silk')),] + urlpatterns
+    urlpatterns = [path('silk/', include('silk.urls', namespace='silk')), ] + urlpatterns

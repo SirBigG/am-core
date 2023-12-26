@@ -1,16 +1,26 @@
 import os
 from PIL import Image
 from io import BytesIO
+from datetime import datetime, timedelta
 
 from django.db import models
 from django.core.files import File
 from django.conf import settings
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext_lazy as _, get_language
+from transliterate import slugify
 
 from core.classifier.models import Category
 
 WIDTH = 350
+
+
+class ActiveAdvertsManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(
+            is_active=True,
+            created__gte=datetime.now() - timedelta(days=settings.ADVERT_ACTIVE_DAYS),
+        )
 
 
 class Advert(models.Model):
@@ -30,9 +40,14 @@ class Advert(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     location = models.ForeignKey('classifier.Location', blank=True, null=True,
                                  on_delete=models.SET_NULL, verbose_name=_('user location'))
+    slug = models.SlugField(max_length=512, blank=True, null=True)
     is_active = models.BooleanField(default=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
+
+    active_objects = ActiveAdvertsManager()
+    objects = models.Manager()
+
 
     class Meta:
         verbose_name = _('advert')
@@ -41,12 +56,15 @@ class Advert(models.Model):
         indexes = [
             models.Index(fields=['created']),
         ]
+        default_manager_name = 'objects'
 
     def __str__(self):
         return self.title
 
     def save(self, *args, **kwargs):
         """Cut image before save."""
+        if not self.slug:
+            self.slug = self.make_slug()
         # do not cut if image is not changed
         if self.pk is not None:
             orig = Advert.objects.get(pk=self.pk)
@@ -77,5 +95,11 @@ class Advert(models.Model):
         self.is_active = False
         self.save()
 
+    def make_slug(self):
+        return slugify(self.title.lower(), get_language())
+
+    def get_slug(self):
+        return self.slug if self.slug else self.make_slug()
+
     def get_absolute_url(self):
-        return reverse('adverts:detail', kwargs={'pk': self.pk})
+        return reverse('adverts:detail', kwargs={'pk': self.pk, 'slug': self.get_slug()})

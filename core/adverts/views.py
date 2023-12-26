@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
-
-from django.views.generic import FormView, ListView, DetailView
+from django.views.generic import FormView, ListView, DetailView, TemplateView
 from django.http.response import HttpResponseRedirect
 from django.urls import reverse
+from django.conf import settings
 
 from .forms import AdvertForm
 from .models import Advert
@@ -22,10 +21,23 @@ class AdvertFormView(FormView):
 class AdvertListView(ListView):
     paginate_by = 25
     template_name = "adverts/list.html"
-    queryset = Advert.objects.filter(updated__gte=datetime.now() - timedelta(days=14))
+    queryset = Advert.active_objects.all()
     ordering = "-updated"
 
 
 class AdvertDetailView(DetailView):
     model = Advert
     template_name = "adverts/detail.html"
+
+
+class AdvertSitemap(TemplateView):
+    template_name = "sitemap.xml"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["urls"] = [
+            {
+                "loc": f"{settings.HOST}{reverse('adverts:detail', kwargs={'pk': i['pk'], 'slug': i['slug']})}",
+                "lastmod": i["updated"],
+            } for i in Advert.active_objects.values('updated', 'slug', 'pk')]
+        return context

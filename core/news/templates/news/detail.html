@@ -24,6 +24,17 @@
 
 {% block content %}
     <div class="post-content">
+        {% if object.image %}
+            <div class="row">
+                <div class="col-12 p-0">
+                    <div class="card">
+                        <img alt="{{ object.title }}" width="1000" height="500"
+                             src="{{ object.image }}"
+                             class="card-img img-fluid"/>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         <div class="row">
             <div class="col-12 p-0">
                 <div class="m-3 post-wrapper">
