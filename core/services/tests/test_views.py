@@ -15,7 +15,7 @@ class FeedbackViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'services/feedback.html')
 
-    @patch("captcha.fields.client.submit")
+    @patch("django_recaptcha.fields.client.submit")
     def test_post_success_response(self, mock_submit):
         response = client.post('/feedback/', {'title': 'feed title', 'email': 'test@test.com',
                                               'text': 'feed text', "g-recaptcha-response": "PASSED"})

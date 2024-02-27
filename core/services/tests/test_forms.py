@@ -7,7 +7,7 @@ from core.services.forms import FeedbackForm
 
 class FeedbackFormTests(TestCase):
 
-    @patch("captcha.fields.client.submit")
+    @patch("django_recaptcha.fields.client.submit")
     def test_form_valid(self, mock_submit):
         form = FeedbackForm({'title': 'feed title',
                              'email': 'test@test.com',

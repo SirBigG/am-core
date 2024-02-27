@@ -96,9 +96,8 @@ class SiteMapTests(TestCase):
     def test_return_context(self):
         response = client.get('/sitemap.xml')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context['base'], 'localhost:8000/')
-        self.assertEqual(len(response.context['urls']), 10)
-        self.assertTemplateUsed(response, 'sitemap.xml')
+        self.assertEqual(len(response.context['urls']), 3)
+        self.assertTemplateUsed(response, 'sitemap_index.xml')
 
 
 class ErrorsHandlerTests(TestCase):

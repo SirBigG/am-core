@@ -85,7 +85,7 @@ INSTALLED_APPS = [
     # http2 support https://github.com/ricardochaves/django_http2_push
     "django_http2_push",
     # https://github.com/praekelt/django-recaptcha
-    'captcha',
+    'django_recaptcha',
     # https://github.com/radi85/Comment
     'comment',
 

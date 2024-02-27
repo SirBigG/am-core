@@ -62,6 +62,5 @@ class CategoryTreeViewTests(APITestCase):
         child1 = CategoryFactory(parent=root1)
 
     def test_response(self):
-        response = reverse('category-tree')
+        response = api_client.get(reverse('category-tree'))
         self.assertEqual(response.status_code, 200)
-        breakpoint()
