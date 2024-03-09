@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block scripts %}
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
+{% endblock scripts %}
+
+
+{% block title %}Companies{% endblock %}
+
+{% block content %}
+    {% for company in companies %}
+        <div class="row">
+            <div class="card mb-3">
+                <div class="row no-gutters">
+                    <div class="col-md-4 col-12 p-0">{% if company.logo %}
+                        <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" class="card-img">{% endif %}
+                    </div>
+                    <div class="col-md-8 col-12">
+                        <div class="card-body">
+                            <h2 class="card-title h4">{{ company.name }}</h2>
+                            <div class="card-text">{{ company.description|striptags|safe|truncatechars:200 }}</div>
+                            <div class="text-right mt-3">
+                                <a class="text-success stretched-link no-decoration"
+                                   href="{{ company.get_absolute_url }}">Докладніше</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <p>No companies found.</p>
+    {% endfor %}
+    {% include "helpers/pagination.html" %}
+{% endblock %}

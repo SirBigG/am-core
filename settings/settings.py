@@ -70,6 +70,7 @@ INSTALLED_APPS = [
     'core.news',
     'core.adverts',
     'core.diary',
+    'core.companies',
 
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html

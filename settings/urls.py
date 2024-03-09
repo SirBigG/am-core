@@ -50,6 +50,7 @@ urlpatterns = i18n_patterns(
     path('news/', include('core.news.urls', namespace='news')),
     path('adverts/', include("core.adverts.urls", namespace='adverts')),
     path('diaries/', include("core.diary.urls", namespace='diaries')),
+    path('companies/', include("core.companies.urls", namespace='companies')),
     # path('adverts/<str:category>/', AdvertListView.as_view(), name="adverts-list"),
     # path('adverts/', AdvertListView.as_view(), name="adverts-list"),
     # Rendering index page for all urls starts with /profile/ for personal page.
