@@ -1,8 +1,10 @@
 from django.contrib import admin
 
 from .models import Company, Product
+from .forms import ProductForm
 
 class ProductInline(admin.TabularInline):
+    form = ProductForm
     model = Product
     extra = 1
 

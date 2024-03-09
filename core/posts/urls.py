@@ -1,8 +1,17 @@
 from django.urls import path
 from django.utils.translation import get_language
 
-from core.posts.views import ParentRubricView, PostList, PostDetail, PostSearchView, PostFormView, GalleryView, \
-    AddPhotoView, PostListView
+from core.posts.views import (
+    ParentRubricView,
+    PostList,
+    PostDetail,
+    PostSearchView,
+    PostFormView,
+    GalleryView,
+    AddPhotoView,
+    PostListView,
+    PostAutocomplete,
+)
 
 from taggit.models import TagBase
 from transliterate import slugify
@@ -21,6 +30,7 @@ TagBase.slugify = custom_slugify
 urlpatterns = [
     path('search/', PostSearchView.as_view(), name='post-search-list'),
     path('publication/create/', PostFormView.as_view(), name='post-add'),
+    path('post-autocomplete/', PostAutocomplete.as_view(), name='post-autocomplete'),
     path('gallery/add/<int:post_id>/', AddPhotoView.as_view(), name="add-photo"),
     path('gallery/<int:post_id>/', GalleryView.as_view(), name="gallery"),
     path('<str:parent>/', ParentRubricView.as_view(), name='parent-category-index'),

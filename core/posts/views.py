@@ -2,6 +2,7 @@ import logging
 from itertools import groupby
 from datetime import date, datetime, timedelta
 
+from dal import autocomplete
 from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
@@ -215,3 +216,14 @@ class AddPhotoView(FormView):
     def form_valid(self, form):
         instance = form.save()
         return HttpResponseRedirect(instance.post.get_absolute_url())
+
+
+class PostAutocomplete(autocomplete.Select2QuerySetView):
+    """
+    Return locations queryset.
+    """
+    def get_queryset(self):
+        qs = Post.objects.all()
+        if self.q:
+            qs = qs.filter(title__icontains=self.q)
+        return qs
