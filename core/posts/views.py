@@ -7,7 +7,7 @@ from django.views.generic import ListView, DetailView, TemplateView, FormView
 from django.conf import settings
 from django.shortcuts import get_object_or_404
 from django.contrib.postgres.search import SearchQuery, SearchRank
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponseGone
 from django.db.models import F
 
 from core.adverts.models import Advert
@@ -207,7 +207,7 @@ class AddPhotoView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["post"] = Post.objects.get(id=self.kwargs.get('post_id'))
+        context["post"] = Post.objects.filter(id=self.kwargs.get('post_id'))
         return context
 
     def get_initial(self):
@@ -216,6 +216,12 @@ class AddPhotoView(FormView):
     def form_valid(self, form):
         instance = form.save()
         return HttpResponseRedirect(instance.post.get_absolute_url())
+
+    def get(self, request, *args, **kwargs):
+        context = self.get_context_data()
+        if context['post'] is None:
+            return HttpResponseGone()
+        return super().get(request, *args, **kwargs)
 
 
 class PostAutocomplete(autocomplete.Select2QuerySetView):

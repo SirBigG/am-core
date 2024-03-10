@@ -1,5 +1,5 @@
 from django.views.generic import FormView, ListView, DetailView, TemplateView
-from django.http.response import HttpResponseRedirect
+from django.http.response import HttpResponseRedirect, Http404, HttpResponseGone
 from django.urls import reverse
 from django.conf import settings
 
@@ -23,6 +23,12 @@ class AdvertListView(ListView):
     template_name = "adverts/list.html"
     queryset = Advert.active_objects.all()
     ordering = "-updated"
+
+    def get(self, request, *args, **kwargs):
+        try:
+            return super().get(request, *args, **kwargs)
+        except Http404:
+            return HttpResponseGone()
 
 
 class AdvertDetailView(DetailView):
