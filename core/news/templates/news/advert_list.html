@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}| AgroMega.in.ua" property="og:title">
+    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}" property="og:title">
     <meta content="Свіжі оголошення аграрної тематики{% if category %} в категорії {{ category.value }}{% endif %}." property="og:description">
     {% if request.GET.page %}
         <meta name="robots" content="noindex, nofollow">{% endif %}

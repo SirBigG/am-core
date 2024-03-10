@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.title }}" property="og:title">
     <meta content="{{ object.description|striptags|truncatechars:160 }}" property="og:description">
     <meta content="{{ object.url }}" property="og:url">
     <meta content="article" property="og:type">

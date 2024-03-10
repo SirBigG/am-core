@@ -6,7 +6,7 @@
 {% block meta_description %}{{ object.description|truncatechars:300|striptags|safe }}{% endblock %}
 
 {% block extra_meta %}
-    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.title }}" property="og:title">
     <meta content="{{ object.description|truncatechars:300|striptags|safe }}" property="og:description">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">

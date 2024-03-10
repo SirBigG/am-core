@@ -8,7 +8,7 @@
                 <a href="{{ item.absolute_url }}" style="text-decoration: none">
                     {% if item.photo__image %}
                         <img src="{{ item.photo__image }}" loading="lazy" class="img-fluid" width="200" height="150"
-                             alt="{{ item.title }}">
+                             alt="Фото {{ item.title }}">
                     {% endif %}
                     <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ item.title }}</p>
                 </a>

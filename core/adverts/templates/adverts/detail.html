@@ -13,7 +13,7 @@
 
 {% block extra_meta %}
     <meta content="{% if object.meta %}{{ object.meta.title }}
-{% else %}{{ object.title }} | {{ category.value }}{% endif %} | AgroMega.in.ua" property="og:title">
+{% else %}{{ object.title }} | {{ category.value }}{% endif %}" property="og:title">
     <meta content="{{ object.description|striptags|truncatechars:160 }}"
           property="og:description">
     <meta content="{% full_url advert.image.url %}" property="og:image">
@@ -21,7 +21,7 @@
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
 
-    <meta content="{{ object.title }} | AgroMega.in.ua" property="twitter:title">
+    <meta content="{{ object.title }}" property="twitter:title">
     <meta content="{{ object.description|striptags|truncatechars:160 }}"
           property="twitter:description">
     <meta content="{% full_url advert.image.url %}" property="twitter:image">

@@ -5,7 +5,7 @@
             <div class="col-6 col-lg-3">
                 <a href="{{ advert_item.url }}" style="text-decoration: none; outline: 0;">
                     {% if advert_item.image %}
-                        <img src="{{ advert_item.image }}" width="200" height="150" loading="lazy" class="img-fluid" alt="{{ advert_item.title }}">
+                        <img src="{{ advert_item.image }}" width="200" height="150" loading="lazy" class="img-fluid" alt="Фото {{ advert_item.title }}">
                     {% endif %}
                     <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ advert_item.title }}</p>
                 </a>

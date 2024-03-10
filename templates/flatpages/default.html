@@ -8,7 +8,7 @@
 {% endblock scripts %}
 
 {% block extra_meta %}
-    <meta content="{{ flatpage.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ flatpage.title }}" property="og:title">
     <meta content="{{ flatpage.content|truncatechars:300|striptags|safe }}" property="og:description">
     <meta content="{{ request.path }}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">

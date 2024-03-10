@@ -2,7 +2,7 @@
 
 {% load static_push cache post_extras comment_tags static %}
 
-{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} | {{ category.value }} |
+{% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} | {{ category.value }}
 {% endif %}{% endblock title %}
 
 {% block meta_description %}{% if object.meta %}{{ object.meta.description }}{% else %}
@@ -34,7 +34,7 @@
     }
     </script>
     <meta content="{% if object.meta %}{{ object.meta.title }}
-{% else %}{{ object.title }} | {{ category.value }}{% endif %} | AgroMega.in.ua" property="og:title">
+{% else %}{{ object.title }} | {{ category.value }}{% endif %}" property="og:title">
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="og:description">
@@ -43,7 +43,7 @@
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
 
-    <meta content="{{ object.title }} | AgroMega.in.ua" property="twitter:title">
+    <meta content="{{ object.title }}" property="twitter:title">
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="twitter:description">

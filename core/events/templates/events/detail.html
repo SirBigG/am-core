@@ -13,7 +13,7 @@
 
 {% block extra_meta %}
     {% load post_extras %}
-    <meta content="{{ object.title }} | AgroMega.in.ua" property="og:title">
+    <meta content="{{ object.title }}" property="og:title">
     <meta content="{{ object.text|truncatechars:300|striptags|safe }}" property="og:description">
     <meta content="{% full_url object.photo.first.image.url %}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
