@@ -23,7 +23,7 @@
         "description": "{% if object.meta_description %}{{ object.meta_description }}
         {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}",
         "image": [
-            "{% full_url main_photo_object.url %}"
+            "{{ main_photo_full_url}}"
         ],
         "datePublished": "{{ object.publish_date|date:"Y-m-d" }}",
         "dateModified": "{{ object.update_date|date:"Y-m-d" }}",
@@ -38,7 +38,7 @@
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="og:description">
-    <meta content="{% full_url main_photo_object.url %}" property="og:image">
+    <meta content="{{ main_photo_full_url}}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
@@ -47,12 +47,12 @@
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="twitter:description">
-    <meta content="{% full_url main_photo_object.url %}" property="twitter:image">
+    <meta content="{{ main_photo_full_url}}" property="twitter:image">
     <meta content="{{ object.title }}" property="twitter:image:alt">
     <meta content="summary_large_image" property="twitter:card">
     <meta content="@AgroMega.in.ua" property="twitter:site">
     <meta content="@AgroMegaTeam" property="twitter:creator">
-    <link href="{% full_url main_photo_object.url %}" rel="image_src"/>
+    <link href="{{ main_photo_full_url}}" rel="image_src"/>
 {% endblock extra_meta %}
 
 {% block second_menu %}

@@ -14,6 +14,7 @@ from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Post, SearchStatistic, Photo
 from core.posts.forms import PostForm, PhotoForm
+from core.posts.templatetags.post_extras import full_url
 
 
 class IndexView(TemplateView):
@@ -120,6 +121,9 @@ class PostDetail(DetailView):
         context = super().get_context_data(**kwargs)
         try:
             context['main_photo_object'] = context['object'].photo.first()
+            if context['main_photo_object']:
+                context['main_photo_thumbnail'] = context['main_photo_object'].thumbnail(1520)
+                context['main_photo_full_url'] = full_url(context['main_photo_thumbnail'])
         except Exception as e:
             logging.error(e)
             context['main_photo_object'] = None
