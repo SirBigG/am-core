@@ -1,0 +1,18 @@
+[MAIN]
+ignore=tests,migrations,docs,build,static,media,venv,thorbanks_migrations
+# R0903 - Too few public methods
+# C0114 - Missing module docstring
+# C0115 - Missing class docstring
+# C0116 - Missing function or method docstring
+disable=C0114,C0115,C0116,R0903
+generated-members=orjson.*,sst.schema.*
+
+[MASTER]
+load-plugins=pylint_django
+django-settings-module=lux.settings
+
+[FORMAT]
+max-line-length=120
+
+[BASIC]
+good-names=e,i,to,k,v

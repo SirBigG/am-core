@@ -2,7 +2,7 @@
 
 {% load post_extras cache static %}
 
-{% block title %}{% if category.meta %}{{ category.meta.title }} |{% else %}{{ category.value }} |{% endif %}{% endblock title %}
+{% block title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.value }}{% endif %}{% endblock title %}
 
 {% block canonical %}
     {% if request.GET %}

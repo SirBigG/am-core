@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock scripts %}
 
-{% block title %}{{ object.title }} |{% endblock title %}
+{% block title %}{{ object.title }}{% endblock title %}
 
 {% block meta_description %}{{ object.text|truncatechars:300|striptags|safe }}{% endblock %}
 
