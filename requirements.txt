@@ -26,3 +26,4 @@ django-comments-dab==2.8.0
 daphne==4.1.0
 python-jose==3.3.0
 django-silk==5.1.0
+lxml==5.1.0

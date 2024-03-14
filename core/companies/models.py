@@ -15,6 +15,7 @@ class Company(models.Model):
     active = models.BooleanField(default=True)
     website = models.URLField()
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
+    parser_map = models.JSONField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -36,10 +37,10 @@ class Company(models.Model):
 
 
 class CurrencyChoices(models.TextChoices):
-    UAH = "UAH", "Ukrainian Hryvnia"
-    USD = "USD", "United States Dollar"
-    EUR = "EUR", "Euro"
-    GBP = "GBP", "British Pound Sterling"
+    UAH = "UAH", "грн."
+    USD = "USD", "$"
+    EUR = "EUR", "€"
+    GBP = "GBP", "£"
 
 
 class Product(models.Model):

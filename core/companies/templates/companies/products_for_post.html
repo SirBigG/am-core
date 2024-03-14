@@ -1,0 +1,17 @@
+{# render list of products like cards with name price company and link to company page #}
+{% for product in products %}
+    {# render block title on first iteration #}
+    {% if forloop.first %}
+        <p class="h5">Пропозиції магазинів та фермерів</p>
+    {% endif %}
+    {# render card for each product #}
+    <div class="col-4 col-lg-3">
+        <div class="card">
+            <div class="card-body">
+                <p class="card-title">{{ product.name }}</p>
+                <p class="card-subtitle mb-2 text-muted">{{ product.price }} {{ product.get_currency_display }}</p>
+                <a href="{{ product.company.get_absolute_url }}" class="card-link text-success no-decoration">{{ product.company.name }}</a>
+            </div>
+        </div>
+    </div>
+{% endfor %}

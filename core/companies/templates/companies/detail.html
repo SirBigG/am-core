@@ -31,16 +31,19 @@
             <h2 class="h4 mb-3">Пропозиції</h2>
             <div class="row">
                 {% for product in products %}
-                    <div class="col-4">
+                    <div class="col-4 mb-2">
                         <div class="card">
                             <div class="card-body">
-                                <h3 class="card-title h5">{{ product.name }}</h3>
-                                <p class="card-text">{{ product.description }}</p>
+                                <p class="card-title">{{ product.name }}</p>
+                                {% if product.description %}
+                                    <p class="card-text">{{ product.description }}</p>
+                                {% endif %}
                                 {% if product.price %}
-                                    <h4 class="card-subtitle mb-1 text-muted h6">{{ product.price }} {{ product.currency }}</h4>
+                                    <p class="card-subtitle mb-1 text-muted">{{ product.price }} {{ product.get_currency_display }}</p>
                                 {% endif %}
                                 {% if product.post_id %}
-                                    <a href="{{ product.post.get_absolute_url }}" class="card-link">Опис</a>
+                                    <a href="{{ product.post.get_absolute_url }}"
+                                       class="card-link text-success no-decoration">Опис</a>
                                 {% endif %}
                             </div>
                         </div>

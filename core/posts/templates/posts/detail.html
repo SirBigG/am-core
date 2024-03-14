@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static_push cache post_extras comment_tags static %}
+{% load static_push cache post_extras comment_tags static companies_extras %}
 
 {% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} | {{ category.value }}
 {% endif %}{% endblock title %}
@@ -15,15 +15,15 @@
 
 {% block extra_meta %}
     <script type="application/ld+json">
-    {
-       "@context": "https://schema.org",
-        "@type": "Article",
-        "headline": "{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
+        {
+           "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": "{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
         {{ category.value }}{% endif %}",
         "description": "{% if object.meta_description %}{{ object.meta_description }}
         {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}",
         "image": [
-            "{{ main_photo_full_url}}"
+            "{{ main_photo_full_url }}"
         ],
         "datePublished": "{{ object.publish_date|date:"Y-m-d" }}",
         "dateModified": "{{ object.update_date|date:"Y-m-d" }}",
@@ -38,7 +38,7 @@
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="og:description">
-    <meta content="{{ main_photo_full_url}}" property="og:image">
+    <meta content="{{ main_photo_full_url }}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
@@ -47,12 +47,12 @@
     <meta content="{% if object.meta_description %}{{ object.meta_description }}
 {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="twitter:description">
-    <meta content="{{ main_photo_full_url}}" property="twitter:image">
+    <meta content="{{ main_photo_full_url }}" property="twitter:image">
     <meta content="{{ object.title }}" property="twitter:image:alt">
     <meta content="summary_large_image" property="twitter:card">
     <meta content="@AgroMega.in.ua" property="twitter:site">
     <meta content="@AgroMegaTeam" property="twitter:creator">
-    <link href="{{ main_photo_full_url}}" rel="image_src"/>
+    <link href="{{ main_photo_full_url }}" rel="image_src"/>
 {% endblock extra_meta %}
 
 {% block second_menu %}
@@ -66,9 +66,9 @@
     {% endif %}{% endblock %}
 
 {% block breadcrumbs %}
-{#    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}#}
-        {% breadcrumbs category object.title %}
-{#    {% endcache %}#}
+    {#    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}#}
+    {% breadcrumbs category object.title %}
+    {#    {% endcache %}#}
 {% endblock %}
 
 {% block content %}
@@ -129,6 +129,9 @@
         </div>
         {# Comments block #}
         {% render_comments object request %}
+        <div class="row mb-3">
+            {% products_for_post object.id %}
+        </div>
         {% relative_posts category.id %}
         {% post_adverts %}
     </div>
