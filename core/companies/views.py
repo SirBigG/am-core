@@ -29,17 +29,29 @@ def admin_parse_form_view(request, company_id: int):
     if request.method == "POST":
         form = AdminParseForm(request.POST, request.FILES)
         if form.is_valid():
+            # get company
+            company = Company.objects.get(id=company_id)
+            objects = []
             # process the form
             if form.cleaned_data.get("url"):
                 # parse from url
                 content = get_content_from_url(form.cleaned_data.get("url"))
+                # parse content
+                objects = parse_data_from_content(
+                    content, form.cleaned_data.get("custom_parser_map") or company.parser_map
+                )
             else:
                 # parse from file
-                content = request.FILES["html_file"].read().decode("utf-8")
-            # get company
-            company = Company.objects.get(id=company_id)
-            # parse content
-            objects = parse_data_from_content(content, form.cleaned_data.get("custom_parser_map") or company.parser_map)
+                for file in request.FILES.getlist("files"):
+                    content = file.read().decode("utf-8")
+                    # parse content
+                    objects.extend(
+                        parse_data_from_content(
+                            content,
+                            form.cleaned_data.get("custom_parser_map") or company.parser_map,
+                        )
+                    )
+
             # save objects
             _to_save = []
             for obj in objects:
