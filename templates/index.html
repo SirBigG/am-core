@@ -26,7 +26,7 @@
                                         <input type="text" name="q" class="form-control"
                                                placeholder="Пошук">
                                     </div>
-                                    <button class="btn btn-common btn-success" type="submit"><i class="icon-search"></i>
+                                    <button class="btn btn-common btn-success" type="submit" title="Search"><i class="icon-search"></i>
                                     </button>
                                 </form>
                             </fieldset>
@@ -74,10 +74,10 @@
                                 <div class="icon">
                                     {% if category.image %}
                                         <img class="img-fluid" src="{{ category.image.url }}"
-                                             alt="{{ category.value }}">
+                                             alt="{{ category.value }} фото">
                                     {% endif %}
                                 </div>
-                                <h4>{{ category.value }}</h4>
+                                <p class="h4">{{ category.value }}</p>
                                 {#                                <strong>189 Ads</strong>#}
                             </div>
                         </a>
@@ -100,7 +100,7 @@
                             <i class="lni-book"></i>
                         </div>
                         <div class="services-content">
-                            <h3><a href="/categories/">Публікації</a></h3>
+                            <p class="h3"><a href="/categories/">Публікації</a></p>
                             <p>Публікації у всіх аграрних категоріях. Про рослин тварин та інших улюбленцях та їх
                                 доглядом можна прочитавши обравши категорію.</p>
                         </div>
@@ -113,7 +113,7 @@
                             <i class="lni-leaf"></i>
                         </div>
                         <div class="services-content">
-                            <h3><a href="/events/">Події</a></h3>
+                            <p class="h3"><a href="/events/">Події</a></p>
                             <p>Список найближчих агроподій щоб Ви не пропустили нічого важливого. Також Ви зможете
                                 підписатись на отримання нових та найближчих подій у Telegram.</p>
                         </div>
@@ -126,7 +126,7 @@
                             <i class="lni-cog"></i>
                         </div>
                         <div class="services-content">
-                            <h3><a href="/news/">Новини</a></h3>
+                            <p class="h3"><a href="/news/">Новини</a></p>
                             <p>Будьте в курсі останніх новини з нашим Telegram ботом або ж просто зайшовши на сайт Ви
                                 зможете ознайомитись з агротрендами.</p>
                         </div>
@@ -139,7 +139,7 @@
                             <i class="lni-spray"></i>
                         </div>
                         <div class="services-content">
-                            <h3><a href="/adverts/">Оголошення</a></h3>
+                            <p class="h3"><a href="/adverts/">Оголошення</a></p>
                             <p>Ми збираємо оголошення для того щоб Вам було зручно шукати потрібні. Ми не збираємо
                                 контактів користувачів, лише інформативні дані.</p>
                         </div>
@@ -152,8 +152,20 @@
                             <i class="lni-emoji-smile"></i>
                         </div>
                         <div class="services-content">
-                            <h3><a href="https://telegram.me/wn_world_news_bot?start=1" rel="noreferrer"
-                                   target="_blank">Telegram</a></h3>
+                            <p class="h3"><a href="/companies/">Компанії</a></p>
+                            <p>Відкрийте для себе широкий спектр компаній у нашому каталозі, кожна з яких пропонує унікальні продукти та послуги, розроблені для задоволення різноманітних потреб наших клієнтів.</p>
+                        </div>
+                    </div>
+                </div>
+                {#           <!-- Services item -->#}
+                <div class="col-md-6 col-lg-4 col-xs-12">
+                    <div class="services-item wow fadeInRight" data-wow-delay="1s">
+                        <div class="icon">
+                            <i class="lni-emoji-smile"></i>
+                        </div>
+                        <div class="services-content">
+                            <p class="h3"><a href="https://telegram.me/wn_world_news_bot?start=1" rel="noreferrer"
+                                   target="_blank">Telegram</a></p>
                             <p>Наш телеграм бот завжди триматиме вас у курсі найсвіжіших новин. Скоро буде підтримка
                                 фільтрування по категоріях та підтримка оголошень.</p>
                         </div>
