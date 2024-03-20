@@ -49,7 +49,7 @@ class CompanyAdmin(admin.ModelAdmin):
     list_display = ("name", "description", "logo", "active", "website", "location")
     list_filter = ("active",)
     search_fields = ("name", "description")
-    inlines = [ProductInline]
+    # inlines = [ProductInline]
 
 
 admin.site.register(Company, CompanyAdmin)

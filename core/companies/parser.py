@@ -1,5 +1,12 @@
+import re
+
 import requests
 from lxml import html  # nosec
+
+
+def extract_price(s):
+    match = re.search(r"\d+\.?\d*", s)
+    return float(match.group()) if match else None
 
 
 def parse_data_from_content(html_content, data_xpaths):
@@ -23,6 +30,8 @@ def parse_data_from_content(html_content, data_xpaths):
         elements = tree.xpath(xpath)
         # Store all found elements' texts (or attributes) in a list
         extracted_data[key] = [element for element in elements] if elements else []
+        if key == "price":
+            extracted_data[key] = [extract_price(element) for element in extracted_data[key]]
     # make list of objects with the same keys as data_xpaths
     extracted_data = [dict(zip(extracted_data, t)) for t in zip(*extracted_data.values())]
     for data in extracted_data:

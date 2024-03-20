@@ -40,7 +40,6 @@ class CompanyForm(forms.ModelForm):
         widget=autocomplete.ModelSelect2(url="location-autocomplete", attrs={"class": "form-control"}),
         help_text=_("Please select city from list."),
         label=_("Локація"),
-        required=False,
     )
 
     class Meta:
