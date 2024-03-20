@@ -8,19 +8,21 @@
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock %}
 
-{% block content %}
-    <h1>{{ company.name }}</h1>
-    <div class="post-content">
-        <div class="row">
-            <div class="col-12 p-0">
-                {% if company.logo %}
-                    <div class="card">
-                        <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" class="card-img img-fluid"
-                             height="500" width="1000"/>
-                    </div>
-                {% endif %}
-            </div>
+{% block page_title %}
+    {{ company.name }}
+{% endblock %}
+
+{% block page_title_right %}
+    {% if company.logo %}
+        <div class="card">
+            <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" class="card-img img-fluid"
+                 height="100" width="150"/>
         </div>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <div class="post-content">
         <div class="col-12">
             <p>{{ company.description }}</p>
             {% if company.website %}
@@ -28,7 +30,7 @@
             {% endif %}
         </div>
         <div class="col-12 mb-3">
-            <h2 class="h4 mb-3">Пропозиції</h2>
+            <h2 class="h5 mb-3">Пропозиції</h2>
             <div class="row">
                 {% for product in products %}
                     <div class="col-4 mb-2">
@@ -55,7 +57,7 @@
         </div>
     </div>
 
-    <div class="col-12">
+    <div class="col-12 mt-3">
         {% post_adverts %}
         {% random_posts %}
     </div>
