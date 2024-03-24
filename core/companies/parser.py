@@ -1,4 +1,5 @@
 import re
+from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 
 import requests
@@ -112,8 +113,8 @@ def parse_link_with_js(driver, link):
 
         # Parse the HTML content
         data = parse_data_from_content(html_content, link.parser_map or link.company.parser_map)
-
-        return data
+        link.last_crawled = timezone.now()
+        return link, data
     finally:
         link.last_crawled = timezone.now()
 
@@ -129,12 +130,11 @@ def parse_many_links_with_same_browser(links):
     )  # or use another browser driver like Chrome
 
     try:
-        parsed_data = []
-        for link in links:
-            data = parse_link_with_js(driver, link)
-            link.save_result_products(data)
-            parsed_data.append(data)
-        return parsed_data
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            results = list(executor.map(lambda link: parse_link_with_js(driver, link), links))
+            for link, data in results:
+                link.save_result_products(data)
+                link.save()
     finally:
         # Close the browser
         driver.quit()
