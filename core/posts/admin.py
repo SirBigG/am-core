@@ -2,6 +2,7 @@ from dal import autocomplete
 from django import forms
 from django.contrib import admin
 from django.db.models import Count
+from mptt.forms import TreeNodeChoiceField
 
 from core.classifier.models import Category
 
@@ -13,7 +14,7 @@ class PhotoInLine(admin.TabularInline):
 
 
 class AdminPostForm(forms.ModelForm):
-    rubric = forms.ModelChoiceField(queryset=Category.objects.filter(level=2))
+    rubric = TreeNodeChoiceField(queryset=Category.objects.all())
 
     class Meta:
         model = Post

@@ -55,7 +55,7 @@ def admin_parse_form_view(request, company_id: int):
             # save objects
             _to_save = []
             for obj in objects:
-                _to_save.append(Product(company_id=company.id, **obj))
+                _to_save.append(Product(company_id=company.id, category=form.cleaned_data.get("category"), **obj))
             for obj in _to_save:
                 # Check if price is decimal
                 if obj.price:

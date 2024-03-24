@@ -2,10 +2,11 @@ from dal import autocomplete
 from django import forms
 from django.forms import Textarea
 from django.utils.translation import gettext_lazy as _
+from mptt.forms import TreeNodeChoiceField
 
-from ..classifier.models import Location
+from ..classifier.models import Category, Location
 from ..posts.models import Post
-from .models import Company, Product
+from .models import Company, Link, Product
 
 
 class ProductForm(forms.ModelForm):
@@ -16,6 +17,12 @@ class ProductForm(forms.ModelForm):
         label=_("Пост"),
         required=False,
     )
+    category = TreeNodeChoiceField(
+        queryset=Category.objects.all(),
+        help_text=_("Please select category from list."),
+        label=_("Категорія"),
+        required=False,
+    )
 
     class Meta:
         model = Product
@@ -24,6 +31,7 @@ class ProductForm(forms.ModelForm):
             "price",
             "description",
             "post",
+            "category",
             "link",
             "active",
             "currency",
@@ -73,9 +81,28 @@ class AdminParseForm(forms.Form):
         help_text=_("Custom parser map for parsing"),
         required=False,
     )
+    category = TreeNodeChoiceField(
+        queryset=Category.objects.all(),
+        help_text=_("Please select category from list."),
+        label=_("Категорія"),
+        required=False,
+    )
 
     def clean(self):
         cleaned_data = super().clean()
         if not cleaned_data.get("url") and not cleaned_data.get("files"):
             raise forms.ValidationError(_("Please select URL or HTML file."))
         return cleaned_data
+
+
+class LinkForm(forms.ModelForm):
+    category = TreeNodeChoiceField(
+        queryset=Category.objects.all(),
+        help_text=_("Please select category from list."),
+        label=_("Категорія"),
+        required=False,
+    )
+
+    class Meta:
+        model = Link
+        fields = "__all__"

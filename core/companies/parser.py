@@ -1,7 +1,15 @@
 import re
+from time import sleep
 
 import requests
+from django.utils import timezone
 from lxml import html  # nosec
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.firefox.service import Service as FirefoxService
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 def extract_price(s):
@@ -54,3 +62,79 @@ def get_content_from_url(url):
     if response.status_code != 200:
         raise ValueError(f"Failed to fetch content from {url}. Status code: {response.status_code}")
     return response.content.decode("utf-8")
+
+
+# def parse_link_with_js(link):
+#     from selenium.webdriver import FirefoxOptions
+#
+#     opts = FirefoxOptions()
+#     opts.add_argument("--headless")
+#     # Set up the Selenium WebDriver
+#     driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=opts)  # or use another browser driver like Chrome
+#
+#     try:
+#         # Navigate to the URL
+#         driver.get(link.url)
+#
+#         # Wait for the JavaScript to load
+#         WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, 'body')))
+#
+#         # Additional sleep to ensure all JS scripts are loaded
+#         sleep(5)
+#
+#         # Extract the HTML content of the page
+#         html_content = driver.page_source
+#
+#         # Parse the HTML content
+#         data = parse_data_from_content(html_content, link.parser_map or link.company.parser_map)
+#
+#
+#         return data
+#     finally:
+#         link.last_crawled = timezone.now()
+#         # Close the browser
+#         driver.quit()
+
+
+def parse_link_with_js(driver, link):
+    try:
+        # Navigate to the URL
+        driver.get(link.url)
+
+        # Wait for the JavaScript to load
+        WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
+
+        # Additional sleep to ensure all JS scripts are loaded
+        sleep(5)
+
+        # Extract the HTML content of the page
+        html_content = driver.page_source
+
+        # Parse the HTML content
+        data = parse_data_from_content(html_content, link.parser_map or link.company.parser_map)
+
+        return data
+    finally:
+        link.last_crawled = timezone.now()
+
+
+def parse_many_links_with_same_browser(links):
+    from selenium.webdriver import FirefoxOptions
+
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    # Set up the Selenium WebDriver
+    driver = webdriver.Firefox(
+        service=FirefoxService(GeckoDriverManager().install()), options=opts
+    )  # or use another browser driver like Chrome
+
+    try:
+        parsed_data = []
+        for link in links:
+            data = parse_link_with_js(driver, link)
+            link.save_result_products(data)
+            parsed_data.append(data)
+        return parsed_data
+    finally:
+        # Close the browser
+        driver.quit()

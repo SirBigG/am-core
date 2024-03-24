@@ -1,8 +1,9 @@
 from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
-from .forms import CompanyForm, ProductForm
-from .models import Company, Product
+from .forms import CompanyForm, LinkForm, ProductForm
+from .models import Company, Link, Product
+from .parser import parse_many_links_with_same_browser
 
 
 class ProductInline(admin.TabularInline):
@@ -52,5 +53,24 @@ class CompanyAdmin(admin.ModelAdmin):
     # inlines = [ProductInline]
 
 
+def parse_link(modeladmin, request, queryset):
+    # for link in queryset:
+    #     link.parse()
+    parse_many_links_with_same_browser(queryset)
+
+
+class LinkAdmin(admin.ModelAdmin):
+    list_display = ("url", "last_crawled", "created", "active")
+    list_filter = (
+        "active",
+        "company",
+    )
+    list_editable = ("active",)
+    search_fields = ("name", "url")
+    actions = [parse_link]
+    form = LinkForm
+
+
 admin.site.register(Company, CompanyAdmin)
 admin.site.register(Product, ProductAdmin)
+admin.site.register(Link, LinkAdmin)
