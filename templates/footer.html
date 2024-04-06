@@ -1,7 +1,16 @@
 <div id="bottom-mobile-menu" class="navbar bg-dark fixed-bottom d-md-none p-0 mt-3">
-    <div class="text-center col-2">
-        <a class="text-success no-decoration" href="/categories/"><span><i
-                class="icon-th-list"></i><br><small>Пости</small></span></a>
+    <div class="d-flex justify-content-center col-2">
+        <div class="btn-group dropup">
+            <button class="btn btn-link text-success no-decoration" data-bs-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                <span><i class="icon-th-list"></i><br><small>Почитати</small></span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-start">
+                <li><a class="dropdown-item text-success no-decoration" href="/categories/">Публікації</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-success no-decoration" href="/registry/"><p>Державний реєстр сортів рослин</p></a></li>
+            </ul>
+        </div>
     </div>
     <div class="text-center col-2">
         <a class="text-success no-decoration" href="/news/"><span><i
@@ -21,13 +30,13 @@
                     aria-expanded="false">
                 <span><i class="icon-ellipsis"></i><br><small>Більше</small></span>
             </button>
-            <div class="dropdown-menu dropdown-menu-end bg-secondary">
+            <div class="dropdown-menu dropdown-menu-end">
                 <a class="dropdown-item text-success" href="/"><i class="icon-home"></i> Головна</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-success" href="/events/">Події</a>
                 <a class="dropdown-item text-success" href="/companies/">Компанії</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-success" href="/feedback/">Зворотний зв'язок</a>
+                <a class="dropdown-item text-success" href="/feedback/">Контакти</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item text-success" href="/events/create/"><i class="icon-plus"></i> Додати подію</a>
                 <a class="dropdown-item text-success" href="/publication/create/"><i class="icon-plus"></i> Додати
@@ -35,8 +44,8 @@
                 <a class="dropdown-item text-success" href="/adverts/create/"><i class="icon-plus"></i> Додати
                     оголошення</a>
                 <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-white" href="/page/about/">Про нас</a>
-                <a class="dropdown-item text-white" href="/page/privacy_policy/">Конфіденційність</a>
+                <a class="dropdown-item text-success" href="/page/about/">Про нас</a>
+                <a class="dropdown-item text-success" href="/page/privacy_policy/">Конфіденційність</a>
             </div>
         </div>
     </div>

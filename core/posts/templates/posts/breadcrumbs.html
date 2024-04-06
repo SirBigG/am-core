@@ -1,6 +1,6 @@
 <nav aria-label="breadcrumb">
  <ol class="breadcrumb">
- <li class="breadcrumb-item"><a class="text-success" href="/" aria-label="Home"><i class="icon-home"></i></a></li>
+ <li class="breadcrumb-item"><a class="text-success" href="/categories/" aria-label="Home"><i class="icon-home"></i></a></li>
   {% if post_title %}
     {% for item in items %}
       <li class="breadcrumb-item"><a class="text-success" href="{{ item.absolute_url }}">{{item.value}}</a></li>

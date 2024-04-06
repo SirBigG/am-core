@@ -1,0 +1,15 @@
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a class="text-success" href="/registry/" aria-label="Home"><i
+                class="icon-home"></i></a></li>
+
+        {% for item in items %}
+            {% if forloop.last %}
+                <li class="breadcrumb-item active">{{ item.title }}</li>
+            {% else %}
+                <li class="breadcrumb-item"><a class="text-success" href="{{ item.absolute_url }}">{{ item.title }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>

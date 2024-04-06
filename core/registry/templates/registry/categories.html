@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% load registry_extras cache static %}
+
+{% block extra_meta %}
+    <meta content="{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
+{% endif %}" property="og:title">
+    <meta content="{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }}
+{% endif %}" property="og:description">
+    <meta content="" property="og:image">
+    <meta content="https://agromega.in.ua{{ request.path }}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+{% endblock extra_meta %}
+
+{% block title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
+{% endif %}{% endblock title %}
+{% block page_title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
+{% endif %}{% endblock page_title %}
+{% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }}
+{% endif %}{% endblock %}
+
+{% block breadcrumbs %}
+    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
+        {% registry_breadcrumbs category %}
+    {% endcache %}
+{% endblock %}
+
+{% block scripts %}
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/categories.css" %}">
+    <link rel="stylesheet" href="{% static "posts/list.css" %}">
+{% endblock scripts %}
+
+{% block content %}
+    {% if category.meta and category.meta.text %}
+        <div class="col-lg-12 col-12">
+            <div class="text-justify">
+                {{ category.meta.text|safe }}
+            </div>
+        </div>
+    {% endif %}
+    <div class="row">
+        {% for object in object_list %}
+            <div class="col-6">
+                <div class="category">
+                    <a href="{{ object.get_absolute_url }}" class="no-decoration text-success">
+                        <h2 class="h6">{{ object.title }}</h2>
+                    </a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
