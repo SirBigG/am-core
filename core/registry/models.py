@@ -146,7 +146,7 @@ class Variety(models.Model):
         slug = slugify(base_category_title, get_language())
         base_category = VarietyCategory.objects.filter(slug=slug).first()
         if base_category is None:
-            base_category = VarietyCategory(title=base_category_title)
+            base_category = VarietyCategory.objects.create(title=base_category_title)
             base_category.save()
         base_category_id = base_category.id
         children_category_title = item.child_category_title
@@ -154,7 +154,9 @@ class Variety(models.Model):
         slug = slugify(children_category_title, get_language())
         children_category = VarietyCategory.objects.filter(slug=slug).first()
         if children_category is None:
-            children_category = VarietyCategory(title=children_category_title, parent_id=base_category_id)
+            children_category = VarietyCategory.objects.create(
+                title=children_category_title, parent_id=base_category_id
+            )
             children_category.save()
         children_category_id = children_category.id
         title = item.title
@@ -200,7 +202,7 @@ class Variety(models.Model):
         slug = slugify(base_category_title, get_language())
         base_category = VarietyCategory.objects.filter(slug=slug).first()
         if base_category is None:
-            base_category = VarietyCategory(title=base_category_title)
+            base_category = VarietyCategory.objects.create(title=base_category_title)
             base_category.save()
         base_category_id = base_category.id
         children_category_title = item.child_category_title
@@ -208,7 +210,9 @@ class Variety(models.Model):
         slug = slugify(children_category_title, get_language())
         children_category = VarietyCategory.objects.filter(slug=slug).first()
         if children_category is None:
-            children_category = VarietyCategory(title=children_category_title, parent_id=base_category_id)
+            children_category = VarietyCategory.objects.create(
+                title=children_category_title, parent_id=base_category_id
+            )
             children_category.save()
 
         children_category_id = children_category.id

@@ -9,27 +9,32 @@ from transliterate import slugify
 from .models import Company, Country, Variety, VarietyCategory
 from .parser_row_types import ActiveRegistryItem, InactiveRegistryItem
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("django")
 
-file_path = "core/registry/data/derzhavnii-reiestr-sortiv-roslin-pridatnikh-dlia-poshirennia-v-ukrayini_19-03-2024.xlsx"
+file_path = "media/derzhavnii-reiestr-sortiv-roslin-pridatnikh-dlia-poshirennia-v-ukrayini_19-03-2024.xlsx"
 
 
-def parse_company(worksheet_number, api: bool = False, token: str = None):
+def parse_company(worksheet_number, api: bool = False, token: str = None, start_row: int = 2):
     # Make dict of countries
     countries = {country.short_slug: country.id for country in Country.objects.all()}
     workbook = load_workbook(filename=file_path)
     sheet = workbook.worksheets[worksheet_number]
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, values_only=True):
+    row_count = sheet.max_row
+    counter = start_row - 1
+    session = requests.Session()
+    session.headers.update({"Authorization": f"Token {token}"})
+    for row in sheet.iter_rows(min_row=start_row, max_row=sheet.max_row, values_only=True):
         if api:
             # send POST request to API
-            response = requests.post(
-                "https://agromega.in.ua/api/v1/registry/add-company/",
+            response = session.post(
+                "https://agromega.in.ua/api/registry/add-company/",
                 json={"row": row},
-                headers={"Authorization": f"Token {token}"},
                 timeout=10,
             )
             if response.status_code != 200:
                 logger.error(f"Error while sending data to API: {response.text}")
+            counter += 1
+            logger.info(f"Row {counter} of {row_count} sent to API")
             continue
         code = row[2]
         if Company.objects.filter(code=code).exists():
@@ -40,19 +45,19 @@ def parse_company(worksheet_number, api: bool = False, token: str = None):
         company.save()
 
 
-def parse_applicant():
-    parse_company(2)
+def parse_applicant(api: bool = False, token: str = None, start_row: int = 2):
+    parse_company(2, api, token, start_row)
 
 
-def parse_owner():
-    parse_company(3)
+def parse_owner(api: bool = False, token: str = None, start_row: int = 2):
+    parse_company(3, api, token, start_row)
 
 
-def parse_breeder():
-    parse_company(4)
+def parse_breeder(api: bool = False, token: str = None, start_row: int = 2):
+    parse_company(4, api, token, start_row)
 
 
-def parse_varieties(api: bool = False, token: str = None):
+def parse_varieties(api: bool = False, token: str = None, start_row: int = 2):
     countries = {country["short_slug"]: country["id"] for country in Country.objects.values("short_slug", "id")}
     companies = {company["code"]: company["id"] for company in Company.objects.values("code", "id")}
     base_categories = {
@@ -63,7 +68,11 @@ def parse_varieties(api: bool = False, token: str = None):
     }
     workbook = load_workbook(filename=file_path)
     sheet = workbook.worksheets[0]
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, values_only=True):
+    row_count = sheet.max_row
+    counter = start_row - 1
+    session = requests.Session()
+    session.headers.update({"Authorization": f"Token {token}"})
+    for row in sheet.iter_rows(min_row=start_row, max_row=sheet.max_row, values_only=True):
         # if len of row is less than 37, then we have empty row and we need to set empty values
         if len(row) < 38:
             row = list(row) + ["" for _ in range(38 - len(row))]
@@ -71,14 +80,15 @@ def parse_varieties(api: bool = False, token: str = None):
             row = row[:38]
         if api:
             # send POST request to API
-            response = requests.post(
-                "https://agromega.in.ua/api/v1/registry/add-active-variety/",
+            response = session.post(
+                "https://agromega.in.ua/api/registry/add-active-variety/",
                 json={"row": row},
-                headers={"Authorization": f"Token {token}"},
                 timeout=10,
             )
             if response.status_code != 200:
                 logger.error(f"Error while sending data to API: {response.text}")
+            counter += 1
+            logger.info(f"Row {counter} of {row_count} sent to API")
             continue
         item = ActiveRegistryItem._make(row)
         base_category_title = item.base_category_title
@@ -133,7 +143,7 @@ def parse_varieties(api: bool = False, token: str = None):
         variety.save()
 
 
-def parse_inactive_varieties(api: bool = False, token: str = None):
+def parse_inactive_varieties(api: bool = False, token: str = None, start_row: int = 2):
     countries = {country["short_slug"]: country["id"] for country in Country.objects.values("short_slug", "id")}
     companies = {company["code"]: company["id"] for company in Company.objects.values("code", "id")}
     base_categories = {
@@ -144,7 +154,11 @@ def parse_inactive_varieties(api: bool = False, token: str = None):
     }
     workbook = load_workbook(filename=file_path)
     sheet = workbook.worksheets[1]
-    for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, values_only=True):
+    row_count = sheet.max_row
+    counter = start_row - 1
+    session = requests.Session()
+    session.headers.update({"Authorization": f"Token {token}"})
+    for row in sheet.iter_rows(min_row=start_row, max_row=sheet.max_row, values_only=True):
         # if len of row is less than 37, then we have empty row and we need to set empty values
         if len(row) < 39:
             row = list(row) + ["" for _ in range(39 - len(row))]
@@ -152,14 +166,16 @@ def parse_inactive_varieties(api: bool = False, token: str = None):
             row = row[:39]
         if api:
             # send POST request to API
-            response = requests.post(
-                "https://agromega.in.ua/api/v1/registry/add-inactive-variety/",
+            response = session.post(
+                "https://agromega.in.ua/api/registry/add-inactive-variety/",
                 json={"row": row},
                 headers={"Authorization": f"Token {token}"},
                 timeout=10,
             )
             if response.status_code != 200:
                 logger.error(f"Error while sending data to API: {response.text}")
+            counter += 1
+            logger.info(f"Row {counter} of {row_count} sent to API")
             continue
         item = InactiveRegistryItem._make(row)
         end_date = item.end_date
