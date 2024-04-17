@@ -1,110 +1,36 @@
-from collections import namedtuple
+import logging
 from datetime import datetime
 
+import requests
 from django.utils.translation import get_language
 from openpyxl import load_workbook
 from transliterate import slugify
 
 from .models import Company, Country, Variety, VarietyCategory
+from .parser_row_types import ActiveRegistryItem, InactiveRegistryItem
+
+logger = logging.getLogger(__name__)
 
 file_path = "core/registry/data/derzhavnii-reiestr-sortiv-roslin-pridatnikh-dlia-poshirennia-v-ukrayini_19-03-2024.xlsx"
 
-ActiveRegistryItem = namedtuple(
-    "ActiveRegistryItem",
-    [
-        "base_category_title",
-        "base_category_title_en",
-        "child_category_title",
-        "child_category_title_en",
-        "child_category_title_lt",
-        "application_number",
-        "date",
-        "title",
-        "title_original",
-        "title_translit",
-        "registration_year",
-        "patent",
-        "creation_method",
-        "recommended_zone",
-        "direction_of_use",
-        "ripeness_group",
-        "quality",
-        "variety_vailabl",
-        "original_country",
-        "registration_country",
-        "applicant",
-        "applicant2",
-        "applicant3",
-        "applicant4",
-        "applicant5",
-        "applicant6",
-        "owner",
-        "owner2",
-        "owner3",
-        "owner4",
-        "owner5",
-        "owner6",
-        "breeder",
-        "breeder2",
-        "breeder3",
-        "breeder4",
-        "breeder5",
-        "breeder6",
-    ],
-)
 
-InactiveRegistryItem = namedtuple(
-    "ActiveRegistryItem",
-    [
-        "end_date",
-        "base_category_title",
-        "base_category_title_en",
-        "child_category_title",
-        "child_category_title_en",
-        "child_category_title_lt",
-        "application_number",
-        "date",
-        "title",
-        "title_original",
-        "title_translit",
-        "registration_year",
-        "patent",
-        "creation_method",
-        "recommended_zone",
-        "direction_of_use",
-        "ripeness_group",
-        "quality",
-        "variety_vailabl",
-        "original_country",
-        "registration_country",
-        "applicant",
-        "applicant2",
-        "applicant3",
-        "applicant4",
-        "applicant5",
-        "applicant6",
-        "owner",
-        "owner2",
-        "owner3",
-        "owner4",
-        "owner5",
-        "owner6",
-        "breeder",
-        "breeder2",
-        "breeder3",
-        "breeder4",
-        "breeder5",
-        "breeder6",
-    ],
-)
-
-
-def parse_company(worksheet_number):
+def parse_company(worksheet_number, api: bool = False, token: str = None):
     # Make dict of countries
     countries = {country.short_slug: country.id for country in Country.objects.all()}
     workbook = load_workbook(filename=file_path)
     sheet = workbook.worksheets[worksheet_number]
     for row in sheet.iter_rows(min_row=2, max_row=sheet.max_row, values_only=True):
+        if api:
+            # send POST request to API
+            response = requests.post(
+                "https://agromega.in.ua/api/v1/registry/add-company/",
+                json={"row": row},
+                headers={"Authorization": f"Token {token}"},
+                timeout=10,
+            )
+            if response.status_code != 200:
+                logger.error(f"Error while sending data to API: {response.text}")
+            continue
         code = row[2]
         if Company.objects.filter(code=code).exists():
             continue
@@ -126,7 +52,7 @@ def parse_breeder():
     parse_company(4)
 
 
-def parse_varieties():
+def parse_varieties(api: bool = False, token: str = None):
     countries = {country["short_slug"]: country["id"] for country in Country.objects.values("short_slug", "id")}
     companies = {company["code"]: company["id"] for company in Company.objects.values("code", "id")}
     base_categories = {
@@ -143,6 +69,17 @@ def parse_varieties():
             row = list(row) + ["" for _ in range(38 - len(row))]
         if len(row) > 38:
             row = row[:38]
+        if api:
+            # send POST request to API
+            response = requests.post(
+                "https://agromega.in.ua/api/v1/registry/add-active-variety/",
+                json={"row": row},
+                headers={"Authorization": f"Token {token}"},
+                timeout=10,
+            )
+            if response.status_code != 200:
+                logger.error(f"Error while sending data to API: {response.text}")
+            continue
         item = ActiveRegistryItem._make(row)
         base_category_title = item.base_category_title
         if base_category_title not in base_categories:
@@ -196,7 +133,7 @@ def parse_varieties():
         variety.save()
 
 
-def parse_inactive_varieties():
+def parse_inactive_varieties(api: bool = False, token: str = None):
     countries = {country["short_slug"]: country["id"] for country in Country.objects.values("short_slug", "id")}
     companies = {company["code"]: company["id"] for company in Company.objects.values("code", "id")}
     base_categories = {
@@ -213,6 +150,17 @@ def parse_inactive_varieties():
             row = list(row) + ["" for _ in range(39 - len(row))]
         if len(row) > 39:
             row = row[:39]
+        if api:
+            # send POST request to API
+            response = requests.post(
+                "https://agromega.in.ua/api/v1/registry/add-inactive-variety/",
+                json={"row": row},
+                headers={"Authorization": f"Token {token}"},
+                timeout=10,
+            )
+            if response.status_code != 200:
+                logger.error(f"Error while sending data to API: {response.text}")
+            continue
         item = InactiveRegistryItem._make(row)
         end_date = item.end_date
         end_date_year = None

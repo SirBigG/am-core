@@ -1,0 +1,62 @@
+{% if variety %}
+    <table class="table table-success table-striped">
+        <tbody>
+        <tr>
+            <td>Назва сорту (українською)</td>
+            <td>{{ variety.title }}</td>
+        </tr>
+        <tr>
+            <td>Назва сорту (мовою заявника)</td>
+            <td>{{ variety.title_original }}</td>
+        </tr>
+        <tr>
+            <td>Номер реєстрації</td>
+            <td>{{ variety.application_number }}</td>
+        </tr>
+        <tr>
+            <td>Рік державної реєстрації</td>
+            <td>{{ variety.registration_year }}</td>
+        </tr>
+        {% if variety.unregister_date and variety.unregister_date > variety.registration_year %}
+            <tr>
+                <td>Дата припинення чинності державної реєстрації</td>
+                <td>{{ variety.unregister_date }}</td>
+            </tr>
+        {% endif %}
+        <tr>
+            <td>Рекомендована зона для вирощування</td>
+            <td>{{ variety.recommended_zone }}</td>
+        </tr>
+        {% if variety.original_country %}
+            <tr>
+                <td>Країна походження сорту</td>
+                <td>{{ variety.original_country.value }}</td>
+            </tr>
+        {% endif %}
+        {% if variety.applicant %}
+            <tr>
+                <td>Заявник</td>
+                <td>{{ variety.applicant }}</td>
+            </tr>
+        {% endif %}
+        {% if variety.owner %}
+            <tr>
+                <td>Власник</td>
+                <td>{{ variety.owner }}</td>
+            </tr>
+        {% endif %}
+        {% if variety.breeder %}
+            <tr>
+                <td>Селекціонер</td>
+                <td>{{ variety.breeder }}</td>
+            </tr>
+        {% endif %}
+        {% if variety.category %}
+            <tr>
+                <td>Ботанічний таксон</td>
+                <td>{{ variety.category.title }}</td>
+            </tr>
+        {% endif %}
+        </tbody>
+    </table>
+{% endif %}

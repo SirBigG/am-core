@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     # Package for project api: http://www.django-rest-framework.org/
     "rest_framework",
+    "rest_framework.authtoken",
     # project apps
     "core.classifier",
     "core.pro_auth",
@@ -310,3 +311,10 @@ RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY", "")
 COMMENT_ALLOW_TRANSLATION = True
 
 ADVERT_ACTIVE_DAYS = int(os.getenv("ADVERT_ACTIVE_DAYS", 30))
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ),
+}

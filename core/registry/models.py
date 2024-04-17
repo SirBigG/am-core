@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.db import models
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +8,7 @@ from mptt.models import MPTTModel
 from transliterate import slugify
 
 from core.classifier.models import Country
+from core.registry.parser_row_types import ActiveRegistryItem, InactiveRegistryItem
 from core.services.models import MetaData
 
 
@@ -21,6 +24,20 @@ class Company(models.Model):
     class Meta:
         verbose_name = "Company"
         verbose_name_plural = "Companies"
+
+    @classmethod
+    def save_company_from_row(cls, row):
+        code = row[2]
+        if Company.objects.filter(code=code).exists():
+            return
+        company = Company(
+            name=row[3],
+            original_name=row[4],
+            code=code,
+            country=Country.objects.filter(short_slug=row[5].lower()).first(),
+        )
+        company.save()
+        return company
 
 
 class VarietyCategory(MPTTModel):
@@ -120,3 +137,112 @@ class Variety(models.Model):
         if self.publication_id:
             return self.publication.get_absolute_url()
         return
+
+    @classmethod
+    def save_active_variety_from_row(cls, row: list):
+        item = ActiveRegistryItem._make(row)
+        base_category_title = item.base_category_title
+        # Check if category already exists
+        slug = slugify(base_category_title, get_language())
+        base_category = VarietyCategory.objects.filter(slug=slug).first()
+        if base_category is None:
+            base_category = VarietyCategory(title=base_category_title)
+            base_category.save()
+        base_category_id = base_category.id
+        children_category_title = item.child_category_title
+        # Check if category already exists
+        slug = slugify(children_category_title, get_language())
+        children_category = VarietyCategory.objects.filter(slug=slug).first()
+        if children_category is None:
+            children_category = VarietyCategory(title=children_category_title, parent_id=base_category_id)
+            children_category.save()
+        children_category_id = children_category.id
+        title = item.title
+        if Variety.objects.filter(title=title, category_id=children_category_id).exists():
+            return
+        registration_country = item.registration_country
+        if registration_country:
+            registration_country = Country.objects.filter(short_slug=registration_country.lower()).first()
+        original_country = item.original_country
+        if original_country:
+            original_country = Country.objects.filter(short_slug=original_country.lower()).first()
+        variety = Variety(
+            title=title,
+            title_original=item.title_original,
+            application_number=item.application_number,
+            registration_year=item.registration_year,
+            recommended_zone=item.recommended_zone,
+            direction_of_use=item.direction_of_use,
+            ripeness_group=item.ripeness_group,
+            quality=item.quality,
+            registration_country_id=registration_country,
+            original_country_id=original_country,
+            applicant=Company.objects.filter(code=item.applicant).first() if item.applicant else None,
+            applicant2=Company.objects.filter(code=item.applicant2).first() if item.applicant2 else None,
+            owner=Company.objects.filter(code=item.owner).first() if item.owner else None,
+            owner2=Company.objects.filter(code=item.owner2).first() if item.owner2 else None,
+            breeder=Company.objects.filter(code=item.breeder).first() if item.breeder else None,
+            category_id=children_category_id,
+        )
+        variety.save()
+
+    @classmethod
+    def save_inactive_variety_from_row(cls, row: list):
+        item = InactiveRegistryItem._make(row)
+        end_date = item.end_date
+        end_date_year = None
+        if end_date:
+            # parse end date by format dd.mm.yyyy
+            end_date = datetime.strptime(end_date, "%d.%m.%Y").date()
+            end_date_year = end_date.year
+        base_category_title = item.base_category_title
+        # Check if category already exists
+        slug = slugify(base_category_title, get_language())
+        base_category = VarietyCategory.objects.filter(slug=slug).first()
+        if base_category is None:
+            base_category = VarietyCategory(title=base_category_title)
+            base_category.save()
+        base_category_id = base_category.id
+        children_category_title = item.child_category_title
+        # Check if category already exists
+        slug = slugify(children_category_title, get_language())
+        children_category = VarietyCategory.objects.filter(slug=slug).first()
+        if children_category is None:
+            children_category = VarietyCategory(title=children_category_title, parent_id=base_category_id)
+            children_category.save()
+
+        children_category_id = children_category.id
+        title = item.title
+        if Variety.objects.filter(title=title, category_id=children_category_id).exists():
+            Variety.objects.filter(title=title, category_id=children_category_id).update(
+                unregister_date=end_date, unregister_year=end_date_year, excluded=True
+            )
+            return
+        registration_country = item.registration_country
+        if registration_country:
+            registration_country = Country.objects.filter(short_slug=registration_country.lower()).first()
+        original_country = item.original_country
+        if original_country:
+            original_country = Country.objects.filter(short_slug=original_country.lower()).first()
+        variety = Variety(
+            title=title,
+            title_original=item.title_original,
+            application_number=item.application_number,
+            registration_year=item.registration_year,
+            recommended_zone=item.recommended_zone,
+            direction_of_use=item.direction_of_use,
+            ripeness_group=item.ripeness_group,
+            quality=item.quality,
+            registration_country_id=registration_country,
+            original_country_id=original_country,
+            applicant_id=Company.objects.filter(code=item.applicant).first() if item.applicant else None,
+            applicant2_id=Company.objects.filter(code=item.applicant2).first() if item.applicant2 else None,
+            owner_id=Company.objects.filter(code=item.owner).first() if item.owner else None,
+            owner2_id=Company.objects.filter(code=item.owner2).first() if item.owner2 else None,
+            breeder_id=Company.objects.filter(code=item.breeder).first() if item.breeder else None,
+            category_id=children_category_id,
+            unregister_date=end_date,
+            unregister_year=end_date_year,
+            excluded=True,
+        )
+        variety.save()

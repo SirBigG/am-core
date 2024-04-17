@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load static_push cache post_extras comment_tags static companies_extras %}
+{% load static_push cache post_extras comment_tags static companies_extras registry_extras %}
 
 {% block title %}{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} | {{ category.value }}
 {% endif %}{% endblock title %}
@@ -96,6 +96,7 @@
             <div class="col-12 p-0">
                 <div class="m-3 post-wrapper">
                     {{ object.text|safe }}
+                    {% variety_item_table object.id %}
                     {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
                     {% if object.source %}
                         <p class="m-0" style="overflow-y: auto;"><span class="h6">Джерело: {{ object.source }}</span>
