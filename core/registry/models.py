@@ -72,12 +72,13 @@ class VarietyCategory(MPTTModel):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title.lower(), get_language())
+        super().save(*args, **kwargs)
         if not self.absolute_url:
             _url = "/registry/"
             for _slug in self.get_ancestors(include_self=True).values_list("slug", flat=True).order_by("level"):
                 _url += f"{_slug}/"
             self.absolute_url = _url
-        super().save(*args, **kwargs)
+            self.save()
 
     def __str__(self):
         return self.title
@@ -162,12 +163,14 @@ class Variety(models.Model):
         title = item.title
         if Variety.objects.filter(title=title, category_id=children_category_id).exists():
             return
-        registration_country = item.registration_country
-        if registration_country:
-            registration_country = Country.objects.filter(short_slug=registration_country.lower()).first()
-        original_country = item.original_country
-        if original_country:
-            original_country = Country.objects.filter(short_slug=original_country.lower()).first()
+        registration_country_slug = item.registration_country
+        registration_country = None
+        if registration_country_slug:
+            registration_country = Country.objects.filter(short_slug=registration_country_slug.lower()).first()
+        original_country_slug = item.original_country
+        original_country = None
+        if original_country_slug:
+            original_country = Country.objects.filter(short_slug=original_country_slug.lower()).first()
         variety = Variety(
             title=title,
             title_original=item.title_original,
@@ -177,8 +180,8 @@ class Variety(models.Model):
             direction_of_use=item.direction_of_use,
             ripeness_group=item.ripeness_group,
             quality=item.quality,
-            registration_country_id=registration_country,
-            original_country_id=original_country,
+            registration_country=registration_country,
+            original_country=original_country,
             applicant=Company.objects.filter(code=item.applicant).first() if item.applicant else None,
             applicant2=Company.objects.filter(code=item.applicant2).first() if item.applicant2 else None,
             owner=Company.objects.filter(code=item.owner).first() if item.owner else None,
@@ -222,12 +225,14 @@ class Variety(models.Model):
                 unregister_date=end_date, unregister_year=end_date_year, excluded=True
             )
             return
-        registration_country = item.registration_country
-        if registration_country:
-            registration_country = Country.objects.filter(short_slug=registration_country.lower()).first()
-        original_country = item.original_country
-        if original_country:
-            original_country = Country.objects.filter(short_slug=original_country.lower()).first()
+        registration_country_slug = item.registration_country
+        registration_country = None
+        if registration_country_slug:
+            registration_country = Country.objects.filter(short_slug=registration_country_slug.lower()).first()
+        original_country_slug = item.original_country
+        original_country = None
+        if original_country_slug:
+            original_country = Country.objects.filter(short_slug=original_country_slug.lower()).first()
         variety = Variety(
             title=title,
             title_original=item.title_original,
@@ -237,13 +242,13 @@ class Variety(models.Model):
             direction_of_use=item.direction_of_use,
             ripeness_group=item.ripeness_group,
             quality=item.quality,
-            registration_country_id=registration_country,
-            original_country_id=original_country,
-            applicant_id=Company.objects.filter(code=item.applicant).first() if item.applicant else None,
-            applicant2_id=Company.objects.filter(code=item.applicant2).first() if item.applicant2 else None,
-            owner_id=Company.objects.filter(code=item.owner).first() if item.owner else None,
-            owner2_id=Company.objects.filter(code=item.owner2).first() if item.owner2 else None,
-            breeder_id=Company.objects.filter(code=item.breeder).first() if item.breeder else None,
+            registration_country=registration_country,
+            original_country=original_country,
+            applicant=Company.objects.filter(code=item.applicant).first() if item.applicant else None,
+            applicant2=Company.objects.filter(code=item.applicant2).first() if item.applicant2 else None,
+            owner=Company.objects.filter(code=item.owner).first() if item.owner else None,
+            owner2=Company.objects.filter(code=item.owner2).first() if item.owner2 else None,
+            breeder=Company.objects.filter(code=item.breeder).first() if item.breeder else None,
             category_id=children_category_id,
             unregister_date=end_date,
             unregister_year=end_date_year,

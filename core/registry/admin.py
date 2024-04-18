@@ -19,6 +19,7 @@ class VarietyAdmin(admin.ModelAdmin):
         "title",
         "title_original",
         "publication",
+        "category",
         "application_number",
         "registration_year",
         "unregister_year",
