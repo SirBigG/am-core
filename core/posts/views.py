@@ -24,9 +24,8 @@ class IndexView(TemplateView):
         from core.events.models import Event
 
         context = super().get_context_data(**kwargs)
-        context["categories"] = Category.objects.filter(
-            id__in=Post.objects.order_by("-hits").values_list("rubric__parent_id")[:8]
-        )
+        _ids = set(Post.objects.order_by("-hits").values_list("rubric__parent_id", flat=True)[:100])
+        context["categories"] = Category.objects.filter(id__in=list(_ids)[:8])
         context["events"] = (
             Event.objects.select_related("location").filter(status=1, start__gte=date.today()).order_by("start")[:4]
         )

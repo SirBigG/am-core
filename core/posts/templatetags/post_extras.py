@@ -2,30 +2,28 @@ import logging
 from pathlib import Path
 from urllib.parse import urlparse
 
-from PIL import Image
 from django import template
 from django.conf import settings
 from django.urls import reverse
-
-from core.classifier.models import Category
-
-from core.posts.models import Post
+from PIL import Image
 
 from core.adverts.models import Advert
+from core.classifier.models import Category
+from core.posts.models import Post
 
 register = template.Library()
 
 
-@register.inclusion_tag('posts/main_menu.html')
+@register.inclusion_tag("posts/main_menu.html")
 def main_menu():
-    """
-    Creating main page menu.
+    """Creating main page menu.
+
     :return: rubric roots queryset
     """
-    return {'roots': Category.objects.filter(level=0, is_active=True).order_by("value")}
+    return {"roots": Category.objects.filter(level=0, is_active=True).order_by("value")}
 
 
-@register.inclusion_tag('posts/index_categories.html')
+@register.inclusion_tag("posts/index_categories.html")
 def index_categories():
     """
     :return: rubric roots queryset
@@ -33,61 +31,71 @@ def index_categories():
     return main_menu()
 
 
-@register.inclusion_tag('posts/second_menu.html')
+@register.inclusion_tag("posts/second_menu.html")
 def second_menu(parent_slug, current_slug=None):
-    return {'menu_items': Category.objects.get(slug=parent_slug).get_children().values(
-        "slug", "value", "absolute_url"), 'slug': current_slug}
+    return {
+        "menu_items": Category.objects.get(slug=parent_slug).get_children().values("slug", "value", "absolute_url"),
+        "slug": current_slug,
+    }
 
 
-@register.inclusion_tag('posts/breadcrumbs.html')
+@register.inclusion_tag("posts/breadcrumbs.html")
 def breadcrumbs(category, post_title=None):
     """Breadcrumbs block."""
-    return {'items': category.get_ancestors(include_self=True).values("value", "absolute_url")[1:],
-            'post_title': post_title}
+    return {
+        "items": category.get_ancestors(include_self=True).values("value", "absolute_url")[1:],
+        "post_title": post_title,
+    }
 
 
-@register.inclusion_tag('posts/post_adverts_block.html')
+@register.inclusion_tag("posts/post_adverts_block.html")
 def post_adverts():
-    """
-    Creating main page menu.
+    """Creating main page menu.
+
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.active_objects.values("title", "image", "pk", "slug")[:4]}
+    context = {"adverts": Advert.active_objects.values("title", "image", "pk", "slug")[:4]}
     for advert in context["adverts"]:
-        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"], 'slug': advert["slug"]})
+        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
         if advert["image"]:
             advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
     return context
 
 
-@register.inclusion_tag('posts/post_adverts_block.html')
+@register.inclusion_tag("posts/post_adverts_block.html")
 def random_adverts():
-    """
-    Creating main page menu.
+    """Creating main page menu.
+
     :return: rubric roots queryset
     """
-    context = {'adverts': Advert.active_objects.order_by("?").values("title", "image", "pk", "slug")[:4]}
+    context = {"adverts": Advert.active_objects.order_by("?").values("title", "image", "pk", "slug")[:4]}
     for advert in context["adverts"]:
-        advert["url"] = reverse('adverts:detail', kwargs={'pk': advert["pk"], 'slug': advert["slug"]})
+        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
         if advert["image"]:
             advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
     return context
 
 
-@register.inclusion_tag('posts/relative_posts.html')
+@register.inclusion_tag("posts/relative_posts.html")
 def relative_posts(category_id):
-    context = {"posts": Post.objects.filter(
-        rubric_id=category_id, status=True).values("id", "title", "absolute_url", "photo__image").order_by("?")[:4]}
+    context = {
+        "posts": Post.objects.filter(rubric_id=category_id, status=True)
+        .values("id", "title", "absolute_url", "photo__image")
+        .order_by("?")[:4]
+    }
     for post in context["posts"]:
         if post["photo__image"]:
             post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
     return context
 
 
-@register.inclusion_tag('posts/random_posts.html')
+@register.inclusion_tag("posts/random_posts.html")
 def random_posts():
-    context = {"posts": Post.objects.filter(
-        status=True).values("id", "title", "absolute_url", "photo__image").order_by("?")[:4]}
+    context = {
+        "posts": Post.objects.filter(status=True)
+        .values("id", "title", "absolute_url", "photo__image")
+        .order_by("?")[:4]
+    }
     for post in context["posts"]:
         if post["photo__image"]:
             post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
@@ -96,8 +104,8 @@ def random_posts():
 
 @register.simple_tag
 def full_url(url):
-    """
-    Create full url with hostname.
+    """Create full url with hostname.
+
     :param: absolute url
     :return: full url
     """
@@ -116,27 +124,39 @@ def thumbnail_path(path, width=300, height=None):
 
 # ####################    Filters    ################### #
 
-def grouped(l, n):
+
+def grouped(value, n):
     # Yield successive n-sized chunks from l.
-    for i in range(0, len(l), n):
-        yield l[i:i + n]
+    for i in range(0, len(value), n):
+        yield value[i : i + n]
 
 
 @register.filter
 def group_by(value, arg):
-    """
-    For grouping iterable items in groups by arg size.
+    """For grouping iterable items in groups by arg size.
+
     :param value: iterable,
-    :param arg: int
-    :return iterator
+    :param arg: int :return iterator
     """
     return grouped(value, arg)
 
 
 @register.filter
-def times(number):
+def divide_into_cols(value, arg):
+    """For grouping iterable items in groups by arg size.
+
+    :param value: iterable,
+    :param arg: int :return iterator
     """
-    For using range function in templatetags.
+    per_col = len(value) // arg + 1
+    return [value[i : i + per_col] for i in range(0, len(value), per_col)]
+    return [value[i : i + arg] for i in range(0, len(value), arg)]
+
+
+@register.filter
+def times(number):
+    """For using range function in templatetags.
+
     :param number: int
     :return range obj:
     """
@@ -145,8 +165,8 @@ def times(number):
 
 @register.filter
 def get_domain(link):
-    """
-    Get domain from start link.
+    """Get domain from start link.
+
     :param link:
     :return domain:
     """
@@ -155,30 +175,30 @@ def get_domain(link):
 
 def _get_thumbnail_path(photo_path, width):
     """Return thumbnail path with dirs created."""
-    path_dict = photo_path.split('/')
-    path = Path('%s/thumb/' % ('/'.join(path_dict[:-1])))
+    path_dict = photo_path.split("/")
+    path = Path("%s/thumb/" % ("/".join(path_dict[:-1])))
     if path.is_dir() is False:
         path.mkdir()
-    path = Path(('%s/%s/' % (str(path), width)).replace('//', '/'))
+    path = Path((f"{str(path)}/{width}/").replace("//", "/"))
     if path.is_dir() is False:
         path.mkdir()
-    return '%s/%s' % (str(path), path_dict[-1].split('.')[0] + '.webp')
+    return "{}/{}".format(str(path), path_dict[-1].split(".")[0] + ".webp")
 
 
 def thumbnail_from_path(photo_path, width=300, height=None):
-    """
-       Create thumbnail if not exists for current image.
-       Returns: url to thumbnail.
+    """Create thumbnail if not exists for current image.
+
+    Returns: url to thumbnail.
     """
     thumb_path = Path(_get_thumbnail_path(photo_path, width))
     if thumb_path.is_file() is False:
         try:
             im = Image.open(photo_path)
         except FileNotFoundError:
-            logging.error('File not found: %s' % photo_path)
+            logging.error("File not found: %s" % photo_path)
             return
         if height is None:
-            height = int((float(im.size[1]) * float(width / float(im.size[0]))))
+            height = int(float(im.size[1]) * float(width / float(im.size[0])))
         im = im.resize((width, height), Image.LANCZOS)
-        im.save(thumb_path, format='webp', quality=80)
-    return ('%s%s' % (settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace('//', '/')
+        im.save(thumb_path, format="webp", quality=80)
+    return ("{}{}".format(settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace("//", "/")

@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% load registry_extras cache static %}
+{% load registry_extras cache static post_extras %}
 
 {% block extra_meta %}
     <meta content="{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
@@ -40,13 +40,17 @@
         </div>
     {% endif %}
     <div class="row">
-        {% for object in object_list %}
+        {% for group in object_list|divide_into_cols:2 %}
             <div class="col-6">
-                <div class="category">
-                    <a href="{{ object.get_absolute_url }}" class="no-decoration text-success">
-                        <h2 class="h6">{{ object.title }}</h2>
-                    </a>
-                </div>
+            <ul class="list-unstyled">
+                {% for object in group %}
+                    <li class="m-2">
+                        <a href="{{ object.get_absolute_url }}" class="list-link no-decoration">
+                            {{ object.title }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
             </div>
         {% endfor %}
     </div>

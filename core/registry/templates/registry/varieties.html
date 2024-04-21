@@ -36,7 +36,7 @@
                     <p class="text-secondary h3">{{ key }}</p>
                     <ul class="list-unstyled">
                     {% for post in list %}
-                        <li class="mb-2">{% if post.publication__absolute_url %}<a class="list-link no-decoration" href="{{ post.publication__absolute_url }}">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}
+                        <li class="m-2">{% if post.publication__absolute_url %}<a class="list-link no-decoration" href="{{ post.publication__absolute_url }}">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}
                         {% if post.original_country__short_slug %}{% with 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' as flag_static %}
         <object type="image/svg+xml" data="{% static_push flag_static %}" height="10px"
                 width="15px" aria-label="{{ post.title }}">{{ post.title }}</object>{% endwith %}{% endif %}</li>
