@@ -1,7 +1,9 @@
 from dal import autocomplete
 from django import forms
 from django.contrib import admin
+from django.contrib.postgres.forms import SimpleArrayField
 from django.db.models import Count
+from mptt.admin import TreeRelatedFieldListFilter
 from mptt.forms import TreeNodeChoiceField
 
 from core.classifier.models import Category
@@ -15,6 +17,9 @@ class PhotoInLine(admin.TabularInline):
 
 class AdminPostForm(forms.ModelForm):
     rubric = TreeNodeChoiceField(queryset=Category.objects.all())
+    sources = SimpleArrayField(
+        forms.URLField(), required=False, widget=forms.Textarea, help_text="Enter sources separated by commas"
+    )
 
     class Meta:
         model = Post
@@ -96,7 +101,7 @@ class PostAdmin(admin.ModelAdmin):
         "absolute_url",
     )
     raw_id_fields = ("publisher",)
-    list_filter = (CategoryFilter, HasPhotoFilter, "status")
+    list_filter = (("rubric", TreeRelatedFieldListFilter), HasPhotoFilter, "status")
     actions = [activate_posts]
     search_fields = (
         "title",
@@ -104,17 +109,18 @@ class PostAdmin(admin.ModelAdmin):
     )
 
     fieldsets = (
-        ("Main data", {"fields": ("title", "text", "status", "rubric")}),
+        ("Main data", {"fields": ("title", "text", "rubric", "country", "sources")}),
         (None, {"fields": ("tags",)}),
-        ("Extra data", {"fields": ("country", "update_date", "meta", "meta_description")}),
+        ("Metadata", {"fields": ("meta", "meta_description")}),
         (
             "Advanced options",
             {
                 "classes": ("collapse",),
                 "fields": (
+                    "status",
+                    "update_date",
                     "work_status",
                     "author",
-                    "source",
                     "publisher",
                     "publish_date",
                     "hits",

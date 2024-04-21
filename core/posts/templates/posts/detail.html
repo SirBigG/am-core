@@ -98,9 +98,13 @@
                     {{ object.text|safe }}
                     {% variety_item_table object.id %}
                     {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
-                    {% if object.source %}
-                        <p class="m-0" style="overflow-y: auto;"><span class="h6">Джерело: {{ object.source }}</span>
-                        </p>
+                    {% if object.sources %}
+                        <span>Джерела:</span>
+                        <ul>
+                            {% for source in object.sources %}
+                                <li style="overflow-y: auto;"><span class="text-secondary small">{{ source }}</span></li>
+                            {% endfor %}
+                        </ul>
                     {% endif %}
                     <p class="m-0"><span class="h6">Дата публікації: {{ object.publish_date|date:"d b Y" }}</span></p>
                     <p class="m-0"><span class="h6">Оновлено: {{ object.update_date|date:"d b Y" }}</span></p>

@@ -8,6 +8,7 @@ from ckeditor.fields import RichTextField
 from comment.models import Comment
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
@@ -55,6 +56,13 @@ class Post(models.Model):
     )
     author = models.CharField(max_length=250, blank=True, null=True, verbose_name=_("post author"))
     source = models.CharField(max_length=250, blank=True, null=True, verbose_name=_("post source"))
+    sources = ArrayField(
+        models.CharField(max_length=250),
+        blank=True,
+        null=True,
+        verbose_name=_("post sources"),
+        help_text=_("Enter sources separated by commas"),
+    )
 
     publisher = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name=_("post publisher"))
     publish_date = models.DateTimeField(_("date of publish"), default=timezone.now)
@@ -78,7 +86,7 @@ class Post(models.Model):
     )
 
     country = models.ForeignKey(
-        Country, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_("post country")
+        Country, on_delete=models.CASCADE, blank=True, null=True, verbose_name=_("origin country")
     )
 
     absolute_url = models.CharField(max_length=512, default="")
