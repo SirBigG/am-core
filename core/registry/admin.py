@@ -1,5 +1,5 @@
 from django.contrib import admin
-from mptt.admin import DraggableMPTTAdmin
+from mptt.admin import DraggableMPTTAdmin, TreeRelatedFieldListFilter
 
 from core.registry.models import Company, Variety, VarietyCategory
 
@@ -31,7 +31,7 @@ class VarietyAdmin(admin.ModelAdmin):
     list_editable = ("publication",)
     autocomplete_fields = ("publication",)
     list_filter = (
-        "category",
+        ("category", TreeRelatedFieldListFilter),
         "registration_year",
         "unregister_year",
         "excluded",
