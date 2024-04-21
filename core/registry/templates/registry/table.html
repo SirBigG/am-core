@@ -17,7 +17,7 @@
             <td>Рік державної реєстрації</td>
             <td>{{ variety.registration_year }}</td>
         </tr>
-        {% if variety.unregister_date and variety.unregister_date > variety.registration_year %}
+        {% if variety.unregister_year and variety.unregister_year > variety.registration_year %}
             <tr>
                 <td>Дата припинення чинності державної реєстрації</td>
                 <td>{{ variety.unregister_date }}</td>
