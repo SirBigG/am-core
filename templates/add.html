@@ -1,38 +1,34 @@
 {% extends "base.html" %}
-
 {% load post_extras events_extras cache static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/add.css" %}">
 {% endblock scripts %}
-
 {% block content %}
     <div class="row">
         <div class="col-md-4 col-6">
-            <a href="/events/create/" role="button" class="no-decoration">
+            <a href="{% url 'events:event-form' %}"
+               role="button"
+               class="no-decoration">
                 <div class="p-2 mb-4 bg-body-tertiary rounded-3 text-center text-success">
-                    <p class="display-4"><i class="icon-plus"></i></p>
+                    <p class="display-4">
+                        <i class="icon-plus"></i>
+                    </p>
                     <p class="lead">Подію</p>
                 </div>
             </a>
         </div>
         <div class="col-md-4 col-6">
-            <a href="/publication/create/" role="button" class="no-decoration">
+            <a href="{% url 'adverts:adverts-create' %}"
+               role="button"
+               class="no-decoration">
                 <div class="p-2 mb-4 bg-body-tertiary rounded-3 text-center text-success">
-                    <p class="display-4"><i class="icon-plus"></i></p>
-                    <p class="lead">Публікацію</p>
-                </div>
-            </a>
-        </div>
-        <div class="col-md-4 col-6">
-            <a href="/adverts/create/" role="button" class="no-decoration">
-                <div class="p-2 mb-4 bg-body-tertiary rounded-3 text-center text-success">
-                    <p class="display-4"><i class="icon-plus"></i></p>
+                    <p class="display-4">
+                        <i class="icon-plus"></i>
+                    </p>
                     <p class="lead">Оголошення</p>
-
                 </div>
             </a>
         </div>
     </div>
-{% endblock %}
+{% endblock content %}

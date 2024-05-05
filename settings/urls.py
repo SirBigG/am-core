@@ -58,7 +58,7 @@ urlpatterns = i18n_patterns(
     # Rendering index page for all urls starts with /profile/ for personal page.
     # path('profile/', login_required(TemplateView.as_view(template_name='personal/personal_index.html')),
     #      name='personal-index'),
-    path("registry/", include("core.registry.urls"), name="registry"),
+    path("registry/", include("core.registry.urls", namespace="registry")),
     path("", include("core.classifier.urls")),
     path("", include("core.pro_auth.urls", namespace="pro_auth")),
     path("", include("core.posts.urls")),

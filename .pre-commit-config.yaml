@@ -46,3 +46,9 @@ repos:
     rev: 1.7.5
     hooks:
       - id: bandit
+
+  - repo: https://github.com/Riverside-Healthcare/djLint
+    rev: v1.34.1
+    hooks:
+      - id: djlint-reformat-django
+      - id: djlint-django

@@ -1,54 +1,80 @@
-<div id="bottom-mobile-menu" class="navbar bg-light fixed-bottom d-md-none p-0 mt-3 border-top border-success">
+<div id="bottom-mobile-menu"
+     class="navbar bg-light fixed-bottom d-md-none p-0 mt-3 border-top border-success">
     <div class="d-flex justify-content-center col-2">
         <div class="btn-group dropup">
-            <button class="btn btn-link text-success no-decoration" data-bs-toggle="dropdown" aria-haspopup="true"
+            <button class="btn btn-link text-success no-decoration"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
                     aria-expanded="false">
-                <span><i class="icon-th-list"></i><br><small>Почитати</small></span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-start">
-                <li><a class="dropdown-item text-success no-decoration" href="/categories/">Публікації</a></li>
-                <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-success no-decoration" href="/registry/"><p>Державний реєстр сортів рослин</p></a></li>
-            </ul>
-        </div>
-    </div>
-    <div class="text-center col-2">
-        <a class="text-success no-decoration" href="/news/"><span><i
-                class="icon-book"></i><br><small>Новини</small></span></a>
-    </div>
-    <div class="text-center col-2">
-        <a class="text-success no-decoration" href="/search/"><span class="h3"><i
-                class="icon-search"></i><br><small> </small></span></a>
-    </div>
-    <div class="text-center col-2">
-        <a class="text-success no-decoration" href="/adverts/"><span class="text-center"><i
-                class="icon-newspaper"></i><br><small>Купити</small></span></a>
-    </div>
-    <div class="d-flex justify-content-center col-2">
-        <div class="btn-group dropup">
-            <button class="btn btn-link text-success no-decoration" data-bs-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                <span><i class="icon-ellipsis"></i><br><small>Більше</small></span>
-            </button>
-            <div class="dropdown-menu dropdown-menu-end">
-                <a class="dropdown-item text-success" href="/"><i class="icon-home"></i> Головна</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-success" href="/events/">Події</a>
-                <a class="dropdown-item text-success" href="/companies/">Компанії</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-success" href="/feedback/">Контакти</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-success" href="/events/create/"><i class="icon-plus"></i> Додати подію</a>
-                <a class="dropdown-item text-success" href="/publication/create/"><i class="icon-plus"></i> Додати
-                    публікацію</a>
-                <a class="dropdown-item text-success" href="/adverts/create/"><i class="icon-plus"></i> Додати
-                    оголошення</a>
-                <div class="dropdown-divider"></div>
-                <a class="dropdown-item text-success" href="/page/about/">Про нас</a>
-                <a class="dropdown-item text-success" href="/page/privacy_policy/">Конфіденційність</a>
-            </div>
-        </div>
-    </div>
+            <span><i class="icon-th-list"></i>
+            <br>
+            <small>Почитати</small></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-start">
+        <li>
+            <a class="dropdown-item text-success no-decoration"
+               href="{% url 'categories' %}">Публікації</a>
+        </li>
+        <li>
+            <hr class="dropdown-divider">
+        </li>
+        <li>
+            <a class="dropdown-item text-success no-decoration"
+               href="{% url 'registry:index' %}">
+                <p>Державний реєстр сортів рослин</p>
+            </a>
+        </li>
+    </ul>
+</div>
+</div>
+<div class="text-center col-2">
+<a class="text-success no-decoration" href="{% url 'news:news-list' %}"><span><i class="icon-book"></i>
+<br>
+<small>Новини</small></span></a>
+</div>
+<div class="text-center col-2">
+<a class="text-success no-decoration"
+   href="{% url 'post-search-list' %}"><span class="h3"><i class="icon-search"></i>
+<br>
+</span></a>
+</div>
+<div class="text-center col-2">
+<a class="text-success no-decoration" href="{% url 'adverts:list' %}"><span class="text-center"><i class="icon-newspaper"></i>
+<br>
+<small>Купити</small></span></a>
+</div>
+<div class="d-flex justify-content-center col-2">
+    <div class="btn-group dropup">
+        <button class="btn btn-link text-success no-decoration"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false">
+        <span><i class="icon-ellipsis"></i>
+        <br>
+        <small>Більше</small></span>
+</button>
+<div class="dropdown-menu dropdown-menu-end">
+    <a class="dropdown-item text-success" href="{% url 'index' %}"><i class="icon-home"></i> Головна</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'events:event-list' %}">Події</a>
+    <a class="dropdown-item text-success" href="{% url 'companies:list' %}">Компанії</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success" href="{% url 'feedback-form' %}">Контакти</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'events:event-form' %}"><i class="icon-plus"></i> Додати подію</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'adverts:adverts-create' %}"><i class="icon-plus"></i> Додати
+    оголошення</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}">Конфіденційність</a>
+</div>
+</div>
+</div>
 </div>
 <div class="wrapper flex-grow-1"></div>
 <footer class="page-footer bg-light d-none d-sm-block border-top border-success">
@@ -57,34 +83,56 @@
             <div class="col-4 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Про нас</p>
                 <ul class="list-unstyled">
-                    <li class="mb-1"><a href="/page/about/" class="no-decoration text-success">Про нас</a></li>
-                    <li class="mb-1"><a href="/page/privacy_policy/" class="no-decoration text-success">Політика
-                        конфіденційності</a></li>
-                    <li class="mb-1"><a href="/feedback/" class="no-decoration text-success">Зворотній зв'язок</a></li>
+                    <li class="mb-1">
+                        <a href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}"
+                           class="no-decoration text-success">Про нас</a>
+                    </li>
+                    <li class="mb-1">
+                        <a href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}"
+                           class="no-decoration text-success">Політика
+                        конфіденційності</a>
+                    </li>
+                    <li class="mb-1">
+                        <a href="{% url 'feedback-form' %}" class="no-decoration text-success">Зворотній зв'язок</a>
+                    </li>
                 </ul>
             </div>
-{#            <hr class="clearfix w-100 d-md-none">#}
+            {#            <hr class="clearfix w-100 d-md-none">#}
             <div class="col-4 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Почитати</p>
                 <ul class="list-unstyled">
-                    <li class="mb-1"><a class="no-decoration text-success" href="/categories/">Публікації</a></li>
-                    <li class="mb-1"><a class="no-decoration text-success" href="/news/">Новини</a></li>
-                    <li class="mb-1"><a class="no-decoration text-success" href="/adverts/">Оголошення</a></li>
-                    <li class="mb-1"><a class="no-decoration text-success" href="/events/">Події</a></li>
-                    <li class="mb-1"><a class="no-decoration text-success" href="/companies/">Компанії</a></li>
+                    <li class="mb-1">
+                        <a class="no-decoration text-success" href="{% url 'categories' %}">Публікації</a>
+                    </li>
+                    <li class="mb-1">
+                        <a class="no-decoration text-success" href="{% url 'news:news-list' %}">Новини</a>
+                    </li>
+                    <li class="mb-1">
+                        <a class="no-decoration text-success" href="{% url 'adverts:list' %}">Оголошення</a>
+                    </li>
+                    <li class="mb-1">
+                        <a class="no-decoration text-success"
+                           href="{% url 'events:event-list' %}">Події</a>
+                    </li>
+                    <li class="mb-1">
+                        <a class="no-decoration text-success" href="{% url 'companies:list' %}">Компанії</a>
+                    </li>
                 </ul>
             </div>
             <hr class="clearfix w-100 d-md-none">
             <div class="col-4 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Соцмережі</p>
                 <ul class="list-unstyled">
-                    <li><a href="https://www.facebook.com/agromega.in.ua/" class="h5 text-primary" target="_blank"
-                           rel="noopener" aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a></li>
+                    <li>
+                        <a href="https://www.facebook.com/agromega.in.ua/"
+                           class="h5 text-primary"
+                           target="_blank"
+                           rel="noopener"
+                           aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a>
+                    </li>
                 </ul>
             </div>
         </div>
     </div>
 </footer>
-<div class="footer-copyright text-center text-white py-3 d-none d-sm-block">
-    © 2016 - 2024 AgroMega.In.Ua
-</div>
+<div class="footer-copyright text-center text-white py-3 d-none d-sm-block">© 2016 - 2024 AgroMega.In.Ua</div>

@@ -8,11 +8,11 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.db.models import F
 from django.http import Http404, HttpResponseGone, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, FormView, ListView, TemplateView
+from django.views.generic import DetailView, FormView, ListView, RedirectView, TemplateView
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
-from core.posts.forms import PhotoForm, PostForm
+from core.posts.forms import PhotoForm
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
 
@@ -135,13 +135,9 @@ class PostDetail(DetailView):
         return context
 
 
-class PostFormView(FormView):
-    form_class = PostForm
-    template_name = "posts/form.html"
-
-    def form_valid(self, form):
-        instance = form.save()
-        return HttpResponseRedirect(instance.get_absolute_url())
+class PostFormView(RedirectView):
+    permanent = True
+    url = "/create/"
 
 
 class SiteMap(TemplateView):
