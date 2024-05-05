@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .forms import CompanyForm, LinkForm, ProductForm
@@ -44,13 +45,26 @@ class ProductAdmin(admin.ModelAdmin):
         form.base_fields["post"].widget.can_add_related = False
         return form
 
+    def has_delete_permission(self, request, obj=None):
+        return False
+
 
 class CompanyAdmin(admin.ModelAdmin):
     form = CompanyForm
-    list_display = ("name", "description", "logo", "active", "website", "location")
-    list_filter = ("active",)
+    list_display = ("name", "type", "logo_img", "active", "website", "location")
+    list_filter = ("active", "type")
     search_fields = ("name", "description")
-    # inlines = [ProductInline]
+
+    def logo_img(self, obj):
+        url = obj.logo.url if obj.logo else None
+        if url:
+            return format_html('<img src="{}" width="100" height="50" />', url)
+        return ""
+
+    logo_img.short_description = _("logo")
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 def parse_link(modeladmin, request, queryset):
@@ -69,6 +83,9 @@ class LinkAdmin(admin.ModelAdmin):
     search_fields = ("name", "url")
     actions = [parse_link]
     form = LinkForm
+
+    def has_delete_permission(self, request, obj=None):
+        return False
 
 
 admin.site.register(Company, CompanyAdmin)

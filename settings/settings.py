@@ -71,6 +71,7 @@ INSTALLED_APPS = [
     "core.diary",
     "core.companies",
     "core.registry",
+    "core.analytics",
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
     "rosetta",

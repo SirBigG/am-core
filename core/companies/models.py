@@ -9,9 +9,17 @@ from core.classifier.models import Location
 from core.posts.models import Post
 
 
+class CompanyType(models.IntegerChoices):
+    SHOP = 1, "Магазин"
+    SERVICE = 2, "Сервіс"
+    SUPERMARKET = 3, "Супермаркет"
+    MARKET = 4, "Ринок"
+
+
 class Company(models.Model):
     name = models.CharField(max_length=200)
     slug = models.SlugField(max_length=200, blank=True, null=True, unique=True)
+    type = models.PositiveSmallIntegerField(choices=CompanyType.choices, default=CompanyType.SHOP)
     description = models.TextField(blank=True, null=True)
     logo = models.ImageField(upload_to="companies", blank=True, null=True)
     active = models.BooleanField(default=True)
@@ -54,6 +62,8 @@ class Product(models.Model):
     link = models.URLField(blank=True, null=True)
     active = models.BooleanField(default=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    max_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    min_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     currency = models.CharField(choices=CurrencyChoices.choices, default=CurrencyChoices.UAH, blank=True, null=True)
     auction_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     auction_currency = models.CharField(
@@ -94,6 +104,6 @@ class Link(models.Model):
     def save_result_products(self, data):
         for obj in data:
             name = obj.pop("name", None)
-            Product.objects.get_or_create(
+            Product.objects.update_or_create(
                 defaults=obj, **{"company_id": self.company_id, "category_id": self.category_id, "name": name}
             )

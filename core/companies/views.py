@@ -2,7 +2,7 @@ from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
 from .forms import AdminParseForm
-from .models import Company, Product
+from .models import Company, CompanyType, Product
 from .parser import get_content_from_url, parse_data_from_content
 
 
@@ -12,7 +12,7 @@ class CompanyListView(ListView):
     context_object_name = "companies"
 
     def get_queryset(self):
-        return Company.objects.filter(active=True)
+        return Company.objects.filter(active=True, type=CompanyType.SHOP)
 
 
 class CompanyDetailView(DetailView):
