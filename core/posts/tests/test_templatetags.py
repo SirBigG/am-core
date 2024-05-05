@@ -1,28 +1,21 @@
 from django.test import TestCase
 
+from core.posts.templatetags.post_extras import full_url, group_by, grouped, main_menu, second_menu, times
 from core.utils.tests.factories import CategoryFactory
-
-from core.posts.templatetags.post_extras import main_menu, full_url, group_by, grouped, times, second_menu,\
-    index_categories
 
 
 class PostExtrasTests(TestCase):
-
     def test_main_menu(self):
         CategoryFactory.create_batch(size=5)
-        self.assertEqual(len(main_menu()['roots']), 5)
-
-    def test_index_categories(self):
-        CategoryFactory.create_batch(size=5)
-        self.assertEqual(len(index_categories()['roots']), 5)
+        self.assertEqual(len(main_menu()["roots"]), 5)
 
     def test_full_url(self):
-        url = '/foo/asd.html'
-        self.assertEqual(full_url(url), 'localhost:8000/foo/asd.html')
+        url = "/foo/asd.html"
+        self.assertEqual(full_url(url), "localhost:8000/foo/asd.html")
 
     def test_grouped(self):
-        l = [1, 2, 3, 4]
-        group = grouped(l, 2)
+        items = [1, 2, 3, 4]
+        group = grouped(items, 2)
         self.assertEqual(next(group), [1, 2])
         self.assertEqual(next(group), [3, 4])
 
@@ -42,7 +35,7 @@ class PostExtrasTests(TestCase):
         self.assertEqual(times(5), range(1, 6))
 
     def test_second_menu(self):
-        parent = CategoryFactory(slug='parent')
+        parent = CategoryFactory(slug="parent")
         CategoryFactory(parent=parent)
         CategoryFactory(parent=parent)
-        self.assertEqual(len(second_menu('parent')['menu_items']), 2)
+        self.assertEqual(len(second_menu("parent")["menu_items"]), 2)

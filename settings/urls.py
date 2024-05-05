@@ -14,6 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 from core.adverts.views import AdvertSitemap
+from core.classifier.views import CategoriesIndex
 from core.companies.views import admin_parse_form_view
 from core.news.views import NewsSitemapView
 from core.posts import views
@@ -39,7 +40,8 @@ urlpatterns = i18n_patterns(
     path("sitemap-main.xml", views.SiteMap.as_view(), name="sitemap"),
     path("sitemap-adverts.xml", AdvertSitemap.as_view(), name="sitemap-adverts"),
     path("sitemap-news.xml", NewsSitemapView.as_view(), name="sitemap-news"),
-    path("categories/", TemplateView.as_view(template_name="categories.html"), name="categories"),
+    path("categories/", CategoriesIndex.as_view(), name="categories"),
+    path("categories/<str:slug>/", CategoriesIndex.as_view(), name="categories-root"),
     path("create/", TemplateView.as_view(template_name="add.html"), name="add"),
     path("social/", include("social_django.urls", namespace="social")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),

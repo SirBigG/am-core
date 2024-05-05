@@ -1,3 +1,5 @@
+{% load classifier_extras %}
+{% get_root_categories_links as categories_links %}
 <div id="bottom-mobile-menu"
      class="navbar bg-light fixed-bottom d-md-none p-0 mt-3 border-top border-success">
     <div class="d-flex justify-content-center col-2">
@@ -13,11 +15,22 @@
     <ul class="dropdown-menu dropdown-menu-start">
         <li>
             <a class="dropdown-item text-success no-decoration"
-               href="{% url 'categories' %}">Публікації</a>
+               href="{% url 'categories' %}">Всі категорії</a>
         </li>
         <li>
             <hr class="dropdown-divider">
         </li>
+        {% for category in categories_links %}
+            <li>
+                <a class="dropdown-item text-success no-decoration"
+                   href="{{ category.url }}">{{ category.title }}</a>
+            </li>
+            {% if forloop.last %}
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+            {% endif %}
+        {% endfor %}
         <li>
             <a class="dropdown-item text-success no-decoration"
                href="{% url 'registry:index' %}">
@@ -72,6 +85,14 @@
        href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
     <a class="dropdown-item text-success"
        href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}">Конфіденційність</a>
+    <div class="dropdown-divider"></div>
+    <a href="https://www.facebook.com/agromega.in.ua/"
+       class="dropdown-item h5 text-primary"
+       target="_blank"
+       rel="noopener"
+       aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a>
+    <div class="dropdown-divider"></div>
+    <p class="dropdown-item h6">© 2016 - 2024 AgroMega.In.Ua</p>
 </div>
 </div>
 </div>
@@ -80,7 +101,7 @@
 <footer class="page-footer bg-light d-none d-sm-block border-top border-success">
     <div class="container mt-4 mb-4">
         <div class="row">
-            <div class="col-4 mx-auto">
+            <div class="col-3 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Про нас</p>
                 <ul class="list-unstyled">
                     <li class="mb-1">
@@ -98,12 +119,9 @@
                 </ul>
             </div>
             {#            <hr class="clearfix w-100 d-md-none">#}
-            <div class="col-4 mx-auto">
+            <div class="col-3 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Почитати</p>
                 <ul class="list-unstyled">
-                    <li class="mb-1">
-                        <a class="no-decoration text-success" href="{% url 'categories' %}">Публікації</a>
-                    </li>
                     <li class="mb-1">
                         <a class="no-decoration text-success" href="{% url 'news:news-list' %}">Новини</a>
                     </li>
@@ -119,8 +137,21 @@
                     </li>
                 </ul>
             </div>
-            <hr class="clearfix w-100 d-md-none">
-            <div class="col-4 mx-auto">
+            <div class="col-3 mx-auto">
+                <p class="font-weight-bold text-uppercase text-success h5">Категорії</p>
+                <ul class="list-unstyled">
+                    <li class="mb-1">
+                        <a class="no-decoration text-success" href="{% url 'categories' %}">Всі категорії</a>
+                    </li>
+                    {% for category in categories_links %}
+                        <li class="mb-1">
+                            <a class="no-decoration text-success" href="{{ category.url }}">{{ category.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {#            <hr class="clearfix w-100 d-md-none">#}
+            <div class="col-3 mx-auto">
                 <p class="font-weight-bold text-uppercase text-success h5">Соцмережі</p>
                 <ul class="list-unstyled">
                     <li>

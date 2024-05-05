@@ -23,14 +23,6 @@ def main_menu():
     return {"roots": Category.objects.filter(level=0, is_active=True).order_by("value")}
 
 
-@register.inclusion_tag("posts/index_categories.html")
-def index_categories():
-    """
-    :return: rubric roots queryset
-    """
-    return main_menu()
-
-
 @register.inclusion_tag("posts/second_menu.html")
 def second_menu(parent_slug, current_slug=None):
     return {

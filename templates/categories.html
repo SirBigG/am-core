@@ -1,32 +1,23 @@
 {% extends "base.html" %}
-
 {% load post_extras cache static %}
-
 {% block extra_meta %}
-    <meta content="Категорії" property="og:title">
-    <meta content="Список доступних категорій." property="og:description">
+    <meta content="{{ metadata.title }}" property="og:title">
+    <meta content="{{ metadata.description }}" property="og:description">
     <meta content="" property="og:image">
-    <meta content="https://agromega.in.ua/categories/" property="og:url">
+    <meta content="{{ view.request.scheme }}://{{ view.request.get_host }}{{ view.request.get_full_path }}"
+          property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
-
 {% block title %}
-    Публікації за категоріями
+    {{ metadata.page_title }}
 {% endblock title %}
-
 {% block page_title %}
-    Публікації за категоріями
-{% endblock %}
-
+    {{ metadata.page_title }}
+{% endblock page_title %}
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/categories.css" %}">
 {% endblock scripts %}
-
 {% block content %}
-    <div class="mb-3">
-        {% cache 60 'index_menu' %}
-            {% index_categories %}
-        {% endcache %}
-    </div>
-{% endblock %}
+    <div class="mb-3">{% include "posts/index_categories.html" %}</div>
+{% endblock content %}
