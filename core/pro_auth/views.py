@@ -1,6 +1,8 @@
 from django.contrib.auth import login, logout
 from django.http import Http404, HttpResponseRedirect, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
+from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 
 from core.adverts.forms import AdvertForm
@@ -161,3 +163,32 @@ class UpdateProfileAdvertsView(UpdateView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class UpdateProfileAdvertsDateView(View):
+    def get(self, request, pk):
+        advert = get_object_or_404(Advert, pk=pk, user=request.user)
+        advert.updated = timezone.now()
+        advert.save()
+        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
+
+
+class AdvertDeleteView(View):
+    def get(self, request, pk):
+        advert = get_object_or_404(Advert, pk=pk, user=request.user)
+        advert.delete()
+        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
+
+
+class AdvertDeactivateView(View):
+    def get(self, request, pk):
+        advert = get_object_or_404(Advert, pk=pk, user=request.user)
+        advert.deactivate()
+        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
+
+
+class AdvertActivateView(View):
+    def get(self, request, pk):
+        advert = get_object_or_404(Advert, pk=pk, user=request.user)
+        advert.activate()
+        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))

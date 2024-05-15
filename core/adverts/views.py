@@ -1,7 +1,7 @@
-from django.views.generic import FormView, ListView, DetailView, TemplateView
-from django.http.response import HttpResponseRedirect, Http404, HttpResponseGone
-from django.urls import reverse
 from django.conf import settings
+from django.http.response import Http404, HttpResponseGone, HttpResponseRedirect
+from django.urls import reverse
+from django.views.generic import DetailView, FormView, ListView, TemplateView
 
 from .forms import AdvertForm
 from .models import Advert
@@ -35,6 +35,13 @@ class AdvertDetailView(DetailView):
     model = Advert
     template_name = "adverts/detail.html"
 
+    def get_object(self, queryset=None):
+        obj = super().get_object(queryset)
+        # increment views count
+        obj.views += 1
+        obj.save(update_fields=["views"])
+        return obj
+
 
 class AdvertSitemap(TemplateView):
     template_name = "sitemap.xml"
@@ -45,5 +52,7 @@ class AdvertSitemap(TemplateView):
             {
                 "loc": f"{settings.HOST}{reverse('adverts:detail', kwargs={'pk': i['pk'], 'slug': i['slug']})}",
                 "lastmod": i["updated"],
-            } for i in Advert.active_objects.values('updated', 'slug', 'pk')]
+            }
+            for i in Advert.active_objects.values("updated", "slug", "pk")
+        ]
         return context

@@ -5,6 +5,9 @@ from django.views.generic import TemplateView
 from core.pro_auth.views import (
     AddDiaryItemView,
     AddDiaryView,
+    AdvertActivateView,
+    AdvertDeactivateView,
+    AdvertDeleteView,
     ChangeProfileView,
     IsAuthenticate,
     Login,
@@ -14,6 +17,7 @@ from core.pro_auth.views import (
     ProfileDiaryDetailView,
     ProfileDiaryListView,
     SocialExistUserLogin,
+    UpdateProfileAdvertsDateView,
     UpdateProfileAdvertsView,
     UpdateProfileDiaryView,
 )
@@ -39,6 +43,14 @@ urlpatterns = [
     path("profile/diary/add", login_required(AddDiaryView.as_view()), name="profile-diary-add"),
     path("profile/diary", login_required(ProfileDiaryListView.as_view()), name="profile-diary-list"),
     path("profile/change", login_required(ChangeProfileView.as_view()), name="change-profile"),
+    path(
+        "profile/adverts/<int:pk>/update-date/",
+        login_required(UpdateProfileAdvertsDateView.as_view()),
+        name="profile-adverts-update-date",
+    ),
+    path("profile/adverts/<int:pk>/delete/", AdvertDeleteView.as_view(), name="profile-adverts-delete"),
+    path("profile/adverts/<int:pk>/deactivate/", AdvertDeactivateView.as_view(), name="profile-adverts-deactivate"),
+    path("profile/adverts/<int:pk>/activate/", AdvertActivateView.as_view(), name="profile-adverts-activate"),
     path("profile/adverts/create", login_required(ProfileAdvertAddView.as_view()), name="profile-adverts-create"),
     path(
         "profile/adverts/update/<int:pk>",
