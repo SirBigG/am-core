@@ -8,7 +8,7 @@ from mptt.forms import TreeNodeChoiceField
 
 from core.classifier.models import Category
 
-from .models import Link, ParsedMap, ParsedPost, Photo, Post, PostView, SearchStatistic, UsefulStatistic
+from .models import Photo, Post, SearchStatistic, UsefulStatistic
 
 
 class PhotoInLine(admin.TabularInline):
@@ -147,49 +147,6 @@ class PostAdmin(admin.ModelAdmin):
         return obj.photo.count() > 0
 
 
-class LinkAdmin(admin.ModelAdmin):
-    list_display = ("link", "is_parsed")
-
-
-class AdminParsedPostForm(forms.ModelForm):
-    rubric = forms.ModelChoiceField(queryset=Category.objects.filter(level=2))
-
-    class Meta:
-        model = ParsedPost
-        fields = "__all__"
-
-
-class ParsedPostAdmin(admin.ModelAdmin):
-    form = AdminParsedPostForm
-    list_display = (
-        "title",
-        "original",
-        "is_processed",
-        "is_translated",
-        "is_finished",
-    )
-    raw_id_fields = ("publisher",)
-    readonly_fields = ("hash",)
-    list_filter = (
-        "is_processed",
-        "is_translated",
-        "is_finished",
-    )
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        form.base_fields["publisher"].initial = request.user
-        return form
-
-
-class ParsedMapAdmin(admin.ModelAdmin):
-    list_display = ("host", "link", "type")
-
-
-class PostViewAdmin(admin.ModelAdmin):
-    list_display = ("fingerprint", "post_id", "user_id", "created")
-
-
 class UsefulStatisticAdmin(admin.ModelAdmin):
     list_display = ("fingerprint", "post_id", "user_id", "is_useful", "created")
 
@@ -211,10 +168,6 @@ class PhotoAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Post, PostAdmin)
-admin.site.register(ParsedMap, ParsedMapAdmin)
-admin.site.register(ParsedPost, ParsedPostAdmin)
-admin.site.register(Link, LinkAdmin)
-admin.site.register(PostView, PostViewAdmin)
 admin.site.register(Photo, PhotoAdmin)
 admin.site.register(UsefulStatistic, UsefulStatisticAdmin)
 admin.site.register(SearchStatistic, SearchStatisticAdmin)
