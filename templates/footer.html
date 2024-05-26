@@ -62,39 +62,30 @@
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
                 aria-expanded="false">
-        <span><i class="icon-ellipsis"></i>
-        <br>
-        <small>Більше</small></span>
-</button>
-<div class="dropdown-menu dropdown-menu-end">
-    <a class="dropdown-item text-success" href="{% url 'index' %}"><i class="icon-home"></i> Головна</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item text-success"
-       href="{% url 'events:event-list' %}">Події</a>
-    <a class="dropdown-item text-success" href="{% url 'companies:list' %}">Компанії</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item text-success" href="{% url 'feedback-form' %}">Контакти</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item text-success"
-       href="{% url 'events:event-form' %}"><i class="icon-plus"></i> Додати подію</a>
-    <a class="dropdown-item text-success"
-       href="{% url 'adverts:adverts-create' %}"><i class="icon-plus"></i> Додати
-    оголошення</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item text-success"
-       href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
-    <a class="dropdown-item text-success"
-       href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}">Конфіденційність</a>
-    <div class="dropdown-divider"></div>
-    <a href="https://www.facebook.com/agromega.in.ua/"
-       class="dropdown-item h5 text-primary"
-       target="_blank"
-       rel="noopener"
-       aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a>
-    <div class="dropdown-divider"></div>
-    <p class="dropdown-item h6">© 2016 - 2024 AgroMega.In.Ua</p>
-</div>
-</div>
+            {% if request.user.avatar %}
+                <img src="{{ request.user.avatar.url }}"
+                     alt=""
+                     class="rounded-circle"
+                     width="40"
+                     height="40">
+            {% else %}
+                <svg width="40"
+                     height="40"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="12" fill="#e0e0e0" />
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M12 12C13.6569 12 15 10.6569 15 9C15 7.34315 13.6569 6 12 6C10.3431 6 9 7.34315 9 9C9 10.6569 10.3431 12 12 12ZM17 18C17 15.7909 15.2091 14 13 14H11C8.79086 14 7 15.7909 7 18V19C7 19.5523 7.44772 20 8 20H16C16.5523 20 17 19.5523 17 19V18Z" fill="#0b8043" />
+                </svg>
+            {% endif %}
+            <br>
+        </button>
+        {% if request.user.is_authenticated %}
+            {% include "helpers/footer/footer_profile_menu_authenticated.html" %}
+        {% else %}
+            {% include "helpers/footer/footer_profile_menu_anonymous.html" %}
+        {% endif %}
+    </div>
 </div>
 </div>
 <div class="wrapper flex-grow-1"></div>

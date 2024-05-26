@@ -7,5 +7,5 @@ from .models import (
 
 @admin.register(Advert)
 class AdvertAdmin(admin.ModelAdmin):
-    list_display = ("title", "user", "author", "category", "location", "price", "updated", "created")
+    list_display = ("title", "user", "author", "views", "category", "location", "price", "updated", "created")
     raw_id_fields = ("user", "category", "location")

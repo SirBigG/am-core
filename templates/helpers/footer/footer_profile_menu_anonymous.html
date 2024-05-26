@@ -1,0 +1,31 @@
+<div class="dropdown-menu dropdown-menu-end">
+    <a class="dropdown-item text-success" href="{% url 'index' %}"><i class="icon-home"></i> Головна</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'events:event-list' %}">Події</a>
+    <a class="dropdown-item text-success" href="{% url 'companies:list' %}">Компанії</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'events:event-form' %}"><i class="icon-plus"></i> Додати подію</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'adverts:adverts-create' %}"><i class="icon-plus"></i> Додати
+    оголошення</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success"
+       href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}">Конфіденційність</a>
+    <a class="dropdown-item text-success" href="{% url 'feedback-form' %}">Контакти</a>
+    <div class="dropdown-divider"></div>
+    <a href="https://www.facebook.com/agromega.in.ua/"
+       class="dropdown-item h5 text-primary"
+       target="_blank"
+       rel="noopener"
+       aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item text-success" href="{% url 'pro_auth:login' %}">Увійти</a>
+    <div class="dropdown-divider"></div>
+    <p class="dropdown-item text-secondary">
+        <small>© 2016 - 2024 AgroMega.In.Ua</small>
+    </p>
+</div>
