@@ -1,4 +1,3 @@
-import os
 from datetime import datetime, timedelta
 from io import BytesIO
 
@@ -85,12 +84,6 @@ class Advert(models.Model):
             im.save(output, format="JPEG", quality=85)
             self.image = File(output, self.image.name)
         super().save(*args, **kwargs)
-
-    def delete(self, using=None, keep_parents=False):
-        """Delete file of image after object deleting."""
-        path = self.image.path
-        super().delete(using=using, keep_parents=keep_parents)
-        os.remove(path)
 
     def activate(self):
         self.is_active = True

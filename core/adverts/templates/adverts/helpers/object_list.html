@@ -1,28 +1,34 @@
 {% load post_extras static_push %}
-
 {% for advert in object_list %}
     <div class="row">
         <div class="card mb-3 w-100">
             <div class="row no-gutters">
-                <div class="col-md-4 col-12 p-0"><img src="{{ advert.image.path }}"
-                                                      alt="{{ advert.title }}"
-                                                      class="card-img"></div>
+                <div class="col-md-4 col-12 p-0">
+                    <img src="{{ advert.image.url }}"
+                         alt="{{ advert.title }}"
+                         class="card-img">
+                </div>
                 <div class="col-md-8 col-12">
                     <div class="card-body">
                         <h2 class="card-title h4">{{ advert.title }}</h2>
                         <div class="card-text mb-1">{{ advert.description|striptags|truncatechars:160 }}</div>
-                        {% if advert.author %}
-                            <div class="card-text mb-1">Автор: {{ advert.author }}</div>
-                        {% endif %}
-                        <div class="card-text mb-1"><strong>Контакти: {{ advert.contact }}</strong></div>
+                        {% if advert.author %}<div class="card-text mb-1">Автор: {{ advert.author }}</div>{% endif %}
+                        <div class="card-text mb-1">
+                            <strong>Контакти: {{ advert.contact }}</strong>
+                        </div>
                         {% if advert.location %}
-                            <div class="card-text mb-1"><strong>Локація: {{ advert.location }}</strong></div>
+                            <div class="card-text mb-1">
+                                <strong>Локація: {{ advert.location }}</strong>
+                            </div>
                         {% endif %}
                         {% if advert.price %}
-                            <div class="card-text mb-1"><strong>Ціна: {{ advert.price }} грн.</strong></div>
+                            <div class="card-text mb-1">
+                                <strong>Ціна: {{ advert.price }} грн.</strong>
+                            </div>
                         {% endif %}
                         <div class="text-right mt-3">
-                            <a class="text-success stretched-link no-decoration" href="{{ advert.get_absolute_url }}">Докладніше</a>
+                            <a class="text-success stretched-link no-decoration"
+                               href="{{ advert.get_absolute_url }}">Докладніше</a>
                         </div>
                     </div>
                 </div>

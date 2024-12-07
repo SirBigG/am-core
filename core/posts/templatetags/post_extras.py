@@ -1,11 +1,12 @@
-import logging
-from pathlib import Path
+import base64
+import hashlib
+import hmac
 from urllib.parse import urlparse
 
 from django import template
 from django.conf import settings
+from django.core.files.storage import storages
 from django.urls import reverse
-from PIL import Image
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
@@ -50,7 +51,7 @@ def post_adverts():
     for advert in context["adverts"]:
         advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
         if advert["image"]:
-            advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
+            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
     return context
 
 
@@ -64,7 +65,7 @@ def random_adverts():
     for advert in context["adverts"]:
         advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
         if advert["image"]:
-            advert["image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + advert["image"], 200, 150)
+            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
     return context
 
 
@@ -77,7 +78,7 @@ def relative_posts(category_id):
     }
     for post in context["posts"]:
         if post["photo__image"]:
-            post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
+            post["photo__image"] = imgproxy_url(storages["default"].url(post["photo__image"]), 200, 150)
     return context
 
 
@@ -90,7 +91,7 @@ def random_posts():
     }
     for post in context["posts"]:
         if post["photo__image"]:
-            post["photo__image"] = thumbnail_path(settings.MEDIA_ROOT + "/" + post["photo__image"], 200, 150)
+            post["photo__image"] = imgproxy_url(storages["default"].url(post["photo__image"]), 200, 150)
     return context
 
 
@@ -105,13 +106,34 @@ def full_url(url):
 
 
 @register.simple_tag
-def thumbnail(photo_obj, width=300, height=None):
-    return photo_obj.thumbnail(width, height) if photo_obj else ""
+def thumbnail(photo_obj, width=300, height=200):
+    return imgproxy_url(photo_obj.image.url, width, height) if photo_obj else ""
 
 
 @register.simple_tag
-def thumbnail_path(path, width=300, height=None):
-    return thumbnail_from_path(path, width, height) if path else ""
+def imgproxy_url(image_url, width, height, resize_type="fit", output_format="webp"):
+    """Generate Imgproxy URL for the given image.
+
+    :param image_url: URL of the original image
+    :param width: Desired width of the thumbnail
+    :param height: Desired height of the thumbnail
+    :param resize_type: Resize type (default is 'fit')
+    :param output_format: Output format (default is 'webp')
+    :return: Imgproxy URL
+    """
+    print(image_url)
+    key = bytes.fromhex(settings.IMGPROXY_KEY)
+    salt = bytes.fromhex(settings.IMGPROXY_SALT)
+    base_url = settings.IMGPROXY_BASE_URL
+
+    encoded_url = base64.urlsafe_b64encode(image_url.encode()).rstrip(b"=").decode()
+    path = f"/rs:{resize_type}:{width}:{height}:f:0/{encoded_url}.{output_format}"
+    path_b = path.encode()
+
+    signature = hmac.new(key, salt + path_b, hashlib.sha256).digest()
+
+    encoded_signature = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
+    return f"{base_url}/{encoded_signature}{path}"
 
 
 # ####################    Filters    ################### #
@@ -142,7 +164,6 @@ def divide_into_cols(value, arg):
     """
     per_col = len(value) // arg + 1
     return [value[i : i + per_col] for i in range(0, len(value), per_col)]
-    return [value[i : i + arg] for i in range(0, len(value), arg)]
 
 
 @register.filter
@@ -163,34 +184,3 @@ def get_domain(link):
     :return domain:
     """
     return urlparse(link).netloc
-
-
-def _get_thumbnail_path(photo_path, width):
-    """Return thumbnail path with dirs created."""
-    path_dict = photo_path.split("/")
-    path = Path("%s/thumb/" % ("/".join(path_dict[:-1])))
-    if path.is_dir() is False:
-        path.mkdir()
-    path = Path((f"{str(path)}/{width}/").replace("//", "/"))
-    if path.is_dir() is False:
-        path.mkdir()
-    return "{}/{}".format(str(path), path_dict[-1].split(".")[0] + ".webp")
-
-
-def thumbnail_from_path(photo_path, width=300, height=None):
-    """Create thumbnail if not exists for current image.
-
-    Returns: url to thumbnail.
-    """
-    thumb_path = Path(_get_thumbnail_path(photo_path, width))
-    if thumb_path.is_file() is False:
-        try:
-            im = Image.open(photo_path)
-        except FileNotFoundError:
-            logging.error("File not found: %s" % photo_path)
-            return
-        if height is None:
-            height = int(float(im.size[1]) * float(width / float(im.size[0])))
-        im = im.resize((width, height), Image.LANCZOS)
-        im.save(thumb_path, format="webp", quality=80)
-    return ("{}{}".format(settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace("//", "/")
