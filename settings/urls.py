@@ -21,9 +21,7 @@ from core.posts import views
 from core.services.views import FeedbackView
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 from django.urls import include, path
 from django.views.generic import TemplateView
 
@@ -70,9 +68,6 @@ urlpatterns = i18n_patterns(
 # For returning errors pages. Need to be the last.
 handler404 = "django.views.defaults.page_not_found"
 handler500 = "django.views.defaults.server_error"
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-urlpatterns += staticfiles_urlpatterns()
 
 if settings.DEBUG:
     urlpatterns = [

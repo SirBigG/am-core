@@ -124,7 +124,7 @@ class PostDetail(DetailView):
         try:
             context["main_photo_object"] = context["object"].photo.first()
             if context["main_photo_object"]:
-                context["main_photo_thumbnail"] = context["main_photo_object"].thumbnail(1520)
+                context["main_photo_thumbnail"] = context["main_photo_object"].image.url
                 context["main_photo_full_url"] = full_url(context["main_photo_thumbnail"])
         except Exception as e:
             logging.error(e)

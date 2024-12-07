@@ -1,35 +1,38 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
 {% block extra_meta %}
     <meta content="{{ post.title }} фотогалерея" property="og:title">
     <meta content="Всі фото {{ post.title }}." property="og:description">
-        {#        <meta content="" property="og:image">#}
-        <meta content="{{ request.path }}" property="og:url">
-        <meta content="AgroMega.in.ua" property="og:site_name">
-    {% endblock extra_meta %}
-
+    {#        <meta content="" property="og:image">#}
+    <meta content="{{ request.path }}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+{% endblock extra_meta %}
 {% block scripts %}
     <script src="{% static "posts/j-gallery.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/gallery.css" %}">
 {% endblock scripts %}
-
 {% block page_title %}{{ post.title }} фото{% endblock %}
 {% block title %}{{ post.title }} фотогалерея{% endblock %}
 {% block meta_description %}Всі фото {{ post.title }}.{% endblock %}
-
 {% block base_content_block %}
     <div class="col-12">
         <a href="{{ post.get_absolute_url }}" class="btn btn-link mb-3">До публікації</a>
-        <a href="/gallery/add/{{ post.id }}/" class="btn btn-success btn-sm mb-3">Завантажити фото публікації</a>
+        <a href="/gallery/add/{{ post.id }}/"
+           class="btn btn-success btn-sm mb-3">Завантажити фото публікації</a>
     </div>
     <div class="col-12">
         {% for photo in object_list %}
-            <a href="{% thumbnail photo 800 %}" class="js-smartPhoto" data-id="{{ photo.id }}" data-group="photo">
-            <img alt="{{ photo.id }}" width="350" height="250" src="{% thumbnail photo 350 %}" class="img-fluid mb-1"/>
+            <a href="{% thumbnail photo 800 500 %}"
+               class="js-smartPhoto"
+               data-id="{{ photo.id }}"
+               data-group="photo">
+                <img alt="{{ photo.id }}"
+                     width="350"
+                     height="250"
+                     src="{% thumbnail photo 350 250 %}"
+                     class="img-fluid mb-1" />
             </a>
         {% endfor %}
-{#        {% include "helpers/pagination.html" %}#}
+        {#        {% include "helpers/pagination.html" %}#}
     </div>
 {% endblock base_content_block %}

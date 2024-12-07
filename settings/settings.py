@@ -238,24 +238,12 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.8/howto/static-files/
-
-STATIC_URL = "/static/"
-
 STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, "pwa")]
-
-STATIC_ROOT = os.getenv("STATIC_ROOT", BASE_DIR + "/static/")
-STATICFILES_STORAGE = "core.utils.storage.VersionedStaticFilesStorage"
-
-# Media files (uploads)
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.getenv("MEDIA_ROOT", os.path.join(BASE_DIR, "media"))
 
 CKEDITOR_UPLOAD_PATH = "/media/ckeditor/"
 
@@ -319,3 +307,7 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.TokenAuthentication",
     ),
 }
+
+IMGPROXY_KEY = os.getenv("IMGPROXY_KEY")
+IMGPROXY_SALT = os.getenv("IMGPROXY_SALT")
+IMGPROXY_BASE_URL = os.getenv("IMGPROXY_BASE_URL", "/imgproxy")

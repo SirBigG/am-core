@@ -1,11 +1,9 @@
 import random
 import string
 from io import BytesIO
-from pathlib import Path
 
 from ckeditor.fields import RichTextField
 from comment.models import Comment
-from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
@@ -161,37 +159,6 @@ class Photo(models.Model):
     def __str__(self):
         return str(self.id)
 
-    def _get_thumbnail_path(self, width):
-        """Return thumbnail path with dirs created."""
-        path_dict = self.image.path.split("/")
-        path = Path("%s/thumb/" % ("/".join(path_dict[:-1])))
-        if path.is_dir() is False:
-            path.mkdir()
-        path = Path((f"{str(path)}/{width}/").replace("//", "/"))
-        if path.is_dir() is False:
-            path.mkdir()
-        return "{}/{}".format(str(path), path_dict[-1].split(".")[0] + ".webp")
-
-    def thumbnail(self, width=300, height=None):
-        """Create thumbnail if not exists for current image.
-
-        Returns: url to thumbnail.
-        """
-        if self.image:
-            thumb_path = Path(self._get_thumbnail_path(width))
-            if thumb_path.is_file() is False:
-                try:
-                    im = Image.open(self.image.path)
-                except FileNotFoundError:
-                    return
-                if height is None:
-                    height = int(float(im.size[1]) * float(width / float(im.size[0])))
-                im = im.resize((width, height), Image.LANCZOS)
-                im.save(thumb_path, format="webp", quality=80)
-            return ("{}{}".format(settings.MEDIA_URL, str(thumb_path).replace(settings.MEDIA_ROOT, ""))).replace(
-                "//", "/"
-            )
-
     def save(self, *args, **kwargs):
         """Cut image before save."""
         if self.image:
@@ -203,14 +170,6 @@ class Photo(models.Model):
             im.save(output, format="webp", quality=85)
             self.image = File(output, self.image.name.split(".")[0] + ".webp")
         super().save(*args, **kwargs)
-
-    def delete(self, using=None, keep_parents=False):
-        """Delete file of image after object deleting."""
-        path = self.image.path
-        super().delete(using=None, keep_parents=False)
-        import os
-
-        os.remove(path)
 
 
 class ParsedMap(models.Model):
