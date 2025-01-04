@@ -30,3 +30,5 @@ MIDDLEWARE += [  # noqa
     "silk.middleware.SilkyMiddleware",
 ]
 SILKY_PYTHON_PROFILER = True
+
+SITE_ID = 2

@@ -1,8 +1,8 @@
 FROM python:3.12.2-slim
 
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONUNBUFFERED=1
 
-ENV PROJECT_DIR /am-core
+ENV PROJECT_DIR=/am-core
 
 ADD requirements.txt $PROJECT_DIR/
 
@@ -23,4 +23,6 @@ RUN apt-get update && \
     apt-get clean && \
     pip install -r requirements.txt
 
-ADD . /am-core/
+ADD . .
+
+CMD ["daphne", "-b 0.0.0.0 -p 8081 -v 0", "settings.asgi:application"]

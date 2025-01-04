@@ -21,6 +21,7 @@
                         </p>
                         <div class="search-bar">
                             <fieldset>
+                                {# djlint:off D018 #}
                                 <form class="search-form" action="/search/" method="get">
                                     <div class="form-group">
                                         <input type="text" name="q" class="form-control" placeholder="Пошук">
@@ -49,11 +50,13 @@
                                 <div class="box">
                                     <div class="icon">
                                         <img class="img-fluid"
-                                             src="{% thumbnail event 350 280 %}"
-                                             alt="{{ event.title }}">
+                                             src="{% thumbnail event 350 280 'poster' %}"
+                                             alt="{{ event.title }}"
+                                             height="280"
+                                             width="350">
                                     </div>
                                     <h4>{{ event.title }}</h4>
-                                    <strong>{{ event.start|date:"d E Y  H:i" }}</strong>
+                                    <strong>{{ event.start|date:"d E Y H:i" }}</strong>
                                 </div>
                             </a>
                         </div>
@@ -76,7 +79,9 @@
                                     {% if category.image %}
                                         <img class="img-fluid"
                                              src="{{ category.image.url }}"
-                                             alt="{{ category.value }} фото">
+                                             alt="{{ category.value }} фото"
+                                             width="200"
+                                             height="150">
                                     {% endif %}
                                 </div>
                                 <p class="h4">{{ category.value }}</p>
@@ -102,6 +107,7 @@
                         </div>
                         <div class="services-content">
                             <p class="h3">
+                                {# djlint:off D018 #}
                                 <a href="/categories/">Публікації</a>
                             </p>
                             <p>
@@ -119,6 +125,7 @@
                         </div>
                         <div class="services-content">
                             <p class="h3">
+                                {# djlint:off D018 #}
                                 <a href="/events/">Події</a>
                             </p>
                             <p>
@@ -136,6 +143,7 @@
                         </div>
                         <div class="services-content">
                             <p class="h3">
+                                {# djlint:off D018 #}
                                 <a href="/news/">Новини</a>
                             </p>
                             <p>
@@ -153,6 +161,7 @@
                         </div>
                         <div class="services-content">
                             <p class="h3">
+                                {# djlint:off D018 #}
                                 <a href="/adverts/">Оголошення</a>
                             </p>
                             <p>
@@ -170,6 +179,7 @@
                         </div>
                         <div class="services-content">
                             <p class="h3">
+                                {# djlint:off D018 #}
                                 <a href="/companies/">Компанії</a>
                             </p>
                             <p>
@@ -215,7 +225,9 @@
                                     {% if post.photo.first %}
                                         <img class="img-fluid"
                                              src="{% thumbnail post.photo.first 350 280 %}"
-                                             alt="{{ post.rubric.value }} {{ post.title }}">
+                                             alt="{{ post.rubric.value }} {{ post.title }}"
+                                             width="350"
+                                             height="280">
                                     {% endif %}
                                 </div>
                                 <p class="h4">{{ post.title }}</p>
@@ -238,7 +250,9 @@
                                     {% if post.photo.first %}
                                         <img class="img-fluid"
                                              src="{% thumbnail post.photo.first 350 280 %}"
-                                             alt="{{ post.rubric.value }} {{ post.title }}">
+                                             alt="{{ post.rubric.value }} {{ post.title }}"
+                                             width="350"
+                                             height="280">
                                     {% endif %}
                                 </div>
                                 <p class="h4">{{ post.title }}</p>
@@ -261,7 +275,9 @@
                                     {% if advert.image.url %}
                                         <img class="img-fluid"
                                              src="{{ advert.image.url }}"
-                                             alt="{{ advert.title }}">
+                                             alt="{{ advert.title }}"
+                                             width="350"
+                                             height="280">
                                     {% endif %}
                                 </div>
                                 <p class="h4">{{ advert.title }}</p>
@@ -272,4 +288,4 @@
             </div>
         </div>
     </section>
-{% endblock %}
+{% endblock main %}

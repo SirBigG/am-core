@@ -106,8 +106,8 @@ def full_url(url):
 
 
 @register.simple_tag
-def thumbnail(photo_obj, width=300, height=200):
-    return imgproxy_url(photo_obj.image.url, width, height) if photo_obj else ""
+def thumbnail(photo_obj, width=300, height=200, object_attr="image"):
+    return imgproxy_url(getattr(photo_obj, object_attr).url, width, height) if photo_obj else ""
 
 
 @register.simple_tag
@@ -121,7 +121,6 @@ def imgproxy_url(image_url, width, height, resize_type="fit", output_format="web
     :param output_format: Output format (default is 'webp')
     :return: Imgproxy URL
     """
-    print(image_url)
     key = bytes.fromhex(settings.IMGPROXY_KEY)
     salt = bytes.fromhex(settings.IMGPROXY_SALT)
     base_url = settings.IMGPROXY_BASE_URL

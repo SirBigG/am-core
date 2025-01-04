@@ -1,31 +1,45 @@
 {% load post_extras %}
-
 {% if object_list %}
-<div class="row">
-    <div class="mb-3">
-        <div id="carouselExampleCaptions" class="carousel slide" data-ride="carousel">
-            <div class="carousel-inner">
-                {% for event in object_list %}
-                <div class="carousel-item bg-dark {% if forloop.counter == 1 %}active{% endif %}">
-                    <img src="{%thumbnail event 800 500 %}" class="d-block w-100" alt="{{event.title}}" style="opacity: .7;">
-                    <div class="carousel-caption">
-                        <h5>{{event.title}}</h5>
-                        <a class="btn btn-success stretched-link" href="{{ event.get_absolute_url }}">Читати далі</a>
-                    </div>
+    <div class="row">
+        <div class="mb-3">
+            <div id="carouselExampleCaptions"
+                 class="carousel slide"
+                 data-ride="carousel">
+                <div class="carousel-inner">
+                    {% for event in object_list %}
+                        <div class="carousel-item bg-dark {% if forloop.counter == 1 %}active{% endif %}">
+                            {# djlint:off H021 #}
+                            <img src="{% thumbnail event 800 500 'poster' %}"
+                                 class="d-block w-100"
+                                 alt="{{ event.title }}"
+                                 style="opacity: .7"
+                                 width="800"
+                                 height="500">
+                            <div class="carousel-caption">
+                                <h5>{{ event.title }}</h5>
+                                <a class="btn btn-success stretched-link"
+                                   href="{{ event.get_absolute_url }}">Читати далі</a>
+                            </div>
+                        </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                {% if object_list|length > 1 %}
+                    <a class="carousel-control-prev"
+                       href="#carouselExampleCaptions"
+                       role="button"
+                       data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                    <a class="carousel-control-next"
+                       href="#carouselExampleCaptions"
+                       role="button"
+                       data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                {% endif %}
             </div>
-            {% if object_list|length > 1 %}
-            <a class="carousel-control-prev" href="#carouselExampleCaptions" role="button" data-slide="prev">
-                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                <span class="sr-only">Previous</span>
-            </a>
-            <a class="carousel-control-next" href="#carouselExampleCaptions" role="button" data-slide="next">
-                <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                <span class="sr-only">Next</span>
-            </a>
-            {% endif %}
         </div>
     </div>
-</div>
 {% endif %}

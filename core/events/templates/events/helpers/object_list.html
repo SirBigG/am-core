@@ -1,24 +1,28 @@
 {% load post_extras %}
-
 {% for event in object_list %}
-<div class="row">
-    <div class="card mb-3">
-        <div class="row no-gutters">
-            <div class="col-md-4 col-12">
-                <img src="{%thumbnail event 350 280 %}" alt="{{event.title}}" class="card-img">
-            </div>
-            <div class="col-md-8">
-                <div class="card-body">
-                    <a href="{{ event.get_absolute_url }}" class="no-decoration">
-                        <h2 class="card-title text-success text-center h4">{{ event.title }}</h2>
-                    </a>
-                    <div class="card-text">{{ event.text|striptags|safe|truncatechars:200 }}</div>
-                    <div class="text-right mt-3">
-                        <a class="text-success stretched-link no-decoration" href="{{ event.get_absolute_url }}">Докладніше</a>
+    <div class="row">
+        <div class="card mb-3">
+            <div class="row no-gutters">
+                <div class="col-md-4 col-12">
+                    <img src="{% thumbnail event 350 280 'poster' %}"
+                         alt="{{ event.title }}"
+                         class="card-img"
+                         width="350"
+                         height="280">
+                </div>
+                <div class="col-md-8">
+                    <div class="card-body">
+                        <a href="{{ event.get_absolute_url }}" class="no-decoration">
+                            <h2 class="card-title text-success text-center h4">{{ event.title }}</h2>
+                        </a>
+                        <div class="card-text">{{ event.text|striptags|safe|truncatechars:200 }}</div>
+                        <div class="text-right mt-3">
+                            <a class="text-success stretched-link no-decoration"
+                               href="{{ event.get_absolute_url }}">Докладніше</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endfor %}
