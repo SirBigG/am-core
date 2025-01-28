@@ -1,24 +1,27 @@
 {% extends "pro_auth/profile/profile_base.html" %}
-
 {% block profile_content %}
     <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
         <h1 class="text-success">{{ object.title }}</h1>
-        <a class="btn btn-success btn-sm text-white"
-           href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}"><i class="fas fa-plus"></i> Додати</a>
     </div>
     {{ object.description|safe }}
-    <section id=timeline>
+    <div class="d-flex justify-content-center">
+        <a class="btn btn-success btn-sm text-white rounded-circle d-flex align-items-center justify-content-center add-diary-item-btn"
+           href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}">
+            <i class="fas fa-plus"></i>
+        </a>
+    </div>
+    <section id="timeline">
         {% for item in object.diary_items.all %}
             <article>
                 <div class="inner">
-      <span class="date">
-        <span class="day">{{ item.date|date:'d' }}</span>
-        <span class="month">{{ item.date|date:'M' }}</span>
-        <span class="year">{{ item.date|date:'Y' }}</span>
-      </span>
+                    <span class="date">
+                        <span class="day">{{ item.date|date:'d' }}</span>
+                        <span class="month">{{ item.date|date:'M' }}</span>
+                        <span class="year">{{ item.date|date:'Y' }}</span>
+                    </span>
                     <h2 class="{% cycle 'step1' 'step2' 'step3' 'step4' 'step5' %}"></h2>
                     {{ item.description|safe }}
-                    <img src="{{ item.image.url }}" alt="Graphic" width="100%">
+                    {% if item.image %}<img src="{{ item.image.url }}" alt="Graphic" width="350" height="250">{% endif %}
                 </div>
             </article>
         {% endfor %}
@@ -154,5 +157,10 @@
         section#timeline article div.inner h2.step5, section#timeline article div.inner h2.step5:after {
             background: #9b59b6;
         }
+
+        .add-diary-item-btn {
+            width: 70px;
+            height: 70px;
+        }
     </style>
-{% endblock %}
+{% endblock profile_content %}

@@ -53,6 +53,13 @@
                     {#                        <h6 class="mb-0 text-success"><i class="fab fa-microblog"></i></h6>#}
                     {#                        <span class="text-secondary">Блог</span>#}
                     {#                    </li>#}
+                    <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
+                       href="{% url 'pro_auth:profile-diary-list' %}">
+                        <h6 class="mb-0 text-success">
+                            <i class="fas fa-bullhorn"></i>
+                        </h6>
+                        <span class="text-secondary">Щоденники</span>
+                    </a>
                 </ul>
             </div>
         </div>

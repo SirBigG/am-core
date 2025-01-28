@@ -14,7 +14,7 @@ class Diary(models.Model):
     user = models.ForeignKey("pro_auth.User", on_delete=models.SET_NULL, null=True)
     title = models.CharField(max_length=255, verbose_name="Заголовок")
     description = RichTextField(verbose_name="Короткий опис")
-    public = models.BooleanField(default=True, verbose_name="Хочу щоб бачили всі")
+    public = models.BooleanField(default=False, verbose_name="Хочу щоб бачили всі")
     created = models.DateTimeField(auto_now_add=True)
 
     def get_profile_absolute_url(self):
@@ -27,7 +27,7 @@ class Diary(models.Model):
 class DiaryItem(models.Model):
     diary = models.ForeignKey(Diary, on_delete=models.CASCADE, related_name="diary_items")
     description = RichTextField(verbose_name="Опис")
-    image = models.ImageField(upload_to="diaries/images", verbose_name="Фото")
+    image = models.ImageField(upload_to="diaries/images", verbose_name="Фото", null=True, blank=True)
     date = models.DateField(default=date.today, verbose_name="Дата")
     created = models.DateTimeField(auto_now_add=True)
 
