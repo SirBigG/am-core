@@ -1,46 +1,65 @@
 {% extends "base.html" %}
-
-{% load post_extras static static_push cache registry_extras %}
-
+{% load post_extras static cache registry_extras %}
 {% block scripts %}
     <script async src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
-{% block title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}{% endif %}{% endblock title %}
-{% block page_title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}{% endif %}{% endblock page_title %}
-{% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }}{% endif %}{% endblock %}
-
+{% block title %}
+    {% if category.meta %}
+        {{ category.meta.title }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock title %}
+{% block page_title %}
+    {% if category.meta %}
+        {{ category.meta.title }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock page_title %}
+{% block meta_description %}
+    {% if category.meta %}
+        {{ category.meta.description }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock meta_description %}
 {% block breadcrumbs %}
     {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
-        {% registry_breadcrumbs category %}
-    {% endcache %}
-{% endblock %}
-
+    {% registry_breadcrumbs category %}
+{% endcache %}
+{% endblock breadcrumbs %}
 {% block extra_meta %}
 {% endblock extra_meta %}
-
 {% block content %}
     {% if category.meta and category.meta.text %}
         <div class="col-lg-12 col-12">
-            <div class="text-justify">
-                {{ category.meta.text|safe }}
-            </div>
+            <div class="text-justify">{{ category.meta.text|safe }}</div>
         </div>
     {% endif %}
-
     {% for group in posts|group_by:2 %}
         <div class="row">
             {% for key, list in group %}
                 <div class="col-md-6 col-12 mt-3">
                     <p class="text-secondary h3">{{ key }}</p>
                     <ul class="list-unstyled">
-                    {% for post in list %}
-                        <li class="m-2">{% if post.publication__absolute_url %}<a class="list-link no-decoration" href="{{ post.publication__absolute_url }}">{{ post.title }}</a>{% else %}{{ post.title }}{% endif %}
-                        {% if post.original_country__short_slug %}{% with 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' as flag_static %}
-        <object type="image/svg+xml" data="{% static_push flag_static %}" height="10px"
-                width="15px" aria-label="{{ post.title }}">{{ post.title }}</object>{% endwith %}{% endif %}</li>
-                    {% endfor %}
+                        {% for post in list %}
+                            <li class="m-2">
+                                {% if post.publication__absolute_url %}
+                                    <a class="list-link no-decoration"
+                                       href="{{ post.publication__absolute_url }}">{{ post.title }}</a>
+                                {% else %}
+                                    {{ post.title }}
+                                {% endif %}
+                                {% if post.original_country__short_slug %}
+                                    <img alt="{{ post.title }}"
+                                         src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
+                                         height="10px"
+                                         width="15px" />
+                                {% endif %}
+                            </li>
+                        {% endfor %}
                     </ul>
                 </div>
             {% endfor %}

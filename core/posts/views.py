@@ -5,6 +5,7 @@ from itertools import groupby
 from dal import autocomplete
 from django.conf import settings
 from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.core.cache import cache
 from django.db.models import F
 from django.http import Http404, HttpResponseGone, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
@@ -55,15 +56,41 @@ class ParentRubricView(TemplateView):
 class PostListView(TemplateView):
     template_name = "posts/list_order.html"
 
+    def _get_post_countries(self, rubric_id):
+        countries = cache.get(f"post_countries_{rubric_id}")
+        if not countries:
+            countries = (
+                Post.objects.filter(country__isnull=False, rubric_id=rubric_id)
+                .values_list("country__slug", "country__value")
+                .distinct()
+            )
+            countries = dict(countries)
+            cache.set("post_countries", countries, 3600)
+        return countries
+
+    def _filter_posts(self, posts):
+        if self.request.GET.get("country"):
+            posts = posts.filter(country__slug=self.request.GET.get("country"))
+        return posts
+
     def get_context_data(self, **kwargs):
         category = Category.objects.select_related("meta").filter(slug=self.kwargs["child"]).first()
         if category is None:
             raise Http404
-        posts = Post.objects.filter(rubric_id=category.id).values("title", "absolute_url").active()
+        posts = (
+            Post.objects.filter(rubric_id=category.id).values("title", "absolute_url", "country__short_slug").active()
+        )
+        posts = self._filter_posts(posts)
         posts = [
             [key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]), key=lambda x: x["title"][0])
         ]
-        return {"posts": posts, "category": category, "view": self, "request": self.request}
+        return {
+            "posts": posts,
+            "category": category,
+            "view": self,
+            "request": self.request,
+            "countries": self._get_post_countries(category.id),
+        }
 
 
 class PostList(ListView):

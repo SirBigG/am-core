@@ -1,4 +1,4 @@
-{% load post_extras static_push %}
+{% load post_extras static %}
 {% for post in object_list %}
     <div class="row">
         <div class="card mb-3">
@@ -7,7 +7,9 @@
                     {% if post.photo.first %}
                         <img src="{% thumbnail post.photo.first 350 280 %}"
                              alt="{{ post.rubric.value }} {{ post.title }}"
-                             class="card-img">
+                             width="350"
+                             height="280"
+                             class="card-img" />
                     {% endif %}
                 </div>
                 <div class="col-md-8 col-12">
@@ -15,12 +17,10 @@
                         <h2 class="card-title h4">
                             {{ post.title }}
                             {% if post.country %}
-                                {% with 'posts/flags/'|add:post.country.short_slug|add:'.svg' as flag_static %}
-                                    <object type="image/svg+xml"
-                                            data="{% static_push flag_static %}"
-                                            height="20px"
-                                            width="30px">{{ post.country.value }}</object>
-                                {% endwith %}
+                                <img alt="{{ post.country.value }}"
+                                     src="{% static 'posts/flags/'|add:post.country.short_slug|add:'.svg' %}"
+                                     height="20px"
+                                     width="30px" />
                             {% endif %}
                         </h2>
                         <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>

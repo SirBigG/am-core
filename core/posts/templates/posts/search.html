@@ -13,22 +13,27 @@
     Пошук
 {% endblock page_title %}
 {% block content %}
-    <form class="form-inline"
-          action="{% url 'post-search-list' %}"
-          method="get">
-        <div class="form-group m-2">
-            <input class="form-control form-control-lg"
-                   name="q"
-                   type="text"
-                   placeholder="Текст пошуку">
-        </div>
-        <button type="submit" class="btn btn-bg btn-success m-2">
-            <i class="icon-search"></i>
-        </button>
-    </form>
+    <div class="row">
+        <form class="form-inline m-0 p-0 pb-3"
+              action="{% url 'post-search-list' %}"
+              method="get">
+            <div class="form-group m-2">
+                <div class="input-group">
+                    <input class="form-control form-control-lg"
+                           name="q"
+                           type="text"
+                           value="{{ request.GET.q|default_if_none:'' }}"
+                           placeholder="Текст пошуку" />
+                    <button type="submit" class="btn btn-lg btn-success">
+                        <i class="icon-search"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
     {% if object_list %}
         {% include "posts/helpers/object_list.html" %}
-    {% else %}
+    {% elif request.GET.q %}
         <p class="text-warning">
             Напишіть <a href="{% url 'feedback-form' %}">нам</a> і ми додаму інформацію найближчим часом.
         </p>

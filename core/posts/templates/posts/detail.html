@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load static_push cache post_extras comment_tags static companies_extras registry_extras %}
+{% load cache post_extras comment_tags static companies_extras registry_extras %}
 {% block title %}
     {% if object.meta %}
         {{ object.meta.title }}
@@ -13,11 +13,11 @@
     {% else %}
         {{ object.text|striptags|truncatechars:160 }}
     {% endif %}
-{% endblock %}
+{% endblock meta_description %}
 {% block scripts %}
     <script src="{% static "posts/j-detail.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
-{% endblock %}
+{% endblock scripts %}
 {% block extra_meta %}
     <script type="application/ld+json">
         {
@@ -38,16 +38,16 @@
         }
     }
     </script>
-    <meta content="{% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
+    <meta content=" {% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
           property="og:title">
-    <meta content="{% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
+    <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="og:description">
     <meta content="{{ main_photo_full_url }}" property="og:image">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
     <meta content="{{ object.title }}" property="twitter:title">
-    <meta content="{% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
+    <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
           property="twitter:description">
     <meta content="{{ main_photo_full_url }}" property="twitter:image">
     <meta content="{{ object.title }}" property="twitter:image:alt">
@@ -66,20 +66,17 @@
         {{ object.title }}
     {% endif %}
     {% if object.country %}
-        {% with 'posts/flags/'|add:object.country.short_slug|add:'.svg' as flag_static %}
-            <object type="image/svg+xml"
-                    data="{% static_push flag_static %}"
-                    height="25px"
-                    width="35px"
-                    aria-label="{{ object.country.value }}">{{ object.country.value }}</object>
-        {% endwith %}
+        <img alt="{{ object.country.value }}"
+             src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"
+             height="25px"
+             width="35px" />
     {% endif %}
-{% endblock %}
+{% endblock page_title %}
 {% block breadcrumbs %}
     {#    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}#}
     {% breadcrumbs category object.title %}
     {#    {% endcache %}#}
-{% endblock %}
+{% endblock breadcrumbs %}
 {% block content %}
     <div class="post-content">
         <div class="row">
@@ -92,12 +89,12 @@
                              src="{% thumbnail main_photo_object 1520 800 %}"
                              class="card-img img-fluid" />
                         <div class="card-body text-end m-1">
-                            <a href="/gallery/add/{{ object.id }}/"
+                            <a href="{% url 'add-photo' object.id %}"
                                class="btn btn-success btn-circle btn-circle-sm mr-2"
                                aria-label="Додати фото до публікації"
                                rel="nofollow"><i class="icon-plus"></i></a>
                             {% if photo_count > 1 %}
-                                <a href="/gallery/{{ object.id }}/"
+                                <a href="{% url 'gallery' object.id %}"
                                    class="btn btn-primary btn-circle btn-circle-sm"
                                    aria-label="Більше фото"
                                    rel="nofollow"><i class="icon-eye"></i></a>
@@ -116,11 +113,13 @@
                     {% if object.sources %}
                         <span>Джерела:</span>
                         <ul>
+                            {# djlint:off #}
                             {% for source in object.sources %}
                                 <li style="overflow-y: auto;">
                                     <span class="text-secondary small">{{ source }}</span>
                                 </li>
                             {% endfor %}
+                            {# djlint:on #}
                         </ul>
                     {% endif %}
                     <p class="m-0">
