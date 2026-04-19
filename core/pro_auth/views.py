@@ -1,34 +1,82 @@
 from django.contrib.auth import login, logout
 from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, FormView, ListView, UpdateView, View
+from django.views.generic import DetailView, FormView, ListView, TemplateView, UpdateView, View
 
 from core.adverts.forms import AdvertForm
 from core.adverts.models import Advert
 from core.diary.forms import DiaryForm, DiaryItemForm
 from core.diary.models import Diary, DiaryItem
 from core.diary.recommendations import PlantRecommendationService
-from core.pro_auth.forms import LoginForm, UserChangeForm
+from core.pro_auth.forms import LoginForm, RegistrationForm, UserChangeForm
 
 
-class Login(FormView):
-    form_class = LoginForm
+class Login(TemplateView):
     template_name = "pro_auth/login.html"
     success_url = "/"
 
-    def form_valid(self, form):
-        user = form.get_user()
-        login(self.request, user)
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        default_tab = "register" if self.request.resolver_match.url_name == "register" else "login"
+        context.setdefault("login_form", kwargs.get("login_form") or LoginForm(request=self.request))
+        context.setdefault("register_form", kwargs.get("register_form") or RegistrationForm())
+        context.setdefault("active_tab", kwargs.get("active_tab", default_tab))
+        return context
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action", "login")
+        if action == "register":
+            return self.handle_register()
+        return self.handle_login()
+
+    def handle_login(self):
+        login_form = LoginForm(request=self.request, data=self.request.POST)
+        register_form = RegistrationForm()
+        if login_form.is_valid():
+            login(self.request, login_form.get_user())
+            return redirect(self.get_success_url())
+        context = self.get_context_data(
+            login_form=login_form,
+            register_form=register_form,
+            active_tab="login",
+        )
+        return self.render_to_response(context)
+
+    def handle_register(self):
+        register_form = RegistrationForm(self.request.POST)
+        login_form = LoginForm(request=self.request)
+        if register_form.is_valid():
+            user = register_form.save()
+            login(self.request, user, backend="core.pro_auth.backends.AuthBackend")
+            return redirect(self.get_success_url())
+        context = self.get_context_data(
+            login_form=login_form,
+            register_form=register_form,
+            active_tab="register",
+        )
+        return self.render_to_response(context)
+
+    def get_success_url(self):
+        return self.request.POST.get("next") or self.request.GET.get("next") or self.success_url
 
 
-class SocialExistUserLogin(Login):
+class SocialExistUserLogin(FormView):
+    form_class = LoginForm
+    template_name = "pro_auth/login.html"
+
     def form_valid(self, form):
         self.request.session["user_pk"] = form.get_user().pk
         return HttpResponseRedirect(reverse("social:complete", args=(self.kwargs.get("backend_name"),)))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("login_form", context.get("form"))
+        context.setdefault("register_form", RegistrationForm())
+        context.setdefault("active_tab", "login")
+        return context
 
 
 class Logout(View):

@@ -1,27 +1,41 @@
-from django.test import TestCase
 from django.contrib.auth.forms import AuthenticationForm
-from django.conf import settings
+from django.test import TestCase
 from django.urls import reverse
 
+from core.pro_auth.forms import RegistrationForm
 from core.utils.tests.factories import UserFactory
 
 
 class AuthTests(TestCase):
-
     def setUp(self):
         self.user = UserFactory()
 
     def test_login(self):
-        response = self.client.post('/login/', data={'username': self.user.email,
-                                                'password': '12345'})
+        response = self.client.post("/login/", data={"username": self.user.email, "password": "12345"})
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/')
-        response = self.client.get('/login/')
-        context_data = response.context_data
+        self.assertEqual(response["location"], "/")
+        response = self.client.get("/login/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pro_auth/login.html')
-        self.assertTrue(context_data['view'].request.user.is_authenticated)
-        self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
+        self.assertTemplateUsed(response, "pro_auth/login.html")
+        self.assertIn("login_form", response.context)
+        self.assertIn("register_form", response.context)
+        self.assertTrue(isinstance(response.context["login_form"], AuthenticationForm))
+        self.assertTrue(isinstance(response.context["register_form"], RegistrationForm))
+
+    def test_register(self):
+        response = self.client.post(
+            "/login/",
+            data={
+                "action": "register",
+                "email": "brand-new@test.com",
+                "password1": "12345",
+                "password2": "12345",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["location"], "/")
+        response = self.client.get("/")
+        self.assertTrue(response.context["request"].user.is_authenticated)
 
     # def test_login_ajax(self):
     #     response = self.client.post('/login/', data={'username': self.user.email,
@@ -38,13 +52,13 @@ class AuthTests(TestCase):
     #     self.assertTrue(isinstance(context_data['form'], AuthenticationForm))
 
     def test_logout(self):
-        self.client.login(username=self.user.email, password='12345')
-        response = self.client.get('/', {'user': self.user})
+        self.client.login(username=self.user.email, password="12345")
+        response = self.client.get("/", {"user": self.user})
         self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context['request'].user.is_authenticated)
-        response = self.client.get('/logout/')
+        self.assertTrue(response.context["request"].user.is_authenticated)
+        response = self.client.get("/logout/")
         self.assertEqual(response.status_code, 302)
-        response = self.client.get('/')
+        response = self.client.get("/")
         self.assertEqual(response.status_code, 200)
 
 
@@ -64,37 +78,39 @@ class AuthTests(TestCase):
 
 class IsAuthenticateTests(TestCase):
     def test_404(self):
-        response = self.client.get('/is-authenticate/')
+        response = self.client.get("/is-authenticate/")
         self.assertEqual(response.status_code, 404)
 
     def test_no_authenticate(self):
-        response = self.client.get('/is-authenticate/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        response = self.client.get("/is-authenticate/", HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get('is_authenticate'), 0)
+        self.assertEqual(response.json().get("is_authenticate"), 0)
 
     def test_authenticate(self):
         user = UserFactory()
-        user.set_password('12345')
+        user.set_password("12345")
         user.save()
-        self.client.login(username=user.email, password='12345')
-        response = self.client.get('/is-authenticate/', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        self.client.login(username=user.email, password="12345")
+        response = self.client.get("/is-authenticate/", HTTP_X_REQUESTED_WITH="XMLHttpRequest")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json().get('is_authenticate'), 1)
+        self.assertEqual(response.json().get("is_authenticate"), 1)
 
 
 class SocialExistUserLoginViewTests(TestCase):
     def test_get(self):
-        response = self.client.post('/register/social/vk-oauth2/login/')
+        response = self.client.post("/register/social/vk-oauth2/login/")
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pro_auth/login.html')
+        self.assertTemplateUsed(response, "pro_auth/login.html")
+        self.assertIn("login_form", response.context)
+        self.assertIn("register_form", response.context)
 
     def test_valid_data(self):
-        _user = UserFactory(email='test@test.com')
-        _user.set_password('11111')
+        _user = UserFactory(email="test@test.com")
+        _user.set_password("11111")
         _user.save()
-        data = {'username': 'test@test.com', 'password': '11111'}
-        response = self.client.post('/register/social/vk-oauth2/login/', data=data)
+        data = {"username": "test@test.com", "password": "11111"}
+        response = self.client.post("/register/social/vk-oauth2/login/", data=data)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], reverse('social:complete', args=('vk-oauth2',)))
+        self.assertEqual(response["location"], reverse("social:complete", args=("vk-oauth2",)))
         session = self.client.session
-        self.assertIsNotNone(session.get('user_pk'))
+        self.assertIsNotNone(session.get("user_pk"))

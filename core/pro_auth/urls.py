@@ -73,6 +73,7 @@ urlpatterns = [
     ),
     path("profile/adverts", login_required(ProfileAdvertListView.as_view()), name="profile-adverts"),
     path("login/", Login.as_view(), name="login"),
+    path("register/", Login.as_view(), name="register"),
     path("logout/", Logout.as_view(), name="logout"),
     path("is-authenticate/", IsAuthenticate.as_view(), name="is_authenticate"),
 ]
