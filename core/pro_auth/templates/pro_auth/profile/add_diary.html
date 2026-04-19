@@ -4,27 +4,51 @@
 
 
 {% block profile_content %}
-    <h1 class="text-success">Додати щоденник</h1>
-    <form method="post" action="{% url 'pro_auth:profile-diary-add' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                <div class="col-12">
-                    <label>{{ field.label }}</label>
+    <div class="profile-page-panel profile-form-panel">
+            <h1 class="profile-page-title">Додати рослину</h1>
+            <p class="profile-page-lead">Створи картку рослини, щоб зберігати нотатки, дати й подальші зміни в одному місці.</p>
+            <form method="post" action="{% url 'pro_auth:profile-diary-add' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="profile-form-row">
+                    {% for field in form %}
+                        {% if field.name == "plant_type" or field.name == "plant_date" %}
+                            <div class="profile-form-group">
+                                <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="profile-form-field">
+                                    {{ field }}
+                                </div>
+                                {% for error in field.errors %}
+                                    <p class="profile-form-error">{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
-                {% for error in field.errors %}
-                    <div class="col-12">
-                        <p class="text-danger">{{ error }}</p>
-                    </div>
+
+                {% for field in form %}
+                    {% if field.name != "plant_type" and field.name != "plant_date" %}
+                        <div class="profile-form-group">
+                            {% if field.name == "public" %}
+                                <div class="profile-form-check">
+                                    {{ field }}
+                                    <label class="profile-form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                </div>
+                            {% else %}
+                                <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                                <div class="profile-form-field">
+                                    {{ field }}
+                                </div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                                <p class="profile-form-error">{{ error }}</p>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
                 {% endfor %}
-                <div class="col-12">
-                    {{ field }}
+                <div class="profile-form-actions">
+                    <button type="submit" class="btn btn-success w-100">Додати рослину</button>
                 </div>
-            </div>
-        {% endfor %}
-        <div class="col-12">
-            <button type="submit" class="btn btn-success mb-3">Додати</button>
-        </div>
-    </form>
+            </form>
+    </div>
     {{ form.media }}
 {% endblock %}

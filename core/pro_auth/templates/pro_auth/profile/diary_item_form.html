@@ -1,0 +1,49 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+
+{% load post_extras %}
+
+
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <h1 class="profile-page-title">
+            {% if is_edit_mode %}
+                Змінити дію
+            {% else %}
+                Додати дію
+            {% endif %}
+        </h1>
+        <p class="profile-page-lead">
+            {% if is_edit_mode %}
+                Онови дію, щоб виправити текст, дату, швидку дію або додати фото.
+            {% else %}
+                Зафіксуй подію, щоб у стрічці рослини зберігалися дата, нотатки й фото.
+            {% endif %}
+        </p>
+        <form method="post"
+              action="{% if is_edit_mode %}{% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %}{% else %}{% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %}{% endif %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="profile-form-group">
+                    <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="profile-form-field">
+                        {{ field }}
+                    </div>
+                    {% for error in field.errors %}
+                        <p class="profile-form-error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+            <div class="profile-form-actions">
+                <button type="submit" class="btn btn-success">
+                    {% if is_edit_mode %}
+                        Зберегти зміни
+                    {% else %}
+                        Додати дію
+                    {% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+    {{ form.media }}
+{% endblock %}

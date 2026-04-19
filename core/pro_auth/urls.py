@@ -9,6 +9,8 @@ from core.pro_auth.views import (
     AdvertDeactivateView,
     AdvertDeleteView,
     ChangeProfileView,
+    DiaryDeleteView,
+    DiaryItemDeleteView,
     IsAuthenticate,
     Login,
     Logout,
@@ -17,6 +19,7 @@ from core.pro_auth.views import (
     ProfileDiaryDetailView,
     ProfileDiaryListView,
     SocialExistUserLogin,
+    UpdateDiaryItemView,
     UpdateProfileAdvertsDateView,
     UpdateProfileAdvertsView,
     UpdateProfileDiaryView,
@@ -36,7 +39,18 @@ urlpatterns = [
         login_required(AddDiaryItemView.as_view()),
         name="profile-diary-item-add",
     ),
+    path(
+        "profile/diary/item/<int:pk>/delete/",
+        login_required(DiaryItemDeleteView.as_view()),
+        name="profile-diary-item-delete",
+    ),
+    path(
+        "profile/diary/item/<int:pk>/update/",
+        login_required(UpdateDiaryItemView.as_view()),
+        name="profile-diary-item-update",
+    ),
     path("profile/diary/<int:pk>", login_required(ProfileDiaryDetailView.as_view()), name="profile-diary-detail"),
+    path("profile/diary/<int:pk>/delete/", login_required(DiaryDeleteView.as_view()), name="profile-diary-delete"),
     path(
         "profile/diary/update/<int:pk>", login_required(UpdateProfileDiaryView.as_view()), name="profile-diary-update"
     ),

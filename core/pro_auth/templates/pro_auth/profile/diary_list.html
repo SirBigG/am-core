@@ -1,18 +1,150 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 
 {% block profile_content %}
-    <div class="d-flex justify-content-between justify-content-center align-items-center mb-1">
-    <h1 class="text-success">Мої щоденники</h1>
-    <a class="btn btn-success btn-sm text-white" href="{% url 'pro_auth:profile-diary-add' %}"><i class="fas fa-plus"></i> Додати</a>
-    </div>
-    <div class="row">
-    {% for object in object_list %}
-        <div class="col-12">
-    <div class="d-flex justify-content-between align-items-center mb-1">
-                <a href="{% url 'pro_auth:profile-diary-detail' pk=object.id %}">{{ object.title }}</a><a class="btn btn-warning btn-sm" href="{% url 'pro_auth:profile-diary-update' pk=object.id %}"><i class="fas fa-pencil-alt text-white"></i></a>
-            </div>
-        {{ object.description|safe }}
+    <div class="profile-diary-wrap">
+        <div class="d-flex justify-content-between justify-content-center align-items-center mb-3">
+        <h1 class="text-success">Мій город🌱</h1>
+        <a class="btn dashed-btn"
+           href="{% url 'pro_auth:profile-diary-add' %}">+Додати рослину</a>
         </div>
-    {% endfor %}
+        <div>
+        {% for object in object_list %}
+                <article class="card w-100 border rounded-4 shadow-sm profile-diary-card mb-4">
+                    <div class="card-body p-3 text-start">
+                        <div class="d-flex flex-column flex-grow-1">
+                            <a class="profile-diary-card-title stretched-link mb-1 d-inline-flex align-items-center gap-3"
+                               href="{% url 'pro_auth:profile-diary-detail' pk=object.id %}">
+                                <span class="profile-diary-card-icon" aria-hidden="true">{{ object.plant_emoji }}</span>
+                                <span>
+                                    {% if object.plant_type %}
+                                        {{ object.get_plant_type_display }} - {{ object.title }}
+                                    {% else %}
+                                        {{ object.title }}
+                                    {% endif %}
+                                </span>
+                            </a>
+                            <div class="profile-diary-card-meta">Додано: {{ object.plant_date|date:"d.m.Y" }}</div>
+                            <div class="profile-diary-card-subtitle">{{ object.description|safe }}</div>
+                            <div class="mt-3 d-flex gap-2 flex-wrap justify-content-center profile-diary-card-actions">
+                                <a class="btn edit-soft-btn"
+                                   href="{% url 'pro_auth:profile-diary-update' pk=object.id %}">
+                                    <span class="edit-soft-btn__icon" aria-hidden="true">✏️</span>
+                                    <span class="edit-soft-btn__label">Змінити</span>
+                                </a>
+                                <a class="btn delete-soft-btn"
+                                   href="{% url 'pro_auth:profile-diary-delete' pk=object.id %}">
+                                    <span class="delete-soft-btn__icon" aria-hidden="true">🗑️</span>
+                                    <span class="delete-soft-btn__label">Видалити</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+        {% empty %}
+                <div class="profile-diary-empty-garden">
+                    <div class="profile-diary-empty-garden__icon" aria-hidden="true">🌱</div>
+                    <h2 class="profile-diary-empty-garden__title">Додай першу рослину та почни відстежувати її розвиток</h2>
+                </div>
+        {% endfor %}
+        </div>
     </div>
+    <div class="profile-confirm-backdrop" id="diaryDeleteConfirm" aria-hidden="true">
+        <div class="profile-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="diaryDeleteConfirmTitle">
+            <h2 class="profile-confirm-title" id="diaryDeleteConfirmTitle">Підтвердження видалення</h2>
+            <p class="profile-confirm-text">Ви видаляєте картку і всю історію вашої рослинки. Ви впевнені?</p>
+            <div class="profile-confirm-actions">
+                <button type="button" class="btn profile-confirm-cancel" data-confirm-cancel>Ні</button>
+                <button type="button" class="btn btn-danger profile-confirm-submit" data-confirm-submit>Так</button>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const deleteLinks = document.querySelectorAll(".delete-soft-btn");
+            const modal = document.getElementById("diaryDeleteConfirm");
+            const confirmButton = modal ? modal.querySelector("[data-confirm-submit]") : null;
+            const cancelButton = modal ? modal.querySelector("[data-confirm-cancel]") : null;
+            let pendingDelete = null;
+
+            function closeModal() {
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.remove("is-open");
+                modal.setAttribute("aria-hidden", "true");
+                pendingDelete = null;
+            }
+
+            function openModal(card, targetUrl) {
+                if (!modal) {
+                    return;
+                }
+
+                pendingDelete = {card: card, targetUrl: targetUrl};
+                modal.classList.add("is-open");
+                modal.setAttribute("aria-hidden", "false");
+
+                if (confirmButton) {
+                    confirmButton.focus();
+                }
+            }
+
+            deleteLinks.forEach(function (link) {
+                link.addEventListener("click", function (event) {
+                    event.preventDefault();
+
+                    const card = link.closest(".profile-diary-card");
+                    const targetUrl = link.getAttribute("href");
+
+                    if (!card || !targetUrl || card.classList.contains("is-deleting")) {
+                        return;
+                    }
+
+                    openModal(card, targetUrl);
+                });
+            });
+
+            if (cancelButton) {
+                cancelButton.addEventListener("click", closeModal);
+            }
+
+            if (modal) {
+                modal.addEventListener("click", function (event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+
+            if (confirmButton) {
+                confirmButton.addEventListener("click", function () {
+                    if (!pendingDelete || !pendingDelete.card || !pendingDelete.targetUrl) {
+                        closeModal();
+                        return;
+                    }
+
+                    const card = pendingDelete.card;
+                    const targetUrl = pendingDelete.targetUrl;
+
+                    card.classList.add("is-deleting");
+                    closeModal();
+
+                    window.setTimeout(function () {
+                        window.location.href = targetUrl;
+                    }, 320);
+                });
+            }
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "Escape" && modal && modal.classList.contains("is-open")) {
+                    closeModal();
+                }
+            });
+        });
+    </script>
 {% endblock %}

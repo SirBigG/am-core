@@ -1,4 +1,5 @@
 from django.contrib.auth import login, logout
+from django.db.models import Prefetch
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -8,7 +9,8 @@ from django.views.generic import DetailView, FormView, ListView, UpdateView, Vie
 from core.adverts.forms import AdvertForm
 from core.adverts.models import Advert
 from core.diary.forms import DiaryForm, DiaryItemForm
-from core.diary.models import Diary
+from core.diary.models import Diary, DiaryItem
+from core.diary.recommendations import PlantRecommendationService
 from core.pro_auth.forms import LoginForm, UserChangeForm
 
 
@@ -88,9 +90,46 @@ class ProfileDiaryListView(ListView):
 class ProfileDiaryDetailView(DetailView):
     model = Diary
     template_name = "pro_auth/profile/diary_detail.html"
+    recommendation_service = PlantRecommendationService()
 
     def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
+        return Diary.objects.filter(user=self.request.user).prefetch_related(
+            Prefetch("diary_items", queryset=DiaryItem.objects.all())
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        diary_items = list(self.object.diary_items.all())
+        latest_item = diary_items[0] if diary_items else None
+
+        context["diary_items"] = diary_items
+        context["recommendation"] = None
+
+        if latest_item:
+            fallback_recommendation = self.recommendation_service.generate(
+                plant_name=self.object.title,
+                plant_date=self.object.plant_date,
+                action_type=latest_item.action_type,
+                note=latest_item.description,
+                last_actions=[
+                    {
+                        "action_type": item.action_type,
+                        "date": item.date.isoformat(),
+                        "has_photo": bool(item.image),
+                    }
+                    for item in diary_items[:5]
+                ],
+                has_photo=bool(latest_item.image),
+                use_ai=False,
+            )
+            context["recommendation"] = self.recommendation_service.build_cached_recommendation(
+                self.request,
+                diary_id=self.object.id,
+                item_id=latest_item.id,
+                fallback_recommendation=fallback_recommendation,
+            )
+
+        return context
 
 
 class UpdateProfileDiaryView(UpdateView):
@@ -115,7 +154,8 @@ class UpdateProfileDiaryView(UpdateView):
 
 class AddDiaryItemView(FormView):
     form_class = DiaryItemForm
-    template_name = "pro_auth/profile/add_diary_item.html"
+    template_name = "pro_auth/profile/diary_item_form.html"
+    recommendation_service = PlantRecommendationService()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -129,7 +169,78 @@ class AddDiaryItemView(FormView):
 
     def form_valid(self, form):
         form.save()
+        diary = form.instance.diary
+        diary_items = list(diary.diary_items.all())
+
+        recommendation = self.recommendation_service.generate(
+            plant_name=diary.title,
+            plant_date=diary.plant_date,
+            action_type=form.instance.action_type,
+            note=form.instance.description,
+            last_actions=[
+                {
+                    "action_type": item.action_type,
+                    "date": item.date.isoformat(),
+                    "has_photo": bool(item.image),
+                }
+                for item in diary_items[:5]
+            ],
+            has_photo=bool(form.instance.image),
+            use_ai=True,
+        )
+        self.recommendation_service.cache_recommendation(
+            self.request,
+            diary_id=diary.id,
+            item_id=form.instance.id,
+            recommendation=recommendation,
+        )
         return HttpResponseRedirect(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.kwargs["diary_id"]}))
+
+
+class UpdateDiaryItemView(UpdateView):
+    form_class = DiaryItemForm
+    template_name = "pro_auth/profile/diary_item_form.html"
+    recommendation_service = PlantRecommendationService()
+
+    def get_queryset(self):
+        return DiaryItem.objects.filter(diary__user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["diary"] = self.object.diary
+        context["is_edit_mode"] = True
+        return context
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["diary"] = self.get_object().diary
+        return kwargs
+
+    def form_valid(self, form):
+        form.save()
+        self.recommendation_service.clear_cached_recommendation(self.request, diary_id=self.object.diary_id)
+        return HttpResponseRedirect(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.object.diary_id}))
+
+
+class DiaryDeleteView(View):
+    recommendation_service = PlantRecommendationService()
+
+    def get(self, request, pk):
+        diary = get_object_or_404(Diary, pk=pk, user=request.user)
+        self.recommendation_service.clear_cached_recommendation(request, diary_id=diary.id)
+        diary.delete()
+        return HttpResponseRedirect(reverse("pro_auth:profile-diary-list"))
+
+
+class DiaryItemDeleteView(View):
+    recommendation_service = PlantRecommendationService()
+
+    def get(self, request, pk):
+        diary_item = get_object_or_404(DiaryItem, pk=pk, diary__user=request.user)
+        diary_pk = diary_item.diary_id
+        self.recommendation_service.clear_cached_recommendation(request, diary_id=diary_pk)
+        diary_item.delete()
+        return HttpResponseRedirect(reverse("pro_auth:profile-diary-detail", kwargs={"pk": diary_pk}))
 
 
 class ProfileAdvertListView(ListView):
