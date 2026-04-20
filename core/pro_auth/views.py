@@ -130,6 +130,7 @@ class AddDiaryView(FormView):
 class ProfileDiaryListView(ListView):
     template_name = "pro_auth/profile/diary_list.html"
     model = Diary
+    ordering = "-created"
 
     def get_queryset(self):
         return Diary.objects.filter(user=self.request.user)

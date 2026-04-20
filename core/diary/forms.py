@@ -1,9 +1,8 @@
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.forms import ModelForm
 
-from ckeditor.widgets import CKEditorWidget
-
-from .models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, PLANT_TYPE_CHOICES
+from .models import DIARY_ITEM_ACTION_CHOICES, PLANT_TYPE_CHOICES, Diary, DiaryItem
 
 
 class DiaryForm(ModelForm):
@@ -19,12 +18,12 @@ class DiaryForm(ModelForm):
 
     class Meta:
         model = Diary
-        fields = ["title", "description", "public"]
+        fields = ["title", "description"]
 
     def __init__(self, *args, **kwargs):
         self.request = kwargs.pop("request")
         super().__init__(*args, **kwargs)
-        self.order_fields(["plant_type", "plant_date", "title", "description", "public"])
+        self.order_fields(["plant_type", "plant_date", "title", "description"])
         self.fields["description"].widget = CKEditorWidget(config_name="public")
         if not self.is_bound and "plant_type" not in self.initial and self.instance and self.instance.pk:
             self.initial["plant_type"] = self.instance.plant_type
@@ -48,12 +47,6 @@ class DiaryForm(ModelForm):
         self.fields["plant_date"].widget.attrs.update(
             {
                 "class": "profile-form-control",
-            }
-        )
-        self.fields["public"].label = "Показувати всім"
-        self.fields["public"].widget.attrs.update(
-            {
-                "class": "form-check-input",
             }
         )
 
