@@ -1,8 +1,5 @@
 {% extends "pro_auth/profile/profile_base.html" %}
-
 {% load post_extras %}
-
-
 {% block profile_content %}
     <div class="profile-page-panel profile-form-panel">
         <h1 class="profile-page-title">
@@ -26,12 +23,21 @@
             {% for field in form %}
                 <div class="profile-form-group">
                     <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    <div class="profile-form-field">
-                        {{ field }}
-                    </div>
-                    {% for error in field.errors %}
-                        <p class="profile-form-error">{{ error }}</p>
-                    {% endfor %}
+                    {% if field.name == "plants" %}
+                        <div class="profile-event-plant-grid">
+                            {% for choice in field %}
+                                <label class="profile-event-plant-card" for="{{ choice.id_for_label }}">
+                                    {{ choice.tag }}
+                                    <span class="profile-event-plant-card__box" aria-hidden="true"></span>
+                                    <span class="profile-event-plant-card__name">{{ choice.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="profile-form-field">{{ field }}</div>
+                    {% endif %}
+                    {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
                 </div>
             {% endfor %}
             <div class="profile-form-actions">
@@ -46,4 +52,4 @@
         </form>
     </div>
     {{ form.media }}
-{% endblock %}
+{% endblock profile_content %}

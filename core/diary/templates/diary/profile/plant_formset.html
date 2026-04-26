@@ -1,0 +1,77 @@
+<section class="profile-plant-formset" data-plant-formset>
+    <div class="profile-plant-formset__header">
+        <h2 class="profile-page-subtitle">Рослини</h2>
+    </div>
+    {% if plant_formset.non_form_errors %}
+        {% for error in plant_formset.non_form_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    {% endif %}
+    {{ plant_formset.management_form }}
+    <div class="profile-plant-formset__rows" data-plant-form-rows>
+        {% for plant_form in plant_formset %}
+            {% include "diary/profile/plant_formset_row.html" with plant_form=plant_form %}
+        {% endfor %}
+    </div>
+    <button type="button"
+            class="btn dashed-btn profile-plant-formset__add"
+            data-plant-form-add>
+        <span aria-hidden="true">+</span>
+    </button>
+    <template data-plant-form-template>
+        {% include "diary/profile/plant_formset_row.html" with plant_form=plant_formset.empty_form %}
+    </template>
+</section>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const formset = document.querySelector("[data-plant-formset]");
+        if (!formset) {
+            return;
+        }
+
+        const addButton = formset.querySelector("[data-plant-form-add]");
+        const rows = formset.querySelector("[data-plant-form-rows]");
+        const template = formset.querySelector("[data-plant-form-template]");
+        const totalForms = formset.querySelector('[name="plants-TOTAL_FORMS"]');
+
+        function initAutocomplete(row) {
+            if (!window.django || !window.django.jQuery) {
+                return;
+            }
+
+            const $ = window.django.jQuery;
+            $(document).trigger("formset:added", [$(row), "plants"]);
+            $(row).find("[data-autocomplete-light-function]").each(function () {
+                $(this).trigger("autocompleteLightInitialize");
+            });
+        }
+
+        function bindRemove(row) {
+            const removeButton = row.querySelector("[data-plant-form-remove]");
+            const deleteInput = row.querySelector('[name$="-DELETE"]');
+
+            if (!removeButton || !deleteInput) {
+                return;
+            }
+
+            removeButton.addEventListener("click", function () {
+                deleteInput.checked = true;
+                row.hidden = true;
+            });
+        }
+
+        rows.querySelectorAll("[data-plant-form-row]").forEach(bindRemove);
+
+        if (addButton && template && totalForms) {
+            addButton.addEventListener("click", function () {
+                const index = Number(totalForms.value);
+                const html = template.innerHTML.replace(/__prefix__/g, String(index));
+
+                rows.insertAdjacentHTML("beforeend", html);
+                totalForms.value = String(index + 1);
+
+                const row = rows.lastElementChild;
+                bindRemove(row);
+                initAutocomplete(row);
+            });
+        }
+    });
+</script>

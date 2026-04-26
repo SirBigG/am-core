@@ -4,25 +4,56 @@
         <div class="profile-diary-detail-hero">
             <div class="profile-diary-detail-topbar">
                 <div class="profile-diary-detail-heading-wrap">
-                    <a class="profile-diary-detail-back" href="{% url 'pro_auth:profile-diary-list' %}">
+                    <a class="profile-diary-detail-back"
+                       href="{% url 'pro_auth:profile-diary-list' %}">
                         <span aria-hidden="true">←</span>
                         <span>Назад</span>
                     </a>
                     <div class="profile-diary-detail-heading">
-                        <h1 class="profile-diary-detail-title">
-                            {% if object.plant_type %}
-                                {{ object.get_plant_type_display }} - {{ object.title }}
-                            {% else %}
-                                {{ object.title }}
-                            {% endif %}
-                        </h1>
-                        <div class="profile-diary-detail-date">Додано: {{ object.plant_date|date:"d.m.Y" }}</div>
+                        <h1 class="profile-diary-detail-title">{{ object.title }}</h1>
+                        <div class="profile-diary-detail-date">Рослини: {{ object.plant_summary }}</div>
                     </div>
                 </div>
                 <a class="btn btn-success profile-diary-detail-add-btn"
                    href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}">+Додати дію</a>
             </div>
         </div>
+        <form class="profile-diary-filters" method="get">
+            <div class="profile-diary-filters__field profile-form-group">
+                <label class="profile-form-label" for="diaryEventPlantFilter">Рослина</label>
+                <div class="profile-form-field">
+                    <select class="profile-form-control profile-form-select"
+                            id="diaryEventPlantFilter"
+                            name="plant">
+                        <option value="">Всі рослини</option>
+                        {% for plant in diary_plants %}
+                            <option value="{{ plant.id }}"
+                                    {% if selected_plant_id == plant.id|stringformat:"s" %}selected{% endif %}>
+                                {{ plant.display_name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="profile-diary-filters__field profile-form-group">
+                <label class="profile-form-label" for="diaryEventSearch">Пошук</label>
+                <div class="profile-form-field">
+                    <input class="profile-form-control"
+                           id="diaryEventSearch"
+                           name="q"
+                           type="search"
+                           value="{{ event_search_query }}"
+                           placeholder="Пошук у подіях">
+                </div>
+            </div>
+            <div class="profile-diary-filters__actions">
+                <button class="btn btn-success" type="submit">Фільтрувати</button>
+                {% if selected_plant_id or event_search_query %}
+                    <a class="btn edit-soft-btn"
+                       href="{% url 'pro_auth:profile-diary-detail' pk=object.id %}">Скинути</a>
+                {% endif %}
+            </div>
+        </form>
         <div class="profile-diary-detail-layout">
             <section class="profile-diary-entry-list">
                 {% for item in diary_items %}
@@ -43,7 +74,20 @@
                                     <div class="profile-diary-entry-image-wrap">
                                         <img class="profile-diary-entry-image"
                                              src="{{ item.image.url }}"
-                                             alt="Фото рослини">
+                                             alt="Фото рослини"
+                                             height="200"
+                                             width="300">
+                                    </div>
+                                {% endif %}
+                                {% if item.plants.all %}
+                                    <div class="profile-diary-entry-meta">
+                                        <span class="profile-diary-entry-type">
+                                            Рослини:
+                                            {% for plant in item.plants.all %}
+                                                {{ plant.display_name }}
+                                                {% if not forloop.last %},{% endif %}
+                                            {% endfor %}
+                                        </span>
                                     </div>
                                 {% endif %}
                                 <div class="profile-diary-entry-description">{{ item.description|safe }}</div>
@@ -78,14 +122,16 @@
                         </div>
                         <h2 class="profile-diary-recommendation__title">{{ recommendation.title }}</h2>
                         <p class="profile-diary-recommendation__summary">{{ recommendation.summary }}</p>
-                        <p class="profile-diary-recommendation__summary"><strong>Далі:</strong> {{ recommendation.nextStep }}</p>
+                        <p class="profile-diary-recommendation__summary">
+                            <strong>Далі:</strong> {{ recommendation.nextStep }}
+                        </p>
                         <button type="button"
                                 class="profile-diary-recommendation__toggle"
                                 data-recommendation-toggle
-                                aria-expanded="false">
-                            Детальніше
-                        </button>
-                        <div class="profile-diary-recommendation__details" data-recommendation-details hidden>
+                                aria-expanded="false">Детальніше</button>
+                        <div class="profile-diary-recommendation__details"
+                             data-recommendation-details
+                             hidden>
                             <p>{{ recommendation.details }}</p>
                         </div>
                     </section>
@@ -103,18 +149,26 @@
             </aside>
         </div>
     </div>
-    <div class="profile-confirm-backdrop" id="diaryItemDeleteConfirm" aria-hidden="true">
-        <div class="profile-confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="diaryItemDeleteConfirmTitle">
+    <div class="profile-confirm-backdrop"
+         id="diaryItemDeleteConfirm"
+         aria-hidden="true">
+        <div class="profile-confirm-dialog"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="diaryItemDeleteConfirmTitle">
             <h2 class="profile-confirm-title" id="diaryItemDeleteConfirmTitle">Підтвердження видалення</h2>
             <p class="profile-confirm-text">Ви хочете повністю видалити цю картку з дією. Ви впевнені?</p>
             <div class="profile-confirm-actions">
-                <button type="button" class="btn profile-confirm-cancel" data-item-confirm-cancel>Ні</button>
-                <button type="button" class="btn btn-danger profile-confirm-submit" data-item-confirm-submit>Так</button>
+                <button type="button"
+                        class="btn profile-confirm-cancel"
+                        data-item-confirm-cancel>Ні</button>
+                <button type="button"
+                        class="btn btn-danger profile-confirm-submit"
+                        data-item-confirm-submit>Так</button>
             </div>
         </div>
     </div>
 {% endblock profile_content %}
-
 {% block extra_footerscript %}
     {{ block.super }}
     <script>
@@ -214,4 +268,4 @@
             }
         });
     </script>
-{% endblock %}
+{% endblock extra_footerscript %}

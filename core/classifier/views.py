@@ -29,6 +29,22 @@ class TagAutocomplete(autocomplete.Select2QuerySetView):
         return qs
 
 
+class DiaryPlantCategoryAutocomplete(autocomplete.Select2QuerySetView):
+    """Return diary species categories."""
+
+    def get_queryset(self):
+        qs = Category.objects.filter(
+            is_active=True,
+            parent__is_active=True,
+            parent__is_diary_species_parent=True,
+        ).order_by("value")
+
+        if self.q:
+            qs = qs.filter(value__icontains=self.q)
+
+        return qs
+
+
 class CategoriesIndex(TemplateView):
     template_name = "categories.html"
 
