@@ -1,32 +1,78 @@
 from django.contrib.auth import login, logout
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
-from django.views.generic import DetailView, FormView, ListView, UpdateView, View
+from django.views.generic import FormView, ListView, TemplateView, UpdateView, View
 
 from core.adverts.forms import AdvertForm
 from core.adverts.models import Advert
-from core.diary.forms import DiaryForm, DiaryItemForm
-from core.diary.models import Diary
-from core.pro_auth.forms import LoginForm, UserChangeForm
+from core.pro_auth.forms import LoginForm, RegistrationForm, UserChangeForm
 
 
-class Login(FormView):
-    form_class = LoginForm
+class Login(TemplateView):
     template_name = "pro_auth/login.html"
     success_url = "/"
 
-    def form_valid(self, form):
-        user = form.get_user()
-        login(self.request, user)
-        return super().form_valid(form)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        default_tab = "register" if self.request.resolver_match.url_name == "register" else "login"
+        context.setdefault("login_form", kwargs.get("login_form") or LoginForm(request=self.request))
+        context.setdefault("register_form", kwargs.get("register_form") or RegistrationForm())
+        context.setdefault("active_tab", kwargs.get("active_tab", default_tab))
+        return context
+
+    def post(self, request, *args, **kwargs):
+        action = request.POST.get("action", "login")
+        if action == "register":
+            return self.handle_register()
+        return self.handle_login()
+
+    def handle_login(self):
+        login_form = LoginForm(request=self.request, data=self.request.POST)
+        register_form = RegistrationForm()
+        if login_form.is_valid():
+            login(self.request, login_form.get_user())
+            return redirect(self.get_success_url())
+        context = self.get_context_data(
+            login_form=login_form,
+            register_form=register_form,
+            active_tab="login",
+        )
+        return self.render_to_response(context)
+
+    def handle_register(self):
+        register_form = RegistrationForm(self.request.POST)
+        login_form = LoginForm(request=self.request)
+        if register_form.is_valid():
+            user = register_form.save()
+            login(self.request, user, backend="core.pro_auth.backends.AuthBackend")
+            return redirect(self.get_success_url())
+        context = self.get_context_data(
+            login_form=login_form,
+            register_form=register_form,
+            active_tab="register",
+        )
+        return self.render_to_response(context)
+
+    def get_success_url(self):
+        return self.request.POST.get("next") or self.request.GET.get("next") or self.success_url
 
 
-class SocialExistUserLogin(Login):
+class SocialExistUserLogin(FormView):
+    form_class = LoginForm
+    template_name = "pro_auth/login.html"
+
     def form_valid(self, form):
         self.request.session["user_pk"] = form.get_user().pk
         return HttpResponseRedirect(reverse("social:complete", args=(self.kwargs.get("backend_name"),)))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("login_form", context.get("form"))
+        context.setdefault("register_form", RegistrationForm())
+        context.setdefault("active_tab", "login")
+        return context
 
 
 class Logout(View):
@@ -61,75 +107,6 @@ class ChangeProfileView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-
-class AddDiaryView(FormView):
-    form_class = DiaryForm
-    template_name = "pro_auth/profile/add_diary.html"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["request"] = self.request
-        return kwargs
-
-    def form_valid(self, form):
-        form.save()
-        return HttpResponseRedirect(form.instance.get_profile_absolute_url())
-
-
-class ProfileDiaryListView(ListView):
-    template_name = "pro_auth/profile/diary_list.html"
-    model = Diary
-
-    def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
-
-
-class ProfileDiaryDetailView(DetailView):
-    model = Diary
-    template_name = "pro_auth/profile/diary_detail.html"
-
-    def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
-
-
-class UpdateProfileDiaryView(UpdateView):
-    form_class = DiaryForm
-    template_name = "pro_auth/profile/diary_update.html"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["request"] = self.request
-        return kwargs
-
-    def get_queryset(self):
-        return Diary.objects.filter(user=self.request.user)
-
-    def get_success_url(self):
-        return self.get_object().get_profile_absolute_url()
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-
-class AddDiaryItemView(FormView):
-    form_class = DiaryItemForm
-    template_name = "pro_auth/profile/add_diary_item.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["diary"] = Diary.objects.get(pk=self.kwargs["diary_id"])
-        return context
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["diary"] = Diary.objects.get(pk=self.kwargs["diary_id"])
-        return kwargs
-
-    def form_valid(self, form):
-        form.save()
-        return HttpResponseRedirect(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.kwargs["diary_id"]}))
 
 
 class ProfileAdvertListView(ListView):

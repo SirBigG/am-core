@@ -4,27 +4,25 @@
 
 
 {% block profile_content %}
-    <h1 class="text-success">Додати оголошення</h1>
-    <form method="post" action="{% url 'pro_auth:profile-adverts-create' %}" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% for field in form %}
-            <div class="form-group">
-                <div class="col-12">
-                    <label>{{ field.label }}</label>
-                </div>
-                {% for error in field.errors %}
-                    <div class="col-12">
-                        <p class="text-danger">{{ error }}</p>
+    <div class="profile-page-panel profile-form-panel">
+        <h1 class="profile-page-title">Додати оголошення</h1>
+        <form method="post" action="{% url 'pro_auth:profile-adverts-create' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="profile-form-group">
+                    <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="profile-form-field">
+                        {{ field }}
                     </div>
-                {% endfor %}
-                <div class="col-12">
-                    {{ field }}
+                    {% for error in field.errors %}
+                        <p class="profile-form-error">{{ error }}</p>
+                    {% endfor %}
                 </div>
+            {% endfor %}
+            <div class="profile-form-actions">
+                <button type="submit" class="btn btn-success">Додати</button>
             </div>
-        {% endfor %}
-        <div class="col-12">
-            <button type="submit" class="btn btn-success mb-3">Додати</button>
-        </div>
-    </form>
+        </form>
+    </div>
     {{ form.media }}
 {% endblock %}

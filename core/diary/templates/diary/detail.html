@@ -1,42 +1,46 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
-{% block title %}{{ object.title }}{% endblock %}
-{% block meta_description %}{{ object.description|truncatechars:300|striptags|safe }}{% endblock %}
-
+{% block title %}
+    {{ object.title }}
+{% endblock title %}
+{% block meta_description %}
+    {{ object.description|truncatechars:300|striptags|safe }}
+{% endblock meta_description %}
 {% block extra_meta %}
     <meta content="{{ object.title }}" property="og:title">
-    <meta content="{{ object.description|truncatechars:300|striptags|safe }}" property="og:description">
+    <meta content="{{ object.description|truncatechars:300|striptags|safe }}"
+          property="og:description">
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
-
 {% block scripts %}
     <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
+          crossorigin="anonymous">
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static 'posts/list.css' %}">
     <link rel="stylesheet" href="{% static 'posts/fontawesome/css/all.css' %}">
-{% endblock %}
-
-{% block page_title %}{{ object.title }}{% endblock %}
-
+{% endblock scripts %}
+{% block page_title %}
+    {{ object.title }}
+{% endblock page_title %}
 {% block content %}
+    <p>{{ object.plant_summary }}</p>
     {{ object.description|safe }}
-    <section id=timeline>
+    <section id="timeline">
         {% for item in object.diary_items.all %}
             <article>
                 <div class="inner">
-      <span class="date">
-        <span class="day">{{ item.date|date:'d' }}</span>
-        <span class="month">{{ item.date|date:'M' }}</span>
-        <span class="year">{{ item.date|date:'Y' }}</span>
-      </span>
+                    <span class="date">
+                        <span class="day">{{ item.date|date:'d' }}</span>
+                        <span class="month">{{ item.date|date:'M' }}</span>
+                        <span class="year">{{ item.date|date:'Y' }}</span>
+                    </span>
                     <h2 class="{% cycle 'step1' 'step2' 'step3' 'step4' 'step5' %}"></h2>
                     {{ item.description|safe }}
-                    <img src="{{ item.image.url }}" alt="Graphic" width="100%">
+                    <img src="{{ item.image.url }}" alt="Graphic" width="100%" height="200">
                 </div>
             </article>
         {% endfor %}
@@ -173,4 +177,4 @@
             background: #9b59b6;
         }
     </style>
-{% endblock %}
+{% endblock content %}

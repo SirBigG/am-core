@@ -7,7 +7,9 @@
     <div class="dropdown-divider"></div>
     <a class="dropdown-item text-success"
        href="{% url 'pro_auth:profile-adverts' %}">Мої
-    оголошення</a>
+    Оголошення</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'pro_auth:profile-diary-list' %}">Мої Щоденники</a>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item text-success"
        href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
@@ -25,12 +27,7 @@
         <div class="row justify-content-between">
             <div class="col">
                 <a class="text-success no-decoration"
-                   href="{% url 'pro_auth:dashboard' %}">Профіль</a>
-            </div>
-            <div class="col">
-                <a class="text-warning"
-                   href="{% url 'pro_auth:change-profile' %}"
-                   title="Налаштування"><i class="fas fa-edit"></i></a>
+                   href="{% url 'pro_auth:change-profile' %}">Профіль</a>
             </div>
             <div class="col">
                 <a class="text-danger no-decoration"

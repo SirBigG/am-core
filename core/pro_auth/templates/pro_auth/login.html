@@ -3,6 +3,145 @@
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/add.css" %}">
+    <style>
+        .auth-shell {
+            min-height: 100vh;
+            padding: 3rem 1rem;
+            background: linear-gradient(180deg, #f6f7f3 0%, #fbfbf8 100%);
+        }
+
+        .auth-card {
+            width: min(560px, 100%);
+            border: 1px solid rgba(28, 52, 35, 0.08);
+            border-radius: 28px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 22px 60px rgba(33, 48, 39, 0.12);
+        }
+
+        .auth-form-panel {
+            padding: 2.5rem;
+        }
+
+        .auth-title {
+            color: #213529;
+            font-size: clamp(1.9rem, 4vw, 2.25rem);
+            font-weight: 700;
+            line-height: 1.15;
+        }
+
+        .auth-tabs {
+            gap: 0.75rem;
+            border: 0;
+            margin-bottom: 1.75rem;
+        }
+
+        .auth-tabs .nav-link {
+            border: 0;
+            border-radius: 999px;
+            padding: 0.8rem 1.2rem;
+            color: #2f4236;
+            background: #eef1ec;
+            font-weight: 600;
+        }
+
+        .auth-tabs .nav-link.active {
+            color: #fff;
+            background: #2f6b3d;
+            box-shadow: 0 10px 20px rgba(47, 107, 61, 0.18);
+        }
+
+        .auth-pane {
+            display: none;
+        }
+
+        .auth-pane.active {
+            display: block;
+        }
+
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+            color: #6b7d71;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            background: rgba(18, 66, 34, 0.14);
+        }
+
+        .social-auth-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .social-auth-grid .btn {
+            padding: 0.9rem 1rem;
+            border-radius: 16px;
+            font-weight: 600;
+        }
+
+        .auth-submit {
+            padding: 0.95rem 1rem;
+            border-radius: 16px;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .auth-input {
+            height: 52px;
+            border: 1px solid rgba(24, 69, 38, 0.14);
+            border-radius: 16px;
+            padding: 0.85rem 1rem;
+            background: #f9faf7;
+            box-shadow: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+        }
+
+        .auth-input:focus {
+            border-color: #2f7b45;
+            background: #fff;
+            box-shadow: 0 0 0 0.2rem rgba(47, 123, 69, 0.12);
+        }
+
+        .auth-label {
+            display: block;
+            margin-bottom: 0.45rem;
+            color: #264332;
+            font-weight: 600;
+        }
+
+        .auth-muted {
+            color: #5f6d62;
+        }
+
+        .auth-form .form-group {
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 575.98px) {
+            .auth-form-panel {
+                padding: 1.4rem;
+            }
+
+            .social-auth-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-tabs .nav-link {
+                width: 100%;
+            }
+        }
+    </style>
 {% endblock scripts %}
 {% block title %}
     Увійти в обліковий запис
@@ -18,27 +157,120 @@
     {% if request.GET %}<link rel="canonical" href="https://agromega.in.ua{{ request.path }}" />{% endif %}
 {% endblock canonical %}
 {% block base_content_block %}
-    <div class="d-flex align-items-center justify-content-center min-vh-100">
-        <div class="card shadow-sm m-3">
-            <div class="card-body">
-                <h1 class="card-title text-success text-center h3">Увійти в обліковий запис</h1>
-                <ul class="nav nav-pills justify-content-center">
-                    <li class="nav-item">
-                        <a class="btn btn-danger btn-lg m-2"
-                           href="{% url 'social:begin' 'google-oauth2' %}"
-                           rel="nofollow">
-                            <i class="icon-google"></i> Google
-                        </a>
+    <div class="auth-shell d-flex align-items-center justify-content-center">
+        <div class="card auth-card shadow-lg">
+            <div class="auth-form-panel">
+                <div class="text-center mb-4">
+                    <h1 class="auth-title mb-2">Увійти або зареєструватися</h1>
+                    <p class="auth-muted mb-0">Email і пароль для входу, або швидке продовження через соціальні мережі.</p>
+                </div>
+                <div class="social-auth-grid mb-4">
+                    <a class="btn btn-danger"
+                       href="{% url 'social:begin' 'google-oauth2' %}"
+                       rel="nofollow">
+                        <i class="icon-google"></i> Google
+                    </a>
+                    <a class="btn btn-primary"
+                       href="{% url 'social:begin' 'facebook' %}"
+                       rel="nofollow">
+                        <i class="icon-facebook"></i> Facebook
+                    </a>
+                </div>
+                <div class="auth-divider">або через email</div>
+                <ul class="nav auth-tabs justify-content-center"
+                    id="auth-tabs"
+                    role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab == 'login' %}active{% endif %}"
+                                id="login-tab"
+                                type="button"
+                                data-target="login-pane">Вхід</button>
                     </li>
-                    <li class="nav-item">
-                        <a class="btn btn-primary btn-lg m-2"
-                           href="{% url 'social:begin' 'facebook' %}"
-                           rel="nofollow">
-                            <i class="icon-facebook"></i> Facebook
-                        </a>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link {% if active_tab == 'register' %}active{% endif %}"
+                                id="register-tab"
+                                type="button"
+                                data-target="register-pane">Реєстрація</button>
                     </li>
                 </ul>
+                <div class="auth-pane {% if active_tab == 'login' %}active{% endif %}"
+                     id="login-pane">
+                    <form method="post" novalidate class="auth-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="login">
+                        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+                        {% if login_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in login_form.non_field_errors %}
+                                    {{ error }}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label class="auth-label" for="{{ login_form.username.id_for_label }}">{{ login_form.username.label }}</label>
+                            {{ login_form.username }}
+                            {% for error in login_form.username.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label class="auth-label" for="{{ login_form.password.id_for_label }}">{{ login_form.password.label }}</label>
+                            {{ login_form.password }}
+                            {% for error in login_form.password.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block auth-submit">Увійти</button>
+                    </form>
+                </div>
+                <div class="auth-pane {% if active_tab == 'register' %}active{% endif %}"
+                     id="register-pane">
+                    <form method="post" novalidate class="auth-form">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="register">
+                        {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+                        {% if register_form.non_field_errors %}
+                            <div class="alert alert-danger" role="alert">
+                                {% for error in register_form.non_field_errors %}
+                                    {{ error }}
+                                    {% if not forloop.last %}<br>{% endif %}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label class="auth-label" for="{{ register_form.email.id_for_label }}">{{ register_form.email.label }}</label>
+                            {{ register_form.email }}
+                            {% for error in register_form.email.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label class="auth-label" for="{{ register_form.password1.id_for_label }}">{{ register_form.password1.label }}</label>
+                            {{ register_form.password1 }}
+                            {% for error in register_form.password1.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="form-group">
+                            <label class="auth-label" for="{{ register_form.password2.id_for_label }}">{{ register_form.password2.label }}</label>
+                            {{ register_form.password2 }}
+                            {% for error in register_form.password2.errors %}<div class="invalid-feedback d-block">{{ error }}</div>{% endfor %}
+                        </div>
+                        <button type="submit" class="btn btn-dark btn-block auth-submit">Створити акаунт</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+    <script>
+        (function () {
+            const tabs = document.querySelectorAll('#auth-tabs .nav-link');
+            const panes = document.querySelectorAll('.auth-pane');
+
+            tabs.forEach((tab) => {
+                tab.addEventListener('click', function () {
+                    tabs.forEach((item) => item.classList.remove('active'));
+                    panes.forEach((pane) => pane.classList.remove('active'));
+                    tab.classList.add('active');
+                    const target = document.getElementById(tab.dataset.target);
+                    if (target) {
+                        target.classList.add('active');
+                    }
+                });
+            });
+        }());
+    </script>
 {% endblock base_content_block %}

@@ -1,0 +1,31 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% load post_extras %}
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <h1 class="profile-page-title">Додати щоденник</h1>
+        <p class="profile-page-lead">Створи щоденник і прив’яжи до нього одну або кілька рослин.</p>
+        <form method="post"
+              action="{% url 'pro_auth:profile-diary-add' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+            {% endif %}
+            {% for field in form %}
+                {% if field.name == "title" or field.name == "description" %}
+                    <div class="profile-form-group">
+                        <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        <div class="profile-form-field">{{ field }}</div>
+                        {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% include "diary/profile/plant_formset.html" %}
+            <div class="profile-form-actions">
+                <button type="submit" class="btn btn-success w-100">Додати щоденник</button>
+            </div>
+        </form>
+    </div>
+    {{ form.media }}
+    {{ plant_formset.media }}
+{% endblock profile_content %}

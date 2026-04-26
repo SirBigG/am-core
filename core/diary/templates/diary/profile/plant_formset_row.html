@@ -1,0 +1,54 @@
+<div class="profile-plant-formset__row" data-plant-form-row>
+    <div class="profile-plant-formset__row-header">
+        <h3 class="profile-plant-formset__row-title">Рослина</h3>
+        <button type="button"
+                class="btn delete-soft-btn profile-plant-formset__remove"
+                data-plant-form-remove>
+            <span class="delete-soft-btn__icon" aria-hidden="true">×</span>
+            <span class="delete-soft-btn__label">Прибрати</span>
+        </button>
+    </div>
+    {% if plant_form.non_field_errors %}
+        {% for error in plant_form.non_field_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    {% endif %}
+    <div class="profile-plant-formset__delete">{{ plant_form.DELETE }}</div>
+    <div class="profile-form-group">
+        <label class="profile-form-label"
+               for="{{ plant_form.existing_plant.id_for_label }}">{{ plant_form.existing_plant.label }}</label>
+        <div class="profile-form-field">{{ plant_form.existing_plant }}</div>
+        {% for error in plant_form.existing_plant.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="profile-plant-formset__divider">Або створити нову</div>
+    <div class="profile-form-group">
+        <label class="profile-form-label"
+               for="{{ plant_form.plant_category.id_for_label }}">{{ plant_form.plant_category.label }}</label>
+        <div class="profile-form-field">{{ plant_form.plant_category }}</div>
+        {% for error in plant_form.plant_category.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="profile-form-row">
+        <div class="profile-form-group">
+            <label class="profile-form-label"
+                   for="{{ plant_form.plant_variety.id_for_label }}">{{ plant_form.plant_variety.label }}</label>
+            <div class="profile-form-field">{{ plant_form.plant_variety }}</div>
+            {% for error in plant_form.plant_variety.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+        </div>
+        <div class="profile-form-group">
+            <label class="profile-form-label"
+                   for="{{ plant_form.plant_title.id_for_label }}">{{ plant_form.plant_title.label }}</label>
+            <div class="profile-form-field">{{ plant_form.plant_title }}</div>
+            {% for error in plant_form.plant_title.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+        </div>
+    </div>
+    <div class="profile-form-group">
+        <label class="profile-form-label"
+               for="{{ plant_form.plant_description.id_for_label }}">{{ plant_form.plant_description.label }}</label>
+        <div class="profile-form-field">{{ plant_form.plant_description }}</div>
+        {% for error in plant_form.plant_description.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    </div>
+    <div class="profile-form-group">
+        <label class="profile-form-label"
+               for="{{ plant_form.plant_date.id_for_label }}">{{ plant_form.plant_date.label }}</label>
+        <div class="profile-form-field">{{ plant_form.plant_date }}</div>
+        {% for error in plant_form.plant_date.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+    </div>
+</div>

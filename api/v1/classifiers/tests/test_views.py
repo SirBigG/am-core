@@ -1,7 +1,5 @@
+from core.utils.tests.factories import CategoryFactory, LocationFactory
 from django.urls import reverse
-
-from core.utils.tests.factories import LocationFactory, CategoryFactory
-
 from rest_framework.test import APIClient, APITestCase
 
 api_client = APIClient()
@@ -10,29 +8,29 @@ api_client = APIClient()
 class LocationListTest(APITestCase):
     def test_response_ok(self):
         LocationFactory()
-        response = api_client.get(reverse('location-list'))
+        response = api_client.get(reverse("location-list"))
         self.assertEqual(response.status_code, 200)
-        self.assertIn('pk', response.data['results'][0])
-        self.assertIn('value', response.data['results'][0])
+        self.assertIn("pk", response.data["results"][0])
+        self.assertIn("value", response.data["results"][0])
 
     def test_pagination(self):
         LocationFactory.create_batch(11)
-        response = api_client.get(reverse('location-list'), data={"page": 2})
+        response = api_client.get(reverse("location-list"), data={"page": 2})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data['count'], 11)
-        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(response.data["count"], 11)
+        self.assertEqual(len(response.data["results"]), 1)
 
     def test_filtering(self):
-        LocationFactory(value='Київ')
-        LocationFactory(value='Краків')
-        LocationFactory(value='Хоростків')
-        # Case sensitive because used SqlLite backend for tests
-        response = api_client.get(reverse('location-list'), data={"loc": "К"})
+        LocationFactory(value="Київ")
+        LocationFactory(value="Краків")
+        LocationFactory(value="Хоростків")
+        # Case sensitive because used Sqlite backend for tests
+        response = api_client.get(reverse("location-list"), data={"loc": "К"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 2)
-        response = api_client.get(reverse('location-list'), data={"loc": "Кр"})
+        self.assertEqual(len(response.data["results"]), 2)
+        response = api_client.get(reverse("location-list"), data={"loc": "Кр"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data['results']), 1)
+        self.assertEqual(len(response.data["results"]), 1)
 
 
 class CategoryListView(APITestCase):
@@ -42,14 +40,14 @@ class CategoryListView(APITestCase):
         CategoryFactory.create_batch(3, **{"parent": parent})
 
     def test_return_all_categories(self):
-        response = api_client.get('/api/categories/')
+        response = api_client.get("/api/categories/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 5)
-        self.assertIn('pk', response.data[0])
-        self.assertIn('value', response.data[0])
+        self.assertIn("pk", response.data[0])
+        self.assertIn("value", response.data[0])
 
     def test_level_filter(self):
-        response = api_client.get('/api/categories/?level=2')
+        response = api_client.get("/api/categories/?level=2")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 3)
 
@@ -57,10 +55,10 @@ class CategoryListView(APITestCase):
 class CategoryTreeViewTests(APITestCase):
     def setUp(self) -> None:
         root = CategoryFactory(level=0)
-        child = CategoryFactory(parent=root)
+        CategoryFactory(parent=root)
         root1 = CategoryFactory(level=0)
-        child1 = CategoryFactory(parent=root1)
+        CategoryFactory(parent=root1)
 
     def test_response(self):
-        response = api_client.get(reverse('category-tree'))
+        response = api_client.get(reverse("category-tree"))
         self.assertEqual(response.status_code, 200)

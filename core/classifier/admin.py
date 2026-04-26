@@ -5,7 +5,9 @@ from core.classifier.models import Area, Category, Country, Location, Region
 
 
 class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
-    pass
+    list_display = ("tree_actions", "indented_title", "slug", "is_active", "is_diary_species_parent")
+    list_filter = ("is_active", "is_diary_species_parent", "is_for_user")
+    search_fields = ["value", "slug"]
 
 
 class LocationAdmin(admin.ModelAdmin):

@@ -1,0 +1,4 @@
+exclude_dirs: ['tests', '.venv']
+recursive: true
+severity-level: high
+confidence-level: high

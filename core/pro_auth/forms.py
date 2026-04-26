@@ -1,62 +1,62 @@
+from dal import autocomplete
 from django import forms
 from django.contrib.auth import password_validation
-from django.contrib.auth.forms import ReadOnlyPasswordHashField, AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, ReadOnlyPasswordHashField
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
-
-from core.pro_auth.models import User
-
-from core.classifier.models import Location
-
 from phonenumber_field.formfields import PhoneNumberField
 
-from dal import autocomplete
+from core.classifier.models import Location
+from core.pro_auth.models import User
 
 
 class AdminUserCreationForm(forms.ModelForm):
-    """
-    A form that create a user, with no privileges.
-    """
-    error_messages = {
-        'password_mismatch': _("The two password fields didn't match."),
-    }
-    password1 = forms.CharField(label=_("Password"),
-                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'off'}))
-    password2 = forms.CharField(label=_("Password confirmation"),
-                                widget=forms.PasswordInput(attrs={'class': 'form-control', 'autocomplete': 'off'}),
-                                help_text=_("Enter the same password as before, for verification."))
-    phone1 = PhoneNumberField(label=_("Phone"),
-                              help_text=_("Enter phone in International format. Example: '+380991234567'."
-                                          "This field is required."),
-                              widget=forms.TextInput(attrs={'class': 'form-control'}))
+    """A form that create a user, with no privileges."""
 
-    location = forms.ModelChoiceField(queryset=Location.objects.all(),
-                                      widget=autocomplete.ModelSelect2(url='location-autocomplete',
-                                                                       attrs={'class': 'form-control'}),
-                                      help_text=_("Please select city from list."),
-                                      label=_("City"))
+    error_messages = {
+        "password_mismatch": _("The two password fields didn't match."),
+    }
+    password1 = forms.CharField(
+        label=_("Password"), widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "off"})
+    )
+    password2 = forms.CharField(
+        label=_("Password confirmation"),
+        widget=forms.PasswordInput(attrs={"class": "form-control", "autocomplete": "off"}),
+        help_text=_("Enter the same password as before, for verification."),
+    )
+    phone1 = PhoneNumberField(
+        label=_("Phone"),
+        help_text=_("Enter phone in International format. Example: '+380991234567'." "This field is required."),
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+    )
+
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.all(),
+        widget=autocomplete.ModelSelect2(url="location-autocomplete", attrs={"class": "form-control"}),
+        help_text=_("Please select city from list."),
+        label=_("City"),
+    )
 
     class Meta:
         model = User
-        fields = ['email', 'phone1', 'location', 'password1', 'password2']
-        widgets = {
-            'email': forms.TextInput(attrs={'class': 'form-control'})
-        }
+        fields = ["email", "phone1", "location", "password1", "password2"]
+        widgets = {"email": forms.TextInput(attrs={"class": "form-control"})}
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
         password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError(
-                self.error_messages['password_mismatch'],
-                code='password_mismatch',
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
             )
         # self.instance.username = self.cleaned_data.get('username')
-        password_validation.validate_password(self.cleaned_data.get('password2'), self.instance)
+        password_validation.validate_password(self.cleaned_data.get("password2"), self.instance)
         return password2
 
     def save(self, commit=True):
         """Save the provided password in hashed format."""
-        user = super(AdminUserCreationForm, self).save(commit=False)
+        user = super().save(commit=False)
         user.set_password(self.cleaned_data["password1"])
         if commit:
             user.save()
@@ -65,30 +65,34 @@ class AdminUserCreationForm(forms.ModelForm):
 
 class UserCreationForm(AdminUserCreationForm):
     class Meta(AdminUserCreationForm.Meta):
-        fields = ['email', 'phone1', 'location', 'password1', 'password2']
+        fields = ["email", "phone1", "location", "password1", "password2"]
 
 
 class AdminUserChangeForm(forms.ModelForm):
     password = ReadOnlyPasswordHashField(
         label=_("Password"),
-        help_text=_("Raw passwords are not stored, so there is no way to see "
-                    "this user's password, but you can change the password "
-                    "using <a href=\"../password/\">this form</a>."))
-    location = forms.ModelChoiceField(queryset=Location.objects.all(),
-                                      widget=autocomplete.ModelSelect2(url='location-autocomplete',
-                                                                       attrs={'class': 'form-control'}),
-                                      help_text=_("Please select city from list."),
-                                      label=_("City"))
+        help_text=_(
+            "Raw passwords are not stored, so there is no way to see "
+            "this user's password, but you can change the password "
+            'using <a href="../password/">this form</a>.'
+        ),
+    )
+    location = forms.ModelChoiceField(
+        queryset=Location.objects.all(),
+        widget=autocomplete.ModelSelect2(url="location-autocomplete", attrs={"class": "form-control"}),
+        help_text=_("Please select city from list."),
+        label=_("City"),
+    )
 
     class Meta:
         model = User
-        fields = '__all__'
+        fields = "__all__"
 
     def __init__(self, *args, **kwargs):
-        super(AdminUserChangeForm, self).__init__(*args, **kwargs)
-        f = self.fields.get('user_permissions')
+        super().__init__(*args, **kwargs)
+        f = self.fields.get("user_permissions")
         if f is not None:
-            f.queryset = f.queryset.select_related('content_type')
+            f.queryset = f.queryset.select_related("content_type")
 
     def clean_password(self):
         # Regardless of what the user provides, return the initial value.
@@ -100,52 +104,46 @@ class AdminUserChangeForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     location = forms.ModelChoiceField(
         queryset=Location.objects.all(),
-        widget=autocomplete.ModelSelect2(url='location-autocomplete',
-                                         attrs={'class': 'form-control'}),
+        widget=autocomplete.ModelSelect2(url="location-autocomplete", attrs={"class": "form-control"}),
         help_text=_("Please select city from list."),
-        label=_("City")
+        label=_("City"),
     )
 
     class Meta:
         model = User
         fields = (
-            'email',
-            'first_name',
-            'last_name',
-            'phone1',
-            'location',
-            'birth_date',
-            'avatar',
+            "email",
+            "first_name",
+            "last_name",
+            "phone1",
+            "location",
+            "birth_date",
+            "avatar",
         )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             if name != "location":
-                field.widget.attrs['class'] = "form-control"
+                field.widget.attrs["class"] = "form-control"
 
 
 class EmailConfirmForm(forms.Form):
     email = forms.EmailField()
 
-    error_messages = {
-        'not_user': _('Sorry, but user with this email does not found!')
-    }
+    error_messages = {"not_user": _("Sorry, but user with this email does not found!")}
 
     def __init__(self, *args, **kwargs):
         self.user_cache = None
-        super(EmailConfirmForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def clean_email(self):
-        email = self.cleaned_data.get('email')
+        email = self.cleaned_data.get("email")
         if email:
             try:
                 self.user_cache = User.objects.get(email=email)
             except User.DoesNotExist:
-                raise forms.ValidationError(
-                    self.error_messages['not_user'],
-                    code='not_user'
-                )
+                raise forms.ValidationError(self.error_messages["not_user"], code="not_user")
         return email
 
     def get_user(self):
@@ -154,6 +152,85 @@ class EmailConfirmForm(forms.Form):
 
 class LoginForm(AuthenticationForm):
     def __init__(self, request=None, *args, **kwargs):
-        super().__init__(request=None, *args, **kwargs)
-        self.fields['username'].widget.attrs['class'] = 'form-control'
-        self.fields['password'].widget.attrs['class'] = 'form-control'
+        super().__init__(request=request, *args, **kwargs)
+        self.fields["username"].widget.attrs["class"] = "form-control auth-input"
+        self.fields["password"].widget.attrs["class"] = "form-control auth-input"
+        self.fields["username"].label = _("Email")
+        self.fields["username"].widget.attrs.update({"placeholder": _("you@example.com"), "autocomplete": "email"})
+        self.fields["password"].widget.attrs.update(
+            {"placeholder": _("Enter password"), "autocomplete": "current-password"}
+        )
+
+
+class RegistrationForm(forms.ModelForm):
+    error_messages = {
+        "password_mismatch": _("The two password fields didn't match."),
+        "duplicate_email": _("A user with that email already exists."),
+    }
+
+    password1 = forms.CharField(
+        label=_("Password"),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control auth-input",
+                "autocomplete": "new-password",
+                "placeholder": _("Create password"),
+            }
+        ),
+    )
+    password2 = forms.CharField(
+        label=_("Confirm password"),
+        strip=False,
+        widget=forms.PasswordInput(
+            attrs={
+                "class": "form-control auth-input",
+                "autocomplete": "new-password",
+                "placeholder": _("Repeat password"),
+            }
+        ),
+    )
+
+    class Meta:
+        model = User
+        fields = ("email",)
+        widgets = {
+            "email": forms.EmailInput(
+                attrs={
+                    "class": "form-control auth-input",
+                    "placeholder": _("you@example.com"),
+                    "autocomplete": "email",
+                }
+            ),
+        }
+        labels = {
+            "email": _("Email"),
+        }
+
+    def clean_email(self):
+        email = User.objects.normalize_email(self.cleaned_data["email"])
+        if User.objects.filter(Q(email__iexact=email)).exists():
+            raise forms.ValidationError(
+                self.error_messages["duplicate_email"],
+                code="duplicate_email",
+            )
+        return email
+
+    def clean_password2(self):
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
+        if password1 and password2 and password1 != password2:
+            raise forms.ValidationError(
+                self.error_messages["password_mismatch"],
+                code="password_mismatch",
+            )
+        password_validation.validate_password(password2, self.instance)
+        return password2
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.email = self.cleaned_data["email"]
+        user.set_password(self.cleaned_data["password1"])
+        if commit:
+            user.save()
+        return user
