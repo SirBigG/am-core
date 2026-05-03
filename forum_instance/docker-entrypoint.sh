@@ -9,6 +9,7 @@ python manage.py migrate --noinput
 python manage.py createcachetable spirit_cache spirit_rl_cache
 
 # Collect static into shared volume (ignore failures)
+python manage.py compilemessages --locale uk || true
 python manage.py collectstatic --noinput || true
 python manage.py update_index --verbosity 0 || true
 

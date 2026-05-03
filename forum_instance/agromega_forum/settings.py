@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     "haystack",
 ]
 
+if os.getenv("FORUM_STORAGE_BACKEND", "").lower() == "s3":
+    INSTALLED_APPS.append("storages")
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -169,10 +172,12 @@ HAYSTACK_CONNECTIONS = {
 HAYSTACK_SIGNAL_PROCESSOR = "spirit.search.signals.RealtimeSignalProcessor"
 
 LANGUAGE_CODE = os.getenv("FORUM_LANGUAGE_CODE", "uk")
+LANGUAGES = [("uk", "Ukrainian")]
 TIME_ZONE = os.getenv("FORUM_TIME_ZONE", "UTC")
 USE_I18N = True
 USE_TZ = True
 DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+LOCALE_PATHS = [BASE_DIR / "locale"]
 
 STATIC_URL = os.getenv("FORUM_STATIC_URL", "/forum/static/" if FORCE_SCRIPT_NAME else "/static/")
 STATIC_ROOT = os.getenv("FORUM_STATIC_ROOT", "/static")
@@ -182,6 +187,42 @@ STORAGES = {
     "default": {"BACKEND": "spirit.core.storage.OverwriteFileSystemStorage"},
     "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
+
+if os.getenv("FORUM_STORAGE_BACKEND", "").lower() == "s3":
+    FORUM_AWS_ACCESS_KEY_ID = os.getenv("FORUM_AWS_ACCESS_KEY_ID", "")
+    FORUM_AWS_SECRET_ACCESS_KEY = os.getenv("FORUM_AWS_SECRET_ACCESS_KEY", "")
+    FORUM_AWS_STORAGE_BUCKET_NAME = os.getenv("FORUM_AWS_STORAGE_BUCKET_NAME", "")
+    FORUM_AWS_S3_ENDPOINT_URL = os.getenv("FORUM_AWS_S3_ENDPOINT_URL", "").strip()
+    FORUM_AWS_S3_CUSTOM_DOMAIN = os.getenv("FORUM_AWS_S3_CUSTOM_DOMAIN", "").strip()
+    FORUM_AWS_S3_REGION_NAME = os.getenv("FORUM_AWS_S3_REGION_NAME", "")
+    FORUM_AWS_MEDIA_LOCATION = os.getenv("FORUM_AWS_MEDIA_LOCATION", "media").strip("/")
+
+    if FORUM_AWS_S3_ENDPOINT_URL and not FORUM_AWS_S3_ENDPOINT_URL.startswith(("http://", "https://")):
+        FORUM_AWS_S3_ENDPOINT_URL = f"https://{FORUM_AWS_S3_ENDPOINT_URL}"
+
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "OPTIONS": {
+            "access_key": FORUM_AWS_ACCESS_KEY_ID,
+            "secret_key": FORUM_AWS_SECRET_ACCESS_KEY,
+            "bucket_name": FORUM_AWS_STORAGE_BUCKET_NAME,
+            "endpoint_url": FORUM_AWS_S3_ENDPOINT_URL or None,
+            "region_name": FORUM_AWS_S3_REGION_NAME or None,
+            "custom_domain": FORUM_AWS_S3_CUSTOM_DOMAIN or None,
+            "querystring_auth": False,
+            "default_acl": "public-read",
+            "file_overwrite": False,
+            "object_parameters": {"CacheControl": "max-age=86400"},
+            "location": FORUM_AWS_MEDIA_LOCATION,
+        },
+    }
+
+    if not os.getenv("FORUM_MEDIA_URL"):
+        if FORUM_AWS_S3_CUSTOM_DOMAIN:
+            MEDIA_URL = f"https://{FORUM_AWS_S3_CUSTOM_DOMAIN}/{FORUM_AWS_MEDIA_LOCATION}/"
+        elif FORUM_AWS_STORAGE_BUCKET_NAME and FORUM_AWS_S3_ENDPOINT_URL:
+            endpoint_host = FORUM_AWS_S3_ENDPOINT_URL.removeprefix("https://").removeprefix("http://")
+            MEDIA_URL = f"https://{FORUM_AWS_STORAGE_BUCKET_NAME}.{endpoint_host}/{FORUM_AWS_MEDIA_LOCATION}/"
 
 ST_SITE_URL = FORUM_SITE_URL
 ST_UPLOAD_FILE_ENABLED = False
