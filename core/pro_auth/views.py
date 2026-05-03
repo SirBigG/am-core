@@ -1,8 +1,14 @@
+import os
+from urllib.parse import urlencode
+
+from django.conf import settings
 from django.contrib.auth import login, logout
 from django.http import Http404, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.http import urlencode as django_urlencode
+from django.views.decorators.http import require_GET
 from django.views.generic import FormView, ListView, TemplateView, UpdateView, View
 
 from core.adverts.forms import AdvertForm
@@ -81,8 +87,12 @@ class Logout(View):
     url = "/"
 
     def get(self, request):
+        next_url = request.GET.get("next") or self.url
         logout(request)
-        return HttpResponseRedirect(self.url)
+        if request.GET.get("local") or request.GET.get("skip_forum") or not settings.FORUM_LOGOUT_URL:
+            return HttpResponseRedirect(next_url)
+        redirect_url = request.build_absolute_uri(next_url)
+        return HttpResponseRedirect(f"{settings.FORUM_LOGOUT_URL}?{urlencode({'next': redirect_url})}")
 
 
 class IsAuthenticate(View):
@@ -169,3 +179,27 @@ class AdvertActivateView(View):
         advert = get_object_or_404(Advert, pk=pk, user=request.user)
         advert.activate()
         return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
+
+
+@require_GET
+def social_oidc_begin(request):
+    """Start OIDC authorization on the main site by redirecting to the OAuth2
+    authorize endpoint.
+
+    This endpoint allows the forum to redirect users to the main site's authorization flow.
+    It accepts an optional `next` parameter which will be included in the `state` value so
+    the forum knows where to redirect the user after authentication.
+    """
+    next_url = request.GET.get("next") or "/"
+    client_id = os.getenv("FORUM_OIDC_CLIENT_ID", "agromega-forum")
+    # The redirect URI must match the one registered for the forum OIDC application.
+    redirect_uri = os.getenv("FORUM_OIDC_REDIRECT_URI", f"{settings.FORUM_BASE_URL}/complete/oidc/")
+    params = {
+        "client_id": client_id,
+        "redirect_uri": redirect_uri,
+        "response_type": "code",
+        "scope": "openid profile email",
+        "state": next_url,
+    }
+    authorize_url = f"{settings.SITE_URL}/o/authorize/?{django_urlencode(params)}"
+    return redirect(authorize_url)
