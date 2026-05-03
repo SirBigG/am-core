@@ -1,10 +1,21 @@
 from urllib.parse import urlencode
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import logout
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
+from django.urls import reverse
+from django.utils.translation import gettext as _
 from django.views import View
+from djconfig import config
+from haystack.views import SearchView as BaseSearchView
+from spirit.core.utils.paginator import yt_paginate
+from spirit.core.utils.views import is_post, post_data, post_files
+from spirit.search.forms import AdvancedSearchForm
+
+from .forms import ForumProfileForm
 
 
 class SSOStartView(View):
@@ -36,3 +47,44 @@ class MainSiteAccountRedirectView(View):
 class SSOErrorView(View):
     def get(self, request):
         return HttpResponse("Forum sign-in failed. Please return to the main site and try again.", status=403)
+
+
+class PublicForumSearchView(BaseSearchView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            template="spirit/search/search.html",
+            form_class=AdvancedSearchForm,
+            load_all=False,
+        )
+
+    def build_page(self):
+        paginator = None
+        page = yt_paginate(
+            self.results,
+            per_page=config.topics_per_page,
+            page_number=self.request.GET.get("page", 1),
+        )
+        page = [{"fields": r.get_stored_fields(), "pk": r.pk} for r in page]
+        return paginator, page
+
+
+@login_required
+def forum_profile_update(request):
+    form = ForumProfileForm(
+        data=post_data(request),
+        files=post_files(request),
+        instance=request.user.st,
+    )
+    if is_post(request) and form.is_valid():
+        form.save()
+        messages.info(request, _("Your forum profile has been updated!"))
+        return redirect(reverse("spirit:user:update"))
+    return render_profile_update(request, form)
+
+
+def render_profile_update(request, form):
+    return render(
+        request=request,
+        template_name="spirit/user/profile_update.html",
+        context={"form": form},
+    )

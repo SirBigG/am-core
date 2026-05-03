@@ -34,6 +34,35 @@ def create_or_update_forum_user(strategy, details, backend, uid=None, user=None,
     if changed:
         user.save()
 
+    is_forum_admin = bool(claims.get("is_superuser") or claims.get("is_staff"))
+    profile = getattr(user, "st", None)
+    if profile is not None:
+        profile_changed = False
+        if display_name and _should_initialize_nickname(profile.nickname, user.username, main_user_id):
+            profile.nickname = display_name
+            slug = slugify(display_name, allow_unicode=True)
+            if slug:
+                profile.slug = slug
+            profile_changed = True
+        if profile.is_administrator != is_forum_admin:
+            profile.is_administrator = is_forum_admin
+            profile_changed = True
+        if profile.is_moderator != is_forum_admin:
+            profile.is_moderator = is_forum_admin
+            profile_changed = True
+        if profile_changed:
+            profile.save()
+
+    auth_changed = False
+    if user.is_staff != is_forum_admin:
+        user.is_staff = is_forum_admin
+        auth_changed = True
+    if user.is_superuser != bool(claims.get("is_superuser")):
+        user.is_superuser = bool(claims.get("is_superuser"))
+        auth_changed = True
+    if auth_changed:
+        user.save(update_fields=["is_staff", "is_superuser"])
+
     return {"user": user, "is_new": False}
 
 
@@ -56,3 +85,11 @@ def _build_username(main_user_id, display_name, email):
     source = display_name or email.split("@", 1)[0] or "user"
     slug = slugify(source, allow_unicode=False) or "user"
     return f"agromega-{main_user_id}-{slug}"[:150]
+
+
+def _should_initialize_nickname(nickname, username, main_user_id):
+    if not nickname:
+        return True
+    if nickname == username:
+        return True
+    return nickname.startswith(f"agromega-{main_user_id}-")

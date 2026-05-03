@@ -1,0 +1,25 @@
+{% load spirit_tags %}
+{% load_settings 'ST_MATH_JAX' %}
+{% spaceless %}
+    <footer class="layout__footer forum-footer">
+        <a class="footer__logo forum-footer__brand" href="{{ main_site_url }}/">Agro Mega</a>
+        <nav class="forum-footer__links" aria-label="Footer navigation">
+            <a href="{{ main_site_url }}/">Головна</a>
+            <a href="{{ main_categories_url }}">Почитати</a>
+            <a href="{{ forum_site_url }}/">Форум</a>
+        </nav>
+    </footer>
+{% endspaceless %}
+{% if st_settings.ST_MATH_JAX %}
+    <script type="text/x-mathjax-config">
+    (function () {
+      var elms = document.querySelectorAll(".math");
+      MathJax.Hub.Config({
+        elements: elms,
+        skipStartupTypeset: elms.length === 0
+      });
+    })();
+    </script>
+    <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML">
+    </script>
+{% endif %}

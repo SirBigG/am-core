@@ -14,6 +14,8 @@ class ForumOIDCValidator(OAuth2Validator):
             "name": lambda request: request.user.get_full_name(),
             "preferred_username": lambda request: request.user.get_full_name(),
             "picture": lambda request: self._avatar_url(request),
+            "is_staff": lambda request: request.user.is_staff,
+            "is_superuser": lambda request: request.user.is_superuser,
         }
 
     def get_discovery_claims(self, request):
@@ -26,6 +28,8 @@ class ForumOIDCValidator(OAuth2Validator):
             "name",
             "preferred_username",
             "picture",
+            "is_staff",
+            "is_superuser",
         ]
 
     @staticmethod

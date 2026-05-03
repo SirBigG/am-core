@@ -83,6 +83,7 @@ TEMPLATES = [
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
                 "djconfig.context_processors.config",
+                "forum_sso.context_processors.site_links",
             ]
         },
     }
