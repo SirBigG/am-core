@@ -187,6 +187,7 @@ ST_SITE_URL = FORUM_SITE_URL
 ST_UPLOAD_FILE_ENABLED = False
 ST_UPLOAD_IMAGE_ENABLED = True
 ST_NOTIFY_WHEN = "never"
+ST_NGRAM_SEARCH = True
 
 # Basic logging to console for local development (prints tracebacks)
 LOGGING = {
