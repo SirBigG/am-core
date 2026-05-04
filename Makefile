@@ -2,8 +2,11 @@ MANAGE=manage.py
 SETTINGS=settings.settings
 DEV_SETTINGS=settings.dev
 TEST_SETTINGS=settings.test_settings
+DOCKER_PLATFORM=linux/x86_64
+CORE_IMAGE=sirbigg/am-core:latest
+FORUM_IMAGE=sirbigg/am-forum:latest
 
-deploy: pull update test migrate statics compilemessages
+deploy: pull update test migrate collectstatic compilemessages
 
 update:
 	pip install -r requirements.txt
@@ -22,7 +25,7 @@ flake:
 migrate:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) migrate
 
-statics:
+collectstatic:
 	PYTHONPATH=`pwd` DJANGO_SETTINGS_MODULE=$(SETTINGS) ./$(MANAGE) collectstatic --noinput -i node_modules
 
 messages:
@@ -52,5 +55,9 @@ pull:
 
 
 release:
-	docker build --platform linux/x86_64 -t sirbigg/am-core:latest .
-	docker push sirbigg/am-core:latest
+	docker build --platform $(DOCKER_PLATFORM) -t $(CORE_IMAGE) .
+	docker push $(CORE_IMAGE)
+
+release-forum:
+	docker build --platform $(DOCKER_PLATFORM) -t $(FORUM_IMAGE) forum_instance
+	docker push $(FORUM_IMAGE)
