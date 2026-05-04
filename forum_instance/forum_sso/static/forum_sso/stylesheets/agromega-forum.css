@@ -539,6 +539,411 @@ body {
   margin: 0;
 }
 
+.agromega-forum .breadcrumb_nav {
+  align-items: center;
+  border-bottom: 1px solid var(--am-border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+  margin: 0 0 18px;
+  padding: 0 0 12px;
+}
+
+.agromega-forum .breadcrumb_nav li {
+  align-items: center;
+  color: var(--am-muted);
+  display: inline-flex;
+  font-size: 13px;
+  gap: 7px;
+}
+
+.agromega-forum .breadcrumb_nav a {
+  color: var(--am-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.agromega-forum .breadcrumb_nav a:hover,
+.agromega-forum .breadcrumb_nav a:focus {
+  color: var(--am-green-dark);
+}
+
+.agromega-forum .breadcrumb_nav .fa {
+  color: #9aaaa1;
+  font-size: 10px;
+}
+
+.agromega-forum .layout__article > .headline {
+  align-items: center;
+  color: var(--am-text);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 28px;
+  gap: 8px;
+  line-height: 1.25;
+  margin: 0 0 14px;
+}
+
+.agromega-forum .layout__article > .headline > .fa {
+  color: var(--am-green);
+  font-size: 17px;
+}
+
+.agromega-forum .topic_edit_link {
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  color: var(--am-green);
+  font-size: 13px;
+  font-weight: 700;
+  margin-left: auto;
+  padding: 6px 9px;
+  text-decoration: none;
+}
+
+.agromega-forum .topic_edit_link:hover,
+.agromega-forum .topic_edit_link:focus {
+  background: #f3faf5;
+  border-color: var(--am-green);
+  color: var(--am-green-dark);
+}
+
+.agromega-forum .layout__article > .layout__menu {
+  border-bottom: 0;
+  justify-content: flex-end;
+  margin: -4px 0 12px;
+  padding-bottom: 0;
+}
+
+.comments_list {
+  border-top: 1px solid var(--am-border);
+  margin-top: 16px;
+}
+
+.comments_list__comment {
+  border-bottom: 1px solid var(--am-border);
+  display: grid;
+  gap: 0 14px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  padding: 18px 0;
+}
+
+.comments_list__item {
+  align-items: center;
+  background: #f8fbf8;
+  border-bottom: 1px solid var(--am-border);
+  color: var(--am-muted);
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+}
+
+.comments_list__item__badge {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--am-border);
+  border-radius: 999px;
+  color: var(--am-green);
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  width: 32px;
+}
+
+.comments_list__item__info {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.comments_list__item__comment {
+  background: #ffffff;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.comment__img,
+.comments__reply__img {
+  grid-row: span 3;
+}
+
+.comment__img img,
+.comments__reply__img img {
+  border: 1px solid var(--am-border);
+  border-radius: 50%;
+  height: 42px;
+  object-fit: cover;
+  width: 42px;
+}
+
+.comment__info {
+  align-items: flex-start;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.comment__info__username__link,
+.comment__reply__info__link {
+  color: var(--am-text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.comment__info__username__link:hover,
+.comment__info__username__link:focus,
+.comment__reply__info__link:hover,
+.comment__reply__info__link:focus {
+  color: var(--am-green-dark);
+}
+
+.comment__info__username__realname,
+.comment__reply__info__realname {
+  color: var(--am-muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.comment__info__date {
+  align-items: center;
+  color: var(--am-muted);
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.comment__info__date li {
+  font-size: 13px;
+}
+
+.comment__text {
+  color: var(--am-text);
+  font-size: 15px;
+  line-height: 1.65;
+  margin-top: 10px;
+  min-width: 0;
+}
+
+.comment__text p {
+  margin: 0 0 12px;
+}
+
+.comment__text p:last-child {
+  margin-bottom: 0;
+}
+
+.comment__text blockquote {
+  background: #f8fbf8;
+  border-left: 3px solid var(--am-green);
+  color: var(--am-muted);
+  margin: 12px 0;
+  padding: 10px 12px;
+}
+
+.comment__text pre,
+.comment__text code {
+  background: #f3faf5;
+  border-radius: 5px;
+}
+
+.comment__text pre {
+  overflow-x: auto;
+  padding: 12px;
+}
+
+.comment__text img {
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  display: block;
+  height: auto;
+  margin: 12px 0;
+  max-width: 100%;
+}
+
+.comment__footer {
+  margin-top: 12px;
+  min-width: 0;
+}
+
+.comment__actions,
+.comment__footer__share__menu {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.comment__actions a,
+.comment__actions li,
+.comment__footer__share__menu a {
+  color: var(--am-muted);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.comment__actions a {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  display: inline-flex;
+  gap: 5px;
+  padding: 5px 8px;
+}
+
+.comment__actions a:hover,
+.comment__actions a:focus {
+  background: #f3faf5;
+  border-color: var(--am-border);
+  color: var(--am-green-dark);
+}
+
+.comment-like .fa-heart,
+.comment__actions .fa-heart {
+  color: #198754;
+}
+
+.comment__footer__share {
+  background: #f8fbf8;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.comment__footer__share__url {
+  margin-bottom: 10px;
+}
+
+.comments__footer_menu {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.comments__footer_menu__notify form {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  margin: 0;
+}
+
+.comments__move {
+  background: #f8fbf8;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  margin-top: 16px;
+  padding: 14px;
+}
+
+.comments__reply {
+  background: #f8fbf8;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  display: grid;
+  gap: 0 14px;
+  grid-template-columns: 44px minmax(0, 1fr);
+  margin-top: 18px;
+  padding: 16px;
+}
+
+.comment__reply__info {
+  min-width: 0;
+}
+
+.comment__reply__text {
+  grid-column: 2;
+  margin-top: 10px;
+  min-width: 0;
+}
+
+.forum-reply-form textarea {
+  min-height: 180px;
+  resize: vertical;
+}
+
+.comment__reply__actions,
+.forum-reply-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.comment__reply__actions__list {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.comment__reply__actions__list a {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--am-border);
+  border-radius: 5px;
+  color: var(--am-green);
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  text-decoration: none;
+  width: 34px;
+}
+
+.comment__reply__actions__list a:hover,
+.comment__reply__actions__list a:focus {
+  background: #f3faf5;
+  border-color: var(--am-green);
+  color: var(--am-green-dark);
+}
+
+.comment__reply__actions__publish {
+  margin-left: auto;
+}
+
+.comment__reply__preview {
+  background: #ffffff;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  margin-top: 10px;
+  padding: 12px;
+}
+
+.textcomplete {
+  background: #ffffff;
+  border: 1px solid var(--am-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 22px rgba(31, 42, 36, 0.08);
+  overflow: hidden;
+}
+
+.textcomplete li {
+  color: var(--am-text);
+  padding: 7px 10px;
+}
+
+.textcomplete .active,
+.textcomplete li:hover {
+  background: #f3faf5;
+}
+
 .agromega-forum .admin__statistics {
   display: grid;
   gap: 12px;
@@ -702,5 +1107,41 @@ body {
     margin-left: 0;
     margin-right: 0;
     padding: 14px;
+  }
+
+  .agromega-forum .layout__article > .headline {
+    font-size: 23px;
+  }
+
+  .agromega-forum .topic_edit_link {
+    margin-left: 0;
+  }
+
+  .comments_list__comment,
+  .comments__reply {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+
+  .comment__img img,
+  .comments__reply__img img {
+    height: 34px;
+    width: 34px;
+  }
+
+  .comment__info {
+    display: block;
+  }
+
+  .comment__info__date {
+    margin-top: 6px;
+  }
+
+  .comment__reply__text {
+    grid-column: 1 / -1;
+  }
+
+  .comment__reply__actions__publish {
+    margin-left: 0;
+    width: 100%;
   }
 }

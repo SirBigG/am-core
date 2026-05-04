@@ -362,3 +362,120 @@ msgstr "Перемістити вибрані коментарі до"
 
 msgid "Select comments to move"
 msgstr "Вибрати коментарі для переміщення"
+
+msgid "Main"
+msgstr "Головна"
+
+msgid "Moderate"
+msgstr "Модерація"
+
+msgid "Undelete topic"
+msgstr "Відновити тему"
+
+msgid "Delete topic"
+msgstr "Видалити тему"
+
+msgid "Open topic"
+msgstr "Відкрити тему"
+
+msgid "Close topic"
+msgstr "Закрити тему"
+
+msgid "Unpin topic"
+msgstr "Відкріпити тему"
+
+msgid "Pin topic"
+msgstr "Закріпити тему"
+
+msgid "Unpin topic globally"
+msgstr "Відкріпити глобально"
+
+msgid "Pin topic globally"
+msgstr "Закріпити глобально"
+
+msgid "Move"
+msgstr "Перемістити"
+
+msgid "Moderator"
+msgstr "Модератор"
+
+msgid "Original Poster"
+msgstr "Автор теми"
+
+msgid "delete"
+msgstr "видалити"
+
+msgid "undelete"
+msgstr "відновити"
+
+msgid "show"
+msgstr "показати"
+
+msgid "report"
+msgstr "поскаржитися"
+
+msgid "share"
+msgstr "поділитися"
+
+msgid "like"
+msgstr "вподобати"
+
+msgid "remove like"
+msgstr "прибрати вподобання"
+
+msgid "quote"
+msgstr "цитувати"
+
+msgid "reply"
+msgstr "відповісти"
+
+msgid "Bold"
+msgstr "Жирний"
+
+msgid "Italic"
+msgstr "Курсив"
+
+msgid "URL"
+msgstr "Посилання"
+
+msgid "Image"
+msgstr "Зображення"
+
+msgid "File"
+msgstr "Файл"
+
+msgid "Poll"
+msgstr "Опитування"
+
+msgid "Preview"
+msgstr "Попередній перегляд"
+
+msgid "uploading {name}"
+msgstr "завантаження {name}"
+
+msgid "bolded text"
+msgstr "жирний текст"
+
+msgid "italicised text"
+msgstr "курсивний текст"
+
+msgid "list item"
+msgstr "елемент списку"
+
+msgid "link text"
+msgstr "текст посилання"
+
+msgid "link url"
+msgstr "адреса посилання"
+
+msgid "image text"
+msgstr "опис зображення"
+
+msgid "image url"
+msgstr "адреса зображення"
+
+msgid "file text"
+msgstr "назва файлу"
+
+msgid "file url"
+msgstr "адреса файлу"
