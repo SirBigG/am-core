@@ -50,17 +50,25 @@ body {
   min-height: 100vh;
 }
 
+.agromega-forum *,
+.agromega-forum *::before,
+.agromega-forum *::after {
+  box-sizing: border-box;
+}
+
 .agromega-forum .spirit {
   background: var(--am-page);
 }
 
 .agromega-forum .layout {
+  display: block;
+  margin: 0 auto;
   max-width: 1180px;
   min-height: 100vh;
   height: auto;
   padding: 0 14px 28px;
   background: var(--am-page);
-  grid-gap: 18px;
+  width: 100%;
 }
 
 .forum-header {
@@ -82,6 +90,7 @@ body {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  min-width: 0;
 }
 
 .forum-header__logo {
@@ -106,10 +115,10 @@ body {
   flex-wrap: wrap;
   gap: 4px 10px;
   justify-content: center;
+  min-width: 0;
 }
 
-.forum-header__nav-link,
-.forum-footer__links a {
+.forum-header__nav-link {
   color: var(--am-green);
   font-size: 15px;
   font-weight: 600;
@@ -117,9 +126,7 @@ body {
 }
 
 .forum-header__nav-link:hover,
-.forum-header__nav-link:focus,
-.forum-footer__links a:hover,
-.forum-footer__links a:focus {
+.forum-header__nav-link:focus {
   color: var(--am-green-dark);
   text-decoration: underline;
 }
@@ -130,10 +137,13 @@ body {
   flex: 0 1 280px;
   gap: 6px;
   margin: 0;
+  min-width: 180px;
 }
 
 .agromega-forum .forum-header__search-input {
+  flex: 1 1 auto;
   font-size: 14px;
+  min-width: 0;
   min-height: 34px;
   padding: 7px 10px;
 }
@@ -146,6 +156,7 @@ body {
   cursor: pointer;
   display: inline-flex;
   height: 34px;
+  flex: 0 0 34px;
   justify-content: center;
   padding: 0 8px;
   width: 34px;
@@ -1056,51 +1067,63 @@ body {
   color: var(--am-green-dark);
 }
 
-.forum-footer {
-  align-items: center;
-  background: transparent;
-  border-top: 1px solid var(--am-border);
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 24px;
-  justify-content: space-between;
-  margin: 8px 0 0;
-  padding: 16px 4px 0;
-}
-
-.forum-footer__brand {
-  color: var(--am-green);
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.forum-footer__links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
 @media (max-width: 760px) {
+  .agromega-forum .layout {
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: 0 10px 22px;
+  }
+
   .forum-header {
     align-items: flex-start;
     flex-direction: column;
+    gap: 12px;
+    padding: 12px;
+    width: 100%;
+  }
+
+  .forum-header__brand,
+  .forum-header__nav,
+  .forum-header__search,
+  .forum-header__actions,
+  .agromega-forum .header__tabs_content {
+    flex: 0 0 auto;
+    max-width: 100%;
+    width: 100%;
   }
 
   .forum-header__nav {
     justify-content: flex-start;
   }
 
+  .forum-header__nav-link {
+    line-height: 1.25;
+  }
+
   .forum-header__search {
-    flex: 1 1 100%;
-    width: 100%;
+    align-self: stretch;
+    min-width: 0;
   }
 
   .forum-header__actions {
+    display: flex;
+    justify-content: flex-start;
     margin-left: 0;
+  }
+
+  .forum-header__user {
+    max-width: calc(100vw - 88px);
   }
 
   .agromega-forum .header__tabs_content__tab {
     justify-content: flex-start;
+  }
+
+  .agromega-forum .header__tab__nav,
+  .agromega-forum .menu_list_wrapper {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
   }
 
   .agromega-forum .layout__article {
