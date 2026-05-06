@@ -36,7 +36,7 @@ class DiaryPlantCategoryAutocomplete(autocomplete.Select2QuerySetView):
         qs = Category.objects.filter(
             is_active=True,
             parent__is_active=True,
-            parent__is_diary_species_parent=True,
+            parent__value="Рослинництво",
         ).order_by("value")
 
         if self.q:

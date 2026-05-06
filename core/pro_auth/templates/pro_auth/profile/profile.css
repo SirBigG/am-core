@@ -1,4 +1,5 @@
-.profile-page-panel {
+.profile-page-panel,
+.am-panel {
     background: linear-gradient(180deg, #ffffff 0%, #f9fbf8 100%);
     border: 1px solid #e4ece5;
     border-radius: 28px;
@@ -10,12 +11,39 @@
     padding: 32px;
 }
 
+.am-card {
+    position: relative;
+    border: 1px solid #d9e1e8;
+    border-radius: 1.75rem;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(148, 163, 184, 0.18);
+    transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, opacity 0.32s ease;
+}
+
+.am-card--compact {
+    border-radius: 1.25rem;
+    box-shadow: 0 6px 16px rgba(148, 163, 184, 0.14);
+}
+
+.profile-form-panel .profile-diary-detail-back {
+    margin-bottom: 1.25rem;
+}
+
 .profile-page-title {
     color: #1f2937;
     font-size: 2rem;
     font-weight: 700;
     line-height: 1.1;
     margin-bottom: 0.5rem;
+}
+
+.profile-page-subtitle {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.32rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
 }
 
 .profile-page-lead {
@@ -25,17 +53,100 @@
     margin-bottom: 1.75rem;
 }
 
-.profile-form-row {
+.am-choice-card {
+    position: relative;
+    border-radius: 16px;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+}
+
+.am-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    background: #eef2f7;
+    color: #52606d;
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.am-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 30px;
+    padding: 0.35rem 0.7rem;
+    border: 1px solid #dbe7dd;
+    border-radius: 999px;
+    background: #f8fbf7;
+    color: #4b5563;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.am-chip--summary {
+    min-height: 32px;
+    padding: 0.4rem 0.75rem;
+    color: #3f4d44;
+    font-size: 0.9rem;
+}
+
+.am-chip--count {
+    justify-content: center;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0 0.35rem;
+    border: 0;
+    background: rgba(20, 133, 67, 0.08);
+    color: currentColor;
+    font-size: 0.76rem;
+}
+
+.am-state {
+    padding: 14px 16px;
+    border: 1px dashed #cad7cb;
+    border-radius: 16px;
+    background: #fbfdf9;
+}
+
+.am-state__title {
+    color: #1f2937;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.am-state__meta {
+    margin-top: 0.35rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.am-state__actions {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin-top: 0.9rem;
+}
+
+.profile-form-row,
+.am-form-row {
     display: grid;
     gap: 1rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.profile-form-group {
+.profile-form-group,
+.am-form-group {
     margin-bottom: 1.5rem;
 }
 
-.profile-form-label {
+.profile-form-label,
+.am-form-label {
     color: #374151;
     display: block;
     font-size: 1rem;
@@ -48,7 +159,14 @@
 .profile-form-field select,
 .profile-form-field textarea,
 .profile-form-field .app-form-control,
-.profile-form-field .profile-form-control {
+.profile-form-field .profile-form-control,
+.profile-form-field .flatpickr-input,
+.am-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.am-field select,
+.am-field textarea,
+.am-field .app-form-control,
+.am-field .profile-form-control,
+.am-field .flatpickr-input {
     width: 100%;
     min-height: 56px;
     padding: 14px 18px;
@@ -61,7 +179,8 @@
     line-height: 1.4;
 }
 
-.profile-form-field input[type="file"] {
+.profile-form-field input[type="file"],
+.am-field input[type="file"] {
     width: 100%;
     padding: 14px 18px;
     background: #ffffff;
@@ -71,13 +190,99 @@
 }
 
 .profile-form-field textarea,
-.profile-form-field .django-ckeditor-widget {
+.profile-form-field .django-ckeditor-widget,
+.am-field textarea {
     min-height: 160px;
 }
 
 .profile-form-field select,
-.profile-form-field .profile-form-select {
-    appearance: auto;
+.profile-form-field .profile-form-select,
+.am-field--select select,
+.am-field--select .profile-form-select {
+    appearance: none;
+    padding-right: 44px;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #607260 50%),
+        linear-gradient(135deg, #607260 50%, transparent 50%);
+    background-position:
+        calc(100% - 22px) 50%,
+        calc(100% - 16px) 50%;
+    background-repeat: no-repeat;
+    background-size: 6px 6px, 6px 6px;
+}
+
+.profile-file-control {
+    width: 100%;
+    min-height: 56px;
+    height: 56px;
+    padding: 7px 14px;
+    background: #ffffff;
+    border: 1px dashed #b9cbb9;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+}
+
+.profile-file-control input[type="file"] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.profile-file-control__button {
+    min-height: 40px;
+    padding: 0 18px;
+    border-radius: 12px;
+    background: #f3fbf3;
+    color: #2f855a;
+    border: 1px solid transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.98rem;
+    font-weight: 600;
+    line-height: 1;
+    flex-shrink: 0;
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.18);
+}
+
+.profile-file-control:hover .profile-file-control__button,
+.profile-file-control:focus-within .profile-file-control__button {
+    border-color: #7ccf86;
+}
+
+.profile-file-control__name {
+    color: #6b7280;
+    font-size: 0.98rem;
+    line-height: 1.3;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-diary-item-meta-row {
+    grid-template-columns: minmax(0, 30fr) minmax(0, 70fr);
+    align-items: end;
+}
+
+.profile-diary-item-meta-row > .profile-form-group {
+    margin-bottom: 0;
+}
+
+.profile-diary-item-meta-row > .am-form-group {
+    margin-bottom: 0;
+}
+
+.profile-diary-item-meta-row + .profile-form-actions {
+    margin-top: 1.5rem;
 }
 
 .profile-form-field .django-ckeditor-widget {
@@ -101,7 +306,14 @@
 .profile-form-field select:focus,
 .profile-form-field textarea:focus,
 .profile-form-field .app-form-control:focus,
-.profile-form-field .profile-form-control:focus {
+.profile-form-field .profile-form-control:focus,
+.profile-form-field .flatpickr-input:focus,
+.am-field input:focus,
+.am-field select:focus,
+.am-field textarea:focus,
+.am-field .app-form-control:focus,
+.am-field .profile-form-control:focus,
+.am-field .flatpickr-input:focus {
     border-color: #8bcf95;
     box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.12);
     outline: none;
@@ -147,9 +359,243 @@
     margin-top: 0.75rem;
 }
 
+.flatpickr-calendar {
+    background: #ffffff;
+    border: 1px solid #dce8dd;
+    border-radius: 20px;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.14);
+    padding-top: 10px;
+}
+
+.flatpickr-months {
+    padding-bottom: 10px;
+    align-items: center;
+    justify-content: center;
+}
+
+.flatpickr-months .flatpickr-month,
+.flatpickr-current-month {
+    color: #1f2937;
+    fill: #1f2937;
+}
+
+.flatpickr-months .flatpickr-month {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flatpickr-current-month {
+    font-size: 1.05rem;
+    font-weight: 700;
+    padding-top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.flatpickr-monthDropdown-months,
+.numInput.cur-year {
+    font-weight: 700;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months,
+.flatpickr-current-month .numInputWrapper {
+    display: inline-flex;
+    align-items: center;
+}
+
+span.flatpickr-weekday {
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.flatpickr-day {
+    border-radius: 12px;
+    color: #1f2937;
+    font-weight: 600;
+}
+
+.flatpickr-day:hover,
+.flatpickr-day:focus {
+    background: #f3fbf3;
+    border-color: #cfe6d2;
+}
+
+.flatpickr-day.today {
+    border-color: #8bcf95;
+    color: #2f855a;
+}
+
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange,
+.flatpickr-day.selected:hover,
+.flatpickr-day.startRange:hover,
+.flatpickr-day.endRange:hover {
+    background: #0b8043;
+    border-color: #0b8043;
+    color: #ffffff;
+}
+
+.flatpickr-months .flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month {
+    top: 10px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border-radius: 10px;
+    color: #607260;
+    fill: #607260;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flatpickr-months .flatpickr-prev-month {
+    left: 10px !important;
+}
+
+.flatpickr-months .flatpickr-next-month {
+    right: 10px !important;
+}
+
+.flatpickr-months .flatpickr-prev-month:hover,
+.flatpickr-months .flatpickr-next-month:hover {
+    background: #f3fbf3;
+    color: #2f855a;
+    fill: #2f855a;
+}
+
+.flatpickr-months .flatpickr-prev-month svg,
+.flatpickr-months .flatpickr-next-month svg {
+    display: block;
+    width: 14px;
+    height: 14px;
+}
+
+.profile-form-actions .am-btn,
 .profile-form-actions .btn {
     min-height: 56px;
     padding-inline: 24px;
+}
+
+.am-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 48px;
+    padding: 0 1.25rem;
+    border-radius: 12px;
+    border: 1px solid transparent;
+    font-size: 1rem;
+    line-height: 1;
+    text-align: center;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease,
+        color 0.18s ease, transform 0.18s ease;
+    outline: none;
+}
+
+.am-btn--primary {
+    color: #ffffff;
+    background: #0b8043;
+    border-color: #0b8043;
+    box-shadow: 0 10px 22px rgba(11, 128, 67, 0.18);
+}
+
+.am-btn--primary:hover,
+.am-btn--primary:focus,
+.am-btn--primary:active {
+    color: #ffffff;
+    background: #096d39;
+    border-color: #096d39;
+    box-shadow: 0 12px 24px rgba(11, 128, 67, 0.22);
+}
+
+.am-btn--soft {
+    color: #148543 !important;
+    background: #f3fbf3 !important;
+    border-color: transparent !important;
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.18) !important;
+}
+
+.am-btn--soft:hover,
+.am-btn--soft:focus,
+.am-btn--soft:active {
+    color: #148543 !important;
+    background: #f3fbf3 !important;
+    border-color: #8bcf95 !important;
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.18) !important;
+}
+
+.am-btn--danger {
+    color: #374151;
+    background: #f5f7fa;
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+}
+
+.am-btn--danger:hover,
+.am-btn--danger:focus,
+.am-btn--danger:active {
+    color: #b42318;
+    background: #fff3f2;
+    border-color: #f3b8b2;
+    box-shadow: 0 8px 18px rgba(220, 53, 69, 0.10);
+}
+
+.am-btn--icon {
+    width: 56px;
+    min-width: 56px;
+    padding: 0;
+    flex-shrink: 0;
+}
+
+.am-btn:focus,
+.am-btn:focus-visible {
+    outline: none;
+}
+
+.am-menu {
+    position: relative;
+    z-index: 4;
+    flex: 0 0 auto;
+}
+
+.am-menu__toggle {
+    position: relative;
+    z-index: 1;
+}
+
+.am-menu__dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    display: grid;
+    gap: 0.5rem;
+    padding: 12px;
+    border: 1px solid #dbe7dd;
+    border-radius: 16px;
+    background: #ffffff;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.12);
+    z-index: 40;
+}
+
+.am-menu__action {
+    width: 100%;
+    min-height: 46px;
+    height: 46px;
+    padding: 0 16px !important;
+    line-height: 1.2;
+    text-align: center;
 }
 
 .profile-plant-formset {
@@ -165,6 +611,10 @@
 }
 
 .profile-plant-formset__header {
+    margin-bottom: 1rem;
+}
+
+.profile-plant-formset__lead {
     margin-bottom: 1rem;
 }
 
@@ -201,6 +651,12 @@
     z-index: 2;
 }
 
+.profile-plant-formset__remove[disabled],
+.profile-plant-formset__remove[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.65;
+}
+
 .profile-plant-formset__delete {
     display: none;
 }
@@ -228,6 +684,67 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
     gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.profile-event-apply-card {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+    min-height: 56px;
+    padding: 14px 16px;
+    border: 1px solid #d6e0d7;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fbf7 100%);
+    color: #1f2937;
+    cursor: pointer;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease,
+        transform 0.18s ease;
+}
+
+.profile-event-apply-card:hover {
+    transform: translateY(-1px);
+    border-color: #9fd7a6;
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.10);
+}
+
+.profile-event-apply-card input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.profile-event-apply-card__box {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #57b85f;
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: inset 0 0 0 4px #ffffff;
+    transition: border-color 0.18s ease, background-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.profile-event-apply-card__name {
+    overflow: hidden;
+    color: #1f2937;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+}
+
+.profile-event-apply-card:has(input:checked) {
+    border-color: #4caf50;
+    background: linear-gradient(180deg, #f9fff9 0%, #f1faef 100%);
+    box-shadow: 0 12px 28px rgba(76, 175, 80, 0.14);
+}
+
+.profile-event-apply-card:has(input:checked) .profile-event-apply-card__box {
+    border-color: #4caf50;
+    background: #4caf50;
+    box-shadow: inset 0 0 0 4px #ffffff;
 }
 
 .profile-event-plant-card {
@@ -286,25 +803,45 @@
     margin: 0 auto;
 }
 
+.profile-diary-section + .profile-diary-section {
+    margin-top: 2rem;
+}
+
+.profile-diary-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-diary-section__title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
 .profile-diary-card {
-    position: relative;
     cursor: pointer;
-    border-color: #d9e1e8 !important;
-    border-radius: 1.75rem !important;
-    box-shadow: 0 8px 20px rgba(148, 163, 184, 0.18) !important;
-    transition: transform 0.32s ease, box-shadow 0.32s ease, border-color 0.32s ease, opacity 0.32s ease;
+}
+
+.profile-diary-card:not(.profile-diary-entry-card) .card-body {
+    padding: 18px !important;
 }
 
 .profile-diary-card:hover {
-    transform: translateY(-1px);
-    border-color: #b8d4bf !important;
-    box-shadow: 0 18px 34px rgba(76, 175, 80, 0.16) !important;
+    transform: translateY(-2px);
+    border-color: #9fcca8 !important;
+    box-shadow: 0 22px 42px rgba(76, 175, 80, 0.22) !important;
 }
 
 .profile-diary-card:focus-within {
-    transform: translateY(-1px);
+    transform: translateY(-2px);
     border-color: #8bcf95 !important;
-    box-shadow: 0 18px 34px rgba(76, 175, 80, 0.18) !important;
+    box-shadow: 0 22px 42px rgba(76, 175, 80, 0.24) !important;
 }
 
 .profile-diary-card.is-deleting {
@@ -319,13 +856,20 @@
     color: #232a33;
     font-size: 1rem;
     font-weight: 700;
-    line-height: 1.2;
+    line-height: 1.25;
     text-decoration: none;
 }
 
 .profile-diary-card-title:hover {
     color: #232a33;
     text-decoration: none;
+}
+
+.profile-diary-card-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 .profile-diary-card-actions {
@@ -345,6 +889,31 @@
     line-height: 1;
 }
 
+.profile-diary-card-archive-btn {
+    position: relative;
+    z-index: 3;
+    flex: 0 0 auto;
+}
+
+.profile-diary-card-menu__toggle {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.profile-diary-card-menu__toggle:hover,
+.profile-diary-card-menu__toggle:focus,
+.profile-diary-card-menu.is-open .profile-diary-card-menu__toggle {
+    border-color: #8bcf95 !important;
+}
+
+.profile-diary-card-menu__dropdown {
+    min-width: 180px;
+}
+
 .profile-diary-card-subtitle {
     overflow: hidden;
     color: #7b8794;
@@ -360,18 +929,26 @@
 }
 
 .profile-diary-card-meta {
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.3rem;
     color: #7b8794;
-    font-size: 0.9rem;
-    line-height: 1.35;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.profile-diary-card-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin: 0.15rem 0 0.7rem;
 }
 
 .profile-diary-card-last-event {
-    margin-top: 0.9rem;
-    padding: 12px 14px;
-    border: 1px solid #dbe7dd;
+    margin-top: 0.85rem;
+    padding: 11px 13px;
+    border: 1px solid #e5ebe5;
     border-radius: 14px;
-    background: #f8fbf6;
+    background: #fbfdf9;
     color: #374151;
 }
 
@@ -386,25 +963,43 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 0.5rem;
-    color: #148543;
-    font-size: 0.85rem;
+    color: #1f2937;
+    font-size: 0.84rem;
     font-weight: 700;
     line-height: 1.25;
 }
 
+.profile-diary-card-last-event__label {
+    margin-bottom: 0.3rem;
+    color: #6b7280;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
 .profile-diary-card-last-event__plants {
-    margin-top: 0.35rem;
+    margin-top: 0.3rem;
     color: #4b5563;
-    font-size: 0.88rem;
+    font-size: 0.86rem;
     font-weight: 700;
     line-height: 1.3;
 }
 
 .profile-diary-card-last-event__text {
-    margin-top: 0.35rem;
+    margin-top: 0.3rem;
     color: #6b7280;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     line-height: 1.4;
+}
+
+.profile-diary-card-state {
+    margin-top: 0.9rem;
+}
+
+.profile-diary-card--archived {
+    opacity: 0.92;
 }
 
 .profile-diary-empty-garden {
@@ -499,7 +1094,7 @@
 }
 
 .profile-diary-detail-hero {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.25rem;
 }
 
 .profile-diary-detail-wrap {
@@ -511,21 +1106,229 @@
 .profile-diary-detail-layout {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 320px;
-    gap: 1.5rem;
+    gap: 1.25rem;
     align-items: start;
+}
+
+.profile-diary-plant-management {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.profile-diary-plant-management__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.profile-diary-plant-management__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.profile-diary-plant-management__lead {
+    margin: -0.15rem 0 0;
+    color: #6b7280;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    width: 100%;
+}
+
+.profile-diary-plant-management__tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.3rem;
+    border: 1px solid #dbe7dd;
+    border-radius: 18px;
+    background: #f7faf7;
+}
+
+.profile-diary-plant-management__tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    flex: 1 1 0;
+    min-height: 40px;
+    padding: 0.55rem 0.8rem;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #4b5563;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-diary-plant-management__tab.is-active {
+    background: #ffffff;
+    color: #148543;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.profile-diary-plant-management__panel {
+    min-width: 0;
+}
+
+.profile-diary-plant-management__list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.profile-diary-plant-management__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 6px 15px;
+    border: 1px solid #dbe7dd;
+    border-radius: 14px;
+    background: #ffffff;
+}
+
+.profile-diary-plant-management__item--completed {
+    background: #fafcf9;
+}
+
+.profile-diary-plant-management__item:has(.profile-diary-plant-menu.is-open) {
+    z-index: 30;
+}
+
+.profile-diary-plant-management__name {
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.25;
+}
+
+.profile-diary-plant-management__item-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.profile-diary-plant-management__meta {
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.profile-diary-plant-management__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-diary-plant-menu__toggle {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.profile-diary-plant-menu__toggle:hover,
+.profile-diary-plant-menu__toggle:focus,
+.profile-diary-plant-menu.is-open .profile-diary-plant-menu__toggle {
+    border-color: #8bcf95 !important;
+}
+
+.profile-diary-plant-menu.is-open {
+    z-index: 50;
+}
+
+.profile-diary-plant-menu__dropdown {
+    top: calc(100% + 0.5rem);
+    z-index: 60;
+    min-width: 220px;
+    border-radius: 18px;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.profile-diary-plant-management {
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.profile-diary-plant-management__empty {
+    padding: 0.95rem 1rem;
+    border: 1px dashed #d6e0d7;
+    border-radius: 14px;
+    background: #fbfdf9;
+    color: #6b7280;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.profile-diary-filters-toggle.is-active {
+    border-color: #8bcf95 !important;
+    color: #148543 !important;
+    background: #f3fbf3 !important;
+}
+
+.profile-diary-entry-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.profile-diary-filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    height: 48px;
+    line-height: 1.2;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
 .profile-diary-filters {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    gap: 0.9rem;
+    margin-bottom: 1.15rem;
+    padding: 20px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+}
+
+.profile-diary-filters.is-collapsed {
+    display: none;
+}
+
+.profile-diary-filters__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 1rem;
     align-items: end;
-    margin-bottom: 1.25rem;
-    padding: 20px;
-    border: 1px solid #dbe7dd;
-    border-radius: 24px;
-    background: linear-gradient(180deg, #ffffff 0%, #f9fbf8 100%);
-    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.08);
+}
+
+.profile-diary-entry-group {
+    margin-bottom: 0.85rem;
+}
+
+.profile-diary-entry-group-title {
+    margin: 0 0 0.55rem;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
 }
 
 .profile-diary-filters__field {
@@ -533,13 +1336,25 @@
     margin-bottom: 0;
 }
 
+.profile-diary-filters__footer {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-diary-filters__search {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+}
+
 .profile-diary-filters .profile-form-label {
-    font-size: 1rem;
-    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+    margin-bottom: 0.55rem;
 }
 
 .profile-diary-filters .profile-form-control {
-    min-height: 56px;
+    min-height: 52px;
     border-radius: 16px;
 }
 
@@ -563,21 +1378,48 @@
 }
 
 .profile-diary-filters__actions .btn {
-    min-height: 56px;
-    border-radius: 16px;
+    min-height: 52px;
+    border-radius: 12px !important;
 }
 
 .profile-diary-detail-topbar {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
-    gap: 1.5rem;
+    gap: 1.75rem;
+}
+
+.profile-diary-detail-topbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex: 0 0 auto;
+}
+
+.profile-diary-detail-menu__toggle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.profile-diary-detail-menu__toggle:hover,
+.profile-diary-detail-menu__toggle:focus,
+.profile-diary-detail-menu.is-open .profile-diary-detail-menu__toggle {
+    border-color: #8bcf95 !important;
+}
+
+.profile-diary-detail-menu__dropdown {
+    min-width: 220px;
 }
 
 .profile-diary-detail-heading-wrap {
     display: flex;
-    align-items: flex-start;
-    gap: 0.9rem;
+    align-items: center;
+    gap: 1.35rem;
     flex: 1 1 auto;
 }
 
@@ -585,17 +1427,17 @@
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding-top: 0.2rem;
-    color: #6b7280;
-    font-size: 0.95rem;
-    font-weight: 600;
+    color: #8a94a5;
+    font-size: 0.9rem;
+    font-weight: 500;
     line-height: 1.2;
     text-decoration: none;
+    flex: 0 0 auto;
 }
 
 .profile-diary-detail-back:hover,
 .profile-diary-detail-back:focus {
-    color: #1f2937;
+    color: #4b5563;
     text-decoration: none;
 }
 
@@ -606,53 +1448,43 @@
     flex: 1 1 auto;
 }
 
+.profile-diary-detail-heading-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
 .profile-diary-detail-title {
     margin: 0;
     color: #148543;
-    font-size: 1.875rem;
+    font-size: 1.95rem;
     font-weight: 700;
-    line-height: 1.05;
-}
-
-.profile-diary-detail-date {
-    color: #6b7280;
-    font-size: 1rem;
-    font-weight: 500;
-    line-height: 1.4;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
 }
 
 .profile-diary-detail-add-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
     flex: 0 0 auto;
-    min-height: 56px;
-    padding: 0.75rem 1.75rem;
-    border-radius: 1.25rem !important;
-    border: 1px solid #4caf50 !important;
-    color: #ffffff !important;
-    background: #4caf50 !important;
-    font-size: 1rem;
+    min-height: 48px;
+    height: 48px;
+    padding: 0 1.5rem;
+    font-size: 0.98rem;
     font-weight: 700;
-    line-height: 1;
+    line-height: 1.2;
     box-shadow: none !important;
-    text-align: center;
-    vertical-align: middle;
 }
 
 .profile-diary-detail-add-btn:hover,
 .profile-diary-detail-add-btn:focus,
 .profile-diary-detail-add-btn:active {
-    color: #2e7d32 !important;
-    background: #f3fbf3 !important;
-    border-color: #4caf50 !important;
     box-shadow: none !important;
 }
 
 .profile-diary-entry-list {
     position: relative;
-    margin-top: 1.5rem;
-    padding-left: 2rem;
+    margin-top: 1.25rem;
+    padding-left: 1.9rem;
 }
 
 .profile-diary-entry-list::before {
@@ -692,12 +1524,16 @@
     box-shadow: 0 8px 20px rgba(148, 163, 184, 0.18) !important;
 }
 
+.profile-diary-entry-card .card-body {
+    padding: 1.0rem !important;
+}
+
 .profile-diary-entry-top {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.4rem;
 }
 
 .profile-diary-entry-meta {
@@ -707,29 +1543,23 @@
     gap: 0.5rem;
 }
 
-.profile-diary-entry-date {
-    color: #6b7280;
-    font-size: 0.95rem;
-    font-weight: 600;
-    line-height: 1.3;
-}
-
-.profile-diary-entry-separator {
-    color: #9ca3af;
-    font-size: 1rem;
-    font-weight: 600;
-    line-height: 1;
-}
-
 .profile-diary-entry-type {
     color: #1f2937;
-    font-size: 1rem;
+    font-size: 0.98rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
+.profile-diary-entry-target {
+    margin-bottom: 0.65rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
 .profile-diary-entry-image-wrap {
-    margin-bottom: 1.25rem;
+    margin-bottom: 0.9rem;
 }
 
 .profile-diary-entry-image {
@@ -742,21 +1572,31 @@
 
 .profile-diary-entry-description {
     color: #4b5563;
-    font-size: 1rem;
-    line-height: 1.55;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .profile-diary-entry-description > *:last-child {
     margin-bottom: 0;
 }
 
-.profile-diary-entry-actions {
-    margin-top: 1.5rem;
+.profile-diary-entry-menu__toggle {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1.05rem;
+    line-height: 1;
 }
 
-.profile-diary-entry-actions .btn[disabled] {
-    opacity: 1;
-    cursor: default;
+.profile-diary-entry-menu__toggle:hover,
+.profile-diary-entry-menu__toggle:focus,
+.profile-diary-entry-menu.is-open .profile-diary-entry-menu__toggle {
+    border-color: #8bcf95 !important;
+}
+
+.profile-diary-entry-menu__dropdown {
+    min-width: 180px;
 }
 
 .profile-diary-empty-state {
@@ -767,8 +1607,9 @@
 .profile-diary-empty-title {
     margin: 0 0 0.5rem;
     color: #1f2937;
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 700;
+    line-height: 1.2;
 }
 
 .profile-diary-empty-text {
@@ -778,36 +1619,48 @@
     line-height: 1.5;
 }
 
+.profile-diary-empty-garden__text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 520px;
+}
+
+.profile-diary-status-banner {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
 .profile-diary-recommendation-column {
     position: relative;
-    margin-top: 1.5rem;
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
 }
 
 .profile-diary-recommendation {
-    position: sticky;
-    top: 1.5rem;
-    padding: 20px 18px;
-    border: 1px solid #dbe7dd;
-    border-radius: 24px;
-    background: linear-gradient(180deg, #ffffff 0%, #f8fbf6 100%);
-    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+    position: static;
+    padding: 15px 14px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
 }
 
 .profile-diary-recommendation--low {
     border-color: #cfe7d1;
-    box-shadow: 0 14px 32px rgba(76, 175, 80, 0.10);
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.05);
 }
 
 .profile-diary-recommendation--medium {
     border-color: #f2ddb7;
     background: linear-gradient(180deg, #fffdfa 0%, #fff8ee 100%);
-    box-shadow: 0 16px 34px rgba(217, 119, 6, 0.12);
+    box-shadow: 0 8px 18px rgba(217, 119, 6, 0.05);
 }
 
 .profile-diary-recommendation--high {
     border-color: #f2c2c2;
     background: linear-gradient(180deg, #fffafa 0%, #fff3f3 100%);
-    box-shadow: 0 16px 34px rgba(220, 53, 69, 0.12);
+    box-shadow: 0 8px 18px rgba(220, 53, 69, 0.05);
 }
 
 .profile-diary-recommendation--empty {
@@ -820,46 +1673,63 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.7rem;
     color: #6b7280;
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 700;
     letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
 .profile-diary-recommendation__title {
-    margin: 0 0 0.5rem;
+    margin: 0 0 0.4rem;
     color: #1f2937;
-    font-size: 1.05rem;
+    font-size: 0.98rem;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.35;
+}
+
+.profile-diary-recommendation__target {
+    margin: 0 0 0.45rem;
+    color: #4b5563;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.35;
 }
 
 .profile-diary-recommendation__summary {
     margin: 0;
     color: #4b5563;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.5;
 }
 
+.profile-diary-recommendation__next-step {
+    margin: 0.7rem 0 0;
+    padding-top: 0.7rem;
+    border-top: 1px solid rgba(107, 114, 128, 0.12);
+    color: #374151;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
 .profile-diary-recommendation__toggle {
-    margin-top: 0.9rem;
+    margin-top: 0.75rem;
     padding: 0;
     border: 0;
     background: transparent;
     color: #148543;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 700;
     line-height: 1.2;
 }
 
 .profile-diary-recommendation__details {
-    margin-top: 0.9rem;
-    padding-top: 0.9rem;
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
     border-top: 1px solid rgba(107, 114, 128, 0.16);
     color: #374151;
-    font-size: 0.93rem;
+    font-size: 0.9rem;
     line-height: 1.55;
 }
 
@@ -869,20 +1739,30 @@
 
 @media (max-width: 767.98px) {
     .profile-form-panel {
-        padding: 24px 20px;
+        padding: 24px 20px calc(96px + env(safe-area-inset-bottom));
+        margin-bottom: calc(88px + env(safe-area-inset-bottom));
     }
 
     .profile-page-title {
         font-size: 1.75rem;
     }
 
-    .profile-form-row {
+    .profile-form-row,
+    .am-form-row {
         grid-template-columns: 1fr;
     }
 
     .profile-diary-detail-topbar {
         flex-direction: column;
         align-items: stretch;
+        gap: 1rem;
+    }
+
+    .profile-diary-detail-topbar-actions {
+        justify-content: stretch;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0.6rem;
     }
 
     .profile-diary-detail-layout {
@@ -893,6 +1773,15 @@
         grid-template-columns: 1fr;
     }
 
+    .profile-diary-filters__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-filters__footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
     .profile-diary-filters__actions {
         flex-direction: column;
         align-items: stretch;
@@ -900,6 +1789,80 @@
 
     .profile-diary-detail-heading-wrap {
         align-items: flex-start;
+    }
+
+    .profile-diary-detail-title {
+        font-size: 1.7rem;
+    }
+
+    .profile-diary-detail-back {
+        font-size: 0.88rem;
+    }
+
+    .profile-diary-detail-add-btn {
+        flex: 1 1 auto;
+        width: auto;
+        text-align: center;
+    }
+
+    .profile-diary-detail-menu {
+        flex: 0 0 auto;
+    }
+
+    .profile-diary-detail-menu__toggle {
+        width: 48px;
+        min-width: 48px;
+    }
+
+    .profile-diary-detail-menu__dropdown,
+    .profile-diary-entry-menu__dropdown,
+    .profile-diary-card-menu__dropdown,
+    .profile-diary-plant-menu__dropdown {
+        min-width: min(220px, calc(100vw - 40px));
+        max-width: calc(100vw - 40px);
+        right: 0;
+    }
+
+    .profile-diary-entry-section-header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .profile-diary-filters-toggle {
+        min-width: fit-content;
+    }
+
+    .profile-diary-plant-management {
+        width: 100%;
+    }
+
+    .profile-diary-plant-management__tabs {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .profile-diary-plant-management__tab {
+        justify-content: center;
+    }
+
+    .profile-diary-plant-management__item-actions {
+        justify-content: flex-end;
+    }
+
+    .profile-diary-plant-management__item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile-diary-plant-management__item-main {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .profile-diary-plant-management__item-actions {
+        flex: 0 0 auto;
+        align-self: center;
     }
 
     .profile-diary-entry-list {
@@ -914,11 +1877,6 @@
         left: -0.77rem;
     }
 
-    .profile-diary-detail-add-btn {
-        width: 100%;
-        text-align: center;
-    }
-
     .profile-diary-empty-garden {
         padding-top: 2.5rem;
     }
@@ -929,11 +1887,7 @@
 
     .profile-diary-recommendation-column {
         margin-top: 0;
-        order: -1;
-    }
-
-    .profile-diary-recommendation {
-        position: static;
+        order: 1;
     }
 
     .profile-confirm-actions {

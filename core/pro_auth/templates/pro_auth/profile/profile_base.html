@@ -6,7 +6,11 @@
           rel="stylesheet"
           integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
           crossorigin="anonymous">
+    <link rel="stylesheet"
+          href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static 'posts/list.css' %}">
 {% endblock scripts %}
@@ -48,4 +52,41 @@
             {% endblock profile_content %}
         </div>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof flatpickr === "undefined") {
+                return;
+            }
+
+            if (flatpickr.l10ns && flatpickr.l10ns.uk) {
+                flatpickr.localize(flatpickr.l10ns.uk);
+            }
+
+            window.initProfileDatepickers = function (container) {
+                const root = container || document;
+                const dateInputs = root.querySelectorAll("[data-profile-datepicker]");
+
+                dateInputs.forEach(function (input) {
+                    if (input._flatpickr) {
+                        return;
+                    }
+
+                    flatpickr(input, {
+                        altInput: true,
+                        altFormat: "d.m.Y",
+                        dateFormat: "Y-m-d",
+                        allowInput: true,
+                        clickOpens: true,
+                        disableMobile: true,
+                        monthSelectorType: "static",
+                        locale: "uk",
+                        prevArrow: "‹",
+                        nextArrow: "›",
+                    });
+                });
+            };
+
+            window.initProfileDatepickers(document);
+        });
+    </script>
 {% endblock base_content_block %}

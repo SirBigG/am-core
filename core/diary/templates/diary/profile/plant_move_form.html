@@ -1,0 +1,29 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <a class="profile-diary-detail-back"
+           href="{% url 'pro_auth:profile-diary-detail' pk=source_diary.id %}">
+            <span aria-hidden="true">←</span>
+            <span>Назад до щоденника</span>
+        </a>
+        <h1 class="profile-page-title">Перенести рослину</h1>
+        <p class="profile-page-lead">
+            Рослина <strong>{{ plant.display_name }}</strong> буде прибрана з щоденника
+            <strong>{{ source_diary.title }}</strong> і прив’язана до іншого активного щоденника.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+            {% endif %}
+            <div class="profile-form-group am-form-group">
+                <label class="profile-form-label am-form-label" for="{{ form.target_diary.id_for_label }}">{{ form.target_diary.label }}</label>
+                <div class="profile-form-field am-field am-field--select">{{ form.target_diary }}</div>
+                {% for error in form.target_diary.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+            </div>
+            <div class="profile-form-actions">
+                <button type="submit" class="btn am-btn am-btn--primary">Підтвердити перенесення</button>
+            </div>
+        </form>
+    </div>
+{% endblock profile_content %}

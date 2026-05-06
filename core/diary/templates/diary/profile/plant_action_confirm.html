@@ -1,0 +1,21 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <a class="profile-diary-detail-back"
+           href="{% url 'pro_auth:profile-diary-detail' pk=diary.id %}">
+            <span aria-hidden="true">←</span>
+            <span>Назад до щоденника</span>
+        </a>
+        <h1 class="profile-page-title">{{ action_title }}</h1>
+        <p class="profile-page-lead">{{ action_lead|safe }}</p>
+        <div class="profile-form-actions">
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit"
+                        class="btn am-btn {% if action_button_class == 'btn-danger' %}am-btn--danger{% else %}am-btn--primary{% endif %}">
+                    {{ action_button_label }}
+                </button>
+            </form>
+        </div>
+    </div>
+{% endblock profile_content %}

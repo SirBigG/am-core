@@ -6,6 +6,12 @@ from core.diary.views import (
     AddDiaryView,
     DiaryDeleteView,
     DiaryItemDeleteView,
+    DiaryRestoreView,
+    PlantArchiveView,
+    PlantDeleteView,
+    PlantingView,
+    PlantMoveView,
+    PlantRestoreView,
     ProfileDiaryDetailView,
     ProfileDiaryListView,
     UpdateDiaryItemView,
@@ -29,6 +35,26 @@ urlpatterns = [
         name="profile-diary-item-update",
     ),
     path(
+        "profile/diary/<int:diary_id>/plant/add/",
+        login_required(PlantingView.as_view()),
+        name="profile-diary-plant-add",
+    ),
+    path(
+        "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/archive/",
+        login_required(PlantArchiveView.as_view()),
+        name="profile-diary-plant-archive",
+    ),
+    path(
+        "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/restore/",
+        login_required(PlantRestoreView.as_view()),
+        name="profile-diary-plant-restore",
+    ),
+    path(
+        "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/delete/",
+        login_required(PlantDeleteView.as_view()),
+        name="profile-diary-plant-delete",
+    ),
+    path(
         "profile/diary/<int:pk>",
         login_required(ProfileDiaryDetailView.as_view()),
         name="profile-diary-detail",
@@ -37,6 +63,16 @@ urlpatterns = [
         "profile/diary/<int:pk>/delete/",
         login_required(DiaryDeleteView.as_view()),
         name="profile-diary-delete",
+    ),
+    path(
+        "profile/diary/<int:pk>/restore/",
+        login_required(DiaryRestoreView.as_view()),
+        name="profile-diary-restore",
+    ),
+    path(
+        "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/move/",
+        login_required(PlantMoveView.as_view()),
+        name="profile-diary-plant-move",
     ),
     path(
         "profile/diary/update/<int:pk>",

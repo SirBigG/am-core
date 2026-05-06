@@ -2,6 +2,11 @@
 {% load post_extras %}
 {% block profile_content %}
     <div class="profile-page-panel profile-form-panel">
+        <a class="profile-diary-detail-back"
+           href="{% url 'pro_auth:profile-diary-detail' pk=diary.id %}">
+            <span aria-hidden="true">←</span>
+            <span>Назад до щоденника</span>
+        </a>
         <h1 class="profile-page-title">
             {% if is_edit_mode %}
                 Змінити дію
@@ -20,28 +25,63 @@
               action="{% if is_edit_mode %}{% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %}{% else %}{% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %}{% endif %}"
               enctype="multipart/form-data">
             {% csrf_token %}
-            {% for field in form %}
-                <div class="profile-form-group">
-                    <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {% if field.name == "plants" %}
-                        <div class="profile-event-plant-grid">
-                            {% for choice in field %}
-                                <label class="profile-event-plant-card" for="{{ choice.id_for_label }}">
-                                    {{ choice.tag }}
-                                    <span class="profile-event-plant-card__box" aria-hidden="true"></span>
-                                    <span class="profile-event-plant-card__name">{{ choice.choice_label }}</span>
-                                </label>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="profile-form-field">{{ field }}</div>
-                    {% endif %}
-                    {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+            {% if form.non_field_errors %}
+                <div class="profile-form-group am-form-group">
+                    {% for error in form.non_field_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
                 </div>
+            {% endif %}
+            {% for field in form %}
+                {% if field.name != "date" and field.name != "image" %}
+                    <div class="profile-form-group am-form-group">
+                        {% if field.name == "apply_to_all" %}
+                            <label class="profile-event-apply-card am-choice-card" for="{{ field.id_for_label }}">
+                                {{ field }}
+                                <span class="profile-event-apply-card__box" aria-hidden="true"></span>
+                                <span class="profile-event-apply-card__name">{{ field.label }}</span>
+                            </label>
+                        {% elif field.name == "plants" %}
+                            <label class="profile-form-label am-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                            <div class="profile-event-plant-grid" data-plant-targets>
+                                {% for choice in field %}
+                                    <label class="profile-event-plant-card am-choice-card" for="{{ choice.id_for_label }}">
+                                        {{ choice.tag }}
+                                        <span class="profile-event-plant-card__box" aria-hidden="true"></span>
+                                        <span class="profile-event-plant-card__name">{{ choice.choice_label }}</span>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <label class="profile-form-label am-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            <div class="profile-form-field am-field{% if field.name == 'action_type' %} am-field--select{% endif %}">{{ field }}</div>
+                        {% endif %}
+                        {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                        {% if field.help_text and field.name != "plants" %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                    </div>
+                {% endif %}
             {% endfor %}
+            <div class="profile-form-row am-form-row profile-diary-item-meta-row">
+                <div class="profile-form-group am-form-group">
+                    <label class="profile-form-label am-form-label" for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+                    <div class="profile-form-field am-field am-field--date">{{ form.date }}</div>
+                    {% for error in form.date.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if form.date.help_text %}<p class="profile-form-help">{{ form.date.help_text }}</p>{% endif %}
+                </div>
+                <div class="profile-form-group am-form-group">
+                    <label class="profile-form-label am-form-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+                    <div class="profile-form-field am-field am-field--file">
+                        <label class="profile-file-control" for="{{ form.image.id_for_label }}">
+                            {{ form.image }}
+                            <span class="profile-file-control__button">Вибрати фото</span>
+                            <span class="profile-file-control__name" data-file-name>Файл не вибрано</span>
+                        </label>
+                    </div>
+                    {% for error in form.image.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if form.image.help_text %}<p class="profile-form-help">{{ form.image.help_text }}</p>{% endif %}
+                </div>
+            </div>
             <div class="profile-form-actions">
-                <button type="submit" class="btn btn-success">
+                <button type="submit" class="btn am-btn am-btn--primary w-100">
                     {% if is_edit_mode %}
                         Зберегти зміни
                     {% else %}
@@ -52,4 +92,37 @@
         </form>
     </div>
     {{ form.media }}
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const actionInput = document.getElementById("id_action_type");
+            const applyToAllInput = document.getElementById("id_apply_to_all");
+            const plantTargets = document.querySelector("[data-plant-targets]");
+            const fileInput = document.getElementById("id_image");
+            const fileName = document.querySelector("[data-file-name]");
+
+            if (!actionInput || !applyToAllInput || !plantTargets) {
+                return;
+            }
+
+            function syncPlantTargetsState() {
+                const applyToAll = applyToAllInput.checked;
+                const inputs = plantTargets.querySelectorAll('input[type="checkbox"]');
+
+                plantTargets.hidden = applyToAll;
+                inputs.forEach(function (input) {
+                    input.disabled = applyToAll;
+                });
+            }
+
+            applyToAllInput.addEventListener("change", syncPlantTargetsState);
+            syncPlantTargetsState();
+
+            if (fileInput && fileName) {
+                fileInput.addEventListener("change", function () {
+                    const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "";
+                    fileName.textContent = selectedFile || "Файл не вибрано";
+                });
+            }
+        });
+    </script>
 {% endblock profile_content %}

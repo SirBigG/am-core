@@ -1,7 +1,10 @@
-<section class="profile-plant-formset" data-plant-formset>
+<section class="profile-plant-formset" id="diary-plants-section" data-plant-formset>
     <div class="profile-plant-formset__header">
         <h2 class="profile-page-subtitle">Рослини</h2>
     </div>
+    <p class="profile-page-lead profile-plant-formset__lead">
+        Рослини з історією не видаляються повністю. Їх можна завершити, і вони залишаться доступними в історії та фільтрах.
+    </p>
     {% if plant_formset.non_form_errors %}
         {% for error in plant_formset.non_form_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
     {% endif %}
@@ -44,6 +47,14 @@
             });
         }
 
+        function initDatepickers(row) {
+            if (typeof window.initProfileDatepickers !== "function") {
+                return;
+            }
+
+            window.initProfileDatepickers(row);
+        }
+
         function bindRemove(row) {
             const removeButton = row.querySelector("[data-plant-form-remove]");
             const deleteInput = row.querySelector('[name$="-DELETE"]');
@@ -53,12 +64,31 @@
             }
 
             removeButton.addEventListener("click", function () {
+                const removeMode = row.dataset.plantRemoveMode || "row";
+                const removeMessage = row.dataset.plantRemoveMessage || "";
+
+                if (removeMode === "blocked") {
+                    if (removeMessage) {
+                        window.alert(removeMessage);
+                    }
+                    return;
+                }
+
+                if ((removeMode === "delete" || removeMode === "finish") && removeMessage) {
+                    if (!window.confirm(removeMessage)) {
+                        return;
+                    }
+                }
+
                 deleteInput.checked = true;
                 row.hidden = true;
             });
         }
 
-        rows.querySelectorAll("[data-plant-form-row]").forEach(bindRemove);
+        rows.querySelectorAll("[data-plant-form-row]").forEach(function (row) {
+            bindRemove(row);
+            initDatepickers(row);
+        });
 
         if (addButton && template && totalForms) {
             addButton.addEventListener("click", function () {
@@ -71,6 +101,7 @@
                 const row = rows.lastElementChild;
                 bindRemove(row);
                 initAutocomplete(row);
+                initDatepickers(row);
             });
         }
     });

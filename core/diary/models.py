@@ -60,6 +60,7 @@ DIARY_ITEM_ACTION_CHOICES = [
     ("photo", "📷 Фото"),
     ("note", "✏️ Нотатка"),
     ("planted", "🌱 Посаджено"),
+    ("transplanted", "🪴 Пересаджено"),
     ("disease", "🤒 Хвороба"),
     ("pest", "🐛 Шкідник"),
     ("pruning", "✂️ Обрізка"),
@@ -181,6 +182,7 @@ class DiaryItem(models.Model):
         default="",
         verbose_name="Оберіть швидку дію",
     )
+    apply_to_all = models.BooleanField(default=True, verbose_name="Застосувати до всіх активних рослин")
     plants = models.ManyToManyField(
         Plant,
         blank=True,

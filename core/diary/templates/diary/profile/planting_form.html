@@ -1,0 +1,32 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <a class="profile-diary-detail-back"
+           href="{% url 'pro_auth:profile-diary-detail' pk=diary.id %}">
+            <span aria-hidden="true">←</span>
+            <span>Назад до щоденника</span>
+        </a>
+        <h1 class="profile-page-title">Посадити рослину</h1>
+        <p class="profile-page-lead">
+            Додайте нову рослину до щоденника <strong>{{ diary.title }}</strong> і зафіксуйте старт її історії.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                {% for error in form.non_field_errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+            {% endif %}
+            {% for field in form %}
+                <div class="profile-form-group am-form-group">
+                    <label class="profile-form-label am-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="profile-form-field am-field{% if field.name == 'plant_category' %} am-field--select{% elif field.name == 'plant_date' %} am-field--date{% endif %}">{{ field }}</div>
+                    {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="profile-form-actions">
+                <button type="submit" class="btn am-btn am-btn--primary">Посадити рослину</button>
+            </div>
+        </form>
+    </div>
+    {{ form.media }}
+{% endblock profile_content %}

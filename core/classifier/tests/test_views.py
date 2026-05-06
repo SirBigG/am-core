@@ -28,7 +28,7 @@ class DiaryPlantCategoryAutocompleteTests(TestCase):
     def setUp(self):
         self.parent = Category.objects.create(
             slug="plants",
-            value="Рослини",
+            value="Рослинництво",
             is_diary_species_parent=True,
         )
         self.basil = Category.objects.create(slug="basil", value="Базилік", parent=self.parent)
@@ -44,10 +44,16 @@ class DiaryPlantCategoryAutocompleteTests(TestCase):
         response = client.get(reverse("diary-plant-category-autocomplete"))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["results"], [{"id": str(self.basil.pk), "text": str(self.basil)}])
+        self.assertEqual(len(response.json()["results"]), 1)
+        self.assertEqual(response.json()["results"][0]["id"], str(self.basil.pk))
+        self.assertEqual(response.json()["results"][0]["text"], str(self.basil))
+        self.assertIn("selected_text", response.json()["results"][0])
 
     def test_search_diary_species_children(self):
         response = client.get(reverse("diary-plant-category-autocomplete") + "?q=баз")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json()["results"], [{"id": str(self.basil.pk), "text": str(self.basil)}])
+        self.assertEqual(len(response.json()["results"]), 1)
+        self.assertEqual(response.json()["results"][0]["id"], str(self.basil.pk))
+        self.assertEqual(response.json()["results"][0]["text"], str(self.basil))
+        self.assertIn("selected_text", response.json()["results"][0])
