@@ -13,11 +13,13 @@ Including another URLconf
     1. Add an import:  from blog import urls as blog_urls
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
+
 from core.adverts.views import AdvertSitemap
 from core.classifier.views import CategoriesIndex
 from core.companies.views import admin_parse_form_view
 from core.news.views import NewsSitemapView
 from core.posts import views
+from core.pro_auth import views as pro_auth_views
 from core.services.views import FeedbackView
 from django.conf import settings
 from django.conf.urls.i18n import i18n_patterns
@@ -41,7 +43,11 @@ urlpatterns = i18n_patterns(
     path("categories/", CategoriesIndex.as_view(), name="categories"),
     path("categories/<str:slug>/", CategoriesIndex.as_view(), name="categories-root"),
     path("create/", TemplateView.as_view(template_name="add.html"), name="add"),
+    # Custom OIDC begin for forum SSO: redirect to /o/authorize/ with forum client details
+    # This must come BEFORE the include of social_django.urls so it takes precedence
+    path("social/login/oidc/", pro_auth_views.social_oidc_begin, name="social-login-oidc"),
     path("social/", include("social_django.urls", namespace="social")),
+    path("o/", include("oauth2_provider.urls", namespace="oauth2_provider")),
     path("api-auth/", include("rest_framework.urls", namespace="rest_framework")),
     path("page/", include("django.contrib.flatpages.urls")),
     path("i18n/", include("django.conf.urls.i18n")),

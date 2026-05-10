@@ -25,6 +25,10 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 DEBUG = False
 
 HOST = os.getenv("HOST") or "localhost:8000"
+SITE_URL = os.getenv("SITE_URL", f"http://{HOST}").rstrip("/")
+FORUM_BASE_URL = os.getenv("FORUM_BASE_URL").rstrip("/")
+FORUM_SSO_URL = os.getenv("FORUM_SSO_URL", f"{FORUM_BASE_URL}/sso/start/")
+FORUM_LOGOUT_URL = os.getenv("FORUM_LOGOUT_URL", f"{FORUM_BASE_URL}/logout/")
 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",") if os.getenv("ALLOWED_HOSTS") else ["localhost:8000"]
 
@@ -63,6 +67,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.flatpages",
     "django.contrib.postgres",
+    "oauth2_provider",
     # Package for project api: http://www.django-rest-framework.org/
     "rest_framework",
     "rest_framework.authtoken",
@@ -128,6 +133,7 @@ TEMPLATES = [
                 "django.contrib.messages.context_processors.messages",
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
+                "core.pro_auth.context_processors.forum",
             ],
         },
     },
@@ -219,6 +225,54 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = os.getenv("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET")
 
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
+
+DEV_OIDC_RSA_PRIVATE_KEY = """-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCmcNgwpVXhYaTw
+yY7Stup7aJuHJBt89jKIdRLluzF9gg/rBSLXb+evjkICz3s/KcbiVVBURnxs4o4g
+MdETm0WYRp4ye2RTh2Z9xkXKODHlhFTFfg6Rwaj2vm2wpogN5H38108NXeJVoe8N
+0SyBi7DBa0wVcmUMzII/2N2L4Ob4tdrXzfNpnoQGRf+Rllj9OlwWbVQSiOsnYemD
+j4GBIyorrU5plzHTm/cZgifBJpTMXsO87q4lsnIeGFrXGasZRghN48SXJMh6/y10
+p+wmDNAFKx2L1nNFgPP0mOtwhVORy+lDCkERUWBl5nzdYoCCGWs9A22b0r1fmc5v
+bjOr+ZvDAgMBAAECggEADhqa30hrZh1hnjveO/HfHdUH9OQ05hpwvsp47vm1YGbQ
+lYBKawojDmfWJSnSzk/qeAx1saaFba6nD4hZKLmsJJK7XhjBsChVoYvXJyMq60GS
+82dSsbxA5qPNZL4/4jl+CZpvKvlNMCd4O+oBRPsC3+kJOfoHIRYFZYapg2xr9iBD
+2fXBKuYNszG2ZJsjzdi3rgXq9PtboHYDXYlZahllWaKdNp4kcit8taeU63/aHZfG
+nG1cwE75yKUg49HzPhzM5YmoDLsYxO6ri6oKMrUWHo1bVJPJN5R9L7Q7bNiMw02Z
+xftgL8bnj/dFHZqYeP8lUrkm3VNa+LFXKGPcjSxa9QKBgQDc/9HM77UE/gB+CWMr
+b4YvW6M9e34F28IjtWBKI6sv8yTeab/6r34UKUBxNuHBrzg0Tj0U9GYf+ZxmBhub
+PU5EuOT5DmRZY779i+moKpN0HFoQPTQuCBIjrxNld8Jd8y8Jw1cHvJG9nVVfqENl
+FT/CbaoJDlVxAUDGwdtR1pTWVwKBgQDAzQJMYkzal7rF2zI2y+8QAAXO0k8RdvjR
+MGhJZDUjl2zmx+KwzMQSaXSZy3vQKov8yc5JHTZf2c+e8J9UYS+zzR2y+DsNVzaT
+saFYk4j+cPciMTIOgYI7L056PIZ/hpRXcIb8bgdS/tSwSTXIidb+fMR44e3ah5cb
+SBz92+XKdQKBgDhA/fx2f9N3fFSYux+RUcy4PMMnrhp7p91DC/GTRr373ESpEm8T
+QLqNDZRD7g9JNLtLtwygcWZuOTtXDqvjXQrtLYuf+DcwxqrvdFiUDdieZuZ/Tcrx
+zvw6UmufomAbyLtpd7vGaiqj49lnkVAnqoUpOQD5HxKWyRBOxC7+ugAdAoGANBIq
+YL7byt3Xz8AXm70QX93hs64RNMJRCQ5t3AR4ZZhsDRhHHUDwY5ifqTnPwrT7Adbv
+I8gD+3c0H9UU8xEcdQ8cyk1IhZ3cW59J2EZgZXfVByMKReisZ5erNlBKcv7B6au2
+iU6eI8g3YTUklXjE3A6OcadzOeYM5Y1gZx+QvFECgYAQtHLDObf/n4FRwCvh6TwI
+2LbwzTjX25HLgx76AuLxSmnfv9uihgEHzJVmGUIitzXoPHWF36FwGWhy8aFLgTb4
+k6Zbti2NBxLieWYJKATwOHjq5LolgtGfuXV+GlIeFkuTj+P0qijU4Lj4GDndcYWy
+ytb9d5Cf6ciLchi5pp2gcQ==
+-----END PRIVATE KEY-----"""
+OIDC_RSA_PRIVATE_KEY = os.getenv("OIDC_RSA_PRIVATE_KEY", "")
+if not OIDC_RSA_PRIVATE_KEY and os.getenv("DJANGO_SETTINGS_MODULE") == "settings.dev":
+    OIDC_RSA_PRIVATE_KEY = DEV_OIDC_RSA_PRIVATE_KEY
+OAUTH2_PROVIDER = {
+    "OIDC_ENABLED": bool(OIDC_RSA_PRIVATE_KEY),
+    "OIDC_RSA_PRIVATE_KEY": OIDC_RSA_PRIVATE_KEY,
+    "OIDC_ISS_ENDPOINT": os.getenv("OIDC_ISS_ENDPOINT", f"{SITE_URL}/o"),
+    "OIDC_RP_INITIATED_LOGOUT_ENABLED": True,
+    "OIDC_RP_INITIATED_LOGOUT_ALWAYS_PROMPT": False,
+    "OAUTH2_VALIDATOR_CLASS": "core.pro_auth.oauth_validators.ForumOIDCValidator",
+    "SCOPES": {
+        "openid": "OpenID Connect",
+        "profile": "User profile",
+        "email": "User email",
+    },
+    "DEFAULT_SCOPES": ["openid", "profile", "email"],
+    "PKCE_REQUIRED": False,
+    "REQUEST_APPROVAL_PROMPT": "auto",
+}
 
 # ========================================================================================
 # Internationalization

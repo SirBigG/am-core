@@ -8,6 +8,8 @@ env/
 /tmp/*
 /static/*
 /front_static/*
+/forum_instance/staticfiles/*
+/forum_instance/st_search/*
 *~
 *.*~
 /media/*
