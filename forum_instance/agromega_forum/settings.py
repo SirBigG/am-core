@@ -11,6 +11,8 @@ MAIN_SITE_URL = os.getenv("MAIN_SITE_URL", "http://localhost:8000").rstrip("/")
 ALLOWED_HOSTS = os.getenv("FORUM_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 CSRF_TRUSTED_ORIGINS = os.getenv("FORUM_CSRF_TRUSTED_ORIGINS", FORUM_SITE_URL).split(",")
 FORCE_SCRIPT_NAME = os.getenv("FORUM_FORCE_SCRIPT_NAME") or None
+USE_X_FORWARDED_HOST = os.getenv("FORUM_USE_X_FORWARDED_HOST", "True").lower() == "true"
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -152,6 +154,13 @@ SOCIAL_AUTH_OIDC_JWKS_URI = os.getenv(
 )
 SOCIAL_AUTH_OIDC_SCOPE = ["openid", "profile", "email"]
 SOCIAL_AUTH_OIDC_USERNAME_KEY = "preferred_username"
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = (
+    os.getenv(
+        "FORUM_SOCIAL_AUTH_REDIRECT_IS_HTTPS",
+        "True" if FORUM_SITE_URL.startswith("https://") else "False",
+    ).lower()
+    == "true"
+)
 SOCIAL_AUTH_PIPELINE = (
     "social_core.pipeline.social_auth.social_details",
     "social_core.pipeline.social_auth.social_uid",
