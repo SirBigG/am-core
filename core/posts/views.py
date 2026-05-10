@@ -134,7 +134,7 @@ class PostSearchView(ListView):
             Post.objects.select_objects()
             .active()
             .annotate(rank=SearchRank(F("text_search"), SearchQuery(self.request.GET.get("q", ""), config="english")))
-            .filter(rank__gt=0.03)
+            .filter(rank__gt=0.01)
             .order_by("-rank")
         )
 
