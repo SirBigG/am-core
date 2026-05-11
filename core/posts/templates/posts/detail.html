@@ -89,10 +89,6 @@
                              src="{% thumbnail main_photo_object 1520 800 %}"
                              class="card-img img-fluid" />
                         <div class="card-body text-end m-1">
-                            <a href="{% url 'add-photo' object.id %}"
-                               class="btn btn-success btn-circle btn-circle-sm mr-2"
-                               aria-label="Додати фото до публікації"
-                               rel="nofollow"><i class="icon-plus"></i></a>
                             {% if photo_count > 1 %}
                                 <a href="{% url 'gallery' object.id %}"
                                    class="btn btn-primary btn-circle btn-circle-sm"

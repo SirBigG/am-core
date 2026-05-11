@@ -11,14 +11,18 @@
     <script src="{% static "posts/j-gallery.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/gallery.css" %}">
 {% endblock scripts %}
-{% block page_title %}{{ post.title }} фото{% endblock %}
-{% block title %}{{ post.title }} фотогалерея{% endblock %}
-{% block meta_description %}Всі фото {{ post.title }}.{% endblock %}
+{% block page_title %}
+    {{ post.title }} фото
+{% endblock page_title %}
+{% block title %}
+    {{ post.title }} фотогалерея
+{% endblock title %}
+{% block meta_description %}
+    Всі фото {{ post.title }}.
+{% endblock meta_description %}
 {% block base_content_block %}
     <div class="col-12">
         <a href="{{ post.get_absolute_url }}" class="btn btn-link mb-3">До публікації</a>
-        <a href="/gallery/add/{{ post.id }}/"
-           class="btn btn-success btn-sm mb-3">Завантажити фото публікації</a>
     </div>
     <div class="col-12">
         {% for photo in object_list %}
