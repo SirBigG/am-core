@@ -1,3 +1,4 @@
+import os
 import re
 from concurrent.futures import ThreadPoolExecutor
 from time import sleep
@@ -10,7 +11,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
-from webdriver_manager.firefox import GeckoDriverManager
 
 
 def extract_price(s):
@@ -71,7 +71,7 @@ def get_content_from_url(url):
 #     opts = FirefoxOptions()
 #     opts.add_argument("--headless")
 #     # Set up the Selenium WebDriver
-#     driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()), options=opts)  # or use another browser driver like Chrome
+#     driver = create_firefox_driver()  # or use another browser driver like Chrome
 #
 #     try:
 #         # Navigate to the URL
@@ -97,6 +97,15 @@ def get_content_from_url(url):
 #         driver.quit()
 
 
+def create_firefox_driver():
+    from selenium.webdriver import FirefoxOptions
+
+    opts = FirefoxOptions()
+    opts.add_argument("--headless")
+    service = FirefoxService(executable_path=os.environ.get("GECKODRIVER_PATH", "geckodriver"))
+    return webdriver.Firefox(service=service, options=opts)
+
+
 def parse_link_with_js(driver, link):
     try:
         # Navigate to the URL
@@ -120,14 +129,8 @@ def parse_link_with_js(driver, link):
 
 
 def parse_many_links_with_same_browser(links):
-    from selenium.webdriver import FirefoxOptions
-
-    opts = FirefoxOptions()
-    opts.add_argument("--headless")
     # Set up the Selenium WebDriver
-    driver = webdriver.Firefox(
-        service=FirefoxService(GeckoDriverManager().install()), options=opts
-    )  # or use another browser driver like Chrome
+    driver = create_firefox_driver()  # or use another browser driver like Chrome
 
     try:
         with ThreadPoolExecutor(max_workers=5) as executor:

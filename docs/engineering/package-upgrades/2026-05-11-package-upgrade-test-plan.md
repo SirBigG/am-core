@@ -96,7 +96,7 @@ Main app direct pin updates:
 - `xlrd==2.0.1` to `xlrd==2.0.2`.
 - `daphne==4.1.0` to `daphne==4.2.1`.
 - `selenium==4.18.1` to `selenium==4.43.0`.
-- `webdriver_manager==3.5.0` to `webdriver_manager==4.0.2`.
+- `webdriver_manager==3.5.0` to `webdriver_manager==4.0.2`; later removed in Batch 5 after switching parser code to the system `geckodriver`.
 - `openpyxl==3.1.2` to `openpyxl==3.1.5`.
 - `boto3==1.35.6` to `boto3==1.43.6`.
 - `django-storages==1.14.4` to `django-storages==1.14.6`.
@@ -124,7 +124,7 @@ Verification commands run from `/Users/andriihots/Projects/am-dev`:
 Residual risks after Batch 2:
 
 - The forum `django-spirit`/Mistune path remains the largest security blocker.
-- The main image still downloads an old geckodriver `v0.30.0` manually. Selenium itself is current, but browser-driver provisioning should be revisited with the parser/browser automation path.
+- Browser-driver provisioning was revisited in Batch 5.
 - There is still no lock file or compiled constraints file, so transitive dependency versions float between builds.
 
 ## Batch 3 Forum Markdown Characterization
@@ -189,6 +189,36 @@ Residual risks after Batch 4:
 - The forum `django-spirit`/Mistune path remains unresolved.
 - `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
 - `django_http2_push==0.0b2` is now pinned, but it is a beta package and should be reviewed during the reproducible dependency workflow.
+
+## Batch 5 Browser Driver Cleanup
+
+Completed on 2026-05-12 for the main parser/browser automation runtime.
+
+Changes:
+
+- `Dockerfile` moved geckodriver from `0.30.0` to `0.36.0`.
+- Geckodriver download now chooses the Linux archive by image architecture: `amd64` uses `linux64`, and `arm64` uses `linux-aarch64`.
+- `core.companies.parser` now creates Firefox with the system `geckodriver`, or the path configured by `GECKODRIVER_PATH`.
+- Removed runtime downloads through `webdriver_manager`.
+- Removed `webdriver_manager==4.0.2` from `requirements.txt`.
+- Added a regression test for the configured geckodriver path used by the parser driver factory.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose exec core ./manage.py test core.companies.tests --settings=settings.test_settings`: passed, 4 tests.
+- `docker compose build core`: passed and downloaded the `geckodriver-v0.36.0-linux-aarch64.tar.gz` archive for the current local `arm64` image.
+- `docker compose up -d core`: passed.
+- `docker compose exec core geckodriver --version`: `geckodriver 0.36.0`.
+- `docker compose exec core python -m pip show webdriver-manager`: package not found.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec core make test`: passed, 232 core tests, 31 API tests, and flake8.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+
+Residual risks after Batch 5:
+
+- The forum `django-spirit`/Mistune path remains unresolved.
+- `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
+- There is still no lock file or compiled constraints file, so transitive dependency versions float between builds.
 
 ## Current Test Coverage Shape
 
@@ -345,8 +375,9 @@ Batch 1, security patch without framework jump:
 
 Batch 2, ecosystem cleanup:
 
-- Done on 2026-05-12: boto3, django-storages, psycopg, daphne, selenium, webdriver_manager, openpyxl, phonenumbers, MarkupSafe, python-dateutil, xlrd, Python 3.12.13 Docker images, and removal of obsolete `ipaddress`.
+- Done on 2026-05-12: boto3, django-storages, psycopg, daphne, selenium, openpyxl, phonenumbers, MarkupSafe, python-dateutil, xlrd, Python 3.12.13 Docker images, and removal of obsolete `ipaddress`.
 - Done on 2026-05-12 in Batch 4: pin currently unpinned dev/test dependencies and update Django 5.2-compatible helper libraries.
+- Done on 2026-05-12 in Batch 5: update geckodriver provisioning to `0.36.0` and remove runtime `webdriver_manager` dependency.
 
 Batch 3, Django 6 and CSP:
 

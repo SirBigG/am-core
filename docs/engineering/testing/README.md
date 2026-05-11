@@ -21,9 +21,9 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-12 after Batch 4 package upgrades:
+As of 2026-05-12 after Batch 5 browser-driver cleanup:
 
-- Core Django tests: 231 passing.
+- Core Django tests: 232 passing.
 - API tests: 31 passing.
 - Flake8: passing.
 - Forum tests: 23 passing.
@@ -35,6 +35,8 @@ Batch 2 upgraded both Docker app runtimes to Python 3.12.13 and updated the ecos
 Batch 3 started forum markdown characterization. The expected forum count is now 23 after adding regression coverage for basic markdown rendering, safe HTTPS links, raw HTML escaping, and `javascript:` URL stripping from links and images.
 
 Batch 4 updated Django helper libraries and dev/test pins: django-autocomplete-light, django-ckeditor, django-mptt, django-phonenumber-field, django-rosetta, social-auth-app-django, django-taggit, django-recaptcha, django-comments-dab, django-silk, django_http2_push, factory-boy, flake8, and coverage. Both services passed `pip check`; the main direct dependency audit still reports no known vulnerabilities, while the forum audit still reports only the known `django-spirit` transitive `mistune==0.8.4` vulnerabilities.
+
+Batch 5 updated main Docker geckodriver provisioning from 0.30.0 to 0.36.0, added architecture-aware `amd64`/`arm64` driver downloads, removed runtime `webdriver_manager` usage from the parser path, and removed `webdriver_manager` from `requirements.txt`. The core image rebuild, `pip check`, main direct dependency audit, focused company parser tests, and full `make test` passed.
 
 Known warnings that remain useful upgrade signals:
 

@@ -1,8 +1,27 @@
-from django.test import TestCase
+import os
+from unittest.mock import patch
+
+from django.test import SimpleTestCase, TestCase
 from django.urls import reverse
 
 from core.companies.models import Company, CompanyType, Product
+from core.companies.parser import create_firefox_driver
 from core.utils.tests.factories import LocationFactory
+
+
+class CompanyParserDriverTests(SimpleTestCase):
+    @patch("core.companies.parser.webdriver.Firefox")
+    @patch("core.companies.parser.FirefoxService")
+    def test_firefox_driver_uses_configured_system_geckodriver(self, service_class, firefox_class):
+        service = object()
+        service_class.return_value = service
+
+        with patch.dict(os.environ, {"GECKODRIVER_PATH": "/custom/geckodriver"}):
+            driver = create_firefox_driver()
+
+        service_class.assert_called_once_with(executable_path="/custom/geckodriver")
+        self.assertEqual(firefox_class.call_args.kwargs["service"], service)
+        self.assertEqual(driver, firefox_class.return_value)
 
 
 class CompanyPublicViewTests(TestCase):
