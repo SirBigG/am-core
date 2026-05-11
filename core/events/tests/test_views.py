@@ -2,7 +2,8 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from core.utils.tests.factories import EventFactory
+from core.events.forms import EventAddForm
+from core.utils.tests.factories import EventFactory, EventTypeFactory, LocationFactory
 
 
 class DetailEventView(TestCase):
@@ -24,3 +25,15 @@ class EventListViewTests(TestCase):
         self.assertTemplateUsed(response, "events/list.html")
         # for event, test in zip(response.context["object_list"], events):
         #     self.assertEqual(event.pk, test.pk)
+
+
+class EventFormViewTests(TestCase):
+    def test_create_form_renders(self):
+        EventTypeFactory()
+        LocationFactory()
+
+        response = self.client.get(reverse("events:event-form"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "events/form.html")
+        self.assertIsInstance(response.context["form"], EventAddForm)

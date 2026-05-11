@@ -23,7 +23,7 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 As of 2026-05-12:
 
-- Core Django tests: 199 passing.
+- Core Django tests: 202 passing.
 - API tests: 24 passing.
 - Flake8: passing.
 - Forum tests: 9 passing.

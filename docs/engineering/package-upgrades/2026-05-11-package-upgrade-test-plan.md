@@ -92,10 +92,10 @@ Exit criteria:
 Add smoke tests for high-traffic template pages:
 
 - Home page. Done.
-- Posts list/detail/gallery paths. Done.
+- Posts list/detail/search/gallery paths. Done.
 - Category pages. Done.
 - Adverts list/detail/create/update paths. List/create/detail coverage exists; profile update coverage exists elsewhere.
-- Events list/detail/create paths. List/detail coverage exists; create form still needs a focused smoke test.
+- Events list/detail/create paths. Done.
 - Services feedback/reviews paths. Existing coverage.
 - Diary public list/detail and profile diary flows. Existing coverage.
 - Registry pages. Done.
