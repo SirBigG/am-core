@@ -40,6 +40,40 @@ Known compatibility pressure:
 - `social-auth-app-django==5.9.0` requires `Django>=5.2`.
 - `django-autocomplete-light==4.0.0` requires `Django>=5.2`.
 
+## Batch 1 Implementation Result
+
+Completed on 2026-05-12 for the main app requirements.
+
+Updated direct pins:
+
+- `Django==5.0.3` to `Django==5.2.14`.
+- `djangorestframework==3.15.1` to `djangorestframework==3.17.1`.
+- `Pillow==10.2.0` to `Pillow==12.2.0`.
+- `requests==2.31.0` to `requests==2.33.1`.
+- `social-auth-app-django[openidconnect]==5.4.0` to `social-auth-app-django==5.7.0`.
+- `python-jose==3.3.0` to `python-jose==3.5.0`.
+- `lxml==5.1.0` to `lxml==6.1.0`.
+
+The stale `openidconnect` extra was removed from `social-auth-app-django` because pip reports that version `5.7.0` no longer declares that extra. The installed package still pulls the current `social-auth-core` dependency used by the project OIDC tests.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose exec core python -m pip install -r requirements.txt`: passed.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+- `docker compose exec core python manage.py check --settings=settings.test_settings`: passed with existing warnings only.
+- `docker compose exec core make test`: passed, 231 core tests, 31 API tests, and flake8.
+- `docker compose exec forum_instance python manage.py test`: passed, 19 forum tests.
+
+Residual risks after Batch 1:
+
+- `django-ckeditor` still warns that bundled CKEditor 4 has unfixed security issues.
+- `pro_auth.User.email` remains the authentication field but is not unique.
+- Some test fixtures still emit naive datetime warnings.
+- Some list views still emit unordered pagination warnings.
+- The forum still carries the separate `django-spirit` and vulnerable `mistune==0.8.4` decision.
+- There is still no lock file or compiled constraints file, so reproducible resolution remains a follow-up before broader package cleanup.
+
 ## Current Test Coverage Shape
 
 The repo has about 25 test files:
@@ -191,8 +225,7 @@ Exit criteria:
 
 Batch 1, security patch without framework jump:
 
-- Django to latest safe 5.0 patch or preferably 5.2 LTS.
-- DRF, requests, python-jose, social-auth-app-django, Pillow, lxml.
+- Done on 2026-05-12 for the main app: Django 5.2.14, DRF 3.17.1, requests 2.33.1, python-jose 3.5.0, social-auth-app-django 5.7.0, Pillow 12.2.0, and lxml 6.1.0.
 
 Batch 2, ecosystem cleanup:
 

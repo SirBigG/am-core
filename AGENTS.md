@@ -46,13 +46,19 @@ Python constraints:
 
 Security review on 2026-05-11 found direct dependency risks in the main requirements:
 
-- `Django==5.0.3`
-- `djangorestframework==3.15.1`
-- `Pillow==10.2.0`
-- `requests==2.31.0`
-- `social-auth-app-django==5.4.0`
-- `python-jose==3.3.0`
-- `lxml==5.1.0`
+- `Django==5.0.3`, upgraded to `Django==5.2.14` on 2026-05-12.
+- `djangorestframework==3.15.1`, upgraded to `djangorestframework==3.17.1` on 2026-05-12.
+- `Pillow==10.2.0`, upgraded to `Pillow==12.2.0` on 2026-05-12.
+- `requests==2.31.0`, upgraded to `requests==2.33.1` on 2026-05-12.
+- `social-auth-app-django==5.4.0`, upgraded to `social-auth-app-django==5.7.0` on 2026-05-12.
+- `python-jose==3.3.0`, upgraded to `python-jose==3.5.0` on 2026-05-12.
+- `lxml==5.1.0`, upgraded to `lxml==6.1.0` on 2026-05-12.
+
+Batch 1 note:
+
+- The old `social-auth-app-django[openidconnect]` extra was removed because pip reports that `social-auth-app-django==5.7.0` does not declare it.
+- After the Batch 1 install, `docker compose exec core python -m pip check` passed with no broken requirements.
+- After the Batch 1 install, direct dependency audit passed with no known vulnerabilities.
 
 Forum-specific risk:
 
@@ -65,8 +71,8 @@ Do not jump straight to latest packages without expanding tests around risky are
 
 Current verified baseline as of 2026-05-12:
 
-- `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
-- `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
+- After Batch 1 package upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
+- After Batch 1 package upgrades, `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
 
 Current upgrade-prep progress:
 
@@ -82,7 +88,7 @@ Recommended order:
 
 1. Make current tests reliably runnable through Docker Compose.
 2. Add regression tests for auth, OIDC, forum SSO, public page smoke coverage, API contracts, file/image/storage behavior, and security headers.
-3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS.
+3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS. Done for Batch 1 on 2026-05-12.
 4. Add CSP in report-only mode before enforcing it.
 5. Decide the forum path separately: keep/fork/patch/replace `django-spirit`.
 6. Move to Django 6 only after Python 3.11 support is dropped and forum compatibility is solved or isolated.
