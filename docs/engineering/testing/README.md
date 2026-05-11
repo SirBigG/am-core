@@ -23,7 +23,7 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 As of 2026-05-12:
 
-- Core Django tests: 210 passing.
+- Core Django tests: 216 passing.
 - API tests: 31 passing.
 - Flake8: passing.
 - Forum tests: 11 passing.
@@ -49,4 +49,5 @@ Completed upgrade-prep slices:
 - Auth, OIDC, and forum SSO regression coverage.
 - Public page and template smoke coverage for posts, events, registry, news, companies, and related high-traffic paths.
 - API contract coverage for pagination envelopes, serializer field shape, authentication-required endpoints, create validation errors, event filtering, service reviews, user profile output, post view tracking, and useful-vote idempotency.
-- File, image, and storage coverage for uploaded post photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, main S3 storage settings, and forum S3 storage settings.
+- File, image, and storage coverage for uploaded post photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
+- Security header coverage for current `SecurityMiddleware` and clickjacking headers on the service worker endpoint.

@@ -135,7 +135,7 @@ Exit criteria:
 Add tests for:
 
 - Image upload and thumbnail/image URL handling. Done for post photos: upload resize/WebP conversion, thumbnail file generation, and uploaded file deletion.
-- CKEditor rich text fields and upload paths. Still remaining.
+- CKEditor rich text fields and upload paths. Settings, public form widgets, rendered widget template contract, and rich-text model fields are covered. Real CKEditor upload endpoint coverage is not applicable yet because the project does not include `ckeditor_uploader` URLs.
 - `core.utils.storage.VersionedStaticFilesStorage`. Done for media-version query strings and CKEditor asset exclusion.
 - Local media handling under test settings. Done for isolated post-photo media files with temporary `MEDIA_ROOT`.
 - S3 storage settings construction in `settings/live.py` and forum S3 settings without real AWS calls. Done for main app S3 backend locations, endpoint URL normalization, forum S3 endpoint normalization, bucket media URL, and custom-domain media URL.
@@ -143,6 +143,7 @@ Add tests for:
 Additional behavior covered:
 
 - Main live settings now accept `AWS_S3_ENDPOINT_URL` with or without an existing URL scheme.
+- CKEditor upgrade risk is now covered at the project integration boundary: configured paths, widget rendering, public form usage, and model field types.
 
 Exit criteria:
 
@@ -152,7 +153,8 @@ Exit criteria:
 
 Before enforcing CSP:
 
-- Add tests that `SecurityMiddleware` headers are present.
+- Add tests that `SecurityMiddleware` headers are present. Done for `X-Content-Type-Options`, `Referrer-Policy`, and `Cross-Origin-Opener-Policy` on `/service-worker.js`.
+- Add tests that clickjacking headers are present. Done for `X-Frame-Options`.
 - Add report-only CSP tests for public pages.
 - Inventory inline scripts/styles and external assets currently used by templates.
 - Add tests for any CSP nonce/context processor behavior if using Django 6 or `django-csp`.
