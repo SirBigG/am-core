@@ -127,13 +127,33 @@ Residual risks after Batch 2:
 - The main image still downloads an old geckodriver `v0.30.0` manually. Selenium itself is current, but browser-driver provisioning should be revisited with the parser/browser automation path.
 - There is still no lock file or compiled constraints file, so transitive dependency versions float between builds.
 
+## Batch 3 Forum Markdown Characterization
+
+Started on 2026-05-12 for the forum security blocker.
+
+Findings:
+
+- PyPI currently lists `django-spirit==0.14.3` as the latest Spirit release, with compatibility for Django 4.2 LTS and 5.2 LTS.
+- Installed package metadata confirms `django-spirit==0.14.3` requires `mistune==0.8.4` exactly, not a loose range.
+- Spirit's markdown layer subclasses Mistune 0.x internals: `mistune.Markdown`, `mistune.Renderer`, `mistune.BlockLexer`, `mistune.InlineLexer`, and grammar objects. Moving to `mistune==3.2.1` requires a renderer/parser migration or a maintained fork; it cannot be handled as a simple requirements override.
+
+Implementation:
+
+- Added forum markdown regression coverage for basic markdown rendering, allowed HTTPS links, raw HTML escaping, and stripping `javascript:` URLs from links and images.
+
+Next practical options:
+
+1. Fork or vendor the minimal Spirit markdown stack and migrate it to Mistune 3 while keeping the current forum models/views/templates.
+2. Replace Spirit with a maintained forum package or custom lightweight forum surface.
+3. Keep Spirit temporarily on Django 5.2 and accept the remaining forum audit finding with an explicit risk exception while prioritizing CSP and main-app updates.
+
 ## Current Test Coverage Shape
 
 The repo has about 25 test files:
 
 - Main app: 19 test files, roughly 2,830 lines.
 - API app: 5 test files, roughly 307 lines.
-- Forum app: 9 tests covering SSO redirects and the forum user sync pipeline.
+- Forum app: 23 local tests covering SSO redirects, the forum user sync pipeline, forum smoke reads, forum storage settings, and markdown security behavior. The installed Spirit package also carries its own markdown tests, but they are not part of this repo's default forum test suite.
 
 Coverage is strongest around diary flows, public rendered page smoke tests, auth/OIDC/forum SSO, and some model/form/view behavior. Coverage is still thin or missing for analytics, storage settings, CSP/security headers, and dependency-heavy integrations like CKEditor, reCAPTCHA, and deeper OAuth Toolkit token endpoint behavior.
 

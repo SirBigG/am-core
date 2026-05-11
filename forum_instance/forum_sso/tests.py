@@ -8,6 +8,7 @@ from django.test import SimpleTestCase, TestCase, override_settings
 from django.urls import reverse
 from spirit.category.models import Category
 from spirit.comment.models import Comment
+from spirit.core.utils.markdown import Markdown
 from spirit.topic.models import Topic
 
 from forum_sso.pipeline import create_or_update_forum_user
@@ -130,6 +131,32 @@ class ForumSSOViewTests(TestCase):
         response = self.client.get("/sso/error/")
 
         self.assertEqual(response.status_code, 403)
+
+
+class ForumMarkdownRenderingTests(TestCase):
+    def test_keeps_basic_markdown_and_safe_links(self):
+        rendered = Markdown().render("**bold** and [link](https://example.com)")
+
+        self.assertIn("<strong>bold</strong>", rendered)
+        self.assertIn('<a rel="nofollow" href="https://example.com">link</a>', rendered)
+
+    def test_escapes_raw_html(self):
+        rendered = Markdown().render("<img src=x onerror=alert(1)>")
+
+        self.assertNotIn("<img src=x", rendered)
+        self.assertIn("&lt;img src=x onerror=alert(1)&gt;", rendered)
+
+    def test_strips_javascript_link_protocols(self):
+        rendered = Markdown().render("[bad](javascript:alert(1))")
+
+        self.assertNotIn("javascript:", rendered)
+        self.assertIn('<a rel="nofollow" href="">bad</a>', rendered)
+
+    def test_strips_javascript_image_protocols(self):
+        rendered = Markdown().render("![x](javascript:alert(1))")
+
+        self.assertNotIn("javascript:", rendered)
+        self.assertIn('<img src="" alt="x">', rendered)
 
 
 class FakeStrategy:

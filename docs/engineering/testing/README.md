@@ -32,6 +32,8 @@ Batch 1 upgraded the main app to Django 5.2.14, DRF 3.17.1, Pillow 12.2.0, socia
 
 Batch 2 upgraded both Docker app runtimes to Python 3.12.13 and updated the ecosystem pins for storage, database, ASGI, browser tooling, spreadsheet/date/phone utilities, MarkupSafe, and requests 2.34.0. `docker compose exec core python -m pip check` and `docker compose exec forum_instance python -m pip check` passed with no broken requirements. The main direct dependency audit reported no known vulnerabilities; the forum audit still reports the known `django-spirit` transitive `mistune==0.8.4` vulnerabilities.
 
+Batch 3 started forum markdown characterization. The expected forum count is now 23 after adding regression coverage for basic markdown rendering, safe HTTPS links, raw HTML escaping, and `javascript:` URL stripping from links and images.
+
 Known warnings that remain useful upgrade signals:
 
 - `django-ckeditor` warns that bundled CKEditor 4 has unfixed security issues.
@@ -55,4 +57,4 @@ Completed upgrade-prep slices:
 - API contract coverage for pagination envelopes, serializer field shape, authentication-required endpoints, create validation errors, event filtering, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - File, image, and storage coverage for uploaded post photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Security header coverage for current `SecurityMiddleware`, clickjacking headers, and report-only CSP on the service worker endpoint, representative public/template pages, authenticated profile/diary pages, and Django admin login/index.
-- Forum smoke coverage for anonymous home/topic/category/detail reads, login through SSO start, logout redirect, and forum profile update authentication.
+- Forum smoke and markdown coverage for anonymous home/topic/category/detail reads, login through SSO start, logout redirect, forum profile update authentication, basic markdown rendering, raw HTML escaping, and unsafe URL protocol stripping.

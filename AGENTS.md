@@ -74,6 +74,7 @@ Forum-specific risk:
 - `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
 - `django-spirit==0.14.3` requires `Django<6,>=4.2`, so the forum blocks a simple whole-repo Django 6 upgrade.
 - Forum audit still reports `mistune==0.8.4` vulnerabilities: `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897`; `CVE-2026-44897` lists `3.2.1` as a fixed version, but Spirit pins Mistune below that line.
+- PyPI currently lists `django-spirit==0.14.3` as the latest Spirit release. Installed metadata pins `mistune==0.8.4` exactly, and Spirit subclasses Mistune 0.x parser/renderer internals, so upgrading to Mistune 3 requires a fork/vendor migration or forum replacement.
 
 ## Upgrade Strategy
 
@@ -83,6 +84,7 @@ Current verified baseline as of 2026-05-12:
 
 - After Batch 2 package and Python upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
 - After Batch 2 package and Python upgrades, `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
+- Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping. Re-run forum tests after this change; the expected count is 23.
 
 Current upgrade-prep progress:
 
@@ -92,7 +94,7 @@ Current upgrade-prep progress:
 - Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, a report-only CSP header, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
-- Step 7 forum smoke coverage has started and now covers anonymous home/topic/category/detail reads, SSO login start, logout redirect, and forum profile update auth behavior. A deliberate `django-spirit`/Mistune mitigation decision still remains.
+- Step 7 forum coverage has started and now covers anonymous home/topic/category/detail reads, SSO login start, logout redirect, forum profile update auth behavior, storage settings, and markdown security behavior. A deliberate `django-spirit`/Mistune mitigation decision still remains.
 
 Recommended order:
 
