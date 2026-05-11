@@ -107,6 +107,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "core.utils.security.ContentSecurityPolicyReportOnlyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django_http2_push.middleware.PushHttp2Middleware",
     "django.middleware.locale.LocaleMiddleware",
@@ -371,3 +372,37 @@ REST_FRAMEWORK = {
 IMGPROXY_KEY = os.getenv("IMGPROXY_KEY")
 IMGPROXY_SALT = os.getenv("IMGPROXY_SALT")
 IMGPROXY_BASE_URL = os.getenv("IMGPROXY_BASE_URL", "/imgproxy")
+
+CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+    "default-src": ("'self'",),
+    "script-src": (
+        "'self'",
+        "'unsafe-inline'",
+        "https://www.googletagmanager.com",
+        "https://pagead2.googlesyndication.com",
+        "https://cdn.jsdelivr.net",
+        "https://code.jquery.com",
+        "https://cdnjs.cloudflare.com",
+        "https://stackpath.bootstrapcdn.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+    ),
+    "style-src": (
+        "'self'",
+        "'unsafe-inline'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://stackpath.bootstrapcdn.com",
+    ),
+    "img-src": ("'self'", "data:", "https:", "http:"),
+    "font-src": ("'self'", "data:"),
+    "connect-src": ("'self'",),
+    "frame-src": (
+        "'self'",
+        "https://www.google.com",
+        "https://googleads.g.doubleclick.net",
+    ),
+    "object-src": ("'none'",),
+    "base-uri": ("'self'",),
+    "form-action": ("'self'", "https://www.facebook.com"),
+}

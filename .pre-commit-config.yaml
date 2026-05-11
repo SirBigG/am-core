@@ -12,7 +12,14 @@ repos:
     rev: v2.4.2
     hooks:
       - id: codespell
-        args: [ "--skip=*.json" ]
+        args: [
+          "--skip=*.json",
+          "--skip=uv.lock" ,
+          "--skip=*.js",
+          "--skip=*.css",
+          "--skip=*.map",
+          "--ignore-words=.codespellignore"
+        ]
   - repo: https://github.com/asottile/pyupgrade
     rev: v3.21.2
     hooks:
