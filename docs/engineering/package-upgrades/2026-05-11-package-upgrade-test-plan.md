@@ -176,7 +176,7 @@ Current report-only policy:
 
 Before upgrading forum dependencies:
 
-- Add minimal forum smoke tests: home, topic list, topic detail, login start, logout, profile update redirect.
+- Add minimal forum smoke tests: home, topic list, category topic list, topic detail, login start, logout, authenticated profile update, and profile update auth redirect. Done.
 - Decide between three paths for `django-spirit`:
   - Keep Spirit temporarily and accept Django `<6` for the forum.
   - Fork/patch Spirit to remove the vulnerable Mistune pin and test parser behavior.

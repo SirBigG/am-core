@@ -66,7 +66,7 @@ Do not jump straight to latest packages without expanding tests around risky are
 Current verified baseline as of 2026-05-12:
 
 - `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
-- `docker compose exec forum_instance python manage.py test`: 11 forum tests passing.
+- `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
 
 Current upgrade-prep progress:
 
@@ -76,6 +76,7 @@ Current upgrade-prep progress:
 - Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, a report-only CSP header, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
+- Step 7 forum smoke coverage has started and now covers anonymous home/topic/category/detail reads, SSO login start, logout redirect, and forum profile update auth behavior. A deliberate `django-spirit`/Mistune mitigation decision still remains.
 
 Recommended order:
 

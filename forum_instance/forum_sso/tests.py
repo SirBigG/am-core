@@ -5,8 +5,89 @@ from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth import get_user_model
 from django.test import SimpleTestCase, TestCase, override_settings
+from django.urls import reverse
+from spirit.category.models import Category
+from spirit.comment.models import Comment
+from spirit.topic.models import Topic
 
 from forum_sso.pipeline import create_or_update_forum_user
+
+
+@override_settings(FORCE_SCRIPT_NAME=None)
+class ForumSmokeTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(username="forum-user", password="password")
+        self.category = Category.objects.create(title="General", slug="general")
+        self.topic = Topic.objects.create(user=self.user, category=self.category, title="Welcome", slug="welcome")
+        self.comment = Comment.objects.create(
+            user=self.user,
+            topic=self.topic,
+            comment="Hello forum",
+            comment_html="<p>Hello forum</p>",
+        )
+        self.topic.comment_count = 1
+        self.topic.save(update_fields=["comment_count"])
+
+    def forum_path(self, path):
+        return path.removeprefix("/forum") or "/"
+
+    def test_forum_home_renders_for_anonymous_user(self):
+        response = self.client.get(self.forum_path(reverse("spirit:index")))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "spirit/topic/active.html")
+
+    def test_topic_active_list_renders_for_anonymous_user(self):
+        response = self.client.get(self.forum_path(reverse("spirit:topic:index-active")))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "spirit/topic/active.html")
+        self.assertContains(response, self.topic.title)
+
+    def test_category_topic_list_renders_for_anonymous_user(self):
+        response = self.client.get(self.forum_path(self.category.get_absolute_url()))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "spirit/category/detail.html")
+        self.assertContains(response, self.topic.title)
+
+    def test_topic_detail_renders_for_anonymous_user(self):
+        response = self.client.get(self.forum_path(self.topic.get_absolute_url()))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "spirit/topic/detail.html")
+        self.assertContains(response, "Hello forum")
+
+    @override_settings(FORUM_SITE_URL="https://forum.example.com")
+    def test_forum_login_routes_to_sso_start(self):
+        response = self.client.get("/user/login/", {"next": self.topic.get_absolute_url()})
+
+        self.assertEqual(response.status_code, 302)
+        parsed = urlparse(response["Location"])
+        self.assertEqual(f"{parsed.scheme}://{parsed.netloc}{parsed.path}", "https://forum.example.com/login/oidc/")
+
+    @override_settings(MAIN_SITE_URL="https://example.com")
+    def test_forum_logout_redirects_to_main_site_for_authenticated_user(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get("/logout/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response["Location"], "https://example.com")
+
+    def test_profile_update_renders_for_authenticated_user(self):
+        self.client.force_login(self.user)
+
+        response = self.client.get("/user/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "spirit/user/profile_update.html")
+
+    def test_profile_update_requires_authentication(self):
+        response = self.client.get("/user/")
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/sso/start/", response["Location"])
 
 
 @override_settings(FORCE_SCRIPT_NAME=None)

@@ -26,7 +26,7 @@ As of 2026-05-12:
 - Core Django tests: 231 passing.
 - API tests: 31 passing.
 - Flake8: passing.
-- Forum tests: 11 passing.
+- Forum tests: 19 passing.
 
 Known warnings that remain useful upgrade signals:
 
@@ -51,3 +51,4 @@ Completed upgrade-prep slices:
 - API contract coverage for pagination envelopes, serializer field shape, authentication-required endpoints, create validation errors, event filtering, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - File, image, and storage coverage for uploaded post photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Security header coverage for current `SecurityMiddleware`, clickjacking headers, and report-only CSP on the service worker endpoint, representative public/template pages, authenticated profile/diary pages, and Django admin login/index.
+- Forum smoke coverage for anonymous home/topic/category/detail reads, login through SSO start, logout redirect, and forum profile update authentication.
