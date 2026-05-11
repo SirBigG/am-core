@@ -48,7 +48,7 @@ The repo has about 25 test files:
 - API app: 5 test files, roughly 307 lines.
 - Forum app: 9 tests covering SSO redirects and the forum user sync pipeline.
 
-Coverage is strongest around diary flows, auth/OIDC/forum SSO, and some model/form/view behavior. Coverage is still thin or missing for registry/news/analytics/companies, storage settings, CSP/security headers, and dependency-heavy integrations like CKEditor, reCAPTCHA, and deeper OAuth Toolkit token endpoint behavior.
+Coverage is strongest around diary flows, public rendered page smoke tests, auth/OIDC/forum SSO, and some model/form/view behavior. Coverage is still thin or missing for analytics, storage settings, CSP/security headers, and dependency-heavy integrations like CKEditor, reCAPTCHA, and deeper OAuth Toolkit token endpoint behavior.
 
 ## Pre-Upgrade Test Plan
 
@@ -91,14 +91,16 @@ Exit criteria:
 
 Add smoke tests for high-traffic template pages:
 
-- Home page.
-- Posts list/detail/search/gallery paths.
-- Category pages.
-- Adverts list/detail/create/update paths.
-- Events list/detail/create paths.
-- Services feedback/reviews paths.
-- Diary public list/detail and profile diary flows.
-- Registry pages.
+- Home page. Done.
+- Posts list/detail/gallery paths. Done.
+- Category pages. Done.
+- Adverts list/detail/create/update paths. List/create/detail coverage exists; profile update coverage exists elsewhere.
+- Events list/detail/create paths. List/detail coverage exists; create form still needs a focused smoke test.
+- Services feedback/reviews paths. Existing coverage.
+- Diary public list/detail and profile diary flows. Existing coverage.
+- Registry pages. Done.
+- News list/detail pages. Done.
+- Company list/detail pages. Done.
 
 For each page, assert status code, selected template, key context variables, and absence of template rendering errors.
 

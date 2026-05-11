@@ -1,6 +1,6 @@
 # Testing
 
-Baseline verified on 2026-05-11 using the parent Docker Compose stack in `/Users/andriihots/Projects/am-dev`.
+Baseline verified on 2026-05-12 using the parent Docker Compose stack in `/Users/andriihots/Projects/am-dev`.
 
 ## Commands
 
@@ -21,9 +21,9 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-11:
+As of 2026-05-12:
 
-- Core Django tests: 188 passing.
+- Core Django tests: 199 passing.
 - API tests: 24 passing.
 - Flake8: passing.
 - Forum tests: 9 passing.
