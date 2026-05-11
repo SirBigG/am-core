@@ -46,9 +46,9 @@ The repo has about 25 test files:
 
 - Main app: 19 test files, roughly 2,830 lines.
 - API app: 5 test files, roughly 307 lines.
-- Forum app: no tests found under `forum_instance`.
+- Forum app: 9 tests covering SSO redirects and the forum user sync pipeline.
 
-Coverage is strongest around diary flows and some model/form/view behavior. Coverage is thin or missing for forum SSO, OIDC provider behavior, registry/news/analytics/companies, storage settings, CSP/security headers, and dependency-heavy integrations like CKEditor, reCAPTCHA, OAuth Toolkit, and social auth.
+Coverage is strongest around diary flows, auth/OIDC/forum SSO, and some model/form/view behavior. Coverage is still thin or missing for registry/news/analytics/companies, storage settings, CSP/security headers, and dependency-heavy integrations like CKEditor, reCAPTCHA, and deeper OAuth Toolkit token endpoint behavior.
 
 ## Pre-Upgrade Test Plan
 
@@ -69,17 +69,17 @@ Exit criteria:
 
 Add tests for the main app as OIDC provider:
 
-- OIDC application creation command behavior.
+- OIDC application creation command behavior. Done.
 - Login/logout redirects and `LOGIN_REDIRECT_URL`.
 - Token/userinfo/JWKS endpoint availability enough to protect forum SSO.
 - Custom user model authentication by email.
-- Social auth pipeline custom `create_user` and extra-data behavior.
+- Social auth pipeline custom `create_user` and extra-data behavior. Done.
 
 Add tests for forum SSO:
 
-- `/sso/start/` redirects to the configured provider.
-- `/complete/oidc/` pipeline creates or updates forum users.
-- Forum logout redirects back to main app logout.
+- `/sso/start/` redirects to the configured provider. Done.
+- `/complete/oidc/` pipeline creates or updates forum users. Pipeline covered; callback endpoint still needs an integration test.
+- Forum logout redirects back to main app logout. Done.
 - Anonymous read access remains available, write/login actions still route through SSO.
 
 Exit criteria:
