@@ -4,11 +4,11 @@ Created: 2026-05-11
 
 ## Current Dependency Shape
 
-The project currently uses `requirements.txt` and `forum_instance/requirements.txt` as the real dependency sources. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
+The project currently uses `requirements.in` plus `requirements.txt` for the main service and `forum_instance/requirements.in` plus `forum_instance/requirements.txt` for the forum service. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
 
 The main and forum Docker images use Python 3.12.13. Django 6 is technically possible for the Python runtime, but the forum stack still blocks a simple whole-repo Django 6 upgrade.
 
-There is no lock file, hash file, or compiled constraints file. Before broader upgrades, we should add a reproducible dependency workflow, for example `pip-tools` with checked-in input and compiled output files.
+Batch 6 added checked-in constraints files for both services: `constraints.txt` and `forum_instance/constraints.txt`. This is a reproducible constraints workflow, not a fully hashed lock workflow. A future improvement is adopting `pip-tools` with hash-checked compiled output files.
 
 ## Security Findings
 
@@ -220,6 +220,38 @@ Residual risks after Batch 5:
 - `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
 - There is still no lock file or compiled constraints file, so transitive dependency versions float between builds.
 
+## Batch 6 Dependency Constraints
+
+Completed on 2026-05-12 for reproducible Python dependency installs.
+
+Changes:
+
+- Added `requirements.in` and `forum_instance/requirements.in` as human-edited top-level dependency inputs.
+- Added `constraints.txt` and `forum_instance/constraints.txt` from the verified Docker Compose environments.
+- Updated the main `Dockerfile` to copy `constraints.txt` and install with `pip install -r requirements.txt -c constraints.txt`.
+- Updated `forum_instance/Dockerfile` to copy `constraints.txt` and install with `pip install --no-cache-dir -r requirements.txt -c constraints.txt`.
+- Updated the main `Makefile` `update` target to install with constraints.
+- Added `docs/engineering/dependencies/README.md` for the dependency file workflow.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose exec core python -m pip install -r requirements.txt -c constraints.txt`: passed.
+- `docker compose exec forum_instance python -m pip install -r requirements.txt -c constraints.txt`: passed.
+- `docker compose build core forum_instance`: passed.
+- `docker compose up -d core forum_instance`: passed.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec forum_instance python -m pip check`: passed with no broken requirements.
+- `docker compose exec core make test`: passed, 232 core tests, 31 API tests, and flake8.
+- `docker compose exec forum_instance python manage.py test`: passed, 23 forum tests.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r forum_instance/requirements.txt --no-deps`: still reports only the known `mistune==0.8.4` vulnerabilities from `django-spirit`.
+
+Residual risks after Batch 6:
+
+- The constraints files are not hash-locked. Use `pip-tools` with hashes later if stronger supply-chain reproducibility is needed.
+- The forum `django-spirit`/Mistune path remains unresolved.
+- `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
+
 ## Current Test Coverage Shape
 
 The repo has about 25 test files:
@@ -378,6 +410,7 @@ Batch 2, ecosystem cleanup:
 - Done on 2026-05-12: boto3, django-storages, psycopg, daphne, selenium, openpyxl, phonenumbers, MarkupSafe, python-dateutil, xlrd, Python 3.12.13 Docker images, and removal of obsolete `ipaddress`.
 - Done on 2026-05-12 in Batch 4: pin currently unpinned dev/test dependencies and update Django 5.2-compatible helper libraries.
 - Done on 2026-05-12 in Batch 5: update geckodriver provisioning to `0.36.0` and remove runtime `webdriver_manager` dependency.
+- Done on 2026-05-12 in Batch 6: add checked-in transitive constraints for both services and use them in Docker installs.
 
 Batch 3, Django 6 and CSP:
 

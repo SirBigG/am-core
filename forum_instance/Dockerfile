@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 WORKDIR /app
 
-COPY requirements.txt /app/
+COPY requirements.txt constraints.txt /app/
 
 # Install build deps required to compile psycopg and other native extensions.
 # Keep the list conservative but include common headers.
@@ -20,7 +20,7 @@ RUN apt-get update \
        libffi-dev \
        ca-certificates \
        && pip install --upgrade pip setuptools wheel \
-    && pip install --no-cache-dir -r requirements.txt \
+    && pip install --no-cache-dir -r requirements.txt -c constraints.txt \
     && apt-get remove -y build-essential gcc \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/* /root/.cache

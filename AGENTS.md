@@ -33,10 +33,21 @@ docker compose exec forum_instance python manage.py test
 
 Runtime dependencies are currently managed by:
 
+- `requirements.in`
 - `requirements.txt`
+- `constraints.txt`
+- `forum_instance/requirements.in`
 - `forum_instance/requirements.txt`
+- `forum_instance/constraints.txt`
 
-`pyproject.toml` does not currently contain runtime dependencies; it mostly contains project metadata and tool configuration. There is no lock file or compiled constraints file yet.
+`requirements.in` files are the human-edited top-level inputs. `requirements.txt` files remain the install inputs used by existing tooling. `constraints.txt` files pin verified transitive dependency versions from the Docker Compose containers. `pyproject.toml` does not currently contain runtime dependencies; it mostly contains project metadata and tool configuration.
+
+Install dependencies with constraints:
+
+```bash
+pip install -r requirements.txt -c constraints.txt
+pip install -r forum_instance/requirements.txt -c forum_instance/constraints.txt
+```
 
 Python constraints:
 
@@ -83,6 +94,12 @@ Batch 5 note:
 - `webdriver_manager` was removed from `requirements.txt`.
 - `docker compose build core`, `docker compose up -d core`, `docker compose exec core make test`, `docker compose exec core python -m pip check`, and the main direct dependency audit passed after Batch 5.
 
+Batch 6 note:
+
+- Added top-level input files and transitive constraints for both services on 2026-05-12: `requirements.in`, `constraints.txt`, `forum_instance/requirements.in`, and `forum_instance/constraints.txt`.
+- Docker builds and the main `Makefile` install path now use `pip install -r requirements.txt -c constraints.txt`.
+- `docker compose build core forum_instance`, `docker compose up -d core forum_instance`, both `pip check` commands, `docker compose exec core make test`, `docker compose exec forum_instance python manage.py test`, and the main direct dependency audit passed after Batch 6.
+
 Forum-specific risk:
 
 - `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
@@ -96,8 +113,8 @@ Do not jump straight to latest packages without expanding tests around risky are
 
 Current verified baseline as of 2026-05-12:
 
-- After Batch 5 browser-driver cleanup, `docker compose exec core make test`: 232 core tests, 31 API tests, and flake8 passing.
-- After Batch 4 package upgrades, `docker compose exec forum_instance python manage.py test`: 23 forum tests passing.
+- After Batch 6 dependency constraints, `docker compose exec core make test`: 232 core tests, 31 API tests, and flake8 passing.
+- After Batch 6 dependency constraints, `docker compose exec forum_instance python manage.py test`: 23 forum tests passing.
 - Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping.
 
 Current upgrade-prep progress:

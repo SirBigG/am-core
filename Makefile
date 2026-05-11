@@ -9,7 +9,7 @@ FORUM_IMAGE=sirbigg/am-forum:latest
 deploy: pull update test migrate collectstatic compilemessages
 
 update:
-	pip install -r requirements.txt
+	pip install -r requirements.txt -c constraints.txt
 
 test: test_core test_api flake
 

@@ -5,7 +5,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PROJECT_DIR=/am-core
 ARG GECKODRIVER_VERSION=0.36.0
 
-ADD requirements.txt $PROJECT_DIR/
+ADD requirements.txt constraints.txt $PROJECT_DIR/
 
 WORKDIR $PROJECT_DIR
 
@@ -28,7 +28,7 @@ RUN set -eux; \
 RUN apt-get update && \
     apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev gettext  && \
     apt-get clean && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt -c constraints.txt
 
 ADD . .
 
