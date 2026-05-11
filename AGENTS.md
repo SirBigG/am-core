@@ -24,7 +24,7 @@ docker compose up
 docker compose exec core ./manage.py test --settings=settings.test_settings
 docker compose exec core ./manage.py test api --settings=settings.test_settings
 docker compose exec core flake8
-docker compose exec forum_instance ./manage.py test
+docker compose exec forum_instance python manage.py test
 ```
 
 ## Dependency Management Findings
@@ -73,6 +73,7 @@ Recommended order:
 Detailed plan:
 
 - `docs/engineering/package-upgrades/2026-05-11-package-upgrade-test-plan.md`
+- `docs/engineering/testing/README.md`
 
 ## Documentation Layout
 

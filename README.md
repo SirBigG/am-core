@@ -21,7 +21,7 @@ docker compose ps
 docker compose exec core ./manage.py test --settings=settings.test_settings
 docker compose exec core ./manage.py test api --settings=settings.test_settings
 docker compose exec core flake8
-docker compose exec forum_instance ./manage.py test
+docker compose exec forum_instance python manage.py test
 ```
 
 Nginx exposes the local app on port `8000`. The compose setup mounts this repo
@@ -40,5 +40,6 @@ Project docs live under `docs/`:
 Current package upgrade and test plan:
 
 - `docs/engineering/package-upgrades/2026-05-11-package-upgrade-test-plan.md`
+- `docs/engineering/testing/README.md`
 
 Agent-specific project memory lives in `AGENTS.md`.

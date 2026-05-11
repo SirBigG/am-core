@@ -5,3 +5,4 @@ Technical project documentation lives here: upgrade plans, architecture notes, i
 Current topics:
 
 - `package-upgrades/` - dependency upgrade research and test plans.
+- `testing/` - local test commands, baseline status, and known test-suite warnings.

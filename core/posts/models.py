@@ -1,9 +1,11 @@
+import os
 import random
 import string
 from io import BytesIO
 
 from ckeditor.fields import RichTextField
 from comment.models import Comment
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericRelation
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.indexes import GinIndex
@@ -112,7 +114,7 @@ class Post(models.Model):
             if self.__class__.objects.filter(slug=self.slug).first():
                 self.slug = self.slug + "".join(random.choice(string.ascii_lowercase) for _ in range(4))  # nosec
         # always upgrade absolute url on save
-        if self.pk:
+        if self.pk and self.rubric_id and self.rubric.parent_id:
             self.absolute_url = reverse(
                 "post-detail",
                 args=(
@@ -170,6 +172,31 @@ class Photo(models.Model):
             im.save(output, format="webp", quality=85)
             self.image = File(output, self.image.name.split(".")[0] + ".webp")
         super().save(*args, **kwargs)
+
+    def thumbnail(self, width=300, height=200):
+        if not self.image:
+            return None
+
+        try:
+            image = Image.open(self.image.path)
+        except FileNotFoundError:
+            return None
+
+        thumb_dir = os.path.join(settings.MEDIA_ROOT, "images", "thumb", str(width))
+        os.makedirs(thumb_dir, exist_ok=True)
+
+        thumb_name = os.path.basename(self.image.name)
+        thumb_path = os.path.join(thumb_dir, thumb_name)
+        image.thumbnail((width, height), Image.LANCZOS)
+        image.save(thumb_path)
+
+        return f"{settings.MEDIA_URL}images/thumb/{width}/{thumb_name}"
+
+    def delete(self, *args, **kwargs):
+        path = self.image.path if self.image else None
+        super().delete(*args, **kwargs)
+        if path and os.path.exists(path):
+            os.remove(path)
 
 
 class ParsedMap(models.Model):

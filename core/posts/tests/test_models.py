@@ -1,11 +1,9 @@
 import os
 
-from django.test import TestCase
 from django.conf import settings
+from django.test import TestCase
 
-from core.utils.tests.factories import PostFactory, PhotoFactory, CategoryFactory
-
-from core.classifier.models import Category
+from core.utils.tests.factories import CategoryFactory, PhotoFactory, PostFactory
 
 
 class PostTests(TestCase):
@@ -14,18 +12,18 @@ class PostTests(TestCase):
         self.post = PostFactory()
 
     def test_str_representation(self):
-        self.assertEqual(str(self.post), u'Заголовок')
+        self.assertEqual(str(self.post), "Заголовок | Категорія")
 
     def test_get_absolute_url(self):
-        parent = CategoryFactory(slug='aaa')
-        child = CategoryFactory(parent=parent, slug='bbb')
-        child2 = CategoryFactory(parent=child, slug='ccc')
-        post = PostFactory(rubric=child2, slug='ddd', id='12')
-        self.assertEqual(post.get_absolute_url(), '/bbb/ccc/ddd-12.html')
+        parent = CategoryFactory(slug="aaa")
+        child = CategoryFactory(parent=parent, slug="bbb")
+        child2 = CategoryFactory(parent=child, slug="ccc")
+        post = PostFactory(rubric=child2, slug="ddd", id="12")
+        self.assertEqual(post.get_absolute_url(), "/bbb/ccc/ddd-12.html")
 
     def test_auto_slug_create(self):
-        post = PostFactory(title='Тест автоідентифікатор', slug=None)
-        self.assertEqual(post.slug, 'test-avtoidentyfikator')
+        post = PostFactory(title="Тест автоідентифікатор", slug=None)
+        self.assertEqual(post.slug, "test-avtoidentyfikator")
 
 
 class PhotoTests(TestCase):
@@ -45,13 +43,14 @@ class PhotoTests(TestCase):
 
     def test_thumbnail(self):
         thumbnail = self.photo.thumbnail(400, 300)
-        self.assertEqual(thumbnail,
-                         '%s%s' % (settings.MEDIA_URL, 'images/thumb/400/%s' % self.photo.image.name.split('/')[-1]))
-        os.remove(settings.MEDIA_ROOT + '/images/thumb/400/%s' % self.photo.image.name.split('/')[-1])
+        self.assertEqual(
+            thumbnail, "{}{}".format(settings.MEDIA_URL, "images/thumb/400/%s" % self.photo.image.name.split("/")[-1])
+        )
+        os.remove(settings.MEDIA_ROOT + "/images/thumb/400/%s" % self.photo.image.name.split("/")[-1])
 
     def test_no_file_thumbnail(self):
         photo = PhotoFactory()
-        photo.image = 'images/test_no_file.jpg'
+        photo.image = "images/test_no_file.jpg"
         self.assertIsNone(photo.thumbnail())
 
 
@@ -61,5 +60,6 @@ class PhotoDeleteTest(TestCase):
         path = photo.image.path
         photo.delete()
         import os
+
         with self.assertRaises(FileNotFoundError):
             os.remove(path)
