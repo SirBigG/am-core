@@ -155,10 +155,10 @@ Before enforcing CSP:
 
 - Add tests that `SecurityMiddleware` headers are present. Done for `X-Content-Type-Options`, `Referrer-Policy`, and `Cross-Origin-Opener-Policy` on `/service-worker.js`.
 - Add tests that clickjacking headers are present. Done for `X-Frame-Options`.
-- Add report-only CSP tests for public pages. Started with `/service-worker.js`; public page group checks still remain.
+- Add report-only CSP tests for public pages. Done for representative pages: home, post detail, event list, CDN-heavy event form, login, reCAPTCHA feedback, and news list with external image data.
 - Inventory inline scripts/styles and external assets currently used by templates. Initial inventory found inline scripts/styles and handlers across main templates, profile/diary pages, forum templates, plus external assets from Google Tag Manager, Google Ads, Google reCAPTCHA, jsDelivr, cdnjs, StackPath Bootstrap, code.jquery.com, Facebook, Telegram, and MathJax.
 - Add tests for any CSP nonce/context processor behavior if using Django 6 or `django-csp`.
-- Verify pages using Bootstrap CDN, CKEditor, reCAPTCHA, and admin assets receive a policy that does not break rendering.
+- Verify pages using Bootstrap CDN, CKEditor, reCAPTCHA, and admin assets receive a policy that does not break rendering. Done for Bootstrap/CDN-heavy event form and reCAPTCHA feedback page. CKEditor form rendering is covered separately; admin assets and deeper authenticated profile/diary pages still remain.
 
 Exit criteria:
 
