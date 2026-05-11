@@ -31,6 +31,7 @@ class MainPageTest(TestCase):
         response = self.client.get("/service-worker.js")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], "application/javascript")
+        self.assertEqual(response.headers["Cache-Control"], "no-cache")
 
 
 class PostListTests(TestCase):
