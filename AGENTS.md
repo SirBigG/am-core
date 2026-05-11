@@ -40,8 +40,8 @@ Runtime dependencies are currently managed by:
 
 Python constraints:
 
-- `pyproject.toml` allows `>=3.11,<3.13`
-- Docker uses Python `3.12.2`
+- `pyproject.toml` allows `>=3.12,<3.13`
+- Docker uses Python `3.12.13` for both `core` and `forum_instance`
 - Django 6 requires Python `>=3.12`, so moving to Django 6 means intentionally dropping Python 3.11 support.
 
 Security review on 2026-05-11 found direct dependency risks in the main requirements:
@@ -49,7 +49,7 @@ Security review on 2026-05-11 found direct dependency risks in the main requirem
 - `Django==5.0.3`, upgraded to `Django==5.2.14` on 2026-05-12.
 - `djangorestframework==3.15.1`, upgraded to `djangorestframework==3.17.1` on 2026-05-12.
 - `Pillow==10.2.0`, upgraded to `Pillow==12.2.0` on 2026-05-12.
-- `requests==2.31.0`, upgraded to `requests==2.33.1` on 2026-05-12.
+- `requests==2.31.0`, upgraded to `requests==2.34.0` on 2026-05-12.
 - `social-auth-app-django==5.4.0`, upgraded to `social-auth-app-django==5.7.0` on 2026-05-12.
 - `python-jose==3.3.0`, upgraded to `python-jose==3.5.0` on 2026-05-12.
 - `lxml==5.1.0`, upgraded to `lxml==6.1.0` on 2026-05-12.
@@ -60,10 +60,20 @@ Batch 1 note:
 - After the Batch 1 install, `docker compose exec core python -m pip check` passed with no broken requirements.
 - After the Batch 1 install, direct dependency audit passed with no known vulnerabilities.
 
+Batch 2 note:
+
+- `core` and `forum_instance` Docker images were moved to `python:3.12.13-slim`; `pyproject.toml` now declares `>=3.12,<3.13`.
+- Main app ecosystem pins were updated: `psycopg[c]==3.3.4`, `django-storages==1.14.6`, `boto3==1.43.6`, `daphne==4.2.1`, `selenium==4.43.0`, `webdriver_manager==4.0.2`, `openpyxl==3.1.5`, `phonenumbers==9.0.30`, `phonenumberslite==9.0.30`, `MarkupSafe==3.0.3`, `python-dateutil==2.9.0.post0`, `xlrd==2.0.2`, and `requests==2.34.0`.
+- The obsolete Python 3 backport `ipaddress==1.0.23` was removed from the main requirements.
+- Forum shared infrastructure pins were updated: `psycopg[c]==3.3.4`, `django-storages==1.14.6`, and `boto3==1.43.6`.
+- `docker compose build core forum_instance`, `docker compose exec core python -m pip check`, `docker compose exec forum_instance python -m pip check`, and the main/forum test suites passed on Python 3.12.13.
+- Direct main dependency audit passed with no known vulnerabilities after Batch 2.
+
 Forum-specific risk:
 
 - `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
 - `django-spirit==0.14.3` requires `Django<6,>=4.2`, so the forum blocks a simple whole-repo Django 6 upgrade.
+- Forum audit still reports `mistune==0.8.4` vulnerabilities: `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897`; `CVE-2026-44897` lists `3.2.1` as a fixed version, but Spirit pins Mistune below that line.
 
 ## Upgrade Strategy
 
@@ -71,8 +81,8 @@ Do not jump straight to latest packages without expanding tests around risky are
 
 Current verified baseline as of 2026-05-12:
 
-- After Batch 1 package upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
-- After Batch 1 package upgrades, `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
+- After Batch 2 package and Python upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
+- After Batch 2 package and Python upgrades, `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
 
 Current upgrade-prep progress:
 
@@ -91,7 +101,7 @@ Recommended order:
 3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS. Done for Batch 1 on 2026-05-12.
 4. Add CSP in report-only mode before enforcing it.
 5. Decide the forum path separately: keep/fork/patch/replace `django-spirit`.
-6. Move to Django 6 only after Python 3.11 support is dropped and forum compatibility is solved or isolated.
+6. Move to Django 6 only after forum compatibility is solved or isolated. Python 3.11 support has already been dropped in project metadata as of Batch 2.
 
 Detailed plan:
 

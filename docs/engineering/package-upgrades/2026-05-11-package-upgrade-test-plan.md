@@ -4,9 +4,9 @@ Created: 2026-05-11
 
 ## Current Dependency Shape
 
-The project currently uses `requirements.txt` and `forum_instance/requirements.txt` as the real dependency sources. `pyproject.toml` only declares the project metadata and Python range `>=3.11,<3.13`; it does not manage the runtime dependencies.
+The project currently uses `requirements.txt` and `forum_instance/requirements.txt` as the real dependency sources. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
 
-The main Docker image uses Python 3.12.2, so Django 6 is technically possible for the container build, but adopting it would require dropping Python 3.11 support in `pyproject.toml`.
+The main and forum Docker images use Python 3.12.13. Django 6 is technically possible for the Python runtime, but the forum stack still blocks a simple whole-repo Django 6 upgrade.
 
 There is no lock file, hash file, or compiled constraints file. Before broader upgrades, we should add a reproducible dependency workflow, for example `pip-tools` with checked-in input and compiled output files.
 
@@ -22,7 +22,7 @@ There is no lock file, hash file, or compiled constraints file. Before broader u
 - `python-jose==3.3.0`; fix `3.4.0`.
 - `lxml==5.1.0`; fix `6.1.0`.
 
-The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. `django-spirit==0.14.3` still pins `mistune==0.8.4` and requires `Django<6,>=4.2`, so the forum cannot move to Django 6 or fixed Mistune without replacing, forking, or patching Spirit.
+The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. `django-spirit==0.14.3` still pins `mistune==0.8.4` and requires `Django<6,>=4.2`, so the forum cannot move to Django 6 or fixed Mistune without replacing, forking, or patching Spirit. After Batch 2, forum audit still reports `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897` for `mistune==0.8.4`.
 
 ## Upgrade Feasibility
 
@@ -31,7 +31,7 @@ Recommended sequence:
 1. Patch within the Django 5 line first: move main app to Django 5.2 LTS if compatible, and apply security updates for DRF, Pillow, requests, social auth, python-jose, and lxml.
 2. Keep forum on Django 5.2-compatible dependencies while deciding how to handle `django-spirit`.
 3. Add CSP in report-only mode before enforcing it. Django 6 has built-in `ContentSecurityPolicyMiddleware`, `SECURE_CSP`, `SECURE_CSP_REPORT_ONLY`, and nonce support. On Django 5.2, use `django-csp` or a small custom middleware if CSP is needed before the Django 6 jump.
-4. Move main app to Django 6 only after Python 3.11 support is intentionally dropped and the forum path is separated or solved.
+4. Move main app to Django 6 only after the forum path is separated or solved. Python 3.11 support was intentionally dropped in Batch 2.
 
 Known compatibility pressure:
 
@@ -49,7 +49,7 @@ Updated direct pins:
 - `Django==5.0.3` to `Django==5.2.14`.
 - `djangorestframework==3.15.1` to `djangorestframework==3.17.1`.
 - `Pillow==10.2.0` to `Pillow==12.2.0`.
-- `requests==2.31.0` to `requests==2.33.1`.
+- `requests==2.31.0` to `requests==2.34.0`.
 - `social-auth-app-django[openidconnect]==5.4.0` to `social-auth-app-django==5.7.0`.
 - `python-jose==3.3.0` to `python-jose==3.5.0`.
 - `lxml==5.1.0` to `lxml==6.1.0`.
@@ -73,6 +73,59 @@ Residual risks after Batch 1:
 - Some list views still emit unordered pagination warnings.
 - The forum still carries the separate `django-spirit` and vulnerable `mistune==0.8.4` decision.
 - There is still no lock file or compiled constraints file, so reproducible resolution remains a follow-up before broader package cleanup.
+
+## Batch 2 Implementation Result
+
+Completed on 2026-05-12 for the main and forum Docker runtimes.
+
+Runtime changes:
+
+- `Dockerfile` moved from `python:3.12.2-slim` to `python:3.12.13-slim`.
+- `forum_instance/Dockerfile` moved from floating `python:3.11-slim` to pinned `python:3.12.13-slim`.
+- `pyproject.toml` moved from `python = ">=3.11,<3.13"` to `python = ">=3.12,<3.13"`.
+- Black target version moved to `py312`.
+
+Main app direct pin updates:
+
+- `MarkupSafe==2.1.5` to `MarkupSafe==3.0.3`.
+- `phonenumbers==8.13.32` to `phonenumbers==9.0.30`.
+- `phonenumberslite==8.13.32` to `phonenumberslite==9.0.30`.
+- `psycopg[c]==3.1.18` to `psycopg[c]==3.3.4`.
+- `python-dateutil==2.8.2` to `python-dateutil==2.9.0.post0`.
+- `requests==2.33.1` to `requests==2.34.0`.
+- `xlrd==2.0.1` to `xlrd==2.0.2`.
+- `daphne==4.1.0` to `daphne==4.2.1`.
+- `selenium==4.18.1` to `selenium==4.43.0`.
+- `webdriver_manager==3.5.0` to `webdriver_manager==4.0.2`.
+- `openpyxl==3.1.2` to `openpyxl==3.1.5`.
+- `boto3==1.35.6` to `boto3==1.43.6`.
+- `django-storages==1.14.4` to `django-storages==1.14.6`.
+- Removed obsolete `ipaddress==1.0.23`; Python 3 provides `ipaddress` in the standard library.
+
+Forum direct pin updates:
+
+- `psycopg[c]==3.1.18` to `psycopg[c]==3.3.4`.
+- `django-storages==1.14.4` to `django-storages==1.14.6`.
+- `boto3==1.35.6` to `boto3==1.43.6`.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose build core forum_instance`: passed.
+- `docker compose up -d core forum_instance`: passed.
+- `docker compose exec core python --version`: `Python 3.12.13`.
+- `docker compose exec forum_instance python --version`: `Python 3.12.13`.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec forum_instance python -m pip check`: passed with no broken requirements.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r forum_instance/requirements.txt --no-deps`: still reports the known `mistune==0.8.4` vulnerabilities from `django-spirit`.
+- `docker compose exec core make test`: passed, 231 core tests, 31 API tests, and flake8.
+- `docker compose exec forum_instance python manage.py test`: passed, 19 forum tests.
+
+Residual risks after Batch 2:
+
+- The forum `django-spirit`/Mistune path remains the largest security blocker.
+- The main image still downloads an old geckodriver `v0.30.0` manually. Selenium itself is current, but browser-driver provisioning should be revisited with the parser/browser automation path.
+- There is still no lock file or compiled constraints file, so transitive dependency versions float between builds.
 
 ## Current Test Coverage Shape
 
@@ -225,12 +278,11 @@ Exit criteria:
 
 Batch 1, security patch without framework jump:
 
-- Done on 2026-05-12 for the main app: Django 5.2.14, DRF 3.17.1, requests 2.33.1, python-jose 3.5.0, social-auth-app-django 5.7.0, Pillow 12.2.0, and lxml 6.1.0.
+- Done on 2026-05-12 for the main app: Django 5.2.14, DRF 3.17.1, requests 2.34.0, python-jose 3.5.0, social-auth-app-django 5.7.0, Pillow 12.2.0, and lxml 6.1.0.
 
 Batch 2, ecosystem cleanup:
 
-- boto3, django-storages, psycopg, daphne, selenium, webdriver_manager, openpyxl, phonenumbers, MarkupSafe.
-- Remove obsolete `ipaddress` on Python 3.
+- Done on 2026-05-12: boto3, django-storages, psycopg, daphne, selenium, webdriver_manager, openpyxl, phonenumbers, MarkupSafe, python-dateutil, xlrd, Python 3.12.13 Docker images, and removal of obsolete `ipaddress`.
 - Pin currently unpinned dev/test dependencies.
 
 Batch 3, Django 6 and CSP:

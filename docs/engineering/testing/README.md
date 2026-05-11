@@ -21,14 +21,16 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-12 after Batch 1 package upgrades:
+As of 2026-05-12 after Batch 2 package and Python upgrades:
 
 - Core Django tests: 231 passing.
 - API tests: 31 passing.
 - Flake8: passing.
 - Forum tests: 19 passing.
 
-Batch 1 upgraded the main app to Django 5.2.14, DRF 3.17.1, Pillow 12.2.0, requests 2.33.1, social-auth-app-django 5.7.0, python-jose 3.5.0, and lxml 6.1.0. `docker compose exec core python -m pip check` also passed with no broken requirements, and the direct dependency audit reported no known vulnerabilities.
+Batch 1 upgraded the main app to Django 5.2.14, DRF 3.17.1, Pillow 12.2.0, social-auth-app-django 5.7.0, python-jose 3.5.0, and lxml 6.1.0.
+
+Batch 2 upgraded both Docker app runtimes to Python 3.12.13 and updated the ecosystem pins for storage, database, ASGI, browser tooling, spreadsheet/date/phone utilities, MarkupSafe, and requests 2.34.0. `docker compose exec core python -m pip check` and `docker compose exec forum_instance python -m pip check` passed with no broken requirements. The main direct dependency audit reported no known vulnerabilities; the forum audit still reports the known `django-spirit` transitive `mistune==0.8.4` vulnerabilities.
 
 Known warnings that remain useful upgrade signals:
 

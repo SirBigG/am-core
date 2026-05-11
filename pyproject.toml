@@ -6,7 +6,7 @@ authors = ["Andrii Hots <gotsandriy@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = ">=3.12,<3.13"
 
 [build-system]
 requires = ["poetry-core"]
@@ -15,7 +15,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.black]
 line-length = 120
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py312']
 exclude = '''
 /(
     \.eggs
