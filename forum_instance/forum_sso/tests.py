@@ -1,7 +1,10 @@
+import importlib
+import os
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth import get_user_model
-from django.test import TestCase, override_settings
+from django.test import SimpleTestCase, TestCase, override_settings
 
 from forum_sso.pipeline import create_or_update_forum_user
 
@@ -116,3 +119,49 @@ class ForumSSOPipelineTests(TestCase):
         self.assertEqual(result["user"], user)
         self.assertEqual(user.first_name, "Jane")
         self.assertEqual(user.last_name, "Doe")
+
+
+class ForumStorageSettingsTests(SimpleTestCase):
+    def load_forum_storage_settings(self, env):
+        import agromega_forum.settings as forum_settings
+
+        with patch.dict(os.environ, env, clear=False):
+            forum_settings = importlib.reload(forum_settings)
+            result = {
+                "media_url": forum_settings.MEDIA_URL,
+                "default_storage": forum_settings.STORAGES["default"],
+            }
+        importlib.reload(forum_settings)
+        return result
+
+    def test_s3_storage_normalizes_endpoint_and_builds_bucket_media_url(self):
+        settings = self.load_forum_storage_settings(
+            {
+                "FORUM_STORAGE_BACKEND": "s3",
+                "FORUM_AWS_STORAGE_BUCKET_NAME": "forum-bucket",
+                "FORUM_AWS_S3_ENDPOINT_URL": "storage.example.com",
+                "FORUM_AWS_MEDIA_LOCATION": "forum-media",
+                "FORUM_MEDIA_URL": "",
+            }
+        )
+
+        self.assertEqual(settings["media_url"], "https://forum-bucket.storage.example.com/forum-media/")
+        self.assertEqual(settings["default_storage"]["BACKEND"], "storages.backends.s3boto3.S3Boto3Storage")
+        self.assertEqual(settings["default_storage"]["OPTIONS"]["endpoint_url"], "https://storage.example.com")
+        self.assertEqual(settings["default_storage"]["OPTIONS"]["location"], "forum-media")
+
+    def test_s3_storage_prefers_custom_domain_media_url(self):
+        settings = self.load_forum_storage_settings(
+            {
+                "FORUM_STORAGE_BACKEND": "s3",
+                "FORUM_AWS_STORAGE_BUCKET_NAME": "forum-bucket",
+                "FORUM_AWS_S3_ENDPOINT_URL": "https://storage.example.com",
+                "FORUM_AWS_S3_CUSTOM_DOMAIN": "cdn.example.com",
+                "FORUM_AWS_MEDIA_LOCATION": "forum-media",
+                "FORUM_MEDIA_URL": "",
+            }
+        )
+
+        self.assertEqual(settings["media_url"], "https://cdn.example.com/forum-media/")
+        self.assertEqual(settings["default_storage"]["OPTIONS"]["endpoint_url"], "https://storage.example.com")
+        self.assertEqual(settings["default_storage"]["OPTIONS"]["custom_domain"], "cdn.example.com")

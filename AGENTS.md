@@ -65,8 +65,8 @@ Do not jump straight to latest packages without expanding tests around risky are
 
 Current verified baseline as of 2026-05-12:
 
-- `docker compose exec core make test`: 202 core tests, 31 API tests, and flake8 passing.
-- `docker compose exec forum_instance python manage.py test`: 9 forum tests passing.
+- `docker compose exec core make test`: 210 core tests, 31 API tests, and flake8 passing.
+- `docker compose exec forum_instance python manage.py test`: 11 forum tests passing.
 
 Current upgrade-prep progress:
 
@@ -74,6 +74,7 @@ Current upgrade-prep progress:
 - Step 2 auth/OIDC/forum SSO regression coverage is done.
 - Step 3 public page and template smoke coverage is done for the planned high-traffic slices.
 - Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
+- Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, main S3 storage settings, and forum S3 storage settings. CKEditor upload/rich-text coverage still remains.
 
 Recommended order:
 

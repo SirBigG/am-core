@@ -134,11 +134,15 @@ Exit criteria:
 
 Add tests for:
 
-- Image upload and thumbnail/image URL handling.
-- CKEditor rich text fields and upload paths.
-- `core.utils.storage.StaticFilesStorageWithoutVersion`.
-- Local media handling under test settings.
-- S3 storage settings construction in `settings/live.py` and forum S3 settings without real AWS calls.
+- Image upload and thumbnail/image URL handling. Done for post photos: upload resize/WebP conversion, thumbnail file generation, and uploaded file deletion.
+- CKEditor rich text fields and upload paths. Still remaining.
+- `core.utils.storage.VersionedStaticFilesStorage`. Done for media-version query strings and CKEditor asset exclusion.
+- Local media handling under test settings. Done for isolated post-photo media files with temporary `MEDIA_ROOT`.
+- S3 storage settings construction in `settings/live.py` and forum S3 settings without real AWS calls. Done for main app S3 backend locations, endpoint URL normalization, forum S3 endpoint normalization, bucket media URL, and custom-domain media URL.
+
+Additional behavior covered:
+
+- Main live settings now accept `AWS_S3_ENDPOINT_URL` with or without an existing URL scheme.
 
 Exit criteria:
 
