@@ -147,6 +147,49 @@ Next practical options:
 2. Replace Spirit with a maintained forum package or custom lightweight forum surface.
 3. Keep Spirit temporarily on Django 5.2 and accept the remaining forum audit finding with an explicit risk exception while prioritizing CSP and main-app updates.
 
+## Batch 4 Helper And Dev Dependency Cleanup
+
+Completed on 2026-05-12 for Django 5.2-compatible helper packages and dev/test tools.
+
+Main app direct pin updates:
+
+- `django-autocomplete-light==3.11.0` to `django-autocomplete-light==4.0.0`.
+- `django-ckeditor==6.7.1` to `django-ckeditor==6.7.3`.
+- `django-mptt==0.16.0` to `django-mptt==0.18.0`.
+- `django-phonenumber-field==7.3.0` to `django-phonenumber-field==8.4.0`.
+- `django-rosetta==0.10.0` to `django-rosetta==0.10.3`.
+- `social-auth-app-django==5.7.0` to `social-auth-app-django==5.9.0`.
+- `django-taggit==5.0.1` to `django-taggit==6.1.0`.
+- `django-recaptcha==4.0.0` to `django-recaptcha==4.1.0`.
+- `django-comments-dab==2.8.0` to `django-comments-dab==3.0.0`.
+- `django-silk==5.1.0` to `django-silk==5.5.0`.
+- Pinned previously floating dev/test tools: `factory-boy==3.3.3`, `flake8==7.3.0`, and `coverage==7.14.0`.
+- Pinned previously floating runtime package `django_http2_push==0.0b2`.
+
+Forum direct pin updates:
+
+- `social-auth-app-django==5.7.0` to `social-auth-app-django==5.9.0`.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose exec core python -m pip install -r requirements.txt`: passed.
+- `docker compose exec forum_instance python -m pip install -r requirements.txt`: passed.
+- `docker compose build core forum_instance`: passed.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec forum_instance python -m pip check`: passed with no broken requirements.
+- `docker compose exec core python manage.py check --settings=settings.test_settings`: passed with existing CKEditor and non-unique-email warnings only.
+- `docker compose exec forum_instance python manage.py check`: passed.
+- `docker compose exec core make test`: passed, 231 core tests, 31 API tests, and flake8.
+- `docker compose exec forum_instance python manage.py test`: passed, 23 forum tests.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r forum_instance/requirements.txt --no-deps`: still reports only the known `mistune==0.8.4` vulnerabilities from `django-spirit`.
+
+Residual risks after Batch 4:
+
+- The forum `django-spirit`/Mistune path remains unresolved.
+- `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
+- `django_http2_push==0.0b2` is now pinned, but it is a beta package and should be reviewed during the reproducible dependency workflow.
+
 ## Current Test Coverage Shape
 
 The repo has about 25 test files:
@@ -303,7 +346,7 @@ Batch 1, security patch without framework jump:
 Batch 2, ecosystem cleanup:
 
 - Done on 2026-05-12: boto3, django-storages, psycopg, daphne, selenium, webdriver_manager, openpyxl, phonenumbers, MarkupSafe, python-dateutil, xlrd, Python 3.12.13 Docker images, and removal of obsolete `ipaddress`.
-- Pin currently unpinned dev/test dependencies.
+- Done on 2026-05-12 in Batch 4: pin currently unpinned dev/test dependencies and update Django 5.2-compatible helper libraries.
 
 Batch 3, Django 6 and CSP:
 

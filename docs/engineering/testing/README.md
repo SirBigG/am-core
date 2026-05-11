@@ -21,18 +21,20 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-12 after Batch 2 package and Python upgrades:
+As of 2026-05-12 after Batch 4 package upgrades:
 
 - Core Django tests: 231 passing.
 - API tests: 31 passing.
 - Flake8: passing.
-- Forum tests: 19 passing.
+- Forum tests: 23 passing.
 
 Batch 1 upgraded the main app to Django 5.2.14, DRF 3.17.1, Pillow 12.2.0, social-auth-app-django 5.7.0, python-jose 3.5.0, and lxml 6.1.0.
 
 Batch 2 upgraded both Docker app runtimes to Python 3.12.13 and updated the ecosystem pins for storage, database, ASGI, browser tooling, spreadsheet/date/phone utilities, MarkupSafe, and requests 2.34.0. `docker compose exec core python -m pip check` and `docker compose exec forum_instance python -m pip check` passed with no broken requirements. The main direct dependency audit reported no known vulnerabilities; the forum audit still reports the known `django-spirit` transitive `mistune==0.8.4` vulnerabilities.
 
 Batch 3 started forum markdown characterization. The expected forum count is now 23 after adding regression coverage for basic markdown rendering, safe HTTPS links, raw HTML escaping, and `javascript:` URL stripping from links and images.
+
+Batch 4 updated Django helper libraries and dev/test pins: django-autocomplete-light, django-ckeditor, django-mptt, django-phonenumber-field, django-rosetta, social-auth-app-django, django-taggit, django-recaptcha, django-comments-dab, django-silk, django_http2_push, factory-boy, flake8, and coverage. Both services passed `pip check`; the main direct dependency audit still reports no known vulnerabilities, while the forum audit still reports only the known `django-spirit` transitive `mistune==0.8.4` vulnerabilities.
 
 Known warnings that remain useful upgrade signals:
 

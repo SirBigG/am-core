@@ -69,6 +69,12 @@ Batch 2 note:
 - `docker compose build core forum_instance`, `docker compose exec core python -m pip check`, `docker compose exec forum_instance python -m pip check`, and the main/forum test suites passed on Python 3.12.13.
 - Direct main dependency audit passed with no known vulnerabilities after Batch 2.
 
+Batch 4 note:
+
+- Main helper/dev pins were updated on 2026-05-12: `django-autocomplete-light==4.0.0`, `django-ckeditor==6.7.3`, `django-mptt==0.18.0`, `django-phonenumber-field==8.4.0`, `django-rosetta==0.10.3`, `social-auth-app-django==5.9.0`, `django-taggit==6.1.0`, `django-recaptcha==4.1.0`, `django-comments-dab==3.0.0`, `django-silk==5.5.0`, `django_http2_push==0.0b2`, `factory-boy==3.3.3`, `flake8==7.3.0`, and `coverage==7.14.0`.
+- Forum `social-auth-app-django` was also moved to `5.9.0`.
+- `docker compose build core forum_instance`, `docker compose exec core make test`, `docker compose exec forum_instance python manage.py test`, both `pip check` commands, and the main direct dependency audit passed after Batch 4.
+
 Forum-specific risk:
 
 - `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
@@ -82,9 +88,9 @@ Do not jump straight to latest packages without expanding tests around risky are
 
 Current verified baseline as of 2026-05-12:
 
-- After Batch 2 package and Python upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
-- After Batch 2 package and Python upgrades, `docker compose exec forum_instance python manage.py test`: 19 forum tests passing.
-- Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping. Re-run forum tests after this change; the expected count is 23.
+- After Batch 4 package upgrades, `docker compose exec core make test`: 231 core tests, 31 API tests, and flake8 passing.
+- After Batch 4 package upgrades, `docker compose exec forum_instance python manage.py test`: 23 forum tests passing.
+- Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping.
 
 Current upgrade-prep progress:
 
