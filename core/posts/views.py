@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import date, datetime, timedelta
 from itertools import groupby
 
@@ -7,7 +8,7 @@ from django.conf import settings
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.cache import cache
 from django.db.models import F
-from django.http import Http404
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 
@@ -15,6 +16,16 @@ from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
+
+
+def service_worker(request):
+    """Serve the service worker from the current origin."""
+    response = FileResponse(
+        open(os.path.join(settings.BASE_DIR, "pwa", "service-worker.js"), "rb"),
+        content_type="application/javascript",
+    )
+    response["Cache-Control"] = "no-cache"
+    return response
 
 
 class IndexView(TemplateView):

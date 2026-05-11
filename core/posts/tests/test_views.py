@@ -27,6 +27,11 @@ class MainPageTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["object_list"].count(), 2)
 
+    def test_service_worker_served_from_current_origin(self):
+        response = self.client.get("/service-worker.js")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.headers["Content-Type"], "application/javascript")
+
 
 class PostListTests(TestCase):
 
