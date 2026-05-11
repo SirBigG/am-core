@@ -112,12 +112,19 @@ Exit criteria:
 
 Broaden API tests around:
 
-- Pagination shape.
-- Filtering and search parameters.
-- Authentication-required endpoints.
-- Create/update/delete permissions.
-- Serializer output fields for posts, events, services, classifiers, and auth endpoints.
-- Error status and validation response shape.
+- Pagination shape. Done for post list endpoints.
+- Filtering and search parameters. Event active/future filtering covered; broader search parameter coverage still remains.
+- Authentication-required endpoints. Done for user posts, event creation, user profile, and service review creation.
+- Create/update/delete permissions. Create permissions covered for the main exposed create endpoints; update/delete coverage still remains where those actions are exposed.
+- Serializer output fields for posts, events, services, classifiers, and auth endpoints. Done for key read and create responses.
+- Error status and validation response shape. Done for event creation, user post creation, and service review creation.
+
+Additional behavior covered:
+
+- User post list only returns posts owned by the authenticated user.
+- User post creation now validates required uploaded photos instead of raising a server error.
+- Post view tracking preserves current per-request hit increment behavior.
+- Post useful votes are idempotent for the same JSON payload.
 
 Exit criteria:
 

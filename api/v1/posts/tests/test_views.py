@@ -1,5 +1,5 @@
 from core.classifier.models import Category
-from core.posts.models import Photo, Post
+from core.posts.models import Photo, Post, UsefulStatistic
 from core.utils.tests.factories import CategoryFactory, PhotoFactory, PostFactory, UserFactory
 from core.utils.tests.utils import make_image
 from rest_framework.test import APIClient, APITestCase
@@ -23,6 +23,9 @@ class ApiPostListTests(APITestCase):
     def test_response(self):
         response = api_client.get("/api/post/all/")
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(set(response.data), {"count", "next", "previous", "results"})
+        self.assertEqual(set(response.data["results"][0]), {"title", "text", "url", "photo"})
+        self.assertEqual(set(response.data["results"][0]["photo"]), {"description", "author", "source", "image"})
 
     def test_pagination(self):
         PostFactory.create_batch(20, **{"rubric": self.child})
@@ -84,10 +87,36 @@ class UserPostsViewSetTests(APITestCase):
         api_client.login(email=self.user.email, password="12345")
         response = api_client.get("/api/user/posts/%s/" % self.post.pk)
         self.assertEqual(response.status_code, 200)
-        self.assertIn("title", response.data)
-        self.assertIn("text", response.data)
-        self.assertIn("photo", response.data)
+        self.assertEqual(
+            set(response.data),
+            {"title", "text", "source", "status", "rubric", "url", "photo"},
+        )
+        self.assertEqual(response.data["rubric"], {"pk": self.post.rubric.pk, "value": str(self.post.rubric)})
+        self.assertEqual(set(response.data["photo"]), {"description", "author", "source", "image"})
         self.assertTrue(response.data["status"])
+
+    def test_only_returns_posts_for_authenticated_user(self):
+        other_user = UserFactory()
+        PostFactory(publisher=other_user, rubric=self.post.rubric)
+        api_client.login(email=self.user.email, password="12345")
+
+        response = api_client.get("/api/user/posts/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["count"], 1)
+        self.assertEqual(response.data["results"][0]["title"], self.post.title)
+
+    def test_create_post_requires_photos(self):
+        root = CategoryFactory()
+        parent = CategoryFactory(parent=root)
+        api_client.login(email=self.user.email, password="12345")
+        response = api_client.post(
+            "/api/user/posts/",
+            data={"title": "тайтл", "text": "text", "rubric": parent.pk},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("photos", response.data)
 
     def test_creating_post_by_user(self):
         root = CategoryFactory()
@@ -122,3 +151,16 @@ class PostViewTests(APITestCase):
         response = self.client.post("/api/post/view/", data={"fingerprint": "fingerprint", "post_id": self.post.pk})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Post.objects.get(pk=self.post.pk).hits, 2)
+
+
+class PostUsefulViewTests(APITestCase):
+    def test_records_useful_vote_once_for_same_payload(self):
+        payload = {"fingerprint": "fingerprint", "post_id": 42, "is_useful": True}
+
+        response = self.client.post("/api/post/useful/", data=payload, format="json")
+        second_response = self.client.post("/api/post/useful/", data=payload, format="json")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(second_response.status_code, 200)
+        self.assertEqual(response.data, {"code": 200, "message": "Success"})
+        self.assertEqual(UsefulStatistic.objects.count(), 1)

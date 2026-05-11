@@ -24,6 +24,8 @@ docker compose up
 docker compose exec core ./manage.py test --settings=settings.test_settings
 docker compose exec core ./manage.py test api --settings=settings.test_settings
 docker compose exec core flake8
+docker compose exec core make test
+docker compose exec core make test_api
 docker compose exec forum_instance python manage.py test
 ```
 
@@ -60,6 +62,18 @@ Forum-specific risk:
 ## Upgrade Strategy
 
 Do not jump straight to latest packages without expanding tests around risky areas.
+
+Current verified baseline as of 2026-05-12:
+
+- `docker compose exec core make test`: 202 core tests, 31 API tests, and flake8 passing.
+- `docker compose exec forum_instance python manage.py test`: 9 forum tests passing.
+
+Current upgrade-prep progress:
+
+- Step 1 baseline is done.
+- Step 2 auth/OIDC/forum SSO regression coverage is done.
+- Step 3 public page and template smoke coverage is done for the planned high-traffic slices.
+- Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 
 Recommended order:
 

@@ -24,7 +24,7 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 As of 2026-05-12:
 
 - Core Django tests: 202 passing.
-- API tests: 24 passing.
+- API tests: 31 passing.
 - Flake8: passing.
 - Forum tests: 9 passing.
 
@@ -40,3 +40,12 @@ Known warnings that remain useful upgrade signals:
 `settings/test_settings.py` must define static and media URL settings so template tests can render through `django.contrib.staticfiles`.
 
 The forum `manage.py` file is not executable in the container mount, so use `python manage.py test`.
+
+## Current Coverage Additions
+
+Completed upgrade-prep slices:
+
+- Baseline command and settings cleanup for Docker Compose testing.
+- Auth, OIDC, and forum SSO regression coverage.
+- Public page and template smoke coverage for posts, events, registry, news, companies, and related high-traffic paths.
+- API contract coverage for pagination envelopes, serializer field shape, authentication-required endpoints, create validation errors, event filtering, service reviews, user profile output, post view tracking, and useful-vote idempotency.
