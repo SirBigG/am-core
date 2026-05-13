@@ -11,6 +11,7 @@
             Рослина <strong>{{ plant.display_name }}</strong> буде прибрана з щоденника
             <strong>{{ source_diary.title }}</strong> і прив’язана до іншого активного щоденника.
         </p>
+        <p class="profile-page-helper">Після пересадки рослина зникне зі списку тих, що ростуть у цьому щоденнику, але її попередня історія тут залишиться доступною.</p>
         <form method="post">
             {% csrf_token %}
             {% if form.non_field_errors %}

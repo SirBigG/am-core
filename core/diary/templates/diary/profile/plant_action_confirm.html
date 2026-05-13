@@ -8,6 +8,11 @@
         </a>
         <h1 class="profile-page-title">{{ action_title }}</h1>
         <p class="profile-page-lead">{{ action_lead|safe }}</p>
+        {% if action_button_label == "Архівувати" %}
+            <p class="profile-page-helper">Рослина перейде в Архів, зникне зі списку тих, що ростуть зараз, але її історія та всі попередні дії залишаться доступними.</p>
+        {% elif action_button_label == "Видалити" %}
+            <p class="profile-page-helper">Це незворотна дія: рослина буде повністю видалена разом з її історією та пов’язаними записами.</p>
+        {% endif %}
         <div class="profile-form-actions">
             <form method="post">
                 {% csrf_token %}

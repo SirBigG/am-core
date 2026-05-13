@@ -100,20 +100,45 @@
                         </div>
                     </article>
                 {% empty %}
-                    <div class="am-panel profile-diary-empty-garden">
-                        <div class="profile-diary-empty-garden__icon" aria-hidden="true">🌱</div>
-                        <h2 class="profile-diary-empty-garden__title">У вас поки немає активних щоденників</h2>
-                        <p class="profile-diary-empty-garden__text">Створіть новий щоденник для грядки, вазона або зони вирощування.</p>
-                    </div>
+                    {% if not archived_diaries %}
+                        <div class="am-panel profile-diary-onboarding">
+                            <h2 class="profile-diary-onboarding__title">Як почати</h2>
+                            <p class="profile-diary-onboarding__lead">Щоденник рослин працює просто: спочатку створи зону вирощування, потім посади рослину і додавай дії в історію.</p>
+                            <ol class="profile-diary-onboarding__list">
+                                <li class="profile-diary-onboarding__item">
+                                    <span class="profile-diary-onboarding__step">1</span>
+                                    <span class="profile-diary-onboarding__text">Створи щоденник для грядки, вазона або теплички.</span>
+                                </li>
+                                <li class="profile-diary-onboarding__item">
+                                    <span class="profile-diary-onboarding__step">2</span>
+                                    <span class="profile-diary-onboarding__text">Посади першу рослину і зафіксуй дату посадки.</span>
+                                </li>
+                                <li class="profile-diary-onboarding__item">
+                                    <span class="profile-diary-onboarding__step">3</span>
+                                    <span class="profile-diary-onboarding__text">Додавай дії, щоб бачити історію догляду та поради.</span>
+                                </li>
+                            </ol>
+                            <div class="profile-diary-onboarding__actions">
+                                <a class="btn am-btn am-btn--primary" href="{% url 'pro_auth:profile-diary-add' %}">+ Додати щоденник</a>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="am-panel profile-diary-empty-garden">
+                            <div class="profile-diary-empty-garden__icon" aria-hidden="true">🌱</div>
+                            <h2 class="profile-diary-empty-garden__title">У вас поки немає активних щоденників</h2>
+                            <p class="profile-diary-empty-garden__text">Створіть новий щоденник для грядки, вазона або зони вирощування.</p>
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </section>
-        <section class="profile-diary-section">
-            <div class="profile-diary-section__header">
-                <h2 class="profile-diary-section__title">Архів</h2>
-            </div>
-            <div>
-                {% for object in archived_diaries %}
+        {% if archived_diaries or active_diaries %}
+            <section class="profile-diary-section">
+                <div class="profile-diary-section__header">
+                    <h2 class="profile-diary-section__title">Архів</h2>
+                </div>
+                <div>
+                    {% for object in archived_diaries %}
                     <article class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card profile-diary-card--archived mb-4">
                         <div class="card-body p-3 text-start">
                             <div class="d-flex flex-column flex-grow-1">
@@ -150,9 +175,10 @@
                         <h2 class="am-state__title profile-diary-empty-title">В архіві поки немає щоденників</h2>
                         <p class="am-state__meta profile-diary-empty-text">Архівовані щоденники з’являться тут і залишаться доступними для перегляду та відновлення.</p>
                     </div>
-                {% endfor %}
-            </div>
-        </section>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
     </div>
     <div class="profile-confirm-backdrop"
          id="diaryDeleteConfirm"
@@ -163,6 +189,7 @@
              aria-labelledby="diaryDeleteConfirmTitle">
             <h2 class="profile-confirm-title" id="diaryDeleteConfirmTitle">Архівувати щоденник?</h2>
             <p class="profile-confirm-text">Щоденник буде перенесено в архів. Його рослини, дії та історія залишаться доступними для перегляду. Ви зможете знайти його у вкладці Архів.</p>
+            <p class="profile-confirm-helper">Якщо щоденник знову знадобиться, його можна буде відновити пізніше без втрати історії.</p>
             <div class="profile-confirm-actions">
                 <button type="button" class="btn profile-confirm-cancel" data-confirm-cancel>Ні</button>
                 <button type="button"

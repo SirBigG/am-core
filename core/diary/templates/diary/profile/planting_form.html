@@ -10,6 +10,7 @@
         <p class="profile-page-lead">
             Додайте нову рослину до щоденника <strong>{{ diary.title }}</strong> і зафіксуйте старт її історії.
         </p>
+        <p class="profile-page-helper">Після посадки рослина з’явиться у вкладці Ростуть, а в історії щоденника збережеться перший запис із датою посадки.</p>
         <form method="post">
             {% csrf_token %}
             {% if form.non_field_errors %}

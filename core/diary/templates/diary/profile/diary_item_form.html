@@ -21,6 +21,13 @@
                 Зафіксуй подію, щоб у стрічці рослини зберігалися дата, нотатки й фото.
             {% endif %}
         </p>
+        <p class="profile-page-helper">
+            {% if is_edit_mode %}
+                Зміни в цьому записі одразу оновлять історію щоденника.
+            {% else %}
+                Якщо дія не для всіх рослин, зніми галочку й вибери лише ті рослини, до яких вона стосується.
+            {% endif %}
+        </p>
         <form method="post"
               action="{% if is_edit_mode %}{% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %}{% else %}{% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %}{% endif %}"
               enctype="multipart/form-data">
