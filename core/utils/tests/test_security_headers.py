@@ -1,7 +1,4 @@
-from django.http import HttpResponse
-from django.test import SimpleTestCase, override_settings
-
-from core.utils.security import ContentSecurityPolicyReportOnlyMiddleware
+from django.test import SimpleTestCase
 
 
 class SecurityHeaderTests(SimpleTestCase):
@@ -50,26 +47,3 @@ class SecurityHeaderTests(SimpleTestCase):
         response = self.client.get("/csp/report/", HTTP_HOST="localhost:8000")
 
         self.assertEqual(response.status_code, 405)
-
-
-class ContentSecurityPolicyReportOnlyMiddlewareTests(SimpleTestCase):
-    def test_policy_serializer_keeps_directive_order(self):
-        policy = {
-            "default-src": ("'self'",),
-            "object-src": ("'none'",),
-            "upgrade-insecure-requests": (),
-        }
-
-        serialized = ContentSecurityPolicyReportOnlyMiddleware._serialize_policy(policy)
-
-        self.assertEqual(serialized, "default-src 'self'; object-src 'none'; upgrade-insecure-requests")
-
-    @override_settings(
-        SECURE_CSP_REPORT_ONLY={"default-src": ("'self'",), "report-uri": ("/new-report/",)},
-        CONTENT_SECURITY_POLICY_REPORT_ONLY={"default-src": ("https://legacy.example",)},
-    )
-    def test_middleware_prefers_django_6_secure_csp_report_only_setting(self):
-        middleware = ContentSecurityPolicyReportOnlyMiddleware(lambda request: HttpResponse())
-        response = middleware(None)
-
-        self.assertEqual(response["Content-Security-Policy-Report-Only"], "default-src 'self'; report-uri /new-report/")

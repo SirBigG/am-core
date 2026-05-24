@@ -6,7 +6,7 @@ Created: 2026-05-11
 
 The project currently uses `requirements.in` plus `requirements.txt` for the main service. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
 
-The main Docker image uses Python 3.12.13. Django 6 is technically possible for the Python runtime.
+The main Docker image uses Python 3.12.13. The main app moved to Django 6.0.5 in Batch 10.
 
 Batch 6 added a checked-in constraints file for the main service: `constraints.txt`. This is a reproducible constraints workflow, not a fully hashed lock workflow. A future improvement is adopting `pip-tools` with hash-checked compiled output files.
 
@@ -30,12 +30,12 @@ Recommended sequence:
 
 1. Patch within the Django 5 line first: move main app to Django 5.2 LTS if compatible, and apply security updates for DRF, Pillow, requests, social auth, python-jose, and lxml.
 2. Keep forum dependency decisions outside `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
-3. Add CSP in report-only mode before enforcing it. Django 6 has built-in `ContentSecurityPolicyMiddleware`, `SECURE_CSP`, `SECURE_CSP_REPORT_ONLY`, and nonce support. On Django 5.2, use `django-csp` or a small custom middleware if CSP is needed before the Django 6 jump.
-4. Move the main app to Django 6 after main-app CSP and CKEditor risks are understood. Python 3.11 support was intentionally dropped in Batch 2.
+3. Add CSP in report-only mode before enforcing it. Done through Django 6's built-in `ContentSecurityPolicyMiddleware` and `SECURE_CSP_REPORT_ONLY` in Batch 10.
+4. Move the main app to Django 6 after main-app CSP and CKEditor risks are understood. Done for `am-core` in Batch 10. Python 3.11 support was intentionally dropped in Batch 2.
 
 Known compatibility pressure:
 
-- `Django==6.0.5` requires Python `>=3.12`.
+- `Django==6.0.5` requires Python `>=3.12`; `am-core` already runs on Python 3.12.13.
 - The sibling forum project still uses `django-spirit==0.14.3`, which requires `Django<6,>=4.2` and pins vulnerable `mistune==0.8.4`; treat that as outside this repo's upgrade scope.
 - `social-auth-app-django==5.9.0` requires `Django>=5.2`.
 - `django-autocomplete-light==4.0.0` requires `Django>=5.2`.
@@ -407,9 +407,8 @@ Exit criteria:
 
 Current report-only policy:
 
-- Implemented by `core.utils.security.ContentSecurityPolicyReportOnlyMiddleware`.
-- Configured primarily in `settings.settings.SECURE_CSP_REPORT_ONLY`, matching the Django 6 setting name.
-- `settings.settings.CONTENT_SECURITY_POLICY_REPORT_ONLY` remains as a Django 5 compatibility alias while the custom middleware is still active.
+- Implemented by Django's built-in `django.middleware.csp.ContentSecurityPolicyMiddleware`.
+- Configured in `settings.settings.SECURE_CSP_REPORT_ONLY`.
 - Intentionally allows current inline scripts/styles and known external assets so violations can be observed before any enforcement work.
 - Reports violations to `/csp/report/` through the `report-uri` directive.
 
@@ -457,6 +456,37 @@ Verification:
 - `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`: passed.
 - `docker compose exec core make test`: passed, 236 core tests, 31 API tests, and flake8.
 
+## Batch 10 Main Django 6 Upgrade
+
+Completed on 2026-05-24 for the main `am-core` service.
+
+Changes:
+
+- Updated the main app from `Django==5.2.14` to `Django==6.0.5` in `requirements.in`, `requirements.txt`, and `constraints.txt`.
+- Switched `settings.settings.MIDDLEWARE` from the temporary `core.utils.security.ContentSecurityPolicyReportOnlyMiddleware` to Django's built-in `django.middleware.csp.ContentSecurityPolicyMiddleware`.
+- Removed the temporary custom CSP middleware and the Django 5 compatibility alias `CONTENT_SECURITY_POLICY_REPORT_ONLY`.
+- Kept `SECURE_CSP_REPORT_ONLY` as the active report-only CSP configuration.
+- Left `django-ckeditor==6.7.3` unchanged by request; CKEditor 4 remains a separate security/product decision.
+- Updated `core.companies.models.Product.save()` to call `super().save()` with keyword arguments, matching Django 6's keyword-only model save API.
+
+Verification:
+
+- `docker compose build core`: passed and installed `Django-6.0.5`.
+- `docker compose up -d core`: passed.
+- `docker compose exec core python -c "import django; print(django.get_version())"`: `6.0.5`.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec core ./manage.py check --settings=settings.test_settings`: passed with existing CKEditor and non-unique-email warnings only.
+- `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`: passed, 5 tests.
+- `docker compose exec core ./manage.py test core.companies.tests.CompanyPublicViewTests.test_company_detail_renders_products --settings=settings.test_settings`: passed.
+- `docker compose exec core make test`: passed, 234 core tests, 31 API tests, and flake8.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+
+Residual risks after Batch 10:
+
+- `django-ckeditor==6.7.3` still bundles CKEditor 4 and emits the upstream unsupported/security warning. This was intentionally not migrated to CKEditor 5 because that is a licensing/product decision.
+- The sibling forum project remains outside `am-core`; if it is still deployed, its `django-spirit`/Mistune risk still needs a separate decision.
+- CSP is still report-only. Enforcement still needs violation cleanup, nonce work where appropriate, and page-group rollout.
+
 ### Step 7: Forum Dependency Decision
 
 Before upgrading forum dependencies:
@@ -487,8 +517,8 @@ Batch 2, ecosystem cleanup:
 
 Batch 3, Django 6 and CSP:
 
-- Drop Python 3.11 support.
-- Add Django 6 CSP middleware and report-only policy.
+- Drop Python 3.11 support. Done in Batch 2.
+- Add Django 6 CSP middleware and report-only policy. Done in Batch 10.
 - Iterate CSP violations.
 - Enforce CSP after reports are clean.
 

@@ -21,9 +21,9 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-12 after Batch 6 dependency constraints:
+As of 2026-05-24 after Batch 10 Django 6 upgrade:
 
-- Core Django tests: 232 passing.
+- Core Django tests: 234 passing.
 - API tests: 31 passing.
 - Flake8: passing.
 - Forum tests: 23 passing.
@@ -43,6 +43,8 @@ Batch 6 added transitive constraints for both services and wired Docker installs
 Batch 8 removed the main app's obsolete beta `django_http2_push` dependency. Existing `{% static_push %}` template calls are now handled by a local compatibility tag that returns Django static asset URLs. The core image rebuild, absence check for `django-http2-push`, `pip check`, direct dependency audit, focused template-tag test, and full core `make test` passed.
 
 Batch 9 moved CSP report-only configuration toward Django 6 setting names and added a `/csp/report/` endpoint for browser violation reports. Core `make test` passed with 236 core tests, 31 API tests, and flake8.
+
+Batch 10 upgraded the main app to Django 6.0.5, switched report-only CSP to Django's built-in `ContentSecurityPolicyMiddleware`, removed the temporary custom CSP middleware, and fixed the Django 6 keyword-only `Model.save()` call in `core.companies.models.Product`. CKEditor stayed on `django-ckeditor==6.7.3`. The core image rebuild, `pip check`, Django system check, focused CSP tests, full core `make test`, and main direct dependency audit passed.
 
 Known warnings that remain useful upgrade signals:
 
@@ -66,5 +68,5 @@ Completed upgrade-prep slices:
 - Public page and template smoke coverage for posts, events, registry, news, companies, and related high-traffic paths.
 - API contract coverage for pagination envelopes, serializer field shape, authentication-required endpoints, create validation errors, event filtering, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - File, image, and storage coverage for uploaded post photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
-- Security header coverage for current `SecurityMiddleware`, clickjacking headers, and report-only CSP on the service worker endpoint, representative public/template pages, authenticated profile/diary pages, and Django admin login/index.
+- Security header coverage for current `SecurityMiddleware`, clickjacking headers, and Django 6 report-only CSP on the service worker endpoint, representative public/template pages, authenticated profile/diary pages, and Django admin login/index.
 - Forum smoke and markdown coverage for anonymous home/topic/category/detail reads, login through SSO start, logout redirect, forum profile update authentication, basic markdown rendering, raw HTML escaping, and unsafe URL protocol stripping.

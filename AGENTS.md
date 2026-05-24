@@ -116,6 +116,14 @@ Batch 9 note:
 - Added `/csp/report/` as a CSRF-exempt POST endpoint for browser CSP violation reports, and added `report-uri /csp/report/` to the report-only policy.
 - `docker compose exec core make test` passed after Batch 9 with 236 core tests, 31 API tests, and flake8.
 
+Batch 10 note:
+
+- Main `am-core` dependencies moved from `Django==5.2.14` to `Django==6.0.5` on 2026-05-24.
+- The main app now uses Django's built-in `django.middleware.csp.ContentSecurityPolicyMiddleware` with `SECURE_CSP_REPORT_ONLY`; the temporary custom report-only middleware and Django 5 alias were removed.
+- `django-ckeditor==6.7.3` was intentionally left unchanged. The CKEditor 4 security warning still requires a separate product/licensing decision, not an automatic CKEditor 5 migration.
+- A Django 6 compatibility fix was needed in `core.companies.models.Product.save`, where `super().save()` now passes Django's keyword-only save arguments by name.
+- `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 10.
+
 Forum-specific risk:
 
 - The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.
@@ -129,9 +137,9 @@ Forum-specific risk:
 
 Do not jump straight to latest packages without expanding tests around risky areas.
 
-Current verified baseline as of 2026-05-12:
+Current verified baseline as of 2026-05-24:
 
-- After Batch 6 dependency constraints, `docker compose exec core make test`: 232 core tests, 31 API tests, and flake8 passing.
+- After Batch 10 Django 6 upgrade, `docker compose exec core make test`: 234 core tests, 31 API tests, and flake8 passing.
 - After Batch 6 dependency constraints, `docker compose exec forum_instance python manage.py test`: 23 forum tests passing.
 - Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping.
 
@@ -142,7 +150,7 @@ Current upgrade-prep progress:
 - Step 3 public page and template smoke coverage is done for the planned high-traffic slices.
 - Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
-- Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, a report-only CSP header, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
+- Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, Django 6 report-only CSP middleware, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
 - Step 7 forum coverage happened before the forum was moved out of `am-core`; future forum work belongs in the sibling `am-dev/forum_instance` project.
 
 Recommended order:
@@ -152,7 +160,7 @@ Recommended order:
 3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS. Done for Batch 1 on 2026-05-12.
 4. Add CSP in report-only mode before enforcing it.
 5. Treat forum dependency risk as external to `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
-6. Move `am-core` toward Django 6 independently once main-app CSP/CKEditor risks are addressed. Python 3.11 support has already been dropped in project metadata as of Batch 2.
+6. Move `am-core` toward Django 6 independently once main-app CSP/CKEditor risks are addressed. Done for `am-core` in Batch 10; CKEditor 4 remains an explicit unresolved risk, and Python 3.11 support has already been dropped in project metadata as of Batch 2.
 
 Detailed plan:
 

@@ -105,7 +105,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "core.utils.security.ContentSecurityPolicyReportOnlyMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -407,5 +407,3 @@ SECURE_CSP_REPORT_ONLY = {
     "form-action": ("'self'", "https://www.facebook.com"),
     "report-uri": ("/csp/report/",),
 }
-
-CONTENT_SECURITY_POLICY_REPORT_ONLY = SECURE_CSP_REPORT_ONLY
