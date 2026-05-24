@@ -46,6 +46,8 @@ Batch 9 moved CSP report-only configuration toward Django 6 setting names and ad
 
 Batch 10 upgraded the main app to Django 6.0.5, switched report-only CSP to Django's built-in `ContentSecurityPolicyMiddleware`, removed the temporary custom CSP middleware, and fixed the Django 6 keyword-only `Model.save()` call in `core.companies.models.Product`. CKEditor stayed on `django-ckeditor==6.7.3`. The core image rebuild, `pip check`, Django system check, focused CSP tests, full core `make test`, and main direct dependency audit passed.
 
+Batch 11 migrated the main app dependency workflow to uv. Direct dependencies now live in `pyproject.toml`, transitive dependencies are locked in `uv.lock`, and Docker installs the locked environment with `uv sync --frozen --all-groups --no-install-project --inexact`. The core image rebuild, container uv/Django version checks, `pip check`, Django system check, full core `make test`, and lock-export audit passed.
+
 Known warnings that remain useful upgrade signals:
 
 - `django-ckeditor` warns that bundled CKEditor 4 has unfixed security issues.

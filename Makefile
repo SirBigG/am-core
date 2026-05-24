@@ -9,7 +9,7 @@ FORUM_IMAGE=sirbigg/am-forum:latest
 deploy: pull update test migrate collectstatic compilemessages
 
 update:
-	pip install -r requirements.txt -c constraints.txt
+	UV_PROJECT_ENVIRONMENT=/usr/local uv sync --frozen --all-groups --no-install-project --inexact
 
 test: test_core test_api flake
 

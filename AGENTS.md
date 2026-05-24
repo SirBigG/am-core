@@ -31,18 +31,17 @@ docker compose exec forum_instance python manage.py test
 
 ## Dependency Management Findings
 
-Runtime dependencies are currently managed by:
+Runtime dependencies are currently managed by uv:
 
-- `requirements.in`
-- `requirements.txt`
-- `constraints.txt`
+- `pyproject.toml`
+- `uv.lock`
 
-`requirements.in` is the human-edited top-level input. `requirements.txt` remains the install input used by existing tooling. `constraints.txt` pins verified transitive dependency versions from the Docker Compose `core` container. `pyproject.toml` does not currently contain runtime dependencies; it mostly contains project metadata and tool configuration.
+`pyproject.toml` is the human-edited top-level dependency input. `uv.lock` is the locked transitive dependency set. The old main-app `requirements.in`, `requirements.txt`, and `constraints.txt` files were removed in Batch 11.
 
-Install dependencies with constraints:
+Install dependencies from the lock:
 
 ```bash
-pip install -r requirements.txt -c constraints.txt
+uv sync --frozen --all-groups
 ```
 
 Python constraints:
@@ -123,6 +122,15 @@ Batch 10 note:
 - `django-ckeditor==6.7.3` was intentionally left unchanged. The CKEditor 4 security warning still requires a separate product/licensing decision, not an automatic CKEditor 5 migration.
 - A Django 6 compatibility fix was needed in `core.companies.models.Product.save`, where `super().save()` now passes Django's keyword-only save arguments by name.
 - `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 10.
+
+Batch 11 note:
+
+- Main dependency management moved from requirements/constraints files to uv on 2026-05-24.
+- `pyproject.toml` now contains the direct main app dependencies and a `dev` dependency group for `coverage`, `factory-boy`, and `flake8`.
+- `uv.lock` is now the locked transitive dependency source for the main app.
+- The main `Dockerfile` installs dependencies with `uv sync --frozen --all-groups --no-install-project --inexact` into `/usr/local`, so Docker Compose bind mounts do not hide dependencies under `/am-core/.venv`.
+- The main `Makefile` `update` target now uses uv. The old main `requirements.in`, `requirements.txt`, and `constraints.txt` files were removed.
+- `docker compose build core`, `docker compose up -d core`, `docker compose exec core uv --version`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core make test`, and the lock-export audit passed after Batch 11.
 
 Forum-specific risk:
 

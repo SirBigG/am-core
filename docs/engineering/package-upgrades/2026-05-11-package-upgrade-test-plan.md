@@ -4,11 +4,11 @@ Created: 2026-05-11
 
 ## Current Dependency Shape
 
-The project currently uses `requirements.in` plus `requirements.txt` for the main service. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
+The main service now uses uv for dependency management. `pyproject.toml` contains the direct dependencies and `uv.lock` pins the transitive dependency set.
 
 The main Docker image uses Python 3.12.13. The main app moved to Django 6.0.5 in Batch 10.
 
-Batch 6 added a checked-in constraints file for the main service: `constraints.txt`. This is a reproducible constraints workflow, not a fully hashed lock workflow. A future improvement is adopting `pip-tools` with hash-checked compiled output files.
+Batch 11 replaced the old main-app `requirements.in`, `requirements.txt`, and `constraints.txt` workflow with uv.
 
 ## Security Findings
 
@@ -486,6 +486,33 @@ Residual risks after Batch 10:
 - `django-ckeditor==6.7.3` still bundles CKEditor 4 and emits the upstream unsupported/security warning. This was intentionally not migrated to CKEditor 5 because that is a licensing/product decision.
 - The sibling forum project remains outside `am-core`; if it is still deployed, its `django-spirit`/Mistune risk still needs a separate decision.
 - CSP is still report-only. Enforcement still needs violation cleanup, nonce work where appropriate, and page-group rollout.
+
+## Batch 11 Main uv Migration
+
+Completed on 2026-05-24 for the main `am-core` service.
+
+Changes:
+
+- Moved direct main-app dependencies into PEP 621 `[project]` metadata in `pyproject.toml`.
+- Added a uv `dev` dependency group for `coverage`, `factory-boy`, and `flake8`.
+- Added `uv.lock` as the locked transitive dependency set.
+- Removed the old main-app `requirements.in`, `requirements.txt`, and `constraints.txt` files.
+- Updated `Dockerfile` to install dependencies with `uv sync --frozen --all-groups --no-install-project --inexact`.
+- Set `UV_PROJECT_ENVIRONMENT=/usr/local` for Docker installs so local Docker Compose bind mounts do not hide dependencies under `/am-core/.venv`.
+- Updated the main `Makefile` `update` target to use uv.
+- Updated dependency docs and agent notes for the uv workflow.
+
+Verification:
+
+- `uv lock`: passed inside the Linux `core` container. The local Homebrew/macOS uv binary panicked under the Codex sandbox, so lock generation was done in Docker.
+- `docker compose build core`: passed and installed dependencies from `uv.lock`.
+- `docker compose up -d core`: passed.
+- `docker compose exec core uv --version`: `uv 0.9.21`.
+- `docker compose exec core python -c "import django; print(django.get_version())"`: `6.0.5`.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec core ./manage.py check --settings=settings.test_settings`: passed with existing CKEditor and non-unique-email warnings only.
+- `docker compose exec core make test`: passed, 234 core tests, 31 API tests, and flake8.
+- `docker compose exec core sh -c 'uv export --no-hashes --format requirements-txt --all-groups --output-file /tmp/am-core-uv-export.txt && uv tool run pip-audit -r /tmp/am-core-uv-export.txt'`: passed with no known vulnerabilities.
 
 ### Step 7: Forum Dependency Decision
 

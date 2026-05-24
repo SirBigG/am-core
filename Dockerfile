@@ -3,9 +3,12 @@ FROM python:3.12.13-slim
 ENV PYTHONUNBUFFERED=1
 
 ENV PROJECT_DIR=/am-core
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
 ARG GECKODRIVER_VERSION=0.36.0
 
-ADD requirements.txt constraints.txt $PROJECT_DIR/
+COPY --from=ghcr.io/astral-sh/uv:0.9.21 /uv /uvx /usr/local/bin/
+
+ADD pyproject.toml uv.lock $PROJECT_DIR/
 
 WORKDIR $PROJECT_DIR
 
@@ -28,7 +31,7 @@ RUN set -eux; \
 RUN apt-get update && \
     apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev gettext  && \
     apt-get clean && \
-    pip install -r requirements.txt -c constraints.txt
+    uv sync --frozen --all-groups --no-install-project --inexact
 
 ADD . .
 

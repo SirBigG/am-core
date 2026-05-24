@@ -2,6 +2,7 @@
 /uploads/*
 .idea/
 env/
+.venv/
 .coverage
 /htmlcov/*
 *.mo
