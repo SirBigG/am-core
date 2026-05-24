@@ -24,7 +24,6 @@ transliterate==1.10.2
 django-taggit==6.1.0
 coverage==7.14.0
 xlrd==2.0.2
-django_http2_push==0.0b2
 django-recaptcha==4.1.0
 django-comments-dab==3.0.0
 daphne==4.2.1

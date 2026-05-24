@@ -188,7 +188,7 @@ Residual risks after Batch 4:
 
 - The forum `django-spirit`/Mistune path remains unresolved.
 - `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
-- `django_http2_push==0.0b2` is now pinned, but it is a beta package and should be reviewed during the reproducible dependency workflow.
+- `django_http2_push==0.0b2` was still pinned at this point, but later removed in Batch 8.
 
 ## Batch 5 Browser Driver Cleanup
 
@@ -410,6 +410,27 @@ Current report-only policy:
 - Implemented by `core.utils.security.ContentSecurityPolicyReportOnlyMiddleware`.
 - Configured in `settings.settings.CONTENT_SECURITY_POLICY_REPORT_ONLY`.
 - Intentionally allows current inline scripts/styles and known external assets so violations can be observed before any enforcement work.
+
+## Batch 8 Main HTTP/2 Push Removal
+
+Completed on 2026-05-24 for the main app.
+
+Changes:
+
+- Removed the obsolete beta `django_http2_push==0.0b2` dependency from `requirements.in`, `requirements.txt`, and `constraints.txt`.
+- Removed `django_http2_push` from `INSTALLED_APPS` and `PushHttp2Middleware` from `MIDDLEWARE`.
+- Added a local `static_push` template tag that delegates to Django's built-in static asset URL helper so existing templates keep rendering.
+- Added a regression test for `{% static_push %}` template rendering.
+
+Verification:
+
+- `docker compose build core`: passed.
+- `docker compose up -d core`: passed.
+- `docker compose exec core python -m pip show django-http2-push`: confirmed the package is not installed.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec core ./manage.py test core.utils.tests.test_static_push --settings=settings.test_settings`: passed.
+- `docker compose exec core make test`: passed, 233 core tests, 31 API tests, and flake8.
+- `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
 
 ### Step 7: Forum Dependency Decision
 

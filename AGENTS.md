@@ -102,6 +102,13 @@ Batch 7 note:
 - Parent Docker Compose now builds and mounts the forum service from `./forum_instance`.
 - `docker compose build forum_instance`, `docker compose up -d forum_instance`, `docker compose exec forum_instance python -m pip check`, `docker compose exec forum_instance python manage.py test`, and `docker compose exec core make test` passed after the move.
 
+Batch 8 note:
+
+- The main app removed the obsolete beta `django_http2_push==0.0b2` dependency on 2026-05-24.
+- A local `static_push` template tag now preserves existing template calls by delegating to Django's built-in static asset URL helper.
+- `django_http2_push` was removed from main `INSTALLED_APPS`, middleware, `requirements.in`, `requirements.txt`, and `constraints.txt`.
+- `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 8.
+
 Forum-specific risk:
 
 - The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.

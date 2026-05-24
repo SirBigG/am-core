@@ -94,8 +94,6 @@ INSTALLED_APPS = [
     "social_django",
     # Simple tags https://github.com/jazzband/django-taggit
     "taggit",
-    # http2 support https://github.com/ricardochaves/django_http2_push
-    "django_http2_push",
     # https://github.com/praekelt/django-recaptcha
     "django_recaptcha",
     # https://github.com/radi85/Comment
@@ -109,7 +107,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "core.utils.security.ContentSecurityPolicyReportOnlyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django_http2_push.middleware.PushHttp2Middleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -127,6 +124,9 @@ TEMPLATES = [
         "DIRS": [os.path.join(BASE_DIR, "templates"), os.path.join(BASE_DIR + "core/templates/ckeditor")],
         "APP_DIRS": True,
         "OPTIONS": {
+            "libraries": {
+                "static_push": "core.templatetags.static_push",
+            },
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",

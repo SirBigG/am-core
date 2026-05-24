@@ -40,6 +40,8 @@ Batch 5 updated main Docker geckodriver provisioning from 0.30.0 to 0.36.0, adde
 
 Batch 6 added transitive constraints for both services and wired Docker installs plus the main `Makefile` install path to use them. Both image rebuilds passed, both `pip check` commands passed, core `make test` passed, forum tests passed, and the main direct dependency audit still reports no known vulnerabilities.
 
+Batch 8 removed the main app's obsolete beta `django_http2_push` dependency. Existing `{% static_push %}` template calls are now handled by a local compatibility tag that returns Django static asset URLs. The core image rebuild, absence check for `django-http2-push`, `pip check`, direct dependency audit, focused template-tag test, and full core `make test` passed.
+
 Known warnings that remain useful upgrade signals:
 
 - `django-ckeditor` warns that bundled CKEditor 4 has unfixed security issues.
