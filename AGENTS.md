@@ -140,6 +140,13 @@ Batch 12 note:
 - The Docker build dependency list no longer installs Debian `python3-dev`, avoiding an extra distro Python toolchain beside the official Python image runtime.
 - `docker compose build core`, `docker compose up -d core`, `docker compose exec core python --version`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core make test`, `docker compose exec core uv lock --check`, `docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check`, and the lock-export audit passed after Batch 12.
 
+Batch 13 note:
+
+- The stale Poetry pre-commit hook was removed on 2026-05-24 after the uv migration.
+- The main `Makefile` gained `make check-deps`, which runs `uv lock --check` and a frozen uv sync check.
+- The stale `release-forum` Makefile target was removed because the forum project now lives outside `am-core`.
+- `docker compose exec core make check-deps` and `docker compose exec core uv tool run pre-commit validate-config` passed after Batch 13.
+
 Forum-specific risk:
 
 - The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.

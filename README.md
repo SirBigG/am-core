@@ -19,6 +19,8 @@ Common commands from the parent folder:
 ```bash
 docker compose up
 docker compose ps
+docker compose exec core make check-deps
+docker compose exec core make test
 docker compose exec core ./manage.py test --settings=settings.test_settings
 docker compose exec core ./manage.py test api --settings=settings.test_settings
 docker compose exec core flake8

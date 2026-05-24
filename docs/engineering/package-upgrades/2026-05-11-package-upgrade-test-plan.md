@@ -546,6 +546,22 @@ Residual risks after Batch 12:
 - `django-ckeditor==6.7.3` still bundles CKEditor 4 and emits the upstream unsupported/security warning. This remains a separate product/licensing decision.
 - CSP is still report-only. Enforcement still needs violation cleanup, nonce work where appropriate, and page-group rollout.
 
+## Batch 13 Tooling Cleanup
+
+Completed on 2026-05-24 for the main `am-core` service.
+
+Changes:
+
+- Removed the stale Poetry pre-commit hook after the main dependency workflow moved to uv.
+- Added `make check-deps`, which runs `uv lock --check` and `uv sync --frozen --all-groups --no-install-project --inexact --check`.
+- Removed the stale in-repo `release-forum` Makefile target because the forum project now lives outside `am-core`.
+- Updated README and dependency/testing docs with the uv dependency check command.
+
+Verification:
+
+- `docker compose exec core make check-deps`: passed.
+- `docker compose exec core uv tool run pre-commit validate-config`: passed.
+
 ### Step 7: Forum Dependency Decision
 
 Before upgrading forum dependencies:

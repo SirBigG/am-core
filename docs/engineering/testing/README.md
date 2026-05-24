@@ -11,6 +11,8 @@ docker compose exec core make test
 docker compose exec forum_instance python manage.py test
 ```
 
+Use `docker compose exec core make check-deps` after dependency or runtime metadata changes. It verifies that `uv.lock` is current and that the frozen uv sync would not change the installed environment.
+
 `make test` inside the `core` container runs:
 
 1. `make test_core`
@@ -49,6 +51,8 @@ Batch 10 upgraded the main app to Django 6.0.5, switched report-only CSP to Djan
 Batch 11 migrated the main app dependency workflow to uv. Direct dependencies now live in `pyproject.toml`, transitive dependencies are locked in `uv.lock`, and Docker installs the locked environment with `uv sync --frozen --all-groups --no-install-project --inexact`. The core image rebuild, container uv/Django version checks, `pip check`, Django system check, full core `make test`, and lock-export audit passed.
 
 Batch 12 upgraded the main Docker runtime to Python 3.14.5 and tightened `pyproject.toml` to `>=3.14,<3.15`. Black and pre-commit Python targets were aligned to Python 3.14, and `uv.lock` was refreshed for the new runtime. The core image rebuild, runtime version checks, `pip check`, Django system check, uv lock/sync checks, full core `make test`, and lock-export audit passed.
+
+Batch 13 cleaned up local tooling after the uv migration. The stale Poetry pre-commit hook and stale in-repo `release-forum` Makefile target were removed, and `make check-deps` now wraps the uv lock/sync checks. Dependency checks and pre-commit config validation passed.
 
 Known warnings that remain useful upgrade signals:
 

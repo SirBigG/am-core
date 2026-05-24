@@ -4,12 +4,15 @@ DEV_SETTINGS=settings.dev
 TEST_SETTINGS=settings.test_settings
 DOCKER_PLATFORM=linux/x86_64
 CORE_IMAGE=sirbigg/am-core:latest
-FORUM_IMAGE=sirbigg/am-forum:latest
 
 deploy: pull update test migrate collectstatic compilemessages
 
 update:
 	UV_PROJECT_ENVIRONMENT=/usr/local uv sync --frozen --all-groups --no-install-project --inexact
+
+check-deps:
+	uv lock --check
+	UV_PROJECT_ENVIRONMENT=/usr/local uv sync --frozen --all-groups --no-install-project --inexact --check
 
 test: test_core test_api flake
 
@@ -57,7 +60,3 @@ pull:
 release:
 	docker build --platform $(DOCKER_PLATFORM) -t $(CORE_IMAGE) .
 	docker push $(CORE_IMAGE)
-
-release-forum:
-	docker build --platform $(DOCKER_PLATFORM) -t $(FORUM_IMAGE) forum_instance
-	docker push $(FORUM_IMAGE)

@@ -20,6 +20,7 @@ Useful commands:
 uv lock
 uv sync --frozen --all-groups
 docker compose build core
+docker compose exec core make check-deps
 docker compose exec core uv lock --check
 docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check
 docker compose exec core make test
