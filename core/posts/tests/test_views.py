@@ -1,5 +1,6 @@
 from django.test import Client, RequestFactory, TestCase
 
+from core.posts.models import SearchStatistic
 from core.utils.tests.factories import CategoryFactory, PhotoFactory, PostFactory
 
 client = Client()
@@ -115,6 +116,23 @@ class GalleryTests(TestCase):
     def test_gallery_add_photo_url_is_not_available(self):
         response = client.get("/gallery/add/%s/" % self.post.id)
         self.assertEqual(response.status_code, 404)
+
+
+class PostSearchTests(TestCase):
+    def test_search_page_renders_without_query(self):
+        response = self.client.get("/search/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "posts/search.html")
+        self.assertEqual(SearchStatistic.objects.count(), 0)
+
+    def test_search_query_renders_no_results_and_records_statistic(self):
+        response = self.client.get("/search/", {"q": "missing query"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "posts/search.html")
+        self.assertEqual(SearchStatistic.objects.count(), 1)
+        self.assertEqual(SearchStatistic.objects.get().search_phrase, "missing query")
 
 
 class SiteMapTests(TestCase):

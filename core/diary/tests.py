@@ -2,7 +2,6 @@ from datetime import timezone as dt_timezone
 
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.formats import date_format
 from django.utils import timezone
 
 from core.classifier.models import Category
@@ -438,9 +437,7 @@ class PlantMoveFlowTests(TestCase):
         source_item = DiaryItem.objects.get(diary=self.source_diary, action_type="transplanted")
         target_item = DiaryItem.objects.get(diary=self.target_diary, action_type="transplanted")
 
-        response = self.client.get(
-            reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": source_item.pk})
-        )
+        response = self.client.get(reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": source_item.pk}))
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.source_diary.get_profile_absolute_url(), fetch_redirect_response=False)
@@ -460,9 +457,7 @@ class PlantMoveFlowTests(TestCase):
         source_item = DiaryItem.objects.get(diary=self.source_diary, action_type="transplanted")
         target_item = DiaryItem.objects.get(diary=self.target_diary, action_type="transplanted")
 
-        response = self.client.get(
-            reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": target_item.pk})
-        )
+        response = self.client.get(reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": target_item.pk}))
 
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, self.source_diary.get_profile_absolute_url(), fetch_redirect_response=False)
@@ -1535,7 +1530,9 @@ class DiaryItemDeleteLifecycleTests(TestCase):
         self.plant.completed_at = latest_finished_item.date
         self.plant.save(update_fields=["status", "completed_at"])
 
-        response = self.client.get(reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": latest_finished_item.pk}))
+        response = self.client.get(
+            reverse("pro_auth:profile-diary-item-delete", kwargs={"pk": latest_finished_item.pk})
+        )
 
         self.assertEqual(response.status_code, 302)
         self.plant.refresh_from_db()

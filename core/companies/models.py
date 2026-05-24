@@ -85,7 +85,12 @@ class Product(models.Model):
             )
             if post.exists():
                 self.post = post.first()
-        super().save(force_insert, force_update, using, update_fields)
+        super().save(
+            force_insert=force_insert,
+            force_update=force_update,
+            using=using,
+            update_fields=update_fields,
+        )
 
 
 class Link(models.Model):

@@ -1,10 +1,9 @@
+from core.classifier.models import Category
+from core.posts.models import Photo, Post
 from rest_framework import serializers
 
-from core.posts.models import Post, Photo
-from core.classifier.models import Category
 
-
-class AbsoluteUrlMixin(object):
+class AbsoluteUrlMixin:
     def get_abs_url(self, instance):
         return instance.get_absolute_url()
 
@@ -17,11 +16,12 @@ class PhotoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Photo
-        fields = ('description', 'author', 'source', 'image')
+        fields = ("description", "author", "source", "image")
 
 
 class PhotoThumbnailSerializer(PhotoSerializer):
     """For make thumbnails in lists."""
+
     # TODO: parametrization
     image = serializers.SerializerMethodField()
 
@@ -36,27 +36,38 @@ class PostSerializer(serializers.ModelSerializer):
     author = serializers.CharField(max_length=250)
     source = serializers.CharField(max_length=250)
     status = serializers.BooleanField()
-    photo = PhotoSerializer(many=True, source='photo.all')
+    photo = PhotoSerializer(many=True, source="photo.all")
 
     class Meta:
         model = Post
-        fields = ('title', 'text', 'author', 'source',
-                  'status', 'photo',)
+        fields = (
+            "title",
+            "text",
+            "author",
+            "source",
+            "status",
+            "photo",
+        )
 
 
 class ShortPostSerializer(AbsoluteUrlMixin, serializers.ModelSerializer):
     title = serializers.CharField(max_length=500)
     text = serializers.CharField()
-    url = serializers.SerializerMethodField('get_abs_url')
-    photo = PhotoSerializer(source='photo.first')
+    url = serializers.SerializerMethodField("get_abs_url")
+    photo = PhotoSerializer(source="photo.first")
 
     class Meta:
         model = Post
-        fields = ('title', 'text', 'url', 'photo',)
+        fields = (
+            "title",
+            "text",
+            "url",
+            "photo",
+        )
 
 
 class ShortPostListSerializer(ShortPostSerializer):
-    photo = PhotoThumbnailSerializer(source='photo.first')
+    photo = PhotoThumbnailSerializer(source="photo.first")
 
 
 class CategoryPKRelatedField(serializers.RelatedField):
@@ -65,34 +76,45 @@ class CategoryPKRelatedField(serializers.RelatedField):
         return self.get_queryset().get(pk=data)
 
     def to_representation(self, value):
-        return {'pk': value.pk, 'value': str(value)}
+        return {"pk": value.pk, "value": str(value)}
 
 
 class UserPostSerializer(AbsoluteUrlMixin, serializers.ModelSerializer):
     """Serializer for user post view set.
-       By default created with inactive status."""
+
+    By default created with inactive status.
+    """
+
     title = serializers.CharField(max_length=500)
     text = serializers.CharField()
     source = serializers.CharField(max_length=250, required=False)
     status = serializers.BooleanField(default=0)
-    url = serializers.SerializerMethodField('get_abs_url')
+    url = serializers.SerializerMethodField("get_abs_url")
     rubric = CategoryPKRelatedField(queryset=Category.objects.filter(level=1))
-    photo = PhotoSerializer(source='photo.first', read_only=True)
-    photos = serializers.ListField(child=serializers.ImageField(), required=False, allow_empty=False)
+    photo = PhotoSerializer(source="photo.first", read_only=True)
+    photos = serializers.ListField(child=serializers.ImageField(), allow_empty=False, write_only=True)
 
     class Meta:
         model = Post
-        fields = ('title', 'text', 'source',
-                  'status', 'rubric', 'url', 'photos', 'photo',)
+        fields = (
+            "title",
+            "text",
+            "source",
+            "status",
+            "rubric",
+            "url",
+            "photos",
+            "photo",
+        )
 
     def create(self, validated_data):
         """For related objects created."""
-        photos = validated_data.pop('photos')
-        rubric = validated_data.pop('rubric')
-        user_rubric, created = Category.objects.get_or_create(defaults={"slug": "%s-user" % rubric.slug},
-                                                              **{"parent": rubric,
-                                                                 "value": "Статті користувачів"})
-        validated_data.update({'rubric': user_rubric})
+        photos = validated_data.pop("photos")
+        rubric = validated_data.pop("rubric")
+        user_rubric, created = Category.objects.get_or_create(
+            defaults={"slug": "%s-user" % rubric.slug}, **{"parent": rubric, "value": "Статті користувачів"}
+        )
+        validated_data.update({"rubric": user_rubric})
         post = Post.objects.create(**validated_data)
         for image in photos:
             Photo.objects.create(image=image, post=post)
