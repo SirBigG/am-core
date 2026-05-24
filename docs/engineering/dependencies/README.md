@@ -8,18 +8,15 @@ Main app:
 - `requirements.txt` is the current install input used by existing tooling.
 - `constraints.txt` pins the verified transitive dependency set from the Docker Compose `core` container.
 
-Forum app:
-
-- `forum_instance/requirements.in` is the human-edited top-level input.
-- `forum_instance/requirements.txt` is the current install input used by existing tooling.
-- `forum_instance/constraints.txt` pins the verified transitive dependency set from the Docker Compose `forum_instance` container.
-
 Install commands must use the matching constraints file:
 
 ```bash
 pip install -r requirements.txt -c constraints.txt
-pip install -r forum_instance/requirements.txt -c forum_instance/constraints.txt
 ```
+
+The forum project now lives outside this repo at `../forum_instance/`. Keep its
+dependency workflow with that sibling project instead of reintroducing forum
+requirements into `am-core`.
 
 When changing direct requirements:
 

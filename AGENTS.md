@@ -14,7 +14,7 @@ Local Docker Compose config:
 - Database service: `db`
 - Nginx service exposes local port `8000`
 - The compose file mounts this repo as `./am-core:/am-core`
-- The forum project lives in `forum_instance` and is mounted as `./am-core/forum_instance:/app`
+- The forum project lives outside this repo at `/Users/andriihots/Projects/am-dev/forum_instance` and is mounted as `./forum_instance:/app`
 
 Useful local commands from the parent folder:
 
@@ -36,23 +36,19 @@ Runtime dependencies are currently managed by:
 - `requirements.in`
 - `requirements.txt`
 - `constraints.txt`
-- `forum_instance/requirements.in`
-- `forum_instance/requirements.txt`
-- `forum_instance/constraints.txt`
 
-`requirements.in` files are the human-edited top-level inputs. `requirements.txt` files remain the install inputs used by existing tooling. `constraints.txt` files pin verified transitive dependency versions from the Docker Compose containers. `pyproject.toml` does not currently contain runtime dependencies; it mostly contains project metadata and tool configuration.
+`requirements.in` is the human-edited top-level input. `requirements.txt` remains the install input used by existing tooling. `constraints.txt` pins verified transitive dependency versions from the Docker Compose `core` container. `pyproject.toml` does not currently contain runtime dependencies; it mostly contains project metadata and tool configuration.
 
 Install dependencies with constraints:
 
 ```bash
 pip install -r requirements.txt -c constraints.txt
-pip install -r forum_instance/requirements.txt -c forum_instance/constraints.txt
 ```
 
 Python constraints:
 
 - `pyproject.toml` allows `>=3.12,<3.13`
-- Docker uses Python `3.12.13` for both `core` and `forum_instance`
+- Docker uses Python `3.12.13` for `core`
 - Django 6 requires Python `>=3.12`, so moving to Django 6 means intentionally dropping Python 3.11 support.
 
 Security review on 2026-05-11 found direct dependency risks in the main requirements:
@@ -100,10 +96,18 @@ Batch 6 note:
 - Docker builds and the main `Makefile` install path now use `pip install -r requirements.txt -c constraints.txt`.
 - `docker compose build core forum_instance`, `docker compose up -d core forum_instance`, both `pip check` commands, `docker compose exec core make test`, `docker compose exec forum_instance python manage.py test`, and the main direct dependency audit passed after Batch 6.
 
+Batch 7 note:
+
+- The forum project was moved out of `am-core` into the parent `/Users/andriihots/Projects/am-dev/forum_instance` folder.
+- Parent Docker Compose now builds and mounts the forum service from `./forum_instance`.
+- `docker compose build forum_instance`, `docker compose up -d forum_instance`, `docker compose exec forum_instance python -m pip check`, `docker compose exec forum_instance python manage.py test`, and `docker compose exec core make test` passed after the move.
+
 Forum-specific risk:
 
+- The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.
+- Do not change forum dependencies as part of the `am-core` package upgrade thread unless the user explicitly asks.
 - `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
-- `django-spirit==0.14.3` requires `Django<6,>=4.2`, so the forum blocks a simple whole-repo Django 6 upgrade.
+- `django-spirit==0.14.3` requires `Django<6,>=4.2`, so the forum still blocks a whole-`am-dev` Django 6 upgrade, but it no longer blocks `am-core` dependency cleanup directly.
 - Forum audit still reports `mistune==0.8.4` vulnerabilities: `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897`; `CVE-2026-44897` lists `3.2.1` as a fixed version, but Spirit pins Mistune below that line.
 - PyPI currently lists `django-spirit==0.14.3` as the latest Spirit release. Installed metadata pins `mistune==0.8.4` exactly, and Spirit subclasses Mistune 0.x parser/renderer internals, so upgrading to Mistune 3 requires a fork/vendor migration or forum replacement.
 
@@ -125,7 +129,7 @@ Current upgrade-prep progress:
 - Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, a report-only CSP header, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
-- Step 7 forum coverage has started and now covers anonymous home/topic/category/detail reads, SSO login start, logout redirect, forum profile update auth behavior, storage settings, and markdown security behavior. A deliberate `django-spirit`/Mistune mitigation decision still remains.
+- Step 7 forum coverage happened before the forum was moved out of `am-core`; future forum work belongs in the sibling `am-dev/forum_instance` project.
 
 Recommended order:
 
@@ -133,8 +137,8 @@ Recommended order:
 2. Add regression tests for auth, OIDC, forum SSO, public page smoke coverage, API contracts, file/image/storage behavior, and security headers.
 3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS. Done for Batch 1 on 2026-05-12.
 4. Add CSP in report-only mode before enforcing it.
-5. Decide the forum path separately: keep/fork/patch/replace `django-spirit`.
-6. Move to Django 6 only after forum compatibility is solved or isolated. Python 3.11 support has already been dropped in project metadata as of Batch 2.
+5. Treat forum dependency risk as external to `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
+6. Move `am-core` toward Django 6 independently once main-app CSP/CKEditor risks are addressed. Python 3.11 support has already been dropped in project metadata as of Batch 2.
 
 Detailed plan:
 

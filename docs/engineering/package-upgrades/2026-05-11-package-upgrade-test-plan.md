@@ -4,11 +4,11 @@ Created: 2026-05-11
 
 ## Current Dependency Shape
 
-The project currently uses `requirements.in` plus `requirements.txt` for the main service and `forum_instance/requirements.in` plus `forum_instance/requirements.txt` for the forum service. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
+The project currently uses `requirements.in` plus `requirements.txt` for the main service. `pyproject.toml` only declares the project metadata and Python range `>=3.12,<3.13`; it does not manage the runtime dependencies.
 
-The main and forum Docker images use Python 3.12.13. Django 6 is technically possible for the Python runtime, but the forum stack still blocks a simple whole-repo Django 6 upgrade.
+The main Docker image uses Python 3.12.13. Django 6 is technically possible for the Python runtime.
 
-Batch 6 added checked-in constraints files for both services: `constraints.txt` and `forum_instance/constraints.txt`. This is a reproducible constraints workflow, not a fully hashed lock workflow. A future improvement is adopting `pip-tools` with hash-checked compiled output files.
+Batch 6 added a checked-in constraints file for the main service: `constraints.txt`. This is a reproducible constraints workflow, not a fully hashed lock workflow. A future improvement is adopting `pip-tools` with hash-checked compiled output files.
 
 ## Security Findings
 
@@ -22,21 +22,21 @@ Batch 6 added checked-in constraints files for both services: `constraints.txt` 
 - `python-jose==3.3.0`; fix `3.4.0`.
 - `lxml==5.1.0`; fix `6.1.0`.
 
-The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. `django-spirit==0.14.3` still pins `mistune==0.8.4` and requires `Django<6,>=4.2`, so the forum cannot move to Django 6 or fixed Mistune without replacing, forking, or patching Spirit. After Batch 2, forum audit still reports `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897` for `mistune==0.8.4`.
+The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. The forum was moved out of `am-core` into the sibling `am-dev/forum_instance` project, and forum dependency changes are intentionally out of scope for this `am-core` upgrade thread unless requested separately.
 
 ## Upgrade Feasibility
 
 Recommended sequence:
 
 1. Patch within the Django 5 line first: move main app to Django 5.2 LTS if compatible, and apply security updates for DRF, Pillow, requests, social auth, python-jose, and lxml.
-2. Keep forum on Django 5.2-compatible dependencies while deciding how to handle `django-spirit`.
+2. Keep forum dependency decisions outside `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
 3. Add CSP in report-only mode before enforcing it. Django 6 has built-in `ContentSecurityPolicyMiddleware`, `SECURE_CSP`, `SECURE_CSP_REPORT_ONLY`, and nonce support. On Django 5.2, use `django-csp` or a small custom middleware if CSP is needed before the Django 6 jump.
-4. Move main app to Django 6 only after the forum path is separated or solved. Python 3.11 support was intentionally dropped in Batch 2.
+4. Move the main app to Django 6 after main-app CSP and CKEditor risks are understood. Python 3.11 support was intentionally dropped in Batch 2.
 
 Known compatibility pressure:
 
 - `Django==6.0.5` requires Python `>=3.12`.
-- `django-spirit==0.14.3` requires `Django<6,>=4.2` and pins vulnerable `mistune==0.8.4`.
+- The sibling forum project still uses `django-spirit==0.14.3`, which requires `Django<6,>=4.2` and pins vulnerable `mistune==0.8.4`; treat that as outside this repo's upgrade scope.
 - `social-auth-app-django==5.9.0` requires `Django>=5.2`.
 - `django-autocomplete-light==4.0.0` requires `Django>=5.2`.
 
@@ -251,6 +251,33 @@ Residual risks after Batch 6:
 - The constraints files are not hash-locked. Use `pip-tools` with hashes later if stronger supply-chain reproducibility is needed.
 - The forum `django-spirit`/Mistune path remains unresolved.
 - `django-ckeditor==6.7.3` still bundles CKEditor 4.22.1 and keeps the upstream warning about unfixed CKEditor 4 security issues.
+
+## Batch 7 Forum Relocation
+
+Completed on 2026-05-24 to keep forum dependency decisions out of the `am-core` package upgrade thread.
+
+Changes:
+
+- Moved the forum project from `am-core/forum_instance` to the sibling parent path `/Users/andriihots/Projects/am-dev/forum_instance`.
+- Updated parent `docker-compose.yml` so `forum_instance` builds from `./forum_instance` and mounts `./forum_instance:/app`.
+- Added parent `.gitignore` entries for generated forum artifacts: `forum_instance/staticfiles/`, `forum_instance/st_search/`, and compiled forum translation files.
+- Updated `am-core` docs to treat the forum as an external sibling project.
+
+Verification commands run from `/Users/andriihots/Projects/am-dev`:
+
+- `docker compose config --services`: passed.
+- `docker compose build forum_instance`: passed.
+- `docker compose up -d forum_instance`: passed.
+- `docker inspect am-forum-instance --format '{{json .Mounts}}'`: confirmed `/Users/andriihots/Projects/am-dev/forum_instance` mounts to `/app`.
+- `docker compose exec forum_instance python -m pip check`: passed with no broken requirements.
+- `docker compose exec forum_instance python manage.py test`: passed, 23 tests.
+- `docker compose exec core make test`: passed, 232 core tests, 31 API tests, and flake8.
+
+Residual risks after Batch 7:
+
+- Forum dependencies are intentionally unchanged and remain outside this `am-core` upgrade scope.
+- The sibling forum still carries the known `django-spirit`/Mistune risk if it remains deployed.
+- `am-core` still needs a CKEditor 4 decision and a main-app CSP/Django 6 path.
 
 ## Current Test Coverage Shape
 

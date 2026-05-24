@@ -1,7 +1,8 @@
 # AgroMega Core
 
-AgroMega Django backend and API project. The forum instance is kept in
-`forum_instance/` and runs as a separate Django project.
+AgroMega Django backend and API project. The forum instance is a sibling
+project in the parent `am-dev/forum_instance/` folder and runs as a separate
+Django service.
 
 ## Local Development
 
@@ -25,8 +26,8 @@ docker compose exec forum_instance python manage.py test
 ```
 
 Nginx exposes the local app on port `8000`. The compose setup mounts this repo
-into the `core` container at `/am-core` and mounts `forum_instance/` into the
-forum container at `/app`.
+into the `core` container at `/am-core` and mounts the sibling
+`../forum_instance/` project into the forum container at `/app`.
 
 ## Documentation
 
