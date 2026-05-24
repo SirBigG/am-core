@@ -3,7 +3,7 @@ name = "agromega"
 version = "0.0.1"
 description = "AgroMega Django backend"
 readme = "README.md"
-requires-python = ">=3.12,<3.13"
+requires-python = ">=3.14,<3.15"
 authors = [
     { name = "Andrii Hots", email = "gotsandriy@gmail.com" },
 ]
@@ -52,7 +52,7 @@ package = false
 
 [tool.black]
 line-length = 120
-target-version = ['py312']
+target-version = ['py314']
 exclude = '''
 /(
     \.eggs

@@ -21,7 +21,7 @@ Do not run `test_core` and `test_api` in parallel unless the test database names
 
 ## Current Baseline
 
-As of 2026-05-24 after Batch 10 Django 6 upgrade:
+As of 2026-05-24 after Batch 12 Python 3.14.5 upgrade:
 
 - Core Django tests: 234 passing.
 - API tests: 31 passing.
@@ -47,6 +47,8 @@ Batch 9 moved CSP report-only configuration toward Django 6 setting names and ad
 Batch 10 upgraded the main app to Django 6.0.5, switched report-only CSP to Django's built-in `ContentSecurityPolicyMiddleware`, removed the temporary custom CSP middleware, and fixed the Django 6 keyword-only `Model.save()` call in `core.companies.models.Product`. CKEditor stayed on `django-ckeditor==6.7.3`. The core image rebuild, `pip check`, Django system check, focused CSP tests, full core `make test`, and main direct dependency audit passed.
 
 Batch 11 migrated the main app dependency workflow to uv. Direct dependencies now live in `pyproject.toml`, transitive dependencies are locked in `uv.lock`, and Docker installs the locked environment with `uv sync --frozen --all-groups --no-install-project --inexact`. The core image rebuild, container uv/Django version checks, `pip check`, Django system check, full core `make test`, and lock-export audit passed.
+
+Batch 12 upgraded the main Docker runtime to Python 3.14.5 and tightened `pyproject.toml` to `>=3.14,<3.15`. Black and pre-commit Python targets were aligned to Python 3.14, and `uv.lock` was refreshed for the new runtime. The core image rebuild, runtime version checks, `pip check`, Django system check, uv lock/sync checks, full core `make test`, and lock-export audit passed.
 
 Known warnings that remain useful upgrade signals:
 

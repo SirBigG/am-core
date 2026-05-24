@@ -6,9 +6,10 @@ Created: 2026-05-11
 
 The main service now uses uv for dependency management. `pyproject.toml` contains the direct dependencies and `uv.lock` pins the transitive dependency set.
 
-The main Docker image uses Python 3.12.13. The main app moved to Django 6.0.5 in Batch 10.
+The main Docker image uses Python 3.14.5. The main app moved to Django 6.0.5 in Batch 10.
 
 Batch 11 replaced the old main-app `requirements.in`, `requirements.txt`, and `constraints.txt` workflow with uv.
+Batch 12 moved the main Docker runtime and project metadata to Python 3.14.
 
 ## Security Findings
 
@@ -35,7 +36,7 @@ Recommended sequence:
 
 Known compatibility pressure:
 
-- `Django==6.0.5` requires Python `>=3.12`; `am-core` already runs on Python 3.12.13.
+- `Django==6.0.5` supports Python 3.12, 3.13, and 3.14; `am-core` now runs on Python 3.14.5.
 - The sibling forum project still uses `django-spirit==0.14.3`, which requires `Django<6,>=4.2` and pins vulnerable `mistune==0.8.4`; treat that as outside this repo's upgrade scope.
 - `social-auth-app-django==5.9.0` requires `Django>=5.2`.
 - `django-autocomplete-light==4.0.0` requires `Django>=5.2`.
@@ -514,6 +515,37 @@ Verification:
 - `docker compose exec core make test`: passed, 234 core tests, 31 API tests, and flake8.
 - `docker compose exec core sh -c 'uv export --no-hashes --format requirements-txt --all-groups --output-file /tmp/am-core-uv-export.txt && uv tool run pip-audit -r /tmp/am-core-uv-export.txt'`: passed with no known vulnerabilities.
 
+## Batch 12 Python 3.14 Runtime
+
+Completed on 2026-05-24 for the main `am-core` service.
+
+Changes:
+
+- Updated the main Docker image from `python:3.12.13-slim` to `python:3.14.5-slim`.
+- Updated `pyproject.toml` from `>=3.12,<3.13` to `>=3.14,<3.15`.
+- Refreshed `uv.lock` for the Python 3.14 runtime.
+- Aligned Black and pre-commit Python targets to Python 3.14.
+- Removed Debian `python3-dev` from Docker build dependencies so the image does not install an extra distro Python toolchain beside the official Python runtime.
+
+Verification:
+
+- `docker compose build core`: passed and installed the locked uv environment on Python 3.14.5.
+- `docker compose up -d core`: passed.
+- `docker compose exec core python --version`: `Python 3.14.5`.
+- `docker compose exec core python -c "import django; print(django.get_version())"`: `6.0.5`.
+- `docker compose exec core python -m pip check`: passed with no broken requirements.
+- `docker compose exec core ./manage.py check --settings=settings.test_settings`: passed with existing CKEditor and non-unique-email warnings only.
+- `docker compose exec core uv lock --check`: passed.
+- `docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check`: passed with no changes.
+- `docker compose exec core make test`: passed, 234 core tests, 31 API tests, and flake8.
+- `docker compose exec core sh -c 'uv export --no-hashes --format requirements-txt --all-groups --output-file /tmp/am-core-uv-export.txt && uv tool run pip-audit -r /tmp/am-core-uv-export.txt'`: passed with no known vulnerabilities.
+
+Residual risks after Batch 12:
+
+- Python 3.14 narrows the supported runtime window for `am-core`; deploy targets must provide Python 3.14-compatible images.
+- `django-ckeditor==6.7.3` still bundles CKEditor 4 and emits the upstream unsupported/security warning. This remains a separate product/licensing decision.
+- CSP is still report-only. Enforcement still needs violation cleanup, nonce work where appropriate, and page-group rollout.
+
 ### Step 7: Forum Dependency Decision
 
 Before upgrading forum dependencies:
@@ -541,6 +573,7 @@ Batch 2, ecosystem cleanup:
 - Done on 2026-05-12 in Batch 4: pin currently unpinned dev/test dependencies and update Django 5.2-compatible helper libraries.
 - Done on 2026-05-12 in Batch 5: update geckodriver provisioning to `0.36.0` and remove runtime `webdriver_manager` dependency.
 - Done on 2026-05-12 in Batch 6: add checked-in transitive constraints for both services and use them in Docker installs.
+- Done on 2026-05-24 in Batch 12: move the main `am-core` Docker runtime and project metadata to Python 3.14.5.
 
 Batch 3, Django 6 and CSP:
 

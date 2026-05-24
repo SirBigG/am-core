@@ -6,6 +6,7 @@ Main app:
 
 - `pyproject.toml` is the human-edited dependency input.
 - `uv.lock` is the locked transitive dependency set.
+- The current Docker runtime is Python 3.14.5, with `pyproject.toml` constrained to `>=3.14,<3.15`.
 - `Dockerfile` installs the locked environment with `uv sync --frozen --all-groups --no-install-project --inexact`.
 - `Makefile` uses uv for the `update` target.
 
@@ -19,6 +20,8 @@ Useful commands:
 uv lock
 uv sync --frozen --all-groups
 docker compose build core
+docker compose exec core uv lock --check
+docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check
 docker compose exec core make test
 docker compose exec core python -m pip check
 ```

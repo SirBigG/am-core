@@ -1,4 +1,4 @@
-FROM python:3.12.13-slim
+FROM python:3.14.5-slim
 
 ENV PYTHONUNBUFFERED=1
 
@@ -29,7 +29,7 @@ RUN set -eux; \
     && rm /tmp/geckodriver.tar.gz
 
 RUN apt-get update && \
-    apt-get install -y gcc build-essential libpq-dev libjpeg-dev python3-dev gettext  && \
+    apt-get install -y gcc build-essential libpq-dev libjpeg-dev gettext  && \
     apt-get clean && \
     uv sync --frozen --all-groups --no-install-project --inexact
 
