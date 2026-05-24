@@ -11,7 +11,9 @@ class ContentSecurityPolicyReportOnlyMiddleware:
 
     def __call__(self, request):
         response = self.get_response(request)
-        policy = getattr(settings, "CONTENT_SECURITY_POLICY_REPORT_ONLY", None)
+        policy = getattr(settings, "SECURE_CSP_REPORT_ONLY", None) or getattr(
+            settings, "CONTENT_SECURITY_POLICY_REPORT_ONLY", None
+        )
         if policy and self.header_name not in response:
             response[self.header_name] = self._serialize_policy(policy)
         return response

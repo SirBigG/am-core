@@ -408,8 +408,10 @@ Exit criteria:
 Current report-only policy:
 
 - Implemented by `core.utils.security.ContentSecurityPolicyReportOnlyMiddleware`.
-- Configured in `settings.settings.CONTENT_SECURITY_POLICY_REPORT_ONLY`.
+- Configured primarily in `settings.settings.SECURE_CSP_REPORT_ONLY`, matching the Django 6 setting name.
+- `settings.settings.CONTENT_SECURITY_POLICY_REPORT_ONLY` remains as a Django 5 compatibility alias while the custom middleware is still active.
 - Intentionally allows current inline scripts/styles and known external assets so violations can be observed before any enforcement work.
+- Reports violations to `/csp/report/` through the `report-uri` directive.
 
 ## Batch 8 Main HTTP/2 Push Removal
 
@@ -431,6 +433,29 @@ Verification:
 - `docker compose exec core ./manage.py test core.utils.tests.test_static_push --settings=settings.test_settings`: passed.
 - `docker compose exec core make test`: passed, 233 core tests, 31 API tests, and flake8.
 - `env PYTHONPATH=/private/tmp/pip-audit-tool python3 -m pip_audit -r requirements.txt --no-deps`: passed with no known direct dependency vulnerabilities.
+
+## Batch 9 CSP Report Pipeline
+
+Completed on 2026-05-24 for Django 6 CSP readiness.
+
+Current package availability checked with `python3 -m pip index versions`:
+
+- `Django==6.0.5` is the latest Django release.
+- `django-ckeditor==6.7.3` is already the latest `django-ckeditor` release, so the CKEditor 4 warning cannot be solved by a simple pin bump.
+- `django-ckeditor-5==0.2.20` is available, but adopting it is an editor migration and licensing/product decision rather than a narrow package update.
+
+Changes:
+
+- Added `SECURE_CSP_REPORT_ONLY` as the primary CSP report-only setting and kept `CONTENT_SECURITY_POLICY_REPORT_ONLY` as a Django 5 compatibility alias.
+- Updated the custom report-only middleware to prefer `SECURE_CSP_REPORT_ONLY`.
+- Added `/csp/report/` as a CSRF-exempt POST endpoint for browser CSP violation reports.
+- Added `report-uri /csp/report/` to the report-only CSP.
+- Added tests for the report endpoint, the `report-uri` directive, and the Django 6 setting-name preference.
+
+Verification:
+
+- `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`: passed.
+- `docker compose exec core make test`: passed, 236 core tests, 31 API tests, and flake8.
 
 ### Step 7: Forum Dependency Decision
 

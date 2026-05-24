@@ -109,6 +109,13 @@ Batch 8 note:
 - `django_http2_push` was removed from main `INSTALLED_APPS`, middleware, `requirements.in`, `requirements.txt`, and `constraints.txt`.
 - `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 8.
 
+Batch 9 note:
+
+- CSP report-only settings were moved toward Django 6 naming on 2026-05-24: `SECURE_CSP_REPORT_ONLY` is now the primary setting, with `CONTENT_SECURITY_POLICY_REPORT_ONLY` kept as a Django 5 compatibility alias.
+- The custom Django 5 middleware now reads `SECURE_CSP_REPORT_ONLY` first, matching the Django 6 migration target.
+- Added `/csp/report/` as a CSRF-exempt POST endpoint for browser CSP violation reports, and added `report-uri /csp/report/` to the report-only policy.
+- `docker compose exec core make test` passed after Batch 9 with 236 core tests, 31 API tests, and flake8.
+
 Forum-specific risk:
 
 - The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.

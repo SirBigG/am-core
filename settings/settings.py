@@ -373,7 +373,7 @@ IMGPROXY_KEY = os.getenv("IMGPROXY_KEY")
 IMGPROXY_SALT = os.getenv("IMGPROXY_SALT")
 IMGPROXY_BASE_URL = os.getenv("IMGPROXY_BASE_URL", "/imgproxy")
 
-CONTENT_SECURITY_POLICY_REPORT_ONLY = {
+SECURE_CSP_REPORT_ONLY = {
     "default-src": ("'self'",),
     "script-src": (
         "'self'",
@@ -405,4 +405,7 @@ CONTENT_SECURITY_POLICY_REPORT_ONLY = {
     "object-src": ("'none'",),
     "base-uri": ("'self'",),
     "form-action": ("'self'", "https://www.facebook.com"),
+    "report-uri": ("/csp/report/",),
 }
+
+CONTENT_SECURITY_POLICY_REPORT_ONLY = SECURE_CSP_REPORT_ONLY

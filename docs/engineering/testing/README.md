@@ -42,6 +42,8 @@ Batch 6 added transitive constraints for both services and wired Docker installs
 
 Batch 8 removed the main app's obsolete beta `django_http2_push` dependency. Existing `{% static_push %}` template calls are now handled by a local compatibility tag that returns Django static asset URLs. The core image rebuild, absence check for `django-http2-push`, `pip check`, direct dependency audit, focused template-tag test, and full core `make test` passed.
 
+Batch 9 moved CSP report-only configuration toward Django 6 setting names and added a `/csp/report/` endpoint for browser violation reports. Core `make test` passed with 236 core tests, 31 API tests, and flake8.
+
 Known warnings that remain useful upgrade signals:
 
 - `django-ckeditor` warns that bundled CKEditor 4 has unfixed security issues.
