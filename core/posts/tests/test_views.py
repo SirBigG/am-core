@@ -28,6 +28,11 @@ class MainPageTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['object_list'].count(), 2)
 
+    def test_plant_diary_landing(self):
+        response = self.client.get('/plant-diary')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'plant_diary.html')
+
 
 class PostListTests(TestCase):
 

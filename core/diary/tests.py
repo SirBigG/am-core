@@ -58,6 +58,27 @@ class DiaryOrderingTests(TestCase):
 
         self.assertEqual(list(response.context["object_list"]), [newer_diary, older_diary])
 
+    def test_add_diary_form_has_back_link(self):
+        user = UserFactory()
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-add"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Назад до щоденників")
+        self.assertContains(response, reverse("pro_auth:profile-diary-list"))
+
+    def test_update_diary_form_has_back_link(self):
+        user = UserFactory()
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-update", kwargs={"pk": diary.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Назад до історії")
+        self.assertContains(response, diary.get_profile_absolute_url())
+
     def test_profile_diary_list_prefetches_latest_event(self):
         user = UserFactory()
         diary = Diary.objects.create(user=user, title="Diary", description="desc")
@@ -89,6 +110,45 @@ class DiaryOrderingTests(TestCase):
         listed_diary = response.context["object_list"][0]
 
         self.assertEqual(listed_diary.plant_summary, active_plant.display_name)
+
+    def test_profile_diary_list_renders_add_action_modal(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-list"))
+
+        self.assertContains(response, "+ Додати іншу дію")
+        self.assertContains(response, f'id="diaryCardActionModal{diary.pk}"')
+        self.assertContains(response, f'name="_form_prefix" value="diary-{diary.pk}"')
+
+    def test_prefixed_diary_item_form_from_list_creates_item(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        diary.plants.add(plant)
+        prefix = f"diary-{diary.pk}"
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {
+                "_form_prefix": prefix,
+                f"{prefix}-action_type": "note",
+                f"{prefix}-apply_to_all": "on",
+                f"{prefix}-description": "Підживлення після огляду",
+                f"{prefix}-date": "2026-05-25",
+            },
+        )
+
+        self.assertRedirects(response, diary.get_profile_absolute_url(), fetch_redirect_response=False)
+        item = DiaryItem.objects.get(diary=diary, action_type="note")
+        self.assertEqual(item.description, "Підживлення після огляду")
+        self.assertTrue(item.apply_to_all)
 
     def test_profile_diary_list_splits_active_and_archived_diaries(self):
         user = UserFactory()
@@ -145,6 +205,59 @@ class DiaryOrderingTests(TestCase):
 
         self.assertEqual(restore_response.status_code, 302)
         self.assertFalse(diary.is_archived)
+
+    def test_quick_watering_creates_item_for_all_active_plants(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        active_plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        completed_plant = Plant.objects.create(user=user, category=category, variety="Purple", status="completed")
+        diary.plants.set([active_plant, completed_plant])
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "1"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("quick_action=watering_added", response["Location"])
+        item = DiaryItem.objects.get(diary=diary, action_type="watering")
+        self.assertTrue(item.apply_to_all)
+        self.assertEqual(list(item.plants.all()), [active_plant])
+
+    def test_quick_watering_creates_item_for_selected_plants(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        first_plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        second_plant = Plant.objects.create(user=user, category=category, variety="Thai")
+        diary.plants.set([first_plant, second_plant])
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "0", "plants": [str(second_plant.pk)]},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        item = DiaryItem.objects.get(diary=diary, action_type="watering")
+        self.assertFalse(item.apply_to_all)
+        self.assertEqual(list(item.plants.all()), [second_plant])
+
+    def test_quick_watering_requires_owned_diary(self):
+        owner = UserFactory()
+        other_user = UserFactory()
+        diary = Diary.objects.create(user=owner, title="Diary", description="desc")
+
+        self.client.force_login(other_user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "1"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(DiaryItem.objects.filter(diary=diary, action_type="watering").exists())
 
 
 class ProfileDiaryDetailFilterTests(TestCase):
@@ -398,6 +511,24 @@ class PlantMoveFlowTests(TestCase):
         transplanted_item = DiaryItem.objects.get(diary=self.source_diary, action_type="transplanted")
         self.assertIn(self.note_item, response.context["diary_items"])
         self.assertIn(transplanted_item, response.context["diary_items"])
+
+    def test_prefixed_move_form_from_detail_modal_moves_plant(self):
+        prefix = f"plant-{self.plant.pk}"
+
+        response = self.client.post(
+            reverse(
+                "pro_auth:profile-diary-plant-move",
+                kwargs={"diary_pk": self.source_diary.pk, "plant_pk": self.plant.pk},
+            ),
+            {
+                "_form_prefix": prefix,
+                f"{prefix}-target_diary": self.target_diary.pk,
+            },
+        )
+
+        self.assertRedirects(response, self.source_diary.get_profile_absolute_url(), fetch_redirect_response=False)
+        self.assertTrue(self.target_diary.plants.filter(pk=self.plant.pk).exists())
+        self.assertFalse(self.source_diary.plants.filter(pk=self.plant.pk).exists())
 
     def test_move_creates_transplanted_item_in_source_diary(self):
         self.client.post(
@@ -1355,6 +1486,15 @@ class PlantLifecycleActionTests(TestCase):
         self.assertContains(response, "Ростуть")
         self.assertContains(response, "Архів")
 
+    def test_detail_renders_plant_move_and_archive_modals(self):
+        response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
+
+        self.assertContains(response, f'id="plantMoveModal{self.growing_plant.pk}"')
+        self.assertContains(response, f'id="plantArchiveModal{self.growing_plant.pk}"')
+        self.assertContains(response, f'data-plant-move-open="plantMoveModal{self.growing_plant.pk}"')
+        self.assertContains(response, f'data-plant-archive-open="plantArchiveModal{self.growing_plant.pk}"')
+        self.assertContains(response, f'name="_form_prefix" value="plant-{self.growing_plant.pk}"')
+
     def test_archive_plant_marks_it_completed_and_creates_finished_item(self):
         response = self.client.post(
             reverse(
@@ -1467,6 +1607,15 @@ class DiaryItemTimelineRenderingTests(TestCase):
         self.assertContains(response, self.first_plant.display_name)
         self.assertContains(response, self.second_plant.display_name)
         self.assertContains(response, self.third_plant.display_name)
+
+    def test_detail_renders_add_action_modal_form(self):
+        response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-diary-item-modal-open')
+        self.assertContains(response, 'id="diaryItemAddModal"')
+        self.assertContains(response, reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": self.diary.pk}))
+        self.assertContains(response, "Оберіть швидку дію")
 
 
 class DiaryItemDeleteLifecycleTests(TestCase):

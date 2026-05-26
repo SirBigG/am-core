@@ -2,6 +2,11 @@
 {% load post_extras %}
 {% block profile_content %}
     <div class="profile-page-panel profile-form-panel">
+        <a class="profile-diary-detail-back"
+           href="{% url 'pro_auth:profile-diary-detail' pk=form.instance.pk %}">
+            <span aria-hidden="true">←</span>
+            <span>Назад до історії</span>
+        </a>
         <h1 class="profile-page-title">Оновити щоденник</h1>
         <p class="profile-page-lead">Онови опис щоденника або прив’яжи до нього додаткові рослини.</p>
         <form method="post"
