@@ -1,4 +1,5 @@
 import logging
+import os
 from datetime import date, datetime, timedelta
 from itertools import groupby
 
@@ -7,15 +8,24 @@ from django.conf import settings
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.cache import cache
 from django.db.models import F
-from django.http import Http404, HttpResponseGone, HttpResponseRedirect
+from django.http import FileResponse, Http404
 from django.shortcuts import get_object_or_404
-from django.views.generic import DetailView, FormView, ListView, RedirectView, TemplateView
+from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
-from core.posts.forms import PhotoForm
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
+
+
+def service_worker(request):
+    """Serve the service worker from the current origin."""
+    response = FileResponse(
+        open(os.path.join(settings.BASE_DIR, "pwa", "service-worker.js"), "rb"),
+        content_type="application/javascript",
+    )
+    response["Cache-Control"] = "no-cache"
+    return response
 
 
 class IndexView(TemplateView):
@@ -244,29 +254,6 @@ class GalleryView(ListView):
 
     def get_queryset(self):
         return Photo.objects.filter(post_id=self.kwargs.get("post_id"))
-
-
-class AddPhotoView(FormView):
-    form_class = PhotoForm
-    template_name = "posts/photo_form.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["post"] = Post.objects.filter(id=self.kwargs.get("post_id"))
-        return context
-
-    def get_initial(self):
-        return {"post_id": self.kwargs.get("post_id")}
-
-    def form_valid(self, form):
-        instance = form.save()
-        return HttpResponseRedirect(instance.post.get_absolute_url())
-
-    def get(self, request, *args, **kwargs):
-        context = self.get_context_data()
-        if context["post"] is None:
-            return HttpResponseGone()
-        return super().get(request, *args, **kwargs)
 
 
 class PostAutocomplete(autocomplete.Select2QuerySetView):

@@ -62,3 +62,7 @@ class CategoryTreeViewTests(APITestCase):
     def test_response(self):
         response = api_client.get(reverse("category-tree"))
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(set(response.data[0]), {"pk", "value", "slug", "image", "children"})
+        self.assertEqual(len(response.data[0]["children"]), 1)
+        self.assertEqual(set(response.data[0]["children"][0]), {"pk", "value", "slug", "image"})

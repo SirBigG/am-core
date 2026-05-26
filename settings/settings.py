@@ -94,8 +94,6 @@ INSTALLED_APPS = [
     "social_django",
     # Simple tags https://github.com/jazzband/django-taggit
     "taggit",
-    # http2 support https://github.com/ricardochaves/django_http2_push
-    "django_http2_push",
     # https://github.com/praekelt/django-recaptcha
     "django_recaptcha",
     # https://github.com/radi85/Comment
@@ -107,8 +105,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django_http2_push.middleware.PushHttp2Middleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -126,6 +124,9 @@ TEMPLATES = [
         "DIRS": [os.path.join(BASE_DIR, "templates"), os.path.join(BASE_DIR + "core/templates/ckeditor")],
         "APP_DIRS": True,
         "OPTIONS": {
+            "libraries": {
+                "static_push": "core.templatetags.static_push",
+            },
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
@@ -371,3 +372,38 @@ REST_FRAMEWORK = {
 IMGPROXY_KEY = os.getenv("IMGPROXY_KEY")
 IMGPROXY_SALT = os.getenv("IMGPROXY_SALT")
 IMGPROXY_BASE_URL = os.getenv("IMGPROXY_BASE_URL", "/imgproxy")
+
+SECURE_CSP_REPORT_ONLY = {
+    "default-src": ("'self'",),
+    "script-src": (
+        "'self'",
+        "'unsafe-inline'",
+        "https://www.googletagmanager.com",
+        "https://pagead2.googlesyndication.com",
+        "https://cdn.jsdelivr.net",
+        "https://code.jquery.com",
+        "https://cdnjs.cloudflare.com",
+        "https://stackpath.bootstrapcdn.com",
+        "https://www.google.com",
+        "https://www.gstatic.com",
+    ),
+    "style-src": (
+        "'self'",
+        "'unsafe-inline'",
+        "https://cdn.jsdelivr.net",
+        "https://cdnjs.cloudflare.com",
+        "https://stackpath.bootstrapcdn.com",
+    ),
+    "img-src": ("'self'", "data:", "https:", "http:"),
+    "font-src": ("'self'", "data:"),
+    "connect-src": ("'self'",),
+    "frame-src": (
+        "'self'",
+        "https://www.google.com",
+        "https://googleads.g.doubleclick.net",
+    ),
+    "object-src": ("'none'",),
+    "base-uri": ("'self'",),
+    "form-action": ("'self'", "https://www.facebook.com"),
+    "report-uri": ("/csp/report/",),
+}
