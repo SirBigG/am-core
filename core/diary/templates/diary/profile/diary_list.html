@@ -66,6 +66,7 @@
                                             <div class="profile-diary-card-last-event__label">Остання дія</div>
                                             <div class="profile-diary-card-last-event__meta">
                                                 {% if latest_item.action_type %}<span>{{ latest_item.get_action_type_display }}</span>{% endif %}
+                                                <span class="profile-diary-card-last-event__date">{{ latest_item.date|date:"j F Y" }}</span>
                                             </div>
                                             <div class="profile-diary-card-last-event__plants">
                                                 {% if latest_item.apply_to_all %}

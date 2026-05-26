@@ -88,9 +88,11 @@ class DiaryOrderingTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("pro_auth:profile-diary-list"))
         listed_diary = response.context["object_list"][0]
+        latest_item.refresh_from_db()
 
         self.assertEqual(listed_diary.latest_diary_items[0], latest_item)
         self.assertEqual(listed_diary.latest_diary_items[1], old_item)
+        self.assertContains(response, date_format(latest_item.date, "j F Y"))
 
     def test_profile_diary_list_summary_uses_active_plants_only(self):
         user = UserFactory()
