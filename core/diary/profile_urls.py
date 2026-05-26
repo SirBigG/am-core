@@ -14,6 +14,7 @@ from core.diary.views import (
     PlantRestoreView,
     ProfileDiaryDetailView,
     ProfileDiaryListView,
+    QuickWateringView,
     UpdateDiaryItemView,
     UpdateProfileDiaryView,
 )
@@ -68,6 +69,11 @@ urlpatterns = [
         "profile/diary/<int:pk>/restore/",
         login_required(DiaryRestoreView.as_view()),
         name="profile-diary-restore",
+    ),
+    path(
+        "profile/diary/<int:pk>/quick-watering/",
+        login_required(QuickWateringView.as_view()),
+        name="profile-diary-quick-watering",
     ),
     path(
         "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/move/",

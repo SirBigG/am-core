@@ -33,6 +33,7 @@ urlpatterns = [
     path("service-worker.js", views.service_worker, name="service-worker"),
 ] + i18n_patterns(
     path("", views.IndexView.as_view(), name="index"),
+    path("plant-diary", views.PlantDiaryLandingView.as_view(), name="plant-diary"),
     path(
         f"admin{settings.ADMIN_HASH}/admin_parse_form/<int:company_id>", admin_parse_form_view, name="admin_parse_form"
     ),

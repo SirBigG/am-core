@@ -33,7 +33,8 @@
                         </div>
                     {% else %}
                         <a class="btn am-btn am-btn--primary profile-diary-detail-add-btn"
-                           href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}">+ Додати дію</a>
+                           href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}"
+                           data-diary-item-modal-open>+ Додати дію</a>
                         <div class="am-menu profile-diary-detail-menu">
                             <button type="button"
                                     class="btn am-btn am-btn--soft am-btn--icon am-menu__toggle profile-diary-detail-menu__toggle"
@@ -71,7 +72,7 @@
                 <div class="profile-diary-entry-section-header">
                     <h2 class="profile-page-subtitle">Історія</h2>
                     <button type="button"
-                            class="btn am-btn am-btn--soft profile-diary-filters-toggle{% if has_active_filters %} is-active{% endif %}"
+                            class="btn am-btn am-btn--quiet-action profile-diary-filters-toggle{% if has_active_filters %} is-active{% endif %}"
                             data-diary-filter-toggle
                             aria-expanded="{% if has_active_filters %}true{% else %}false{% endif %}">
                         Фільтр{% if has_active_filters %} · активний{% endif %}
@@ -244,7 +245,7 @@
                                 <a class="btn am-btn am-btn--soft"
                                    href="{% url 'pro_auth:profile-diary-plant-add' diary_id=object.id %}">+ Посадити рослину</a>
                             </div>
-                            <p class="profile-diary-plant-management__lead">Перемикайтеся між рослинами, що ростуть зараз, і архівом.</p>
+                            <p class="profile-diary-plant-management__lead">У вкладці Ростуть — рослини, за якими ви доглядаєте зараз. В Архіві — завершені рослини з доступною історією та можливістю відновлення.</p>
                             <div class="profile-diary-plant-management__tabs"
                                  role="tablist"
                                  aria-label="Рослини щоденника">
@@ -285,14 +286,72 @@
                                                         </button>
                                                         <div class="am-menu__dropdown profile-diary-plant-menu__dropdown" data-diary-plant-menu-dropdown hidden>
                                                             <a class="btn am-btn am-btn--soft am-menu__action profile-diary-plant-menu__action"
-                                                               href="{% url 'pro_auth:profile-diary-plant-move' diary_pk=object.id plant_pk=plant.id %}">Пересадити</a>
+                                                               href="{% url 'pro_auth:profile-diary-plant-move' diary_pk=object.id plant_pk=plant.id %}"
+                                                               data-plant-move-open="plantMoveModal{{ plant.id }}">Пересадити</a>
                                                             <a class="btn am-btn am-btn--soft am-menu__action profile-diary-plant-menu__action"
-                                                               href="{% url 'pro_auth:profile-diary-plant-archive' diary_pk=object.id plant_pk=plant.id %}">Архівувати</a>
+                                                               href="{% url 'pro_auth:profile-diary-plant-archive' diary_pk=object.id plant_pk=plant.id %}"
+                                                               data-plant-archive-open="plantArchiveModal{{ plant.id }}">Архівувати</a>
                                                             <a class="btn am-btn am-btn--danger am-menu__action profile-diary-plant-menu__action"
                                                                href="{% url 'pro_auth:profile-diary-plant-delete' diary_pk=object.id plant_pk=plant.id %}">Видалити</a>
                                                         </div>
                                                     </div>
                                                 </div>
+                                            </div>
+                                            <div class="profile-confirm-backdrop profile-plant-move-modal"
+                                                 id="plantMoveModal{{ plant.id }}"
+                                                 aria-hidden="true">
+                                                <form class="profile-confirm-dialog profile-plant-action-dialog"
+                                                      method="post"
+                                                      action="{% url 'pro_auth:profile-diary-plant-move' diary_pk=object.id plant_pk=plant.id %}"
+                                                      role="dialog"
+                                                      aria-modal="true"
+                                                      aria-labelledby="plantMoveModalTitle{{ plant.id }}">
+                                                    {% csrf_token %}
+                                                    {% if plant.move_form.prefix %}<input type="hidden" name="_form_prefix" value="{{ plant.move_form.prefix }}">{% endif %}
+                                                    <h2 class="profile-confirm-title" id="plantMoveModalTitle{{ plant.id }}">Пересадити рослину</h2>
+                                                    <p class="profile-confirm-text">
+                                                        Рослина <strong>{{ plant.display_name }}</strong> буде прибрана з щоденника
+                                                        <strong>{{ object.title }}</strong> і прив’язана до іншого активного щоденника.
+                                                    </p>
+                                                    <p class="profile-confirm-helper">Попередня історія в цьому щоденнику залишиться доступною.</p>
+                                                    <div class="profile-form-group am-form-group profile-plant-action-field">
+                                                        <label class="profile-form-label am-form-label"
+                                                               for="{{ plant.move_form.target_diary.id_for_label }}">{{ plant.move_form.target_diary.label }}</label>
+                                                        <div class="profile-form-field am-field am-field--select">{{ plant.move_form.target_diary }}</div>
+                                                    </div>
+                                                    <div class="profile-confirm-actions">
+                                                        <button type="button"
+                                                                class="btn profile-confirm-cancel"
+                                                                data-plant-action-cancel>Відмінити</button>
+                                                        <button type="submit"
+                                                                class="btn am-btn am-btn--primary profile-confirm-submit">Підтвердити перенесення</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                            <div class="profile-confirm-backdrop profile-plant-archive-modal"
+                                                 id="plantArchiveModal{{ plant.id }}"
+                                                 aria-hidden="true">
+                                                <form class="profile-confirm-dialog profile-plant-action-dialog"
+                                                      method="post"
+                                                      action="{% url 'pro_auth:profile-diary-plant-archive' diary_pk=object.id plant_pk=plant.id %}"
+                                                      role="dialog"
+                                                      aria-modal="true"
+                                                      aria-labelledby="plantArchiveModalTitle{{ plant.id }}">
+                                                    {% csrf_token %}
+                                                    <h2 class="profile-confirm-title" id="plantArchiveModalTitle{{ plant.id }}">Архівувати рослину?</h2>
+                                                    <p class="profile-confirm-text">
+                                                        Рослина <strong>{{ plant.display_name }}</strong> зникне зі списку тих, що ростуть зараз,
+                                                        але її історія збережеться в архіві.
+                                                    </p>
+                                                    <p class="profile-confirm-helper">Ви зможете переглядати всі записи та відновити рослину пізніше.</p>
+                                                    <div class="profile-confirm-actions">
+                                                        <button type="button"
+                                                                class="btn profile-confirm-cancel"
+                                                                data-plant-action-cancel>Відмінити</button>
+                                                        <button type="submit"
+                                                                class="btn am-btn am-btn--primary profile-confirm-submit">Архівувати</button>
+                                                    </div>
+                                                </form>
                                             </div>
                                         {% endfor %}
                                     </div>
@@ -401,6 +460,31 @@
             </div>
         </div>
     </div>
+    {% if not object.is_archived %}
+        <div class="profile-confirm-backdrop profile-diary-item-modal"
+             id="diaryItemAddModal"
+             aria-hidden="true">
+            <div class="profile-confirm-dialog profile-diary-item-modal__dialog"
+                 role="dialog"
+                 aria-modal="true"
+                 aria-labelledby="diaryItemAddModalTitle">
+                <div class="profile-diary-item-modal__header">
+                    <div>
+                        <h2 class="profile-confirm-title" id="diaryItemAddModalTitle">Додати дію</h2>
+                        <p class="profile-confirm-text">Зафіксуй подію, щоб у стрічці рослини зберігалися дата, нотатки й фото.</p>
+                    </div>
+                    <button type="button"
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-item-modal__close"
+                            data-diary-item-modal-cancel
+                            aria-label="Закрити форму">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                {% include "diary/profile/_diary_item_form_fields.html" with form=diary_item_form diary=object is_edit_mode=False is_modal=True %}
+            </div>
+        </div>
+        {{ diary_item_form.media }}
+    {% endif %}
 {% endblock profile_content %}
 {% block extra_footerscript %}
     {{ block.super }}
@@ -417,6 +501,11 @@
             const plantMenuToggles = document.querySelectorAll("[data-diary-plant-menu-toggle]");
             const entryMenuToggles = document.querySelectorAll("[data-diary-entry-menu-toggle]");
             const detailMenuToggles = document.querySelectorAll("[data-diary-detail-menu-toggle]");
+            const diaryItemModal = document.getElementById("diaryItemAddModal");
+            const diaryItemModalOpen = document.querySelector("[data-diary-item-modal-open]");
+            const diaryItemModalCancel = diaryItemModal ? diaryItemModal.querySelectorAll("[data-diary-item-modal-cancel]") : [];
+            const plantMoveLinks = document.querySelectorAll("[data-plant-move-open]");
+            const plantArchiveLinks = document.querySelectorAll("[data-plant-archive-open]");
             let pendingDelete = null;
 
             function closeMenuGroup(menuSelector, toggleSelector, dropdownSelector) {
@@ -440,6 +529,8 @@
                 closeMenuGroup(".profile-diary-entry-menu", "[data-diary-entry-menu-toggle]", "[data-diary-entry-menu-dropdown]");
                 closeMenuGroup(".profile-diary-plant-menu", "[data-diary-plant-menu-toggle]", "[data-diary-plant-menu-dropdown]");
             }
+
+            window.addEventListener("pageshow", closeAllMenus);
 
             function closeModal() {
                 if (!modal) {
@@ -465,6 +556,92 @@
                 }
             }
 
+            function syncPlantTargetsState(formElement) {
+                const applyToAllInput = formElement.querySelector("input[name='apply_to_all']");
+                const plantTargets = formElement.querySelector("[data-plant-targets]");
+
+                if (!applyToAllInput || !plantTargets) {
+                    return;
+                }
+
+                const applyToAll = applyToAllInput.checked;
+                const inputs = plantTargets.querySelectorAll('input[type="checkbox"]');
+
+                plantTargets.hidden = applyToAll;
+                inputs.forEach(function (input) {
+                    input.disabled = applyToAll;
+                });
+            }
+
+            function bindDiaryItemForm(formElement) {
+                const applyToAllInput = formElement.querySelector("input[name='apply_to_all']");
+                const fileInput = formElement.querySelector("input[type='file']");
+                const fileName = formElement.querySelector("[data-file-name]");
+
+                syncPlantTargetsState(formElement);
+
+                if (applyToAllInput) {
+                    applyToAllInput.addEventListener("change", function () {
+                        syncPlantTargetsState(formElement);
+                    });
+                }
+
+                if (fileInput && fileName) {
+                    fileInput.addEventListener("change", function () {
+                        const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "";
+                        fileName.textContent = selectedFile || "Файл не вибрано";
+                    });
+                }
+            }
+
+            function closeDiaryItemModal() {
+                if (!diaryItemModal) {
+                    return;
+                }
+
+                diaryItemModal.classList.remove("is-open");
+                diaryItemModal.setAttribute("aria-hidden", "true");
+            }
+
+            function openDiaryItemModal() {
+                if (!diaryItemModal) {
+                    return;
+                }
+
+                closeAllMenus();
+                diaryItemModal.classList.add("is-open");
+                diaryItemModal.setAttribute("aria-hidden", "false");
+
+                const firstField = diaryItemModal.querySelector("select, input:not([type='hidden']), textarea, button");
+                if (firstField) {
+                    firstField.focus();
+                }
+            }
+
+            function closePlantActionModal(modalElement) {
+                if (!modalElement) {
+                    return;
+                }
+
+                modalElement.classList.remove("is-open");
+                modalElement.setAttribute("aria-hidden", "true");
+            }
+
+            function openPlantActionModal(modalElement) {
+                if (!modalElement) {
+                    return;
+                }
+
+                closeAllMenus();
+                modalElement.classList.add("is-open");
+                modalElement.setAttribute("aria-hidden", "false");
+
+                const firstField = modalElement.querySelector("select, input:not([type='hidden']), textarea, button");
+                if (firstField) {
+                    firstField.focus();
+                }
+            }
+
             deleteLinks.forEach(function (link) {
                 link.addEventListener("click", function (event) {
                     event.preventDefault();
@@ -477,6 +654,71 @@
                     }
 
                     openModal(card, targetUrl);
+                });
+            });
+
+            document.querySelectorAll(".profile-diary-item-modal__form").forEach(bindDiaryItemForm);
+
+            document.querySelectorAll(".profile-diary-detail-menu__action, .profile-diary-entry-menu__action, .profile-diary-plant-menu__action").forEach(function (action) {
+                action.addEventListener("click", closeAllMenus);
+            });
+
+            if (diaryItemModalOpen) {
+                diaryItemModalOpen.addEventListener("click", function (event) {
+                    if (!diaryItemModal) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    openDiaryItemModal();
+                });
+            }
+
+            diaryItemModalCancel.forEach(function (button) {
+                button.addEventListener("click", closeDiaryItemModal);
+            });
+
+            if (diaryItemModal) {
+                diaryItemModal.addEventListener("click", function (event) {
+                    if (event.target === diaryItemModal) {
+                        closeDiaryItemModal();
+                    }
+                });
+            }
+
+            plantMoveLinks.forEach(function (link) {
+                link.addEventListener("click", function (event) {
+                    const modalId = link.getAttribute("data-plant-move-open");
+                    const actionModal = document.getElementById(modalId);
+
+                    if (!actionModal) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    openPlantActionModal(actionModal);
+                });
+            });
+
+            plantArchiveLinks.forEach(function (link) {
+                link.addEventListener("click", function (event) {
+                    const modalId = link.getAttribute("data-plant-archive-open");
+                    const actionModal = document.getElementById(modalId);
+
+                    if (!actionModal) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    openPlantActionModal(actionModal);
+                });
+            });
+
+            document.querySelectorAll(".profile-plant-move-modal, .profile-plant-archive-modal").forEach(function (actionModal) {
+                actionModal.addEventListener("click", function (event) {
+                    if (event.target === actionModal || event.target.closest("[data-plant-action-cancel]")) {
+                        closePlantActionModal(actionModal);
+                    }
                 });
             });
 
@@ -583,6 +825,16 @@
             document.addEventListener("keydown", function (event) {
                 if (event.key === "Escape" && modal && modal.classList.contains("is-open")) {
                     closeModal();
+                }
+
+                if (event.key === "Escape" && diaryItemModal && diaryItemModal.classList.contains("is-open")) {
+                    closeDiaryItemModal();
+                }
+
+                if (event.key === "Escape") {
+                    document.querySelectorAll(".profile-plant-move-modal.is-open, .profile-plant-archive-modal.is-open").forEach(function (actionModal) {
+                        closePlantActionModal(actionModal);
+                    });
                 }
 
                 if (event.key === "Escape") {

@@ -48,6 +48,10 @@ class IndexView(TemplateView):
         return context
 
 
+class PlantDiaryLandingView(TemplateView):
+    template_name = "plant_diary.html"
+
+
 class ParentRubricView(TemplateView):
     """For base rubric text."""
 

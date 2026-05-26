@@ -235,6 +235,9 @@ class ProfileDiaryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         diaries = list(context["object_list"])
+        for diary in diaries:
+            if not diary.is_archived:
+                diary.diary_item_form = DiaryItemForm(diary=diary, prefix=f"diary-{diary.pk}")
         context["active_diaries"] = [diary for diary in diaries if not diary.is_archived]
         context["archived_diaries"] = [diary for diary in diaries if diary.is_archived]
         return context
@@ -309,6 +312,13 @@ class ProfileDiaryDetailView(DetailView):
         latest_item = diary_items[0] if diary_items else None
         active_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "active"]
         completed_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "completed"]
+        for plant in active_diary_plants:
+            plant.move_form = PlantMoveForm(
+                user=self.request.user,
+                source_diary=self.object,
+                plant=plant,
+                prefix=f"plant-{plant.pk}",
+            )
         selected_plant_id = self.request.GET.get("plant", "")
         selected_period = self.request.GET.get("period", "").strip()
         diary_filter_plants = _build_diary_filter_plants(self.object)
@@ -329,6 +339,7 @@ class ProfileDiaryDetailView(DetailView):
         context["period_filter_options"] = self.get_period_filter_options()
         context["event_search_query"] = event_search_query
         context["has_active_filters"] = bool(selected_plant_id or selected_action_type or selected_period or event_search_query)
+        context["diary_item_form"] = DiaryItemForm(diary=self.object)
         context["recommendation"] = None
         context["recommendation_target_label"] = None
 
@@ -418,6 +429,9 @@ class AddDiaryItemView(FormView):
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["diary"] = get_object_or_404(Diary, pk=self.kwargs["diary_id"], user=self.request.user)
+        form_prefix = self.request.POST.get("_form_prefix", "").strip()
+        if self.request.method == "POST" and form_prefix:
+            kwargs["prefix"] = form_prefix
         return kwargs
 
     def form_valid(self, form):
@@ -524,6 +538,38 @@ class DiaryRestoreView(View):
         return HttpResponseRedirect(reverse("pro_auth:profile-diary-list"))
 
 
+class QuickWateringView(View):
+    def post(self, request, pk):
+        diary = get_object_or_404(Diary, pk=pk, user=request.user, is_archived=False)
+        active_plants = diary.plants.filter(status="active")
+        redirect_url = reverse("pro_auth:profile-diary-list")
+
+        if not active_plants.exists():
+            return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_empty")
+
+        apply_to_all = request.POST.get("apply_to_all") == "1"
+        selected_plant_ids = request.POST.getlist("plants")
+
+        if apply_to_all:
+            target_plants = active_plants
+        else:
+            target_plants = active_plants.filter(pk__in=selected_plant_ids)
+            if not target_plants.exists():
+                return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_missing_plants")
+
+        diary_item = DiaryItem.objects.create(
+            diary=diary,
+            action_type="watering",
+            apply_to_all=apply_to_all,
+            description="",
+            date=timezone.localdate(),
+        )
+        diary_item.plants.set(target_plants)
+        diary.updated = timezone.now()
+        diary.save(update_fields=["updated"])
+        return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_added")
+
+
 class PlantMoveView(FormView):
     form_class = PlantMoveForm
     template_name = "diary/profile/plant_move_form.html"
@@ -542,6 +588,9 @@ class PlantMoveView(FormView):
         kwargs["user"] = self.request.user
         kwargs["source_diary"] = self.source_diary
         kwargs["plant"] = self.plant
+        form_prefix = self.request.POST.get("_form_prefix", "").strip()
+        if self.request.method == "POST" and form_prefix:
+            kwargs["prefix"] = form_prefix
         return kwargs
 
     def get_context_data(self, **kwargs):

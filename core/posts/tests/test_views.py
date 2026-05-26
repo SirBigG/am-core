@@ -34,6 +34,11 @@ class MainPageTest(TestCase):
         self.assertEqual(response.headers["Content-Type"], "application/javascript")
         self.assertEqual(response.headers["Cache-Control"], "no-cache")
 
+    def test_plant_diary_landing(self):
+        response = self.client.get('/plant-diary')
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'plant_diary.html')
+
 
 class PostListTests(TestCase):
 

@@ -154,6 +154,67 @@
             box-shadow: none !important;
             text-decoration: none;
         }
+
+        .plant-diary-site-banner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 65px;
+            padding: 12px 16px;
+            background: #0b8043;
+            border-bottom: 1px solid #086a37;
+            color: #ffffff;
+            font-size: 22px;
+            font-weight: 400;
+            line-height: 1.25;
+            text-align: center;
+        }
+
+        .plant-diary-site-banner__inner {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .plant-diary-site-banner__link {
+            display: inline-flex;
+            align-items: center;
+            color: #fff3a3 !important;
+            font-size: 22px;
+            font-weight: 800;
+            line-height: 1;
+            text-decoration: none !important;
+            transition: font-size 0.16s ease, color 0.16s ease;
+        }
+
+        .plant-diary-site-banner:hover .plant-diary-site-banner__link,
+        .plant-diary-site-banner:focus-within .plant-diary-site-banner__link,
+        .plant-diary-site-banner__link:focus {
+            color: #ffe66d !important;
+            font-size: 24px;
+            text-decoration: none !important;
+        }
+
+        @media (max-width: 767.98px) {
+            .plant-diary-site-banner {
+                min-height: auto;
+                padding: 14px 16px;
+                font-size: 17px;
+            }
+
+            .plant-diary-site-banner__link {
+                font-size: 17px;
+            }
+
+            .plant-diary-site-banner:hover .plant-diary-site-banner__link,
+            .plant-diary-site-banner:focus-within .plant-diary-site-banner__link,
+            .plant-diary-site-banner__link:focus {
+                font-size: 19px;
+            }
+        }
     </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -196,6 +257,14 @@
     {% endblock adverts %}
 </head>
 <body class="d-flex flex-column min-vh-100">
+    {% if request.resolver_match.url_name != "plant-diary" %}
+        <aside class="plant-diary-site-banner" aria-label="Щоденник для рослин">
+            <div class="plant-diary-site-banner__inner">
+                <span>🌼 Доглядайте за рослинами з любов’ю — спробуйте наш щоденник для городу.</span>
+                <a class="plant-diary-site-banner__link" href="{% url 'plant-diary' %}">Спробувати ➜</a>
+            </div>
+        </aside>
+    {% endif %}
     {% block header %}
         {% include "header.html" %}
     {% endblock header %}

@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% load static static_push %}
+
+{% block title %}
+    Щоденник рослин онлайн — догляд за рослинами, полив, добрива та історія догляду
+{% endblock title %}
+
+{% block meta_description %}
+    Онлайн-щоденник для рослин і городу: ведіть облік поливу, добрив, пересадки, фото та нотаток. Зберігайте всю історію догляду за рослинами в одному місці.
+{% endblock meta_description %}
+
+{% block canonical %}
+    <link rel="canonical" href="{{ request.build_absolute_uri }}">
+{% endblock canonical %}
+
+{% block extra_meta %}
+    <meta property="og:title" content="Щоденник рослин онлайн — догляд за рослинами, полив, добрива та історія догляду">
+    <meta property="og:description" content="Онлайн-щоденник для рослин і городу: ведіть облік поливу, добрив, пересадки, фото та нотаток. Зберігайте всю історію догляду за рослинами в одному місці.">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta property="og:site_name" content="AgroMega">
+{% endblock extra_meta %}
+
+{% block scripts %}
+    <script src="{% static "posts/j-index.js" %}"></script>
+    <link rel="stylesheet" href="{% static_push "posts/main.css" %}">
+    <link rel="stylesheet" href="{% static_push "posts/plant-diary.css" %}?v=20260526-3">
+{% endblock scripts %}
+
+{% block main %}
+    <div class="plant-diary-page">
+        <section class="plant-diary-hero">
+            <div class="container">
+                <div class="plant-diary-hero__grid">
+                    <div class="plant-diary-hero__content">
+                        <span class="plant-diary-pill">Онлайн-щоденник для догляду за рослинами</span>
+                        <h1 class="plant-diary-title">Щоденник для рослин</h1>
+                        <p class="plant-diary-lead">
+                            Створюйте окремі щоденники для грядок, вазонів і теплиць, додавайте рослини та
+                            фіксуйте полив, добрива, пересадку, фото й нотатки. Уся історія догляду
+                            зберігається в одному місці, щоб ви завжди бачили повну картину сезону.
+                        </p>
+                        <div class="plant-diary-hero__actions">
+                            <a class="plant-diary-cta" href="{% url 'pro_auth:profile-diary-list' %}">
+                                <span>Спробувати</span>
+                                <span class="plant-diary-cta__arrow" aria-hidden="true">➜</span>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="plant-diary-hero__preview">
+                        <div class="plant-diary-mockup plant-diary-mockup--list">
+                            <div class="plant-diary-mockup__header">
+                                <div>
+                                    <div class="plant-diary-mockup__titlebar">
+                                        <h3 class="plant-diary-mockup__heading">Мої щоденники</h3>
+                                        <span class="plant-diary-mockup__title-icon" aria-hidden="true">🌱</span>
+                                    </div>
+                                    <span class="plant-diary-mockup__meta">2 активні щоденники</span>
+                                </div>
+                                <span class="plant-diary-mockup__action">+ Додати щоденник</span>
+                            </div>
+                            <div class="plant-diary-mockup__stack">
+                                <article class="plant-diary-mockup__diary-card">
+                                    <strong>Теплиця</strong>
+                                    <p class="plant-diary-mockup__meta-row"><strong>Рослини:</strong> Огірок, томат, базилік</p>
+                                    <p class="plant-diary-mockup__meta-row"><strong>Опис:</strong> Літня теплиця для овочів і зелені з регулярним поливом.</p>
+                                    <span class="plant-diary-mockup__quick-action">+ Додати швидку дію</span>
+                                </article>
+                                <article class="plant-diary-mockup__diary-card">
+                                    <strong>Грядка біля дому</strong>
+                                    <p class="plant-diary-mockup__meta-row"><strong>Рослини:</strong> Редиска, рукола, салат</p>
+                                    <p class="plant-diary-mockup__meta-row"><strong>Опис:</strong> Зелень для щоденного збору поруч із кухнею.</p>
+                                    <span class="plant-diary-mockup__quick-action">+ Додати швидку дію</span>
+                                </article>
+                                <article class="plant-diary-mockup__archive-card">
+                                    <strong>Архів</strong>
+                                    <p>Попередні сезони та завершені рослини збережені окремо.</p>
+                                </article>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section" style="padding-bottom: 0;">
+            <div class="container">
+                <div class="plant-diary-problem-layout">
+                    <div class="plant-diary-section__intro plant-diary-problem-layout__content">
+                        <h2>Знайомо?</h2>
+                        <p>
+                            Догляд за рослинами без системи часто виглядає однаково: сьогодні ви пам’ятаєте про полив,
+                            а через кілька днів уже важко згадати, що саме робили і коли.
+                        </p>
+                    </div>
+                    <div class="plant-diary-problem-visual" aria-hidden="true">
+                        <div class="plant-diary-problem-visual__bubble plant-diary-problem-visual__bubble--tl">
+                            Не пам’ятаєте, коли востаннє поливали рослини
+                        </div>
+                        <div class="plant-diary-problem-visual__bubble plant-diary-problem-visual__bubble--tr">
+                            Забуваєте про добрива, обробку або пересадку
+                        </div>
+                        <div class="plant-diary-problem-visual__bubble plant-diary-problem-visual__bubble--bl">
+                            Не ведете облік рослин і важливих записів
+                        </div>
+                        <div class="plant-diary-problem-visual__bubble plant-diary-problem-visual__bubble--br">
+                            Історія догляду губиться між фото, нотатками та пам’яттю
+                        </div>
+                        <img class="plant-diary-problem-visual__image"
+                             src="{% static_push "posts/plant-diary-farmer.png" %}"
+                             alt="Збентежений агроном">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section plant-diary-section--tint">
+            <div class="container">
+                <div class="plant-diary-principles-layout">
+                    <div class="plant-diary-principles-layout__stack">
+                        <article class="plant-diary-principle-card">
+                            <div class="plant-diary-principle-card__top">
+                                <span class="plant-diary-principle-card__icon" aria-hidden="true">🪴</span>
+                                <h3>Окремі щоденники для різних зон</h3>
+                            </div>
+                            <p>Для грядки, вазона, теплиці або іншої зони вирощування.</p>
+                        </article>
+                        <article class="plant-diary-principle-card">
+                            <div class="plant-diary-principle-card__top">
+                                <span class="plant-diary-principle-card__icon" aria-hidden="true">📝</span>
+                                <h3>Усі дії в одному місці</h3>
+                            </div>
+                            <p>Полив, добрива, фото, нотатки, пересадка та важливі події поруч.</p>
+                        </article>
+                        <article class="plant-diary-principle-card">
+                            <div class="plant-diary-principle-card__top">
+                                <span class="plant-diary-principle-card__icon" aria-hidden="true">🌿</span>
+                                <h3>Повна історія кожної рослини</h3>
+                            </div>
+                            <p>Усі записи зберігаються в таймлайні й доступні в будь-який момент.</p>
+                        </article>
+                    </div>
+                    <div class="plant-diary-section__intro plant-diary-section__intro--center plant-diary-principles-layout__content">
+                        <h2>Онлайн-щоденник рослин, який спрощує догляд</h2>
+                        <p>
+                            Онлайн-щоденник для рослин допомагає вести облік рослин, поливу,
+                            добрив, пересадки, фото й нотаток без хаосу в сезоні.
+                        </p>
+                        <p>
+                            Усі записи про догляд за рослинами зберігаються в одному місці, щоб ви
+                            бачили повну історію кожної рослини та кожної зони вирощування.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section">
+            <div class="container">
+                <div class="plant-diary-how plant-diary-how--orbit">
+                    <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-how__card plant-diary-how__card--one">
+                        <div class="plant-diary-step-card__top">
+                            <span class="plant-diary-step-card__number">1</span>
+                            <h3>Створіть щоденник</h3>
+                        </div>
+                        <p>Для грядки, вазона, теплиці або будь-якої окремої зони вирощування.</p>
+                    </article>
+
+                    <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-how__card plant-diary-how__card--two">
+                        <div class="plant-diary-step-card__top">
+                            <span class="plant-diary-step-card__number">2</span>
+                            <h3>Додайте рослини</h3>
+                        </div>
+                        <p>Збережіть назву, категорію та дату посадки, щоб почати історію рослини.</p>
+                    </article>
+
+                    <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-how__card plant-diary-how__card--three">
+                        <div class="plant-diary-step-card__top">
+                            <span class="plant-diary-step-card__number">3</span>
+                            <h3>Фіксуйте дії</h3>
+                        </div>
+                        <p>Записуйте полив, добрива, фото, хвороби, пересадку та інші події в житті рослини.</p>
+                    </article>
+
+                    <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-step-card--summary plant-diary-how__card plant-diary-how__card--four">
+                        <div class="plant-diary-step-card__top">
+                            <span class="plant-diary-step-card__number">4</span>
+                            <h3>Усе під контролем</h3>
+                        </div>
+                        <p>Менше хаосу, більше ясності: уся важлива інформація про рослини зібрана в одному місці.</p>
+                    </article>
+
+                    <div class="plant-diary-how__line plant-diary-how__line--one-two" aria-hidden="true"></div>
+                    <div class="plant-diary-how__line plant-diary-how__line--two-three" aria-hidden="true"></div>
+                    <div class="plant-diary-how__line plant-diary-how__line--three-four" aria-hidden="true"></div>
+
+                    <div class="plant-diary-section__intro plant-diary-how__content">
+                        <h2>Як працює щоденник рослин?</h2>
+                        <p>Почати легко: створіть щоденник, додайте рослини і фіксуйте все, що важливо для догляду.</p>
+                        <p>У кілька простих кроків ви переходите від хаотичних згадок до зрозумілої системи, де вся історія рослин завжди перед очима.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section plant-diary-section--tint">
+            <div class="container">
+                <div class="plant-diary-split">
+                    <div class="plant-diary-split__content">
+                        <h2>Вся історія догляду за рослинами — перед очима</h2>
+                        <p>
+                            Кожен полив, кожне добриво, пересадка, фото чи нотатка зберігаються у стрічці подій.
+                            Ви бачите повну історію догляду за рослиною — від посадки до архіву або пересадки.
+                        </p>
+                        <p>
+                            Це допомагає швидко перевірити попередній догляд, не забути важливі дії й краще
+                            розуміти, що впливає на ріст рослин.
+                        </p>
+                    </div>
+                    <div class="plant-diary-split__preview">
+                        <div class="plant-diary-mockup plant-diary-mockup--detail">
+                            <div class="plant-diary-mockup__detail-layout">
+                                <div class="plant-diary-mockup__timeline">
+                                    <div class="plant-diary-mockup__detail-top">
+                                        <div>
+                                            <span class="plant-diary-mockup__eyebrow">Щоденник</span>
+                                            <h3 class="plant-diary-mockup__heading">Теплиця</h3>
+                                        </div>
+                                    </div>
+                                    <div class="plant-diary-mockup__timeline-group">
+                                        <span class="plant-diary-mockup__timeline-date">6 травня 2026</span>
+                                        <article class="plant-diary-mockup__timeline-card">
+                                            <div class="plant-diary-mockup__timeline-dot"></div>
+                                            <div class="plant-diary-mockup__timeline-box">
+                                                <strong>Полив</strong>
+                                                <span>Огірок · Томат · Базилік</span>
+                                                <p>Полив зафіксовано в щоденнику.</p>
+                                            </div>
+                                        </article>
+                                        <article class="plant-diary-mockup__timeline-card">
+                                            <div class="plant-diary-mockup__timeline-dot"></div>
+                                            <div class="plant-diary-mockup__timeline-box">
+                                                <strong>Добриво</strong>
+                                                <span>Томат</span>
+                                                <p>Запис про підживлення збережено.</p>
+                                            </div>
+                                        </article>
+                                    </div>
+                                </div>
+                                <aside class="plant-diary-mockup__sidebar">
+                                    <div class="plant-diary-mockup__insight">
+                                        <strong>AI рекомендації</strong>
+                                        <p>Полив краще провести ввечері, щоб волога довше трималась у ґрунті.</p>
+                                    </div>
+                                    <div class="plant-diary-mockup__panel">
+                                        <div class="plant-diary-mockup__row">
+                                            <strong>Рослини</strong>
+                                        </div>
+                                        <div class="plant-diary-mockup__tabs">
+                                            <span class="plant-diary-mockup__tab plant-diary-mockup__tab--active">Ростуть 3</span>
+                                            <span class="plant-diary-mockup__tab">Архів</span>
+                                        </div>
+                                        <div class="plant-diary-mockup__plants">
+                                            <div class="plant-diary-mockup__plant-card">
+                                                <strong>Огірок Роднічок F1</strong>
+                                            </div>
+                                            <div class="plant-diary-mockup__plant-card">
+                                                <strong>Томат де Барао</strong>
+                                            </div>
+                                            <div class="plant-diary-mockup__plant-card">
+                                                <strong>Базилік Генуезький</strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section plant-diary-section--benefits">
+            <div class="container">
+                <div class="plant-diary-section__intro plant-diary-section__intro--center">
+                    <h2 class="plant-diary-section__heading">Чому варто вести щоденник рослин</h2>
+                </div>
+                <div class="plant-diary-benefits">
+                    <div class="plant-diary-benefit-card">Не забуваєте про полив і добрива</div>
+                    <div class="plant-diary-benefit-card">Усі записи зберігаються в одному місці</div>
+                    <div class="plant-diary-benefit-card">Бачите історію кожної рослини</div>
+                    <div class="plant-diary-benefit-card">Підходить для грядок, теплиць, вазонів і домашніх рослин</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section plant-diary-section--trust">
+            <div class="container">
+                <div class="plant-diary-trust-layout">
+                    <div class="plant-diary-trust-layout__visual">
+                        <img src="{% static_push "posts/plant-diary-farmer-happy.png" %}"
+                             alt="Усміхнений агроном">
+                    </div>
+                    <div class="plant-diary-section__intro plant-diary-trust-layout__content">
+                        <h2>Доглядайте за рослинами впевнено</h2>
+                        <p>
+                            Щоденник рослин зберігає полив, добрива, фото, пересадку та всю історію
+                            догляду в одному місці, щоб ви бачили актуальний стан рослин без хаосу
+                            в записах і згадках з памʼяті.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="plant-diary-section plant-diary-section--compact">
+            <div class="container">
+                <div class="plant-diary-final-card">
+                    <h2>Почніть вести щоденник рослин вже сьогодні 🌱</h2>
+                    <p>
+                        Створіть свій перший щоденник і зберігайте всю історію догляду в одному місці.
+                    </p>
+                    <a class="plant-diary-cta"
+                       href="{% url 'pro_auth:profile-diary-list' %}">
+                        <span>Зареєструватись</span>
+                        <span class="plant-diary-cta__arrow" aria-hidden="true">➜</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock main %}
