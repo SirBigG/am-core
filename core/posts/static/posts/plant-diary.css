@@ -23,6 +23,7 @@
     border-bottom:0
 }
 .plant-diary-section--compact{padding:0 0 64px}
+.plant-diary-section--flush-bottom{padding-bottom:0}
 .plant-diary-hero__grid,.plant-diary-split{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,.98fr);gap:36px;align-items:center}
 .plant-diary-pill{
     display:inline-flex;
@@ -605,21 +606,19 @@
     color:#6b7488 !important;
 }
 .plant-diary-benefit-card:before{
-    content:"✔";
+    content:"";
     display:inline-flex;
     align-items:center;
     justify-content:center;
     flex:0 0 auto;
-    width:22px;
-    height:22px;
+    width:10px;
+    height:18px;
     margin-right:0;
-    border-radius:999px;
+    border:solid #49b54e;
+    border-width:0 4px 4px 0;
+    border-radius:0;
     background:transparent;
-    color:#49b54e !important;
-    -webkit-text-fill-color:#49b54e;
-    font-size:18px;
-    font-weight:900;
-    line-height:1;
+    transform:rotate(45deg);
     text-shadow:none;
 }
 .plant-diary-feature-card{padding:22px}
@@ -824,7 +823,7 @@
     }
     .plant-diary-problem-visual__image{display:block;width:min(100%,22rem);bottom:0}
     .plant-diary-problem-visual__bubble{
-        max-width:12.4rem;
+        max-width:11.4rem;
         padding:.8rem .9rem;
         font-size:1rem;
         line-height:1.65;

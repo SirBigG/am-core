@@ -1,6 +1,6 @@
 {% load static_push post_extras events_extras static %}
 <!DOCTYPE html>
-{# djlint:off #}<html lang="uk">{# djlint:on #}
+{# djlint:off #}<html lang="uk"{% if request.resolver_match.url_name == "plant-diary" %} class="plant-diary-landing-html"{% endif %}>{# djlint:on #}
 <head>
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-0V6Q0F65LP"></script>
@@ -215,6 +215,22 @@
                 font-size: 19px;
             }
         }
+
+        .plant-diary-landing-html,
+        .plant-diary-landing-body {
+            padding-top: 0 !important;
+        }
+
+        .plant-diary-landing-body > .plant-diary-site-banner {
+            display: none !important;
+            min-height: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+        }
+
+        .plant-diary-landing-body > header.navbar {
+            margin-top: 0 !important;
+        }
     </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -256,7 +272,7 @@
                 crossorigin="anonymous"></script>
     {% endblock adverts %}
 </head>
-<body class="d-flex flex-column min-vh-100">
+<body class="d-flex flex-column min-vh-100{% if request.resolver_match.url_name == "plant-diary" %} plant-diary-landing-body{% endif %}">
     {% if request.resolver_match.url_name != "plant-diary" %}
         <aside class="plant-diary-site-banner" aria-label="Щоденник для рослин">
             <div class="plant-diary-site-banner__inner">
