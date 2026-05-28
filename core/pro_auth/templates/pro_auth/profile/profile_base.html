@@ -16,8 +16,8 @@
 {% endblock scripts %}
 {% block base_content_block %}
     {% include "pro_auth/profile/profile_styles.html" %}
-    <div class="row">
-        <div class="col-md-4 col-12">
+    <div class="row profile-layout-row">
+        <div class="col-md-4 col-12 profile-sidebar-col">
             <div class="card mb-3">
                 <ul class="list-group list-group-flush">
                     <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
@@ -47,7 +47,7 @@
                 </ul>
             </div>
         </div>
-        <div class="col-md-8 col-12">
+        <div class="col-md-8 col-12 profile-content-col">
             {% block profile_content %}
             {% endblock profile_content %}
         </div>
