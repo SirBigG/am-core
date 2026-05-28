@@ -1,0 +1,1426 @@
+.profile-diary-wrap {
+    width: 100%;
+    max-width: 1080px;
+    margin: 0 auto;
+}
+
+.profile-diary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.profile-diary-section + .profile-diary-section {
+    margin-top: 2rem;
+}
+
+.profile-diary-section__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.profile-diary-section__title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+}
+
+.profile-diary-card {
+    cursor: pointer;
+    display: flex;
+    height: 100%;
+}
+
+.profile-diary-card:not(.profile-diary-entry-card) .card-body {
+    display: flex;
+    width: 100%;
+    padding: 18px !important;
+}
+
+.profile-diary-card:not(.profile-diary-entry-card) .card-body > .d-flex {
+    width: 100%;
+}
+
+.profile-diary-card:hover {
+    transform: translateY(-2px);
+    border-color: #9fcca8 !important;
+    box-shadow: 0 22px 42px rgba(76, 175, 80, 0.22) !important;
+}
+
+.profile-diary-card:focus-within {
+    transform: translateY(-2px);
+    border-color: #8bcf95 !important;
+    box-shadow: 0 22px 42px rgba(76, 175, 80, 0.24) !important;
+}
+
+.profile-diary-card.is-deleting {
+    pointer-events: none;
+    transform: scale(0.985) translateY(6px);
+    opacity: 0;
+    border-color: #f0c9cd !important;
+    box-shadow: 0 10px 24px rgba(220, 53, 69, 0.10) !important;
+}
+
+.profile-diary-card-title {
+    color: #232a33;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.25;
+    text-decoration: none;
+}
+
+.profile-diary-card-title:hover {
+    color: #232a33;
+    text-decoration: none;
+}
+
+.profile-diary-card-topline {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-diary-card-actions {
+    position: relative;
+    z-index: 3;
+}
+
+.profile-diary-card-quick-actions {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+    justify-content: flex-start;
+    margin-top: 0;
+    padding-top: 0.85rem;
+}
+
+.profile-diary-quick-water-btn {
+    min-height: 42px;
+    padding: 0 1rem !important;
+    font-weight: 400;
+}
+
+.profile-diary-card.is-deleting .profile-diary-card-actions {
+    opacity: 0.5;
+}
+
+.profile-diary-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.profile-diary-card-archive-btn {
+    position: relative;
+    z-index: 3;
+    flex: 0 0 auto;
+}
+
+.profile-diary-card-menu {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+}
+
+.profile-diary-card:hover .profile-diary-card-menu,
+.profile-diary-card:focus-within .profile-diary-card-menu,
+.profile-diary-card-menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.profile-diary-card-menu__toggle {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.profile-diary-card-menu__dropdown {
+    min-width: 180px;
+}
+
+.profile-diary-card-subtitle {
+    overflow: hidden;
+    color: #7b8794;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.profile-diary-card-subtitle > * {
+    display: inline;
+    margin: 0;
+}
+
+.profile-diary-card-meta {
+    margin-bottom: 0.3rem;
+    color: #7b8794;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.profile-diary-card-meta__inline,
+.profile-diary-card-meta__inline > * {
+    display: inline;
+    margin: 0;
+}
+
+.profile-diary-card-summary {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    margin: 0.15rem 0 0.7rem;
+}
+
+.profile-diary-card-last-event {
+    margin-top: auto;
+    padding: 11px 13px;
+    border: 1px solid #ead77e;
+    border-radius: 14px;
+    background: #fffdf7;
+    color: #374151;
+}
+
+.profile-diary-card-last-event--empty {
+    color: #7b8794;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.profile-diary-card-last-event__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: #1f2937;
+    font-size: 0.84rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.profile-diary-card-last-event__date {
+    color: #6b7280;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.profile-diary-card-last-event__label {
+    margin-bottom: 0.3rem;
+    color: #6b7280;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.profile-diary-card-last-event__plants {
+    margin-top: 0.3rem;
+    color: #4b5563;
+    font-size: 0.86rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.profile-diary-card-last-event__text {
+    margin-top: 0.3rem;
+    color: #6b7280;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.profile-diary-card-state {
+    margin-top: 0.9rem;
+}
+
+.profile-diary-card--archived {
+    opacity: 0.92;
+}
+
+.profile-diary-empty-garden {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: 3.5rem 0 2rem;
+    text-align: center;
+}
+
+.profile-diary-empty-garden__icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+
+.profile-diary-empty-garden__title {
+    margin: 0;
+    color: #1f2937;
+    font-size: clamp(1.8rem, 4vw, 2.65rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.profile-diary-onboarding {
+    display: grid;
+    gap: 1rem;
+    padding: 28px 24px;
+}
+
+.profile-diary-onboarding__title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.profile-diary-onboarding__lead {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.98rem;
+    line-height: 1.6;
+}
+
+.profile-diary-onboarding__list {
+    display: grid;
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.profile-diary-onboarding__item {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: start;
+    gap: 0.85rem;
+}
+
+.profile-diary-onboarding__step {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    background: #f3fbf3;
+    border: 1px solid #b7dfbd;
+    color: #148543;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.profile-diary-onboarding__text {
+    color: #374151;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    padding-top: 0.35rem;
+}
+
+.profile-diary-onboarding__actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 0.25rem;
+}
+
+.profile-confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(15, 23, 42, 0.48);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.22s ease;
+}
+
+.profile-confirm-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.profile-confirm-dialog {
+    width: min(100%, 440px);
+    padding: 28px 24px 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 24px;
+    box-shadow: 0 24px 60px rgba(15, 23, 42, 0.18);
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.22s ease;
+}
+
+.profile-confirm-backdrop.is-open .profile-confirm-dialog {
+    transform: translateY(0) scale(1);
+}
+
+.profile-confirm-title {
+    margin: 0 0 0.75rem;
+    color: #1f2937;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-confirm-text {
+    margin: 0;
+    color: #4b5563;
+    font-size: 1rem;
+    line-height: 1.55;
+}
+
+.profile-confirm-helper {
+    margin: 0.75rem 0 0;
+    color: #6b7280;
+    font-size: 0.93rem;
+    line-height: 1.5;
+}
+
+.profile-confirm-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 1.5rem;
+}
+
+.profile-confirm-cancel {
+    min-width: 92px;
+    color: #1f2937 !important;
+    background: #f3f4f6 !important;
+    border: 1px solid transparent !important;
+}
+
+.profile-confirm-submit {
+    min-width: 92px;
+}
+
+.profile-quick-action-dialog {
+    width: min(100%, 480px);
+}
+
+.profile-diary-item-modal {
+    align-items: flex-start;
+    overflow-y: auto;
+}
+
+.profile-diary-item-modal__dialog {
+    width: min(100%, 600px);
+    max-height: calc(100vh - 40px);
+    margin: auto 0;
+    overflow-y: auto;
+}
+
+.profile-diary-item-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.profile-diary-item-modal__close {
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.profile-diary-item-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 1.5rem;
+}
+
+.profile-diary-item-modal__actions .am-btn {
+    min-width: 130px;
+}
+
+.profile-plant-action-dialog {
+    width: min(100%, 520px);
+}
+
+.profile-plant-action-field {
+    margin-top: 1.25rem;
+    margin-bottom: 0;
+}
+
+.profile-quick-action-options,
+.profile-quick-action-plants {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.profile-quick-action-option,
+.profile-quick-action-plant {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 12px 14px;
+    border: 1px solid #dbe7dd;
+    border-radius: 14px;
+    background: #fbfdf9;
+    color: #374151;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.profile-quick-action-option input,
+.profile-quick-action-plant input {
+    flex: 0 0 auto;
+    width: 18px;
+    height: 18px;
+    accent-color: #0b8043;
+}
+
+.profile-diary-toast {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    z-index: 1100;
+    width: max-content;
+    max-width: min(420px, calc(100vw - 32px));
+    padding: 14px 18px;
+    border: 1px solid #8bcf95;
+    border-radius: 16px;
+    background: #f3fbf3;
+    color: #148543;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.35;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.14);
+    opacity: 0;
+    transform: translate(-50%, -12px);
+    pointer-events: none;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.profile-diary-toast.is-visible {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.profile-diary-detail-hero {
+    margin-bottom: 1.25rem;
+}
+
+.profile-diary-detail-wrap {
+    width: 100%;
+    max-width: 1040px;
+    margin: 0 auto;
+}
+
+.profile-diary-detail-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 1.25rem;
+    align-items: start;
+}
+
+.profile-diary-plant-management {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    display: grid;
+    gap: 0.9rem;
+}
+
+.profile-diary-plant-management__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0;
+}
+
+.profile-diary-plant-management__heading {
+    min-width: 0;
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+}
+
+.profile-diary-plant-management__lead {
+    margin: -0.15rem 0 0;
+    color: #6b7280;
+    font-size: 0.86rem;
+    line-height: 1.4;
+    width: 100%;
+}
+
+.profile-diary-plant-management__tabs {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: 0.3rem;
+    border: 1px solid #dbe7dd;
+    border-radius: 18px;
+    background: #f7faf7;
+}
+
+.profile-diary-plant-management__tab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.45rem;
+    flex: 1 1 0;
+    min-height: 40px;
+    padding: 0.55rem 0.8rem;
+    border: 0;
+    border-radius: 14px;
+    background: transparent;
+    color: #4b5563;
+    font-size: 0.88rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-diary-plant-management__tab.is-active {
+    background: #ffffff;
+    color: #148543;
+    box-shadow: 0 4px 10px rgba(15, 23, 42, 0.06);
+}
+
+.profile-diary-plant-management__panel {
+    min-width: 0;
+}
+
+.profile-diary-plant-management__list {
+    display: grid;
+    gap: 0.65rem;
+}
+
+.profile-diary-plant-management__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 6px 15px;
+    border: 1px solid #dbe7dd;
+    border-radius: 14px;
+    background: #ffffff;
+    transition: background-color 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.profile-diary-plant-management__item--completed {
+    background: #fafcf9;
+}
+
+.profile-diary-plant-management__item:hover,
+.profile-diary-plant-management__item:focus-within {
+    border-color: #cfe7d1;
+    background: #fbfdf9;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+}
+
+.profile-diary-plant-management__item:has(.profile-diary-plant-menu.is-open) {
+    z-index: 30;
+}
+
+.profile-diary-plant-management__name {
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1.25;
+}
+
+.profile-diary-plant-management__item-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+}
+
+.profile-diary-plant-management__meta {
+    color: #6b7280;
+    font-size: 0.82rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.profile-diary-plant-management__item-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 0 0 auto;
+    position: relative;
+    z-index: 1;
+}
+
+.profile-diary-plant-menu {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+}
+
+.profile-diary-plant-management__item:hover .profile-diary-plant-menu,
+.profile-diary-plant-management__item:focus-within .profile-diary-plant-menu,
+.profile-diary-plant-menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.profile-diary-plant-menu__toggle {
+    width: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.profile-diary-plant-menu.is-open {
+    z-index: 50;
+}
+
+.profile-diary-plant-menu__dropdown {
+    top: calc(100% + 0.5rem);
+    z-index: 60;
+    min-width: 220px;
+    border-radius: 18px;
+    box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16);
+}
+
+.profile-diary-plant-management {
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06) !important;
+}
+
+.profile-diary-plant-management__empty {
+    padding: 0.95rem 1rem;
+    border: 1px dashed #d6e0d7;
+    border-radius: 14px;
+    background: #fbfdf9;
+    color: #6b7280;
+    font-size: 0.88rem;
+    line-height: 1.4;
+}
+
+.profile-diary-entry-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+}
+
+.profile-diary-filters-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 48px;
+    height: 48px;
+    line-height: 1.2;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.profile-diary-filters {
+    display: grid;
+    gap: 0.9rem;
+    margin-bottom: 1.15rem;
+    padding: 20px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
+}
+
+.profile-diary-filters.is-collapsed {
+    display: none;
+}
+
+.profile-diary-filters__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.profile-diary-entry-group {
+    margin-bottom: 0.85rem;
+}
+
+.profile-diary-entry-group-title {
+    margin: 0 0 0.55rem;
+    color: #1f2937;
+    font-size: 1.1rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+}
+
+.profile-diary-filters__field {
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.profile-diary-filters__footer {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-diary-filters__search {
+    flex: 1 1 auto;
+    margin-bottom: 0;
+}
+
+.profile-diary-filters .profile-form-label {
+    font-size: 0.9rem;
+    margin-bottom: 0.55rem;
+}
+
+.profile-diary-filters .profile-form-control {
+    min-height: 52px;
+    border-radius: 16px;
+}
+
+.profile-diary-filters .profile-form-select {
+    appearance: none;
+    padding-right: 44px;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #607260 50%),
+        linear-gradient(135deg, #607260 50%, transparent 50%);
+    background-position:
+        calc(100% - 22px) 50%,
+        calc(100% - 16px) 50%;
+    background-repeat: no-repeat;
+    background-size: 6px 6px, 6px 6px;
+}
+
+.profile-diary-filters__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.profile-diary-filters__actions .btn {
+    min-height: 52px;
+    border-radius: 12px !important;
+}
+
+.profile-diary-detail-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.75rem;
+}
+
+.profile-diary-detail-topbar-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    flex: 0 0 auto;
+}
+
+.profile-diary-detail-menu__toggle {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 1.1rem;
+    line-height: 1;
+}
+
+.profile-diary-detail-menu__dropdown {
+    min-width: 220px;
+}
+
+.profile-diary-detail-heading-wrap {
+    display: flex;
+    align-items: center;
+    gap: 1.35rem;
+    flex: 1 1 auto;
+}
+
+.profile-diary-detail-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #8a94a5;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    flex: 0 0 auto;
+}
+
+.profile-diary-detail-back:hover,
+.profile-diary-detail-back:focus {
+    color: #4b5563;
+    text-decoration: none;
+}
+
+.profile-diary-detail-heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1 1 auto;
+}
+
+.profile-diary-detail-heading-main {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.profile-diary-detail-title {
+    margin: 0;
+    color: #148543;
+    font-size: 1.95rem;
+    font-weight: 700;
+    line-height: 1.08;
+    letter-spacing: -0.02em;
+}
+
+.profile-diary-detail-add-btn {
+    flex: 0 0 auto;
+    min-height: 45px;
+    height: 45px;
+    padding: 0 1.5rem;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.2;
+    box-shadow: none !important;
+}
+
+.profile-diary-detail-add-btn:hover,
+.profile-diary-detail-add-btn:focus,
+.profile-diary-detail-add-btn:active {
+    box-shadow: none !important;
+}
+
+.profile-diary-entry-list {
+    position: relative;
+    margin-top: 1.25rem;
+    padding-left: 1.9rem;
+}
+
+.profile-diary-entry-list::before {
+    content: "";
+    position: absolute;
+    top: 0.5rem;
+    bottom: 0.5rem;
+    left: 1.0rem;
+    width: 3px;
+    border-radius: 999px;
+    background: #dfe6df;
+}
+
+.profile-diary-entry-timeline-item {
+    position: relative;
+}
+
+.profile-diary-entry-marker {
+    position: absolute;
+    top: 2rem;
+    left: -1.32rem;
+    z-index: 2;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    background: #4caf50;
+}
+
+.profile-diary-entry-card {
+    cursor: default;
+}
+
+.profile-diary-entry-card:hover,
+.profile-diary-entry-card:focus-within {
+    transform: none;
+    border-color: #d9e1e8 !important;
+    box-shadow: 0 8px 20px rgba(148, 163, 184, 0.18) !important;
+}
+
+.profile-diary-entry-card .card-body {
+    padding: 1.0rem !important;
+}
+
+.profile-diary-entry-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.4rem;
+}
+
+.profile-diary-entry-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.profile-diary-entry-type {
+    color: #1f2937;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-diary-entry-target {
+    margin-bottom: 0.65rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+}
+
+.profile-diary-entry-image-wrap {
+    margin-bottom: 0.9rem;
+}
+
+.profile-diary-entry-image {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    border-radius: 18px;
+    object-fit: cover;
+}
+
+.profile-diary-entry-description {
+    color: #4b5563;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.profile-diary-entry-description > *:last-child {
+    margin-bottom: 0;
+}
+
+.profile-diary-entry-menu {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.16s ease;
+}
+
+.profile-diary-entry-card:hover .profile-diary-entry-menu,
+.profile-diary-entry-card:focus-within .profile-diary-entry-menu,
+.profile-diary-entry-menu.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.profile-diary-entry-menu__toggle {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    font-size: 1.05rem;
+    line-height: 1;
+}
+
+.profile-diary-entry-menu__dropdown {
+    min-width: 180px;
+}
+
+.profile-diary-empty-state {
+    padding: 28px 24px;
+    text-align: center;
+}
+
+.profile-diary-empty-title {
+    margin: 0 0 0.5rem;
+    color: #1f2937;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-diary-empty-text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.profile-diary-empty-garden__text {
+    margin: 0;
+    color: #6b7280;
+    font-size: 1rem;
+    line-height: 1.55;
+    max-width: 520px;
+}
+
+.profile-diary-status-banner {
+    margin-bottom: 1.25rem;
+    text-align: left;
+}
+
+.profile-diary-recommendation-column {
+    position: relative;
+    margin-top: 1.25rem;
+    display: grid;
+    gap: 0.9rem;
+    align-content: start;
+}
+
+.profile-diary-recommendation {
+    position: static;
+    padding: 15px 14px;
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+}
+
+.profile-diary-recommendation--low {
+    border-color: #cfe7d1;
+    box-shadow: 0 8px 18px rgba(76, 175, 80, 0.05);
+}
+
+.profile-diary-recommendation--medium {
+    border-color: #f2ddb7;
+    background: linear-gradient(180deg, #fffdfa 0%, #fff8ee 100%);
+    box-shadow: 0 8px 18px rgba(217, 119, 6, 0.05);
+}
+
+.profile-diary-recommendation--high {
+    border-color: #f2c2c2;
+    background: linear-gradient(180deg, #fffafa 0%, #fff3f3 100%);
+    box-shadow: 0 8px 18px rgba(220, 53, 69, 0.05);
+}
+
+.profile-diary-recommendation--empty {
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.profile-diary-recommendation__eyebrow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.7rem;
+    color: #6b7280;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.profile-diary-recommendation__title {
+    margin: 0 0 0.4rem;
+    color: #1f2937;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.profile-diary-recommendation__target {
+    margin: 0 0 0.45rem;
+    color: #4b5563;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.profile-diary-recommendation__summary {
+    margin: 0;
+    color: #4b5563;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.profile-diary-recommendation__next-step {
+    margin: 0.7rem 0 0;
+    padding-top: 0.7rem;
+    border-top: 1px solid rgba(107, 114, 128, 0.12);
+    color: #374151;
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+.profile-diary-recommendation__toggle {
+    margin-top: 0.75rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #148543;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.profile-diary-recommendation__details {
+    margin-top: 0.75rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(107, 114, 128, 0.16);
+    color: #374151;
+    font-size: 0.9rem;
+    line-height: 1.55;
+}
+
+.profile-diary-recommendation__details p {
+    margin: 0;
+}
+
+@media (max-width: 767.98px) {
+    .profile-layout-row {
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .profile-sidebar-col,
+    .profile-content-col {
+        padding-right: 0;
+        padding-left: 0;
+    }
+
+    .profile-form-panel {
+        padding: 24px 20px calc(96px + env(safe-area-inset-bottom));
+        margin-bottom: calc(88px + env(safe-area-inset-bottom));
+    }
+
+    .profile-page-title {
+        font-size: 1.75rem;
+    }
+
+    .profile-form-row,
+    .am-form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-wrap {
+        max-width: none;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .profile-diary-detail-wrap {
+        max-width: none;
+        margin-right: 0;
+        margin-left: 0;
+    }
+
+    .profile-diary-header {
+        flex-direction: column;
+        align-items: stretch !important;
+        gap: 1rem;
+    }
+
+    .profile-diary-header h1 {
+        width: 100%;
+        margin-bottom: 0;
+        white-space: nowrap;
+        font-size: clamp(2.15rem, 10vw, 2.8rem);
+        line-height: 1.08;
+    }
+
+    .profile-diary-header .am-btn {
+        align-self: flex-end;
+    }
+
+    .profile-diary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-card-quick-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-diary-card-quick-actions .btn {
+        width: 100%;
+    }
+
+    .profile-diary-detail-topbar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .profile-diary-detail-topbar-actions {
+        justify-content: stretch;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 0.6rem;
+    }
+
+    .profile-diary-detail-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-filters {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-filters__grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-diary-filters__footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-diary-filters__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-diary-detail-heading-wrap {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .profile-diary-detail-heading {
+        width: 100%;
+    }
+
+    .profile-diary-detail-heading-main {
+        width: 100%;
+    }
+
+    .profile-diary-detail-title {
+        width: 100%;
+        font-size: 1.7rem;
+    }
+
+    .profile-diary-detail-back {
+        font-size: 0.88rem;
+    }
+
+    .profile-diary-detail-add-btn {
+        flex: 1 1 auto;
+        width: auto;
+        text-align: center;
+    }
+
+    .profile-diary-detail-menu {
+        flex: 0 0 auto;
+    }
+
+    .profile-diary-detail-menu__toggle {
+        width: 48px;
+        min-width: 48px;
+    }
+
+    .profile-diary-detail-menu__dropdown,
+    .profile-diary-entry-menu__dropdown,
+    .profile-diary-card-menu__dropdown,
+    .profile-diary-plant-menu__dropdown {
+        min-width: min(220px, calc(100vw - 40px));
+        max-width: calc(100vw - 40px);
+        right: 0;
+    }
+
+    .profile-diary-card-menu {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .profile-diary-entry-section-header {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .profile-diary-entry-menu {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .profile-diary-plant-menu {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .profile-diary-filters-toggle {
+        min-width: fit-content;
+    }
+
+    .profile-diary-plant-management {
+        width: 100%;
+    }
+
+    .profile-diary-plant-management__tabs {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .profile-diary-plant-management__tab {
+        justify-content: center;
+    }
+
+    .profile-diary-plant-management__item-actions {
+        justify-content: flex-end;
+    }
+
+    .profile-diary-plant-management__item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile-diary-plant-management__item-main {
+        min-width: 0;
+        flex: 1 1 auto;
+    }
+
+    .profile-diary-plant-management__item-actions {
+        flex: 0 0 auto;
+        align-self: center;
+    }
+
+    .profile-diary-entry-list {
+        padding-left: 1.5rem;
+    }
+
+    .profile-diary-entry-list::before {
+        left: 0.75rem;
+    }
+
+    .profile-diary-entry-marker {
+        left: -1.1rem;
+    }
+
+    .profile-diary-empty-garden {
+        padding-top: 2.5rem;
+    }
+
+    .profile-diary-empty-garden__title {
+        font-size: 1.85rem;
+    }
+
+    .profile-diary-recommendation-column {
+        margin-top: 0;
+        order: 1;
+    }
+
+    .profile-confirm-actions,
+    .profile-diary-item-modal__actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .profile-confirm-actions .btn,
+    .profile-diary-item-modal__actions .btn {
+        width: 100%;
+        min-height: 48px;
+    }
+}
