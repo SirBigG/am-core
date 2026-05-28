@@ -68,10 +68,6 @@ class ContentSecurityPolicyPublicPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/form.html")
         self.assert_report_only_csp(response)
-        policy = response.headers[self.header_name]
-        self.assertIn("https://code.jquery.com", policy)
-        self.assertIn("https://cdnjs.cloudflare.com", policy)
-        self.assertIn("https://stackpath.bootstrapcdn.com", policy)
 
     def test_login_page_has_report_only_csp_for_auth_template(self):
         response = self.client.get("/login/")
@@ -86,9 +82,6 @@ class ContentSecurityPolicyPublicPageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "services/feedback.html")
         self.assert_report_only_csp(response)
-        policy = response.headers[self.header_name]
-        self.assertIn("https://www.google.com", policy)
-        self.assertIn("https://www.gstatic.com", policy)
 
     @override_settings(API_HOST="https://api.example.com")
     @patch("core.news.views.requests.get")

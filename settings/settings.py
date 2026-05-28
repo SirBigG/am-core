@@ -16,6 +16,11 @@ from django.utils.translation import gettext_lazy as _
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+
+def _split_env_tuple(name):
+    return tuple(value.strip() for value in os.getenv(name, "").split(",") if value.strip())
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
@@ -372,38 +377,23 @@ REST_FRAMEWORK = {
 IMGPROXY_KEY = os.getenv("IMGPROXY_KEY")
 IMGPROXY_SALT = os.getenv("IMGPROXY_SALT")
 IMGPROXY_BASE_URL = os.getenv("IMGPROXY_BASE_URL", "/imgproxy")
+CSP_STATIC_ORIGINS = _split_env_tuple("CSP_STATIC_ORIGINS")
+CSP_SCRIPT_SRC_ORIGINS = _split_env_tuple("CSP_SCRIPT_SRC_ORIGINS")
+CSP_STYLE_SRC_ORIGINS = _split_env_tuple("CSP_STYLE_SRC_ORIGINS")
+CSP_FONT_SRC_ORIGINS = _split_env_tuple("CSP_FONT_SRC_ORIGINS")
+CSP_FRAME_SRC_ORIGINS = _split_env_tuple("CSP_FRAME_SRC_ORIGINS")
+CSP_FORM_ACTION_ORIGINS = _split_env_tuple("CSP_FORM_ACTION_ORIGINS")
 
 SECURE_CSP_REPORT_ONLY = {
     "default-src": ("'self'",),
-    "script-src": (
-        "'self'",
-        "'unsafe-inline'",
-        "https://www.googletagmanager.com",
-        "https://pagead2.googlesyndication.com",
-        "https://cdn.jsdelivr.net",
-        "https://code.jquery.com",
-        "https://cdnjs.cloudflare.com",
-        "https://stackpath.bootstrapcdn.com",
-        "https://www.google.com",
-        "https://www.gstatic.com",
-    ),
-    "style-src": (
-        "'self'",
-        "'unsafe-inline'",
-        "https://cdn.jsdelivr.net",
-        "https://cdnjs.cloudflare.com",
-        "https://stackpath.bootstrapcdn.com",
-    ),
+    "script-src": ("'self'", "'unsafe-inline'") + CSP_STATIC_ORIGINS + CSP_SCRIPT_SRC_ORIGINS,
+    "style-src": ("'self'", "'unsafe-inline'") + CSP_STATIC_ORIGINS + CSP_STYLE_SRC_ORIGINS,
     "img-src": ("'self'", "data:", "https:", "http:"),
-    "font-src": ("'self'", "data:"),
+    "font-src": ("'self'", "data:") + CSP_STATIC_ORIGINS + CSP_FONT_SRC_ORIGINS,
     "connect-src": ("'self'",),
-    "frame-src": (
-        "'self'",
-        "https://www.google.com",
-        "https://googleads.g.doubleclick.net",
-    ),
+    "frame-src": ("'self'",) + CSP_FRAME_SRC_ORIGINS,
     "object-src": ("'none'",),
     "base-uri": ("'self'",),
-    "form-action": ("'self'", "https://www.facebook.com"),
+    "form-action": ("'self'",) + CSP_FORM_ACTION_ORIGINS,
     "report-uri": ("/csp/report/",),
 }

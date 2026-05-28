@@ -16,5 +16,5 @@ def content_security_policy_report(request):
     except ValueError:
         payload = {"invalid": request.body.decode("utf-8", errors="replace")}
 
-    logger.info("Content Security Policy report received", extra={"csp_report": payload})
+    logger.info("Content Security Policy report received: %s", json.dumps(payload, sort_keys=True))
     return HttpResponse(status=204)
