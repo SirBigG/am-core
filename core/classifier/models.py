@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from django.conf import settings
 from django.core.files import File
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -151,3 +152,74 @@ class Category(MPTTModel):
             self.image = File(output, name=self.image.name)
         super().save(*args, **kwargs)
         Category.objects.filter(pk=self.pk).update(absolute_url=self.get_absolute_url())
+
+
+class CategoryAIProfile(models.Model):
+    """Private plant-care knowledge used as AI context for diary recommendations."""
+
+    STATUS_DRAFT = "draft"
+    STATUS_READY = "ready"
+    STATUS_ARCHIVED = "archived"
+
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, _("Draft")),
+        (STATUS_READY, _("Ready")),
+        (STATUS_ARCHIVED, _("Archived")),
+    ]
+
+    category = models.OneToOneField(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="ai_profile",
+        verbose_name=_("category"),
+    )
+    title = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("AI profile title"),
+        help_text=_("Optional readable title, for example: Basil (Ocimum basilicum)."),
+    )
+    content = models.TextField(
+        blank=True,
+        verbose_name=_("AI knowledge content"),
+        help_text=_("Structured plain text or Markdown used as private AI context. This text is not published."),
+    )
+    sources = models.TextField(
+        blank=True,
+        verbose_name=_("sources"),
+        help_text=_("Optional links, books, notes, or source references for this knowledge profile."),
+    )
+    internal_notes = models.TextField(
+        blank=True,
+        verbose_name=_("internal notes"),
+        help_text=_("Optional team-only notes. Not intended for AI prompts by default."),
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default=STATUS_DRAFT,
+        verbose_name=_("status"),
+    )
+    is_ai_enabled = models.BooleanField(
+        default=True,
+        verbose_name=_("use for AI recommendations"),
+    )
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="updated_category_ai_profiles",
+        verbose_name=_("updated by"),
+    )
+    created = models.DateTimeField(auto_now_add=True, verbose_name=_("created"))
+    updated = models.DateTimeField(auto_now=True, verbose_name=_("updated"))
+
+    class Meta:
+        db_table = "classifier_category_ai_profile"
+        verbose_name = _("AI documentation")
+        verbose_name_plural = _("AI documentation")
+        ordering = ["category__value"]
+
+    def __str__(self):
+        return self.title or f"{self.category} AI documentation"
