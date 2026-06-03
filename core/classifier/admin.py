@@ -8,7 +8,17 @@ class CategoryAIProfileInline(admin.StackedInline):
     model = CategoryAIProfile
     extra = 0
     max_num = 1
-    fields = ("title", "status", "is_ai_enabled", "content", "sources", "internal_notes", "updated_by", "updated")
+    fields = (
+        "title",
+        "status",
+        "is_ai_enabled",
+        "content",
+        "recommendation_rules",
+        "sources",
+        "internal_notes",
+        "updated_by",
+        "updated",
+    )
     readonly_fields = ("updated_by", "updated")
 
 
@@ -33,7 +43,7 @@ class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
 class CategoryAIProfileAdmin(admin.ModelAdmin):
     list_display = ("category", "title", "status", "is_ai_enabled", "updated")
     list_filter = ("status", "is_ai_enabled", "category__is_active", "category__is_diary_species_parent")
-    search_fields = ("category__value", "category__slug", "title", "content")
+    search_fields = ("category__value", "category__slug", "title", "content", "recommendation_rules")
     autocomplete_fields = ("category",)
     readonly_fields = ("created", "updated", "updated_by")
     fieldsets = (
@@ -46,6 +56,7 @@ class CategoryAIProfileAdmin(admin.ModelAdmin):
                     "status",
                     "is_ai_enabled",
                     "content",
+                    "recommendation_rules",
                     "sources",
                     "internal_notes",
                 )
