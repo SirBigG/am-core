@@ -184,6 +184,11 @@ class CategoryAIProfile(models.Model):
         verbose_name=_("AI knowledge content"),
         help_text=_("Structured plain text or Markdown used as private AI context. This text is not published."),
     )
+    recommendation_rules = models.TextField(
+        blank=True,
+        verbose_name=_("AI recommendation rules"),
+        help_text=_("Structured rules for risks, triggers, confidence, and recommendations used as private AI context."),
+    )
     sources = models.TextField(
         blank=True,
         verbose_name=_("sources"),
