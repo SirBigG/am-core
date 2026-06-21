@@ -23,6 +23,7 @@
 - Added shared mobile detail/product styles and applied them to event and company detail pages.
 - Reduced plant diary promo fatigue with a compact, dismissible site banner that remembers dismissal when browser storage is available.
 - Improved diary workspace mobile action targets so diary, entry, and plant overflow controls are visible and 48px on mobile.
+- Reworked `/search/` into the shared public form panel with a mobile-stacked search input and visible submit label.
 
 ## Verification
 
@@ -53,6 +54,7 @@
   - Company detail page from `/companies/`
   - Plant diary banner layout and dismiss behavior on `/companies/`
   - Diary list and diary detail action target sizes at `390px` width.
+  - `/search/?q=...` search panel at `390px` width.
 
 ## Remaining Follow-Ups
 
