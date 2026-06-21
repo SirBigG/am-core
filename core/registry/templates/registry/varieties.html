@@ -43,20 +43,32 @@
             {% for key, list in group %}
                 <div class="col-md-6 col-12 mt-3">
                     <p class="text-secondary h3">{{ key }}</p>
-                    <ul class="list-unstyled">
+                    <ul class="site-link-grid site-link-grid--compact">
                         {% for post in list %}
-                            <li class="m-2">
+                            <li class="site-link-grid__item">
                                 {% if post.publication__absolute_url %}
-                                    <a class="list-link no-decoration"
-                                       href="{{ post.publication__absolute_url }}">{{ post.title }}</a>
+                                    <a class="site-link-grid__link"
+                                       href="{{ post.publication__absolute_url }}">
+                                        {{ post.title }}
+                                        {% if post.original_country__short_slug %}
+                                            <img alt="{{ post.title }}"
+                                                 src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
+                                                 class="site-link-grid__flag"
+                                                 height="12"
+                                                 width="18" />
+                                        {% endif %}
+                                    </a>
                                 {% else %}
-                                    {{ post.title }}
-                                {% endif %}
-                                {% if post.original_country__short_slug %}
-                                    <img alt="{{ post.title }}"
-                                         src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
-                                         height="10px"
-                                         width="15px" />
+                                    <span class="site-link-grid__text">
+                                        {{ post.title }}
+                                        {% if post.original_country__short_slug %}
+                                            <img alt="{{ post.title }}"
+                                                 src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
+                                                 class="site-link-grid__flag"
+                                                 height="12"
+                                                 width="18" />
+                                        {% endif %}
+                                    </span>
                                 {% endif %}
                             </li>
                         {% endfor %}
