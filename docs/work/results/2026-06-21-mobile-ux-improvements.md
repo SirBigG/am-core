@@ -19,6 +19,7 @@
 - Added shared mobile link-grid styles for long category/catalog lists.
 - Applied larger 48px tap targets to posts catalog category links and registry category/variety links.
 - Improved the mobile footer navigation with consistent 60px controls and a fuller sections menu for categories, events, companies, forum, registry, about, and contact links.
+- Added mobile-friendly sign-in prompts on public advert and event create forms with `next` links back to the current form, without blocking anonymous posting.
 
 ## Verification
 
@@ -45,6 +46,7 @@
   - `/categories/`
   - `/registry/`
   - Mobile footer navigation on `/registry/`
+  - Signed-in `/adverts/create/` and `/events/create/` form rendering
 
 ## Remaining Follow-Ups
 
