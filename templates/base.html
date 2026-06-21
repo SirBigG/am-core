@@ -2,21 +2,19 @@
 <!DOCTYPE html>
 {# djlint:off #}<html lang="uk"{% if request.resolver_match.url_name == "plant-diary" %} class="plant-diary-landing-html"{% endif %}>{# djlint:on #}
 <head>
-    {% if enable_analytics %}
-        <!-- Global site tag (gtag.js) - Google Analytics -->
-        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0V6Q0F65LP"></script>
-        <script>
-            window.dataLayer = window.dataLayer || [];
-
-            function gtag() {
-                dataLayer.push(arguments);
-            }
-
-            gtag('js', new Date());
-
-            gtag('config', 'G-0V6Q0F65LP');
-        </script>
-    {% endif %}
+    <script>
+        window.agromegaConsentConfig = {
+            analytics: {
+                enabled: {{ enable_analytics|yesno:"true,false" }},
+                measurementId: "G-0V6Q0F65LP"
+            },
+            advertising: {
+                enabled: {{ enable_adverts|yesno:"true,false" }},
+                client: "ca-pub-4522526101011449"
+            },
+            policyUrl: "{% url 'django.contrib.flatpages.views.flatpage' 'cookies_policy/' %}"
+        };
+    </script>
     <style>
         .btn {
             --bs-border-radius: 0.75rem;
@@ -1958,6 +1956,92 @@
         .plant-diary-landing-body > header.navbar {
             margin-top: 0 !important;
         }
+
+        .cookie-consent {
+            position: fixed;
+            right: 16px;
+            bottom: 16px;
+            left: 16px;
+            z-index: 1080;
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 16px;
+            color: #1f2937;
+            background: #fff;
+            border: 1px solid rgba(11, 128, 67, .24);
+            border-radius: 8px;
+            box-shadow: 0 12px 36px rgba(31, 41, 55, .18);
+        }
+
+        .cookie-consent[hidden] {
+            display: none !important;
+        }
+
+        .cookie-consent__title {
+            margin: 0 0 8px;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .cookie-consent__text {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.45;
+        }
+
+        .cookie-consent__actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .cookie-consent__settings {
+            display: grid;
+            gap: 10px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .cookie-consent__option {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.35;
+        }
+
+        .cookie-consent__option input {
+            flex: 0 0 auto;
+            margin-top: 3px;
+        }
+
+        .cookie-settings-link {
+            padding: 0;
+            color: #0b8043;
+            text-align: left;
+            background: transparent;
+            border: 0;
+        }
+
+        .cookie-settings-link:hover,
+        .cookie-settings-link:focus {
+            color: #086536;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 575.98px) {
+            .cookie-consent {
+                bottom: 76px;
+                padding: 14px;
+            }
+
+            .cookie-consent__actions .btn {
+                flex: 1 1 100%;
+            }
+        }
     </style>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -1994,11 +2078,6 @@
     {% block scripts %}
     {% endblock scripts %}
     {% block adverts %}
-        {% if enable_adverts %}
-            <script async
-                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
-                    crossorigin="anonymous"></script>
-        {% endif %}
     {% endblock adverts %}
 </head>
 <body class="d-flex flex-column min-vh-100{% if request.resolver_match.url_name == "plant-diary" %} plant-diary-landing-body{% endif %}">
@@ -2062,7 +2141,233 @@
     {% block footer %}
         {% include "footer.html" %}
     {% endblock footer %}
+    {% if enable_analytics or enable_adverts %}
+        <section class="cookie-consent"
+                 data-cookie-consent
+                 hidden
+                 aria-label="Налаштування cookies">
+            <p class="cookie-consent__title">Cookies на AgroMega</p>
+            <p class="cookie-consent__text">
+                Ми використовуємо необхідні cookies для роботи сайту. Аналітичні та рекламні cookies запускаються тільки після вашого вибору.
+                <a href="{% url 'django.contrib.flatpages.views.flatpage' 'cookies_policy/' %}">Політика cookies</a>
+            </p>
+            <div class="cookie-consent__settings" data-cookie-settings hidden>
+                <label class="cookie-consent__option">
+                    <input type="checkbox" checked disabled>
+                    <span><strong>Необхідні</strong>
+                        <br>
+                    Потрібні для роботи сайту, безпеки, форм і збереження вашого вибору.</span>
+                </label>
+                {% if enable_analytics %}
+                    <label class="cookie-consent__option">
+                        <input type="checkbox" data-cookie-category="analytics">
+                        <span><strong>Аналітика</strong>
+                            <br>
+                        Допомагає зрозуміти відвідуваність і покращувати сайт.</span>
+                    </label>
+                {% endif %}
+                {% if enable_adverts %}
+                    <label class="cookie-consent__option">
+                        <input type="checkbox" data-cookie-category="advertising">
+                        <span><strong>Реклама</strong>
+                            <br>
+                        Дозволяє завантажувати рекламні сервіси, зокрема Google AdSense.</span>
+                    </label>
+                {% endif %}
+            </div>
+            <div class="cookie-consent__actions">
+                <button type="button" class="btn btn-success btn-sm" data-cookie-accept-all>Прийняти всі</button>
+                <button type="button"
+                        class="btn btn-outline-secondary btn-sm"
+                        data-cookie-reject>Відхилити необов'язкові</button>
+                <button type="button"
+                        class="btn btn-outline-success btn-sm"
+                        data-cookie-customize>Налаштувати</button>
+                <button type="button" class="btn btn-success btn-sm" data-cookie-save hidden>Зберегти вибір</button>
+            </div>
+        </section>
+    {% endif %}
     <script>
+    {% if enable_analytics or enable_adverts %}
+    (function () {
+        const config = window.agromegaConsentConfig || {};
+        const banner = document.querySelector("[data-cookie-consent]");
+        const settingsPanel = document.querySelector("[data-cookie-settings]");
+        const customizeButton = document.querySelector("[data-cookie-customize]");
+        const saveButton = document.querySelector("[data-cookie-save]");
+        const storageKey = "agromegaCookieConsent.v1";
+        const defaultConsent = {
+            analytics: false,
+            advertising: false
+        };
+
+        function hasOptionalServices() {
+            return Boolean((config.analytics && config.analytics.enabled) || (config.advertising && config.advertising.enabled));
+        }
+
+        function readConsent() {
+            try {
+                const rawConsent = window.localStorage.getItem(storageKey);
+                return rawConsent ? JSON.parse(rawConsent) : null;
+            } catch (error) {
+                return null;
+            }
+        }
+
+        function writeConsent(consent) {
+            try {
+                window.localStorage.setItem(storageKey, JSON.stringify({
+                    analytics: Boolean(consent.analytics),
+                    advertising: Boolean(consent.advertising),
+                    updatedAt: new Date().toISOString()
+                }));
+            } catch (error) {
+                // Consent still applies for the current page if storage is unavailable.
+            }
+        }
+
+        function loadScript(id, src, attributes) {
+            if (document.getElementById(id)) {
+                return;
+            }
+
+            const script = document.createElement("script");
+            script.id = id;
+            script.async = true;
+            script.src = src;
+            Object.keys(attributes || {}).forEach(function (name) {
+                script.setAttribute(name, attributes[name]);
+            });
+            document.head.appendChild(script);
+        }
+
+        function enableAnalytics() {
+            if (!config.analytics || !config.analytics.enabled || !config.analytics.measurementId) {
+                return;
+            }
+
+            window.dataLayer = window.dataLayer || [];
+            window.gtag = window.gtag || function () {
+                window.dataLayer.push(arguments);
+            };
+            window.gtag("js", new Date());
+            window.gtag("config", config.analytics.measurementId);
+            loadScript(
+                "agromega-google-analytics",
+                "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(config.analytics.measurementId)
+            );
+        }
+
+        function enableAdvertising() {
+            if (!config.advertising || !config.advertising.enabled || !config.advertising.client) {
+                return;
+            }
+
+            loadScript(
+                "agromega-google-adsense",
+                "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" + encodeURIComponent(config.advertising.client),
+                { crossorigin: "anonymous" }
+            );
+        }
+
+        function applyConsent(consent) {
+            if (consent.analytics) {
+                enableAnalytics();
+            }
+            if (consent.advertising) {
+                enableAdvertising();
+            }
+        }
+
+        function setInputs(consent) {
+            document.querySelectorAll("[data-cookie-category]").forEach(function (input) {
+                input.checked = Boolean(consent[input.getAttribute("data-cookie-category")]);
+            });
+        }
+
+        function getInputConsent() {
+            const consent = Object.assign({}, defaultConsent);
+            document.querySelectorAll("[data-cookie-category]").forEach(function (input) {
+                consent[input.getAttribute("data-cookie-category")] = input.checked;
+            });
+            return consent;
+        }
+
+        function hideBanner() {
+            if (banner) {
+                banner.hidden = true;
+            }
+        }
+
+        function showBanner(openSettings) {
+            if (!banner || !hasOptionalServices()) {
+                return;
+            }
+
+            const existingConsent = readConsent() || defaultConsent;
+            setInputs(existingConsent);
+            banner.hidden = false;
+            if (settingsPanel) {
+                settingsPanel.hidden = !openSettings;
+            }
+            if (saveButton) {
+                saveButton.hidden = !openSettings;
+            }
+        }
+
+        function saveAndApply(consent) {
+            writeConsent(consent);
+            applyConsent(consent);
+            hideBanner();
+        }
+
+        document.querySelectorAll("[data-cookie-settings-open]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                showBanner(true);
+            });
+        });
+
+        if (banner) {
+            const acceptAllButton = banner.querySelector("[data-cookie-accept-all]");
+            const rejectButton = banner.querySelector("[data-cookie-reject]");
+
+            if (acceptAllButton) {
+                acceptAllButton.addEventListener("click", function () {
+                    saveAndApply({
+                        analytics: Boolean(config.analytics && config.analytics.enabled),
+                        advertising: Boolean(config.advertising && config.advertising.enabled)
+                    });
+                });
+            }
+
+            if (rejectButton) {
+                rejectButton.addEventListener("click", function () {
+                    saveAndApply(defaultConsent);
+                });
+            }
+
+            if (customizeButton) {
+                customizeButton.addEventListener("click", function () {
+                    showBanner(true);
+                });
+            }
+
+            if (saveButton) {
+                saveButton.addEventListener("click", function () {
+                    saveAndApply(getInputConsent());
+                });
+            }
+        }
+
+        const savedConsent = readConsent();
+        if (savedConsent) {
+            applyConsent(savedConsent);
+        } else {
+            showBanner(false);
+        }
+    }());
+    {% endif %}
+
     (function () {
         const banner = document.querySelector("[data-plant-diary-banner]");
         if (!banner) {

@@ -21,6 +21,8 @@ Events calendar lets anyone share events with other people. It is the shared cal
 - Anyone can share an event, subject to permissions and moderation rules that still need confirmation.
 - Event information should be understandable to people who may attend or follow the event.
 - Date and calendar accuracy are central to the domain.
+- Public event submissions are subject to baseline site terms and publication/moderation rules seeded as flatpages.
+- Event authors are responsible for keeping public event details accurate and lawful.
 
 ## States And Lifecycle
 
@@ -43,3 +45,4 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Are event organizers modeled separately from creators?
 - Are recurring events, locations, registration, or attendance tracked?
 - What happens after an event date passes?
+- Who is the final legal owner/contact for privacy and content complaints?
