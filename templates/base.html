@@ -789,25 +789,35 @@
             width: 100%;
             min-height: 60px;
             padding: 0.35rem 0.25rem;
-            color: #148543;
+            color: #0b8043 !important;
             border: 0;
             text-align: center;
-            text-decoration: none;
+            text-decoration: none !important;
             line-height: 1.1;
         }
 
         .mobile-bottom-nav__control.is-active,
         .mobile-bottom-nav__control[aria-current="page"] {
-            color: #0f6f37;
+            color: #0b8043 !important;
             background: #eef8ef;
             font-weight: 800;
+            text-decoration: none !important;
         }
 
         .mobile-bottom-nav__control:hover,
-        .mobile-bottom-nav__control:focus {
-            color: #0f6f37;
+        .mobile-bottom-nav__control:focus,
+        .mobile-bottom-nav__control:active {
+            color: #0b8043 !important;
             background: #f3fbf3;
-            text-decoration: none;
+            text-decoration: none !important;
+        }
+
+        .mobile-bottom-nav__control *,
+        .mobile-bottom-nav__control:hover *,
+        .mobile-bottom-nav__control:focus *,
+        .mobile-bottom-nav__control:active * {
+            color: currentColor !important;
+            text-decoration: none !important;
         }
 
         .mobile-bottom-nav__icon {
@@ -931,6 +941,10 @@
         }
 
         @media (max-width: 767.98px) {
+            main > .container {
+                padding-top: 1rem;
+            }
+
             .plant-diary-site-banner {
                 min-height: auto;
                 padding: 10px 12px;

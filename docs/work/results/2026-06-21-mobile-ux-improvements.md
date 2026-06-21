@@ -28,6 +28,7 @@
 - Added a real personal dashboard at `/profile/` with mobile-friendly entry cards for adverts, diaries, plants, profile settings, creation, and forum handoff.
 - Added current-page state to the mobile bottom navigation and normalized bottom-nav avatar/icon sizing.
 - Expanded the personal-area sidebar into a full shortcut navigation for dashboard, adverts, advert creation, diaries, plants, settings, and forum handoff, with a horizontal mobile rail.
+- Cleaned the mobile bottom/profile navigation by keeping bottom-nav controls brand green without underlines, moving section links out of the profile menu, adding a mobile top gutter below the header, and centering the diary overview content.
 
 ## Verification
 
@@ -63,6 +64,7 @@
   - `/profile/` dashboard cards and forum handoff at `390px` width.
   - Mobile bottom navigation active states on `/search/`, `/adverts/`, and `/profile/`.
   - `/profile/change` personal-area shortcut navigation at `390px` width, including active state and no page-level horizontal overflow.
+  - Screenshot follow-up checks for `/adverts/create/`, `/profile/`, and `/profile/diary` at `390px` width: bottom-nav color/underline state, profile menu contents, form top spacing, and diary centering.
 
 ## Remaining Follow-Ups
 

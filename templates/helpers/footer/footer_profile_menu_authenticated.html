@@ -1,44 +1,19 @@
 <div class="dropdown-menu dropdown-menu-end">
-    <a class="dropdown-item text-success" href="{% url 'index' %}"><i class="icon-home"></i> Головна</a>
-    <div class="dropdown-divider"></div>
     <a class="dropdown-item text-success"
-       href="{% url 'events:event-list' %}">Події</a>
-    <a class="dropdown-item text-success" href="{% url 'companies:list' %}">Компанії</a>
-    <a class="dropdown-item text-success" href="{{ forum_sso_url }}">Форум</a>
-    <div class="dropdown-divider"></div>
+       href="{% url 'pro_auth:dashboard' %}"><i class="icon-home"></i> Огляд профілю</a>
     <a class="dropdown-item text-success"
        href="{% url 'pro_auth:profile-adverts' %}">Мої
     Оголошення</a>
     <a class="dropdown-item text-success"
        href="{% url 'pro_auth:profile-diary-list' %}">Мої Щоденники</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'pro_auth:profile-plant-list' %}">Мої рослини</a>
+    <a class="dropdown-item text-success"
+       href="{% url 'pro_auth:profile-adverts-create' %}"><i class="icon-plus"></i> Додати оголошення</a>
     <div class="dropdown-divider"></div>
     <a class="dropdown-item text-success"
-       href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}">Про нас</a>
-    <a class="dropdown-item text-success"
-       href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}">Конфіденційність</a>
-    <a class="dropdown-item text-success" href="{% url 'feedback-form' %}">Контакти</a>
-    <div class="dropdown-divider"></div>
-    <a href="https://www.facebook.com/agromega.in.ua/"
-       class="dropdown-item h5 text-primary"
-       target="_blank"
-       rel="noopener"
-       aria-label="наша facebook сторінка"><i class="icon-facebook"></i></a>
-    <div class="dropdown-divider"></div>
-    <div class="dropdown-item">
-        <div class="row justify-content-between">
-            <div class="col">
-                <a class="text-success no-decoration"
-                   href="{% url 'pro_auth:change-profile' %}">Профіль</a>
-            </div>
-            <div class="col">
-                <a class="text-danger no-decoration"
-                   href="{% url 'pro_auth:logout' %}"
-                   title="Вийти">Вийти</a>
-            </div>
-        </div>
-    </div>
-    <div class="dropdown-divider"></div>
-    <p class="dropdown-item text-secondary">
-        <small>© 2016 - 2025 AgroMega.In.Ua</small>
-    </p>
+       href="{% url 'pro_auth:change-profile' %}">Налаштування</a>
+    <a class="dropdown-item text-danger"
+       href="{% url 'pro_auth:logout' %}"
+       title="Вийти">Вийти</a>
 </div>

@@ -95,6 +95,10 @@
                                 {% if request.user.is_authenticated %}
                                     <li>
                                         <a class="dropdown-item text-success"
+                                           href="{% url 'pro_auth:dashboard' %}">Огляд профілю</a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item text-success"
                                            href="{% url 'pro_auth:profile-adverts' %}">Мої
                                         Оголошення</a>
                                     </li>
@@ -103,11 +107,8 @@
                                            href="{% url 'pro_auth:profile-diary-list' %}">Мої Щоденники</a>
                                     </li>
                                     <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
                                         <a class="dropdown-item text-success"
-                                           href="{% url 'pro_auth:dashboard' %}">Профіль</a>
+                                           href="{% url 'pro_auth:profile-plant-list' %}">Мої рослини</a>
                                     </li>
                                     <li>
                                         <a class="dropdown-item text-success"
