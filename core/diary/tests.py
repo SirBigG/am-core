@@ -1,4 +1,5 @@
-from datetime import timedelta, timezone as dt_timezone
+from datetime import timedelta
+from datetime import timezone as dt_timezone
 
 from django.test import TestCase
 from django.urls import reverse
@@ -272,6 +273,7 @@ class DiaryOrderingTests(TestCase):
         self.assertContains(response, 'data-diary-view-tab="archive"')
         self.assertContains(response, 'data-diary-view-groups="all attention"')
         self.assertContains(response, 'data-diary-view-groups="archive"')
+        self.assertNotContains(response, "profile-diary-card profile-diary-card--large")
         self.assertIn(active_diary, response.context["attention_diaries"])
         self.assertIn(archived_diary, response.context["archived_diaries"])
 
@@ -1766,6 +1768,8 @@ class PlantLifecycleActionTests(TestCase):
 
         self.assertContains(response, "Ростуть")
         self.assertContains(response, "Архів")
+        self.assertContains(response, "profile-sidebar-nav")
+        self.assertNotContains(response, "profile-layout-row profile-layout-row--full")
 
     def test_detail_renders_plant_move_and_archive_modals(self):
         response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
@@ -1912,7 +1916,7 @@ class DiaryItemTimelineRenderingTests(TestCase):
         response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'data-diary-item-modal-open')
+        self.assertContains(response, "data-diary-item-modal-open")
         self.assertContains(response, 'id="diaryItemAddModal"')
         self.assertContains(response, reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": self.diary.pk}))
         self.assertContains(response, "Оберіть швидку дію")
@@ -2087,9 +2091,15 @@ Confidence: High
 
 CUCUMBER_MATCHER_RULES = [
     {"id": "cucumber_pollination_failure_01", "noteSignals": ["багато квітів", "немає огірків", "зав'язі не ростуть"]},
-    {"id": "cucumber_parthenocarpic_pollination_confusion_01", "noteSignals": ["потрібні бджоли", "немає запилення", "теплиця"]},
+    {
+        "id": "cucumber_parthenocarpic_pollination_confusion_01",
+        "noteSignals": ["потрібні бджоли", "немає запилення", "теплиця"],
+    },
     {"id": "cucumber_irregular_watering_01", "noteSignals": ["гіркі", "деформовані", "то сухо то мокро"]},
-    {"id": "cucumber_overripe_fruit_reducing_yield_01", "noteSignals": ["переросли", "великі огірки", "нові не ростуть"]},
+    {
+        "id": "cucumber_overripe_fruit_reducing_yield_01",
+        "noteSignals": ["переросли", "великі огірки", "нові не ростуть"],
+    },
     {"id": "cucumber_powdery_mildew_suspected_01", "noteSignals": ["білий наліт", "наче мука", "білі плями"]},
     {"id": "cucumber_bacterial_wilt_risk_01", "noteSignals": ["раптово зів'яв", "огірковий жук", "листя висить"]},
     {"id": "cucumber_greenhouse_airflow_01", "noteSignals": ["теплиця", "конденсат", "волога", "погана вентиляція"]},
@@ -2172,11 +2182,14 @@ class PlantRecommendationServiceTests(TestCase):
 
         self.assertEqual(len(rules), 2)
         self.assertEqual(rules[0]["id"], "arugula_heat_bolting_risk_01")
-        self.assertEqual(rules[0]["noteSignals"], [
-            "температура >29°C",
-            "рослина на повному сонці",
-            "з’являється квітконос",
-        ])
+        self.assertEqual(
+            rules[0]["noteSignals"],
+            [
+                "температура >29°C",
+                "рослина на повному сонці",
+                "з’являється квітконос",
+            ],
+        )
         self.assertEqual(rules[0]["outcome"], "ризик bolting ↑")
         self.assertEqual(rules[0]["confidence"], "High")
         self.assertIn("притінення", rules[0]["recommendation"])
@@ -2194,8 +2207,7 @@ class PlantRecommendationServiceTests(TestCase):
         self.assertEqual(matched_rules[0]["matchedSignals"], ["ґрунт сухий", "листя в’яне"])
 
     def test_rule_matcher_uses_action_interval_condition(self):
-        rules = parsePlantRecommendationRules(
-            """
+        rules = parsePlantRecommendationRules("""
 Rule ID:
 cucumber_irregular_watering_01
 
@@ -2211,8 +2223,7 @@ medium
 
 Recommendation:
 Перевірити вологість ґрунту перед наступним поливом.
-""".strip()
-        )
+""".strip())
 
         matched_rules = selectRelevantRecommendationRules(
             rules,

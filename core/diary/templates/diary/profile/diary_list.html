@@ -142,7 +142,7 @@
             </div>
             <div class="profile-diary-grid profile-diary-grid--bento">
                 {% for object in active_diaries %}
-                    <article class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card{% if forloop.first %} profile-diary-card--large{% endif %}"
+                    <article class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card"
                              data-diary-view-card
                              data-diary-view-groups="all{% if object.needs_attention %} attention{% endif %}">
                         <div class="card-body text-start">
