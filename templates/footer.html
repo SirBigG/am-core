@@ -7,7 +7,8 @@
             <button class="btn btn-link text-success no-decoration"
                     data-bs-toggle="dropdown"
                     aria-haspopup="true"
-                    aria-expanded="false">
+                    aria-expanded="false"
+                    aria-label="Відкрити меню публікацій">
             <span><i class="icon-th-list"></i>
             <br>
             <small>Почитати</small></span>
@@ -47,8 +48,10 @@
 </div>
 <div class="text-center col-2">
 <a class="text-success no-decoration"
-   href="{% url 'post-search-list' %}"><span class="h3"><i class="icon-search"></i>
+   href="{% url 'post-search-list' %}"
+   aria-label="Пошук"><span class="h3"><i class="icon-search" aria-hidden="true"></i>
 <br>
+<span class="visually-hidden">Пошук</span>
 </span></a>
 </div>
 <div class="text-center col-2">
@@ -61,7 +64,8 @@
         <button class="btn btn-link text-success no-decoration"
                 data-bs-toggle="dropdown"
                 aria-haspopup="true"
-                aria-expanded="false">
+                aria-expanded="false"
+                aria-label="Відкрити меню профілю">
             {% if request.user.avatar %}
                 <img src="{{ request.user.avatar.url }}"
                      alt=""
