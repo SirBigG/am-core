@@ -91,6 +91,19 @@ class TestAdvertFormView(TestCase):
             self.assertEqual(image.format, "JPEG")
             self.assertGreater(image.size[0], 0)
 
+    @override_settings(ADVERT_IMAGE_WIDTH=1200)
+    def test_large_photo_is_prepared_for_detail_gallery(self):
+        advert = Advert.objects.create(
+            title="large",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_image({"width": 1600, "height": 1000}),
+        )
+
+        with Image.open(advert.image.path) as image:
+            self.assertEqual(image.size, (1200, 750))
+
     def test_post_limits_photo_count(self):
         photos = [make_named_image(f"test-{index}.jpg") for index in range(get_advert_max_photos() + 1)]
         response = self.client.post(
@@ -164,6 +177,28 @@ class TestAdvertFormView(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, 'src="/imgproxy/')
+
+    @override_settings(USE_IMGPROXY=False)
+    def test_detail_renders_grouped_gallery_without_raw_image_navigation(self):
+        advert = Advert.objects.create(
+            title="test",
+            description="<p>description</p>",
+            price=100,
+            contact="test",
+            image=make_named_image("test.jpg"),
+        )
+        AdvertImage.objects.create(advert=advert, image=make_named_image("extra.jpg"))
+
+        response = self.client.get(advert.get_absolute_url())
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, 'class="advert-detail__main-photo js-smartPhoto"')
+        self.assertContains(response, f'data-advert-gallery-main="{advert.id}"')
+        self.assertContains(response, 'class="advert-detail__lightbox-items" aria-hidden="true" hidden')
+        self.assertContains(response, f'data-group="advert-{advert.id}"', count=2)
+        self.assertNotContains(response, "2 фото")
+        self.assertNotContains(response, 'class="advert-detail__thumb js-smartPhoto"')
+        self.assertNotContains(response, 'target="_blank" rel="noopener"')
 
 
 class ProfileAdvertTests(TestCase):

@@ -8,13 +8,13 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
-from PIL import Image
+from PIL import Image, ImageOps
 from transliterate import slugify
 
 from core.classifier.models import Category
 from core.utils.images import unique_image_name
 
-WIDTH = 350
+DEFAULT_IMAGE_WIDTH = 1200
 DEFAULT_MAX_PHOTOS = 5
 
 
@@ -32,11 +32,14 @@ class ActiveAdvertsManager(models.Manager):
 
 def prepare_advert_image(image):
     im = Image.open(BytesIO(image.read()))
+    im = ImageOps.exif_transpose(im)
     if im.mode != "RGB":
         im = im.convert("RGB")
-    im = im.resize((WIDTH, int(float(im.size[1]) * float(WIDTH / float(im.size[0])))), Image.LANCZOS)
+    width = min(im.size[0], getattr(settings, "ADVERT_IMAGE_WIDTH", DEFAULT_IMAGE_WIDTH))
+    if im.size[0] > width:
+        im = im.resize((width, int(float(im.size[1]) * float(width / float(im.size[0])))), Image.LANCZOS)
     output = BytesIO()
-    im.save(output, format="JPEG", quality=85)
+    im.save(output, format="JPEG", quality=88, optimize=True, progressive=True)
     output.seek(0)
     return File(output, unique_image_name(prefix="advert", extension="jpg"))
 

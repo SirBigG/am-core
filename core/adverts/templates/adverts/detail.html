@@ -7,8 +7,9 @@
     {{ object.description|striptags|truncatechars:160 }}
 {% endblock meta_description %}
 {% block scripts %}
-    <script src="{% static "posts/j-detail.js" %}"></script>
-    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
+    <script src="{% static "posts/j-gallery.js" %}"></script>
+    <link rel="stylesheet" href="{% static "posts/gallery.css" %}">
+    <link rel="stylesheet" href="{% static "adverts/detail.css" %}">
 {% endblock scripts %}
 {% block extra_meta %}
     <meta content="{% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
@@ -40,69 +41,83 @@
     {{ object.title }}
 {% endblock page_title %}
 {% block content %}
-    <div class="post-content">
-        <div class="row">
-            <div class="col-12 p-0">
-                {% if object.photo_urls %}
-                    <div class="card">
-                        <img src="{% imgproxy_url object.primary_image_url 1000 500 %}"
-                             alt="{{ object.title }}"
-                             width="1000"
-                             height="500"
-                             class="card-img img-fluid">
-                    </div>
-                    {% if object.photo_urls|length > 1 %}
-                        <div class="row mt-2">
-                            {% for photo_url in object.photo_urls %}
-                                <div class="col-6 col-md-3 mb-2">
-                                    <a href="{{ photo_url }}" target="_blank" rel="noopener">
-                                        <img src="{% imgproxy_url photo_url 350 260 %}"
-                                             alt="{{ object.title }}"
-                                             width="350"
-                                             height="260"
-                                             class="img-fluid rounded">
-                                    </a>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 p-0">
-                <div class="m-3 post-wrapper">
-                    {{ object.description|safe }}
-                    {% if advert.author %}
-                        <div class="card-text mb-1">
-                            <strong>Автор: {{ advert.author }}</strong>
-                        </div>
-                    {% endif %}
-                    <div class="card-text mb-1">
-                        <strong>Контакти: {{ advert.contact }}</strong>
-                    </div>
-                    {% if advert.location %}
-                        <div class="card-text mb-1">
-                            <strong>Локація: {{ advert.location }}</strong>
-                        </div>
-                    {% endif %}
-                    <div class="card-text mb-1">
-                        <strong>Оновлено: {{ object.updated|date:"d b Y" }}</strong>
-                    </div>
-                </div>
-                <div class="col-12 d-flex justify-content-between p-3">
-                    {#                                    <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>#}
-                    <a class="h5 text-primary"
-                       tabindex="-1"
-                       target="Share-in-facebook"
-                       onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                       href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
-                       aria-label="Опублікувати у фейсбук">
-                        <i class="icon-facebook"></i>
+    <div class="advert-detail">
+        <div class="advert-detail__gallery">
+            {% if object.photo_urls %}
+                <div class="col-12">
+                    <a href="{% imgproxy_url object.primary_image_url 1200 800 %}"
+                       class="advert-detail__main-photo js-smartPhoto"
+                       data-id="advert-photo-main"
+                       data-group="advert-{{ object.id }}"
+                       data-advert-gallery-main="{{ object.id }}"
+                       aria-label="{{ object.title }}">
+                        <img src="{{ object.primary_image_url }}" alt="{{ object.title }}">
                     </a>
                 </div>
-            </div>
+                {% if object.photo_urls|length > 1 %}
+                    <div class="advert-detail__lightbox-items" aria-hidden="true" hidden>
+                        {% for photo_url in object.photo_urls %}
+                            {% if not forloop.first %}
+                                <a href="{% imgproxy_url photo_url 1200 800 %}"
+                                   class="js-smartPhoto"
+                                   data-id="advert-photo-{{ forloop.counter }}"
+                                   data-group="advert-{{ object.id }}"
+                                   tabindex="-1">
+                                    <img src="{% imgproxy_url photo_url 350 260 %}"
+                                         alt="{{ object.title }} фото {{ forloop.counter }}"
+                                         width="350"
+                                         height="260">
+                                </a>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endif %}
         </div>
+        <aside class="advert-detail__summary">
+            {% if advert.price %}<div class="advert-detail__price">{{ advert.price }} грн.</div>{% endif %}
+            <dl class="advert-detail__meta">
+                {% if advert.author %}
+                    <div class="advert-detail__meta-item">
+                        <dt class="advert-detail__meta-label">Автор</dt>
+                        <dd class="advert-detail__meta-value mb-0">
+                            {{ advert.author }}
+                        </dd>
+                    </div>
+                {% endif %}
+                <div class="advert-detail__meta-item">
+                    <dt class="advert-detail__meta-label">Контакти</dt>
+                    <dd class="advert-detail__meta-value mb-0">
+                        {{ advert.contact }}
+                    </dd>
+                </div>
+                {% if advert.location %}
+                    <div class="advert-detail__meta-item">
+                        <dt class="advert-detail__meta-label">Локація</dt>
+                        <dd class="advert-detail__meta-value mb-0">
+                            {{ advert.location }}
+                        </dd>
+                    </div>
+                {% endif %}
+                <div class="advert-detail__meta-item">
+                    <dt class="advert-detail__meta-label">Оновлено</dt>
+                    <dd class="advert-detail__meta-value mb-0">
+                        {{ object.updated|date:"d b Y" }}
+                    </dd>
+                </div>
+            </dl>
+        </aside>
+    </div>
+    <div class="advert-detail__description post-wrapper">{{ object.description|safe }}</div>
+    <div class="advert-detail__share">
+        <a class="h5 text-primary"
+           tabindex="-1"
+           target="Share-in-facebook"
+           onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+           href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
+           aria-label="Опублікувати у фейсбук">
+            <i class="icon-facebook"></i>
+        </a>
     </div>
     {% if enable_adverts %}
         <div class="col-12 mt-3">{% random_adverts %}</div>
