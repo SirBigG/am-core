@@ -298,6 +298,36 @@
             padding-inline: 1rem;
         }
 
+        .site-search-panel {
+            max-width: 820px;
+        }
+
+        .site-search-form__row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.75rem;
+            align-items: stretch;
+        }
+
+        .site-search-form__field {
+            min-width: 0;
+        }
+
+        .site-search-form__submit {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 56px;
+            padding-inline: 1.25rem;
+            border-radius: 16px;
+            font-weight: 700;
+        }
+
+        .site-search-empty {
+            padding: 24px;
+        }
+
         .site-action-panel {
             width: 100%;
             max-width: 760px;
@@ -930,6 +960,14 @@
             }
 
             .site-login-prompt__action {
+                width: 100%;
+            }
+
+            .site-search-form__row {
+                grid-template-columns: 1fr;
+            }
+
+            .site-search-form__submit {
                 width: 100%;
             }
 
