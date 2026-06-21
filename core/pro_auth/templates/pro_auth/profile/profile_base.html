@@ -14,45 +14,64 @@
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static 'posts/list.css' %}">
 {% endblock scripts %}
-{% block base_content_block %}
-    {% include "pro_auth/profile/profile_styles.html" %}
-    <div class="row profile-layout-row {% block profile_layout_class %}{% endblock profile_layout_class %}">
-        {% block profile_sidebar %}
-            <div class="col-md-4 col-12 profile-sidebar-col">
-                <div class="card mb-3">
-                    <ul class="list-group list-group-flush">
-                        <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                           href="{% url 'pro_auth:profile-adverts' %}">
-                            <h6 class="mb-0 text-success">
-                                <i class="fas fa-bullhorn"></i>
-                            </h6>
-                            <span class="text-secondary">Мої оголошення</span>
-                        </a>
-                        {#                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">#}
-                        {#                        <h6 class="mb-0 text-success">#}
-                        {#                            <i class="far fa-calendar-alt"></i>#}
-                        {#                        </h6>#}
-                        {#                        <span class="text-secondary">Події</span>#}
-                        {#                    </li>#}
-                        {#                    <li class="list-group-item d-flex justify-content-between align-items-center flex-wrap">#}
-                        {#                        <h6 class="mb-0 text-success"><i class="fab fa-microblog"></i></h6>#}
-                        {#                        <span class="text-secondary">Блог</span>#}
-                        {#                    </li>#}
-                        <a class="list-group-item d-flex justify-content-between align-items-center flex-wrap"
-                           href="{% url 'pro_auth:profile-diary-list' %}">
-                            <h6 class="mb-0 text-success">
-                                <i class="far fa-calendar-alt"></i>
-                            </h6>
-                            <span class="text-secondary">Мої Щоденники</span>
-                        </a>
-                    </ul>
+{% block main %}
+    {% block second_menu %}
+    {% endblock second_menu %}
+    <div class="container">
+        {% block base_content_block %}
+            {% include "pro_auth/profile/profile_styles.html" %}
+            <div class="row profile-layout-row {% block profile_layout_class %}{% endblock profile_layout_class %}">
+                {% block profile_sidebar %}
+                    <div class="col-md-4 col-12 profile-sidebar-col">
+                        <nav class="profile-sidebar-nav"
+                             aria-label="Навігація особистого кабінету">
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:dashboard' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">⌂</span>
+                                <span>Огляд</span>
+                            </a>
+                            <hr class="profile-sidebar-nav__divider">
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-adverts' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:profile-adverts' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">☰</span>
+                                <span>Мої оголошення</span>
+                            </a>
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-adverts-create' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:profile-adverts-create' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">+</span>
+                                <span>Створити оголошення</span>
+                            </a>
+                            <hr class="profile-sidebar-nav__divider">
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-diary-list' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:profile-diary-list' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">✍</span>
+                                <span>Мої щоденники</span>
+                            </a>
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-plant-list' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:profile-plant-list' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">•</span>
+                                <span>Мої рослини</span>
+                            </a>
+                            <hr class="profile-sidebar-nav__divider">
+                            <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'change-profile' %} is-active{% endif %}"
+                               href="{% url 'pro_auth:change-profile' %}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">◎</span>
+                                <span>Налаштування</span>
+                            </a>
+                            <a class="profile-sidebar-nav__item profile-sidebar-nav__item--forum"
+                               href="{{ forum_sso_url }}">
+                                <span class="profile-sidebar-nav__icon" aria-hidden="true">↗</span>
+                                <span>Форум</span>
+                            </a>
+                        </nav>
+                    </div>
+                {% endblock profile_sidebar %}
+                <div class="col-md-8 col-12 profile-content-col">
+                    {% block profile_content %}
+                    {% endblock profile_content %}
                 </div>
             </div>
-        {% endblock profile_sidebar %}
-        <div class="col-md-8 col-12 profile-content-col">
-            {% block profile_content %}
-            {% endblock profile_content %}
-        </div>
+        {% endblock base_content_block %}
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -91,4 +110,4 @@
             window.initProfileDatepickers(document);
         });
     </script>
-{% endblock base_content_block %}
+{% endblock main %}

@@ -1,57 +1,75 @@
 {% extends "base.html" %}
-
 {% load registry_extras cache static post_extras %}
-
 {% block extra_meta %}
-    <meta content="{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
-{% endif %}" property="og:title">
-    <meta content="{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }}
-{% endif %}" property="og:description">
+    <meta content="{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }} {% endif %}"
+          property="og:title">
+    <meta content="{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }} {% endif %}"
+          property="og:description">
     <meta content="" property="og:image">
     <meta content="https://agromega.in.ua{{ request.path }}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
-
-{% block title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
-{% endif %}{% endblock title %}
-{% block page_title %}{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.title }}
-{% endif %}{% endblock page_title %}
-{% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.title }}
-{% endif %}{% endblock %}
-
+{% block title %}
+    {% if category.meta %}
+        {{ category.meta.title }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock title %}
+{% block page_title %}
+    {% if category.meta %}
+        {{ category.meta.title }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock page_title %}
+{% block meta_description %}
+    {% if category.meta %}
+        {{ category.meta.description }}
+    {% else %}
+        {{ category.title }}
+    {% endif %}
+{% endblock meta_description %}
 {% block breadcrumbs %}
-    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
-        {% registry_breadcrumbs category %}
-    {% endcache %}
-{% endblock %}
-
+{% endblock breadcrumbs %}
+{% block page_header %}
+{% endblock page_header %}
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/categories.css" %}">
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
 {% block content %}
-    {% if category.meta and category.meta.text %}
-        <div class="col-lg-12 col-12">
-            <div class="text-justify">
-                {{ category.meta.text|safe }}
-            </div>
+    <div class="site-catalog-shell">
+        <header class="site-catalog-hero">
+            <div class="site-catalog-hero__breadcrumbs">
+                {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
+                {% registry_breadcrumbs category %}
+            {% endcache %}
         </div>
-    {% endif %}
-    <div class="row">
-        {% for group in object_list|divide_into_cols:2 %}
-            <div class="col-6">
-            <ul class="list-unstyled">
-                {% for object in group %}
-                    <li class="m-2">
-                        <a href="{{ object.get_absolute_url }}" class="list-link no-decoration">
-                            {{ object.title }}
-                        </a>
-                    </li>
-                {% endfor %}
-            </ul>
-            </div>
+        <p class="site-catalog-hero__eyebrow">Категорії реєстру</p>
+        <h1 class="site-catalog-hero__title">
+            {% if category.meta %}
+                {{ category.meta.title }}
+            {% else %}
+                {{ category.title }}
+            {% endif %}
+        </h1>
+        {% if category.meta and category.meta.text %}
+            <div class="site-catalog-hero__text">{{ category.meta.text|safe }}</div>
+        {% else %}
+            <p class="site-catalog-hero__text">Оберіть групу культур, щоб перейти до списку сортів у державному реєстрі.</p>
+        {% endif %}
+        <ul class="site-catalog-stats" aria-label="Огляд категорії">
+            <li class="site-catalog-stats__item">{{ object_list|length }} підкатегорій</li>
+        </ul>
+    </header>
+    <ul class="site-link-grid">
+        {% for object in object_list %}
+            <li class="site-link-grid__item">
+                <a href="{{ object.get_absolute_url }}" class="site-link-grid__link">{{ object.title }}</a>
+            </li>
         {% endfor %}
-    </div>
-{% endblock %}
+    </ul>
+</div>
+{% endblock content %}

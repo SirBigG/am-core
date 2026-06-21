@@ -8,12 +8,14 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
-from PIL import Image
+from PIL import Image, ImageOps
 from transliterate import slugify
 
 from core.classifier.models import Category
+from core.utils.images import unique_image_name
 
-WIDTH = 350
+DEFAULT_IMAGE_WIDTH = 1200
+DEFAULT_MAX_PHOTOS = 5
 
 
 class ActiveAdvertsManager(models.Manager):
@@ -28,6 +30,20 @@ class ActiveAdvertsManager(models.Manager):
         )
 
 
+def prepare_advert_image(image):
+    im = Image.open(BytesIO(image.read()))
+    im = ImageOps.exif_transpose(im)
+    if im.mode != "RGB":
+        im = im.convert("RGB")
+    width = min(im.size[0], getattr(settings, "ADVERT_IMAGE_WIDTH", DEFAULT_IMAGE_WIDTH))
+    if im.size[0] > width:
+        im = im.resize((width, int(float(im.size[1]) * float(width / float(im.size[0])))), Image.LANCZOS)
+    output = BytesIO()
+    im.save(output, format="JPEG", quality=88, optimize=True, progressive=True)
+    output.seek(0)
+    return File(output, unique_image_name(prefix="advert", extension="jpg"))
+
+
 class Advert(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="adverts", null=True, blank=True
@@ -35,7 +51,7 @@ class Advert(models.Model):
     title = models.CharField(max_length=512)
     description = models.TextField()
     category = models.ForeignKey(Category, blank=True, null=True, on_delete=models.SET_NULL)
-    image = models.ImageField(upload_to="adverts/images", verbose_name=_("image"))
+    image = models.ImageField(upload_to="adverts/images", verbose_name=_("image"), blank=True, null=True)
     author = models.CharField(max_length=512, blank=True, null=True)
     contact = models.CharField(max_length=512)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -76,13 +92,7 @@ class Advert(models.Model):
                 super().save(*args, **kwargs)
                 return
         if self.image:
-            im = Image.open(BytesIO(self.image.read()))
-            if im.mode != "RGB":
-                im = im.convert("RGB")
-            im = im.resize((WIDTH, int(float(im.size[1]) * float(WIDTH / float(im.size[0])))), Image.LANCZOS)
-            output = BytesIO()
-            im.save(output, format="JPEG", quality=85)
-            self.image = File(output, self.image.name)
+            self.image = prepare_advert_image(self.image)
         super().save(*args, **kwargs)
 
     def activate(self):
@@ -101,3 +111,44 @@ class Advert(models.Model):
 
     def get_absolute_url(self):
         return reverse("adverts:detail", kwargs={"pk": self.pk, "slug": self.get_slug()})
+
+    @property
+    def photo_urls(self):
+        urls = []
+        if self.image and self.image.name:
+            urls.append(self.image.url)
+        urls.extend(photo.image.url for photo in self.photos.all() if photo.image and photo.image.name)
+        return urls[: get_advert_max_photos()]
+
+    @property
+    def primary_image_url(self):
+        urls = self.photo_urls
+        return urls[0] if urls else ""
+
+
+class AdvertImage(models.Model):
+    advert = models.ForeignKey(Advert, on_delete=models.CASCADE, related_name="photos")
+    image = models.ImageField(upload_to="adverts/images", verbose_name=_("image"))
+    created = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _("advert photo")
+        verbose_name_plural = _("advert photos")
+        ordering = ["created", "pk"]
+
+    def __str__(self):
+        return self.advert.title
+
+    def save(self, *args, **kwargs):
+        if self.pk is not None:
+            orig = AdvertImage.objects.get(pk=self.pk)
+            if orig.image == self.image:
+                super().save(*args, **kwargs)
+                return
+        if self.image:
+            self.image = prepare_advert_image(self.image)
+        super().save(*args, **kwargs)
+
+
+def get_advert_max_photos():
+    return getattr(settings, "ADVERT_MAX_PHOTOS", DEFAULT_MAX_PHOTOS)

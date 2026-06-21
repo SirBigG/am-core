@@ -1,36 +1,33 @@
 {% load post_extras static %}
-{% for post in object_list %}
-    <div class="row">
-        <div class="card mb-3">
-            <div class="row no-gutters">
-                <div class="col-md-4 col-12 p-0">
-                    {% if post.photo.first %}
-                        <img src="{% thumbnail post.photo.first 350 280 %}"
-                             alt="{{ post.rubric.value }} {{ post.title }}"
-                             width="350"
-                             height="280"
-                             class="card-img" />
+<div class="site-card-list">
+    {% for post in object_list %}
+        <article class="site-list-card{% if not post.photo.first %} site-list-card--text-only{% endif %}">
+            {% if post.photo.first %}
+                <a class="site-list-card__media"
+                   href="{{ post.get_absolute_url }}"
+                   aria-label="{{ post.title }}">
+                    <img src="{% thumbnail post.photo.first 350 280 %}"
+                         alt="{{ post.rubric.value }} {{ post.title }}"
+                         width="350"
+                         height="280"
+                         class="site-list-card__image" />
+                </a>
+            {% endif %}
+            <div class="site-list-card__body">
+                <h2 class="site-list-card__title">
+                    <a class="site-list-card__title-link" href="{{ post.get_absolute_url }}">{{ post.title }}</a>
+                    {% if post.country %}
+                        <img alt="{{ post.country.value }}"
+                             src="{% static 'posts/flags/'|add:post.country.short_slug|add:'.svg' %}"
+                             height="20"
+                             width="30" />
                     {% endif %}
-                </div>
-                <div class="col-md-8 col-12">
-                    <div class="card-body">
-                        <h2 class="card-title h4">
-                            {{ post.title }}
-                            {% if post.country %}
-                                <img alt="{{ post.country.value }}"
-                                     src="{% static 'posts/flags/'|add:post.country.short_slug|add:'.svg' %}"
-                                     height="20px"
-                                     width="30px" />
-                            {% endif %}
-                        </h2>
-                        <div class="card-text">{{ post.text|striptags|safe|truncatechars:200 }}</div>
-                        <div class="text-right mt-3">
-                            <a class="text-success stretched-link no-decoration"
-                               href="{{ post.get_absolute_url }}">Докладніше</a>
-                        </div>
-                    </div>
+                </h2>
+                <p class="site-list-card__text">{{ post.text|striptags|safe|truncatechars:200 }}</p>
+                <div class="site-list-card__actions">
+                    <a class="site-list-card__link" href="{{ post.get_absolute_url }}">Докладніше</a>
                 </div>
             </div>
-        </div>
-    </div>
-{% endfor %}
+        </article>
+    {% endfor %}
+</div>

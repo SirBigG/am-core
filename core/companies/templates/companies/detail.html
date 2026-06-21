@@ -1,64 +1,58 @@
 {% extends "base.html" %}
 {% load static post_extras %}
-
-{% block title %}{{ company.name }}{% endblock %}
-
+{% block title %}
+    {{ company.name }}
+{% endblock title %}
 {% block scripts %}
     <script src="{% static "posts/j-detail.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
-{% endblock %}
-
+{% endblock scripts %}
 {% block page_title %}
     {{ company.name }}
-{% endblock %}
-
+{% endblock page_title %}
 {% block page_title_right %}
     {% if company.logo %}
-        <div class="card">
-            <img src="{{ company.logo.url }}" alt="{{ company.name }} logo" class="card-img img-fluid"
-                 height="100" width="150"/>
-        </div>
+        <img src="{{ company.logo.url }}"
+             alt="{{ company.name }} logo"
+             class="img-fluid"
+             height="100"
+             width="150" />
     {% endif %}
-{% endblock %}
-
+{% endblock page_title_right %}
 {% block content %}
-    <div class="post-content">
-        <div class="col-12">
-            <p>{{ company.description }}</p>
+    <div class="site-detail-panel">
+        <div class="site-detail-content mb-0">
+            {{ company.description }}
             {% if company.website %}
-                <p>Вебсайт: <a href="{{ company.website }}" target="_blank">{{ company.website }}</a></p>
+                <p>
+                    Вебсайт:
+                    <a href="{{ company.website }}" target="_blank" rel="noopener">{{ company.website }}</a>
+                </p>
             {% endif %}
         </div>
-        <div class="col-12 mb-3">
-            <h2 class="h5 mb-3">Пропозиції</h2>
-            <div class="row">
-                {% for product in products %}
-                    <div class="col-4 mb-2">
-                        <div class="card">
-                            <div class="card-body">
-                                <p class="card-title">{{ product.name }}</p>
-                                {% if product.description %}
-                                    <p class="card-text">{{ product.description }}</p>
-                                {% endif %}
-                                {% if product.price %}
-                                    <p class="card-subtitle mb-1 text-muted">{{ product.price }} {{ product.get_currency_display }}</p>
-                                {% endif %}
-                                {% if product.post_id %}
-                                    <a href="{{ product.post.get_absolute_url }}"
-                                       class="card-link text-success no-decoration">Опис</a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                {% empty %}
-                    <p>Поки немає пропозицій.</p>
-                {% endfor %}
-            </div>
+    </div>
+    <div class="mb-3">
+        <h2 class="h5 mb-3">Пропозиції</h2>
+        <div class="site-product-grid">
+            {% for product in products %}
+                <article class="site-product-card">
+                    <h3 class="site-product-card__title">{{ product.name }}</h3>
+                    {% if product.description %}<p class="site-product-card__text">{{ product.description }}</p>{% endif %}
+                    {% if product.price %}
+                        <p class="site-product-card__price">{{ product.price }} {{ product.get_currency_display }}</p>
+                    {% endif %}
+                    {% if product.post_id %}
+                        <a href="{{ product.post.get_absolute_url }}"
+                           class="site-product-card__link">Опис</a>
+                    {% endif %}
+                </article>
+            {% empty %}
+                <div class="am-state">Поки немає пропозицій.</div>
+            {% endfor %}
         </div>
     </div>
-
     <div class="col-12 mt-3">
         {% post_adverts %}
         {% random_posts %}
     </div>
-{% endblock %}
+{% endblock content %}

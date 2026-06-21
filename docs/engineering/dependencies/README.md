@@ -8,7 +8,7 @@ Main app:
 - `uv.lock` is the locked transitive dependency set.
 - The current Docker runtime is Python 3.14.5, with `pyproject.toml` constrained to `>=3.14,<3.15`.
 - `Dockerfile` installs the locked environment with `uv sync --frozen --all-groups --no-install-project --inexact`.
-- `Makefile` uses uv for the `update` target.
+- `justfile` uses uv for the `update` and `check-deps` recipes.
 
 The Docker image syncs dependencies into `/usr/local` with `UV_PROJECT_ENVIRONMENT=/usr/local`.
 This avoids putting the runtime environment under `/am-core/.venv`, because Docker Compose bind
@@ -20,10 +20,10 @@ Useful commands:
 uv lock
 uv sync --frozen --all-groups
 docker compose build core
-docker compose exec core make check-deps
+just check-deps
 docker compose exec core uv lock --check
 docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check
-docker compose exec core make test
+just test
 docker compose exec core python -m pip check
 ```
 

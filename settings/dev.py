@@ -1,8 +1,14 @@
+import os
+
 from settings.settings import *  # noqa
 
 ALLOWED_HOSTS = ["*"]
 
 DEBUG = True
+
+ENABLE_ADVERTS = os.getenv("ENABLE_ADVERTS", "0") == "1"
+ENABLE_ANALYTICS = os.getenv("ENABLE_ANALYTICS", "0") == "1"
+USE_IMGPROXY = os.getenv("USE_IMGPROXY", "0") == "1"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
@@ -16,7 +22,7 @@ STATIC_URL = "/static/"
 STATIC_ROOT = "/static"
 
 MEDIA_URL = "/media/"
-MEDIA_ROOT = "/media"
+MEDIA_ROOT = "/var/www/media"
 
 # MIDDLEWARE = ['corsheaders.middleware.CorsMiddleware'] + MIDDLEWARE
 #

@@ -12,6 +12,12 @@ class DetailEventView(TestCase):
         response = self.client.get(reverse("events:event-detail", args=(event.slug,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/detail.html")
+        self.assertContains(response, "site-detail-panel")
+
+    def test_events_are_active_by_default(self):
+        event = EventFactory()
+
+        self.assertTrue(event.status)
 
 
 class EventListViewTests(TestCase):
@@ -23,6 +29,11 @@ class EventListViewTests(TestCase):
         response = self.client.get(reverse("events:event-list"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/list.html")
+        self.assertContains(response, "Події агросфери")
+        self.assertContains(response, reverse("events:event-form"))
+        self.assertContains(response, "Опублікувати подію")
+        self.assertContains(response, "site-list-card__meta")
+        self.assertContains(response, "до ")
         # for event, test in zip(response.context["object_list"], events):
         #     self.assertEqual(event.pk, test.pk)
 
@@ -37,3 +48,5 @@ class EventFormViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/form.html")
         self.assertIsInstance(response.context["form"], EventAddForm)
+        self.assertContains(response, "site-login-prompt")
+        self.assertContains(response, "/login/?next=/events/create/")

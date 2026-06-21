@@ -4,30 +4,24 @@
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/add.css" %}">
 {% endblock scripts %}
+{% block page_header %}
+{% endblock page_header %}
 {% block content %}
-    <div class="row">
-        <div class="col-md-4 col-6">
-            <a href="{% url 'events:event-form' %}"
-               role="button"
-               class="no-decoration">
-                <div class="p-2 mb-4 bg-body-tertiary rounded-3 text-center text-success">
-                    <p class="display-4">
-                        <i class="icon-plus"></i>
-                    </p>
-                    <p class="lead">Подію</p>
-                </div>
+    <div class="site-action-panel">
+        <h1 class="site-action-panel__title">Що хочете додати?</h1>
+        <p class="site-action-panel__lead">Оберіть тип публікації, а далі ми покажемо потрібну форму.</p>
+        <div class="site-action-grid">
+            <a href="{% url 'events:event-form' %}" class="site-action-card">
+                <span class="site-action-card__icon" aria-hidden="true"><i class="icon-calendar"></i></span>
+                <span class="site-action-card__title">Подію</span>
+                <p class="site-action-card__text">Анонсуйте виставку, зустріч, семінар або іншу агроподію.</p>
+                <span class="site-action-card__cta">Додати подію</span>
             </a>
-        </div>
-        <div class="col-md-4 col-6">
-            <a href="{% url 'adverts:adverts-create' %}"
-               role="button"
-               class="no-decoration">
-                <div class="p-2 mb-4 bg-body-tertiary rounded-3 text-center text-success">
-                    <p class="display-4">
-                        <i class="icon-plus"></i>
-                    </p>
-                    <p class="lead">Оголошення</p>
-                </div>
+            <a href="{% url 'adverts:adverts-create' %}" class="site-action-card">
+                <span class="site-action-card__icon" aria-hidden="true"><i class="icon-plus"></i></span>
+                <span class="site-action-card__title">Оголошення</span>
+                <p class="site-action-card__text">Опублікуйте пропозицію, товар, послугу або запит для спільноти.</p>
+                <span class="site-action-card__cta">Додати оголошення</span>
             </a>
         </div>
     </div>

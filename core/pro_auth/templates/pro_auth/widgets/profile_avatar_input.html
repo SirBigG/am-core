@@ -1,0 +1,37 @@
+<div class="profile-avatar-control">
+    {% if widget.is_initial %}
+        <div class="profile-avatar-current">
+            <img class="profile-avatar-current__image"
+                 src="{{ widget.value.url }}"
+                 alt="Поточне фото профілю"
+                 width="72"
+                 height="72">
+            <div class="profile-avatar-current__body">
+                <div class="profile-avatar-current__label">Поточне фото профілю</div>
+                <a class="profile-avatar-current__link"
+                   href="{{ widget.value.url }}"
+                   target="_blank"
+                   rel="noopener">Відкрити фото</a>
+            </div>
+        </div>
+        {% if not widget.required %}
+            <label class="profile-avatar-clear" for="{{ widget.checkbox_id }}">
+                <input type="checkbox"
+                       name="{{ widget.checkbox_name }}"
+                       id="{{ widget.checkbox_id }}">
+                <span>{{ widget.clear_checkbox_label }}</span>
+            </label>
+        {% endif %}
+    {% endif %}
+    <label class="profile-file-control" for="{{ widget.attrs.id }}">
+        {% include "django/forms/widgets/input.html" %}
+        <span class="profile-file-control__button">
+            {% if widget.is_initial %}
+                Змінити фото
+            {% else %}
+                Вибрати фото
+            {% endif %}
+        </span>
+        <span class="profile-file-control__name" data-file-name>Файл не вибрано</span>
+    </label>
+</div>

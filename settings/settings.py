@@ -45,6 +45,10 @@ ASGI_APPLICATION = "settings.asgi.application"
 
 ADMIN_HASH = os.getenv("ADMIN_HASH", "")
 
+ENABLE_ADVERTS = os.getenv("ENABLE_ADVERTS", "1") == "1"
+ENABLE_ANALYTICS = os.getenv("ENABLE_ANALYTICS", "1") == "1"
+USE_IMGPROXY = os.getenv("USE_IMGPROXY", "1") == "1"
+
 PLANT_RECOMMENDATION_OPENAI_API_KEY = os.getenv("PLANT_RECOMMENDATION_OPENAI_API_KEY", "")
 PLANT_RECOMMENDATION_OPENAI_MODEL = os.getenv("PLANT_RECOMMENDATION_OPENAI_MODEL", "gpt-4.1-mini")
 PLANT_RECOMMENDATION_OPENAI_URL = os.getenv("PLANT_RECOMMENDATION_OPENAI_URL", "https://api.openai.com/v1/responses")
@@ -140,6 +144,7 @@ TEMPLATES = [
                 "social_django.context_processors.backends",
                 "social_django.context_processors.login_redirect",
                 "core.pro_auth.context_processors.forum",
+                "core.utils.context_processors.feature_flags",
             ],
         },
     },
@@ -322,23 +327,18 @@ CKEDITOR_CONFIGS = {
     },
     "public": {
         "width": "100%",
+        "removePlugins": "exportpdf",
         "toolbar_Full": [
             [
                 "Format",
                 "Bold",
                 "Italic",
-                "Underline",
-                "Strike",
-                "SpellChecker",
                 "Undo",
                 "Redo",
                 "-",
                 "NumberedList",
                 "BulletedList",
             ],
-            ["Table"],
-            ["TextColor", "BGColor"],
-            ["SpecialChar"],
         ],
         "bodyClass": "col-12",
     },

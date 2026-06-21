@@ -37,10 +37,22 @@ class VarietyListView(TemplateView):
             raise Http404
         for i in Variety.objects.filter(category_id=category.id):
             i.save()
-        posts = Variety.objects.filter(category_id=category.id).values(
-            "title", "publication__absolute_url", "original_country__short_slug"
+        posts = list(
+            Variety.objects.filter(category_id=category.id).values(
+                "title", "publication__absolute_url", "original_country__short_slug"
+            )
         )
+        variety_count = len(posts)
+        linked_variety_count = sum(1 for post in posts if post["publication__absolute_url"])
         posts = [
             [key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]), key=lambda x: x["title"][0])
         ]
-        return {"posts": posts, "category": category, "view": self, "request": self.request}
+        return {
+            "posts": posts,
+            "category": category,
+            "view": self,
+            "request": self.request,
+            "variety_count": variety_count,
+            "linked_variety_count": linked_variety_count,
+            "group_count": len(posts),
+        }

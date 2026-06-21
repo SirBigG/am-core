@@ -1,1 +1,52 @@
 {% extends "pro_auth/profile/profile_base.html" %}
+{% block profile_content %}
+    <section class="profile-page-panel profile-dashboard-panel"
+             aria-labelledby="profileDashboardTitle">
+        <div class="profile-dashboard-hero">
+            <p class="profile-dashboard-eyebrow">Особистий кабінет</p>
+            <h1 class="profile-page-title" id="profileDashboardTitle">Що робимо сьогодні?</h1>
+            <p class="profile-page-lead">
+                Швидкий доступ до ваших оголошень, щоденників рослин, налаштувань профілю та форуму AgroMega.
+            </p>
+        </div>
+        <div class="profile-dashboard-grid"
+             aria-label="Розділи особистого кабінету">
+            <a class="profile-dashboard-card profile-dashboard-card--primary"
+               href="{% url 'pro_auth:profile-adverts-create' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">+</span>
+                <span class="profile-dashboard-card__title">Створити оголошення</span>
+                <span class="profile-dashboard-card__text">Опублікуйте пропозицію або оновіть інформацію для покупців.</span>
+            </a>
+            <a class="profile-dashboard-card"
+               href="{% url 'pro_auth:profile-adverts' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">☰</span>
+                <span class="profile-dashboard-card__title">Мої оголошення</span>
+                <span class="profile-dashboard-card__text">Керуйте статусами, редагуванням і датами актуальності.</span>
+            </a>
+            <a class="profile-dashboard-card"
+               href="{% url 'pro_auth:profile-diary-list' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">✍</span>
+                <span class="profile-dashboard-card__title">Мої щоденники</span>
+                <span class="profile-dashboard-card__text">Фіксуйте полив, догляд, фото, урожай і стан рослин.</span>
+            </a>
+            <a class="profile-dashboard-card"
+               href="{% url 'pro_auth:profile-plant-list' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">•</span>
+                <span class="profile-dashboard-card__title">Мої рослини</span>
+                <span class="profile-dashboard-card__text">Перегляньте активні рослини та швидко відкрийте їхні щоденники.</span>
+            </a>
+            <a class="profile-dashboard-card"
+               href="{% url 'pro_auth:change-profile' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">◎</span>
+                <span class="profile-dashboard-card__title">Налаштування профілю</span>
+                <span class="profile-dashboard-card__text">Оновіть контакти, місто, фото профілю та базові дані.</span>
+            </a>
+            <a class="profile-dashboard-card profile-dashboard-card--forum"
+               href="{{ forum_sso_url }}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">↗</span>
+                <span class="profile-dashboard-card__title">Форум</span>
+                <span class="profile-dashboard-card__text">Перейти на форум через ваш AgroMega акаунт.</span>
+            </a>
+        </div>
+    </section>
+{% endblock profile_content %}

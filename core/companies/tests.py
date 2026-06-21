@@ -74,6 +74,8 @@ class CompanyPublicViewTests(TestCase):
         self.assertTemplateUsed(response, "companies/detail.html")
         self.assertEqual(response.context["company"], self.company)
         self.assertIn(product, response.context["products"])
+        self.assertContains(response, "site-detail-panel")
+        self.assertContains(response, "site-product-card")
 
     def test_company_detail_returns_404_for_unknown_company(self):
         response = self.client.get("/companies/missing-999.html")

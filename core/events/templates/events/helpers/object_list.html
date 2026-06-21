@@ -1,28 +1,50 @@
 {% load post_extras %}
-{% for event in object_list %}
-    <div class="row">
-        <div class="card mb-3">
-            <div class="row no-gutters">
-                <div class="col-md-4 col-12">
-                    <img src="{% thumbnail event 350 280 'poster' %}"
-                         alt="{{ event.title }}"
-                         class="card-img"
-                         width="350"
-                         height="280">
-                </div>
-                <div class="col-md-8">
-                    <div class="card-body">
-                        <a href="{{ event.get_absolute_url }}" class="no-decoration">
-                            <h2 class="card-title text-success text-center h4">{{ event.title }}</h2>
-                        </a>
-                        <div class="card-text">{{ event.text|striptags|safe|truncatechars:200 }}</div>
-                        <div class="text-right mt-3">
-                            <a class="text-success stretched-link no-decoration"
-                               href="{{ event.get_absolute_url }}">Докладніше</a>
-                        </div>
-                    </div>
+<div class="site-card-list">
+    {% for event in object_list %}
+        <article class="site-list-card">
+            <a class="site-list-card__media"
+               href="{{ event.get_absolute_url }}"
+               aria-label="{{ event.title }}">
+                <img src="{% thumbnail event 350 280 'poster' %}"
+                     alt="{{ event.title }}"
+                     class="site-list-card__image"
+                     width="350"
+                     height="280">
+            </a>
+            <div class="site-list-card__body">
+                <h2 class="site-list-card__title">
+                    <a class="site-list-card__title-link"
+                       href="{{ event.get_absolute_url }}">{{ event.title }}</a>
+                </h2>
+                <ul class="site-list-card__meta" aria-label="Дані події">
+                    {% if event.type %}<li class="site-list-card__meta-item">{{ event.type.title }}</li>{% endif %}
+                    <li class="site-list-card__meta-item">
+                        <i class="icon-calendar" aria-hidden="true"></i>
+                        {{ event.start|date:"d E Y H:i" }}
+                    </li>
+                    {% if event.stop %}
+                        <li class="site-list-card__meta-item">
+                            <i class="icon-clock" aria-hidden="true"></i>
+                            до {{ event.stop|date:"d E Y H:i" }}
+                        </li>
+                    {% endif %}
+                    {% if event.location %}
+                        <li class="site-list-card__meta-item">
+                            <i class="icon-home" aria-hidden="true"></i>
+                            {{ event.location }}
+                        </li>
+                    {% endif %}
+                </ul>
+                <p class="site-list-card__text">{{ event.text|striptags|safe|truncatechars:200 }}</p>
+                <div class="site-list-card__actions">
+                    <a class="site-list-card__link" href="{{ event.get_absolute_url }}">Докладніше</a>
                 </div>
             </div>
+        </article>
+    {% empty %}
+        <div class="site-form-panel site-search-empty">
+            <h2 class="site-action-panel__title">Подій поки немає</h2>
+            <p class="site-form-help">Ви можете опублікувати першу подію, і вона з'явиться в цьому списку після збереження.</p>
         </div>
-    </div>
-{% endfor %}
+    {% endfor %}
+</div>

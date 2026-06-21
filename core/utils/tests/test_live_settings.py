@@ -41,3 +41,11 @@ class LiveStorageSettingsTests(SimpleTestCase):
                 "OPTIONS": {"location": "static"},
             },
         )
+
+
+class DevStorageSettingsTests(SimpleTestCase):
+    def test_dev_media_root_matches_nginx_media_volume(self):
+        import settings.dev as dev_settings
+
+        self.assertEqual(dev_settings.MEDIA_URL, "/media/")
+        self.assertEqual(dev_settings.MEDIA_ROOT, "/var/www/media")

@@ -19,6 +19,11 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertIn("public", settings.CKEDITOR_CONFIGS)
         self.assertEqual(settings.CKEDITOR_CONFIGS["default"]["language"], "uk")
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["width"], "100%")
+        self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["removePlugins"], "exportpdf")
+        self.assertEqual(
+            settings.CKEDITOR_CONFIGS["public"]["toolbar_Full"],
+            [["Format", "Bold", "Italic", "Undo", "Redo", "-", "NumberedList", "BulletedList"]],
+        )
 
     def test_public_forms_use_ckeditor_widget_for_rich_text_fields(self):
         forms_and_fields = (

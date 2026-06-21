@@ -1,18 +1,23 @@
 {% load post_extras %}
-
 {% if posts %}
-    <p class="h5">Публікації в категорії:</p>
-    <div class="row mt-3 mb-3">
-        {% for item in posts %}
-            <div class="col-6 col-lg-3">
-                <a href="{{ item.absolute_url }}" style="text-decoration: none">
-                    {% if item.photo__image %}
-                        <img src="{{ item.photo__image }}" loading="lazy" class="img-fluid" width="200" height="150"
-                             alt="Фото {{ item.title }}">
-                    {% endif %}
-                    <p class="text-center text-success h6 m-3" style="overflow: auto;">{{ item.title }}</p>
-                </a>
-            </div>
-        {% endfor %}
-    </div>
+    <section class="site-content-section site-random-posts">
+        <h2 class="site-content-section__title">Публікації в категорії</h2>
+        <div class="site-random-posts__grid">
+            {% for item in posts %}
+                <article class="site-random-posts__item">
+                    <a href="{{ item.absolute_url }}" class="site-random-posts__link">
+                        {% if item.photo__image %}
+                            <img src="{{ item.photo__image }}"
+                                 loading="lazy"
+                                 class="site-random-posts__image"
+                                 width="200"
+                                 height="150"
+                                 alt="Фото {{ item.title }}">
+                        {% endif %}
+                        <p class="site-random-posts__title">{{ item.title }}</p>
+                    </a>
+                </article>
+            {% endfor %}
+        </div>
+    </section>
 {% endif %}

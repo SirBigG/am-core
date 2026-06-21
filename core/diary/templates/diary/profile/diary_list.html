@@ -1,7 +1,5 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 {% load static %}
-{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
-{% block profile_sidebar %}{% endblock profile_sidebar %}
 {% block profile_content %}
     <div class="profile-diary-wrap">
         <header class="profile-diary-hero">
@@ -9,17 +7,24 @@
                 <p class="profile-diary-eyebrow">Щоденник рослин</p>
                 <h1 class="text-success">Мої щоденники</h1>
                 {% if diary_dashboard.attention_count %}
-                    <p>Сьогодні варто перевірити {{ diary_dashboard.attention_count }} рослин{% if diary_dashboard.last_watering %}, останній полив був {{ diary_dashboard.last_watering.date|date:"j F" }}{% endif %}.</p>
+                    <p>
+                        Сьогодні варто перевірити {{ diary_dashboard.attention_count }} рослин
+                        {% if diary_dashboard.last_watering %}
+                            , останній полив був {{ diary_dashboard.last_watering.date|date:"j F" }}
+                        {% endif %}
+                        .
+                    </p>
                 {% else %}
                     <p>У догляді все спокійно. Продовжуйте фіксувати полив, фото, врожай і важливі зміни.</p>
                 {% endif %}
             </div>
             <div class="profile-diary-hero__actions">
-                <a class="btn dashed-btn am-btn am-btn--primary profile-diary-add-btn" href="{% url 'pro_auth:profile-diary-add' %}">+ Додати щоденник</a>
+                <a class="btn dashed-btn am-btn am-btn--primary profile-diary-add-btn"
+                   href="{% url 'pro_auth:profile-diary-add' %}">+ Додати щоденник</a>
             </div>
         </header>
-
-        <section class="profile-diary-dashboard profile-diary-dashboard--overview" aria-label="Огляд догляду">
+        <section class="profile-diary-dashboard profile-diary-dashboard--overview"
+                 aria-label="Огляд догляду">
             <article class="profile-diary-dashboard-card profile-diary-dashboard-card--advice">
                 <p class="profile-diary-dashboard-card__kicker">Порада дня</p>
                 {% if diary_dashboard.plants_needing_attention %}
@@ -61,7 +66,8 @@
                 {% if diary_dashboard.harvest_summary %}
                     <strong class="profile-diary-stat-card__value--text">
                         {% for harvest in diary_dashboard.harvest_summary %}
-                            {{ harvest.display }}{% if not forloop.last %}, {% endif %}
+                            {{ harvest.display }}
+                            {% if not forloop.last %},{% endif %}
                         {% endfor %}
                     </strong>
                     <small>останній збір · {{ diary_dashboard.last_harvest.date|date:"d.m.Y" }}</small>
@@ -111,7 +117,6 @@
                 {% endif %}
             </article>
         </section>
-
         <section class="profile-diary-section">
             <div class="profile-diary-section__header">
                 <div>
@@ -124,26 +129,20 @@
                     <button type="button"
                             class="profile-diary-view-tabs__button is-active"
                             data-diary-view-tab="all"
-                            aria-selected="true">
-                        Всі
-                    </button>
+                            aria-selected="true">Всі</button>
                     <button type="button"
                             class="profile-diary-view-tabs__button"
                             data-diary-view-tab="attention"
-                            aria-selected="false">
-                        Увага
-                    </button>
+                            aria-selected="false">Увага</button>
                     <button type="button"
                             class="profile-diary-view-tabs__button"
                             data-diary-view-tab="archive"
-                            aria-selected="false">
-                        Архів
-                    </button>
+                            aria-selected="false">Архів</button>
                 </div>
             </div>
             <div class="profile-diary-grid profile-diary-grid--bento">
                 {% for object in active_diaries %}
-                    <article class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card{% if forloop.first %} profile-diary-card--large{% endif %}"
+                    <article class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card"
                              data-diary-view-card
                              data-diary-view-groups="all{% if object.needs_attention %} attention{% endif %}">
                         <div class="card-body text-start">
@@ -162,7 +161,9 @@
                                                 aria-label="Дії зі щоденником">
                                             <span aria-hidden="true">⋯</span>
                                         </button>
-                                        <div class="am-menu__dropdown profile-diary-card-menu__dropdown" data-diary-card-menu-dropdown hidden>
+                                        <div class="am-menu__dropdown profile-diary-card-menu__dropdown"
+                                             data-diary-card-menu-dropdown
+                                             hidden>
                                             <a class="btn am-btn am-btn--soft am-menu__action profile-diary-card-menu__action"
                                                href="{% url 'pro_auth:profile-diary-update' pk=object.id %}">
                                                 Змінити
@@ -170,24 +171,22 @@
                                             <a class="btn am-btn am-btn--soft profile-diary-card-menu__action profile-diary-card-archive-btn"
                                                href="{% url 'pro_auth:profile-diary-delete' pk=object.id %}"
                                                aria-label="Архівувати щоденник"
-                                               title="Архівувати щоденник">
-                                                Архівувати
-                                            </a>
+                                               title="Архівувати щоденник">Архівувати</a>
                                         </div>
                                     </div>
                                 </div>
                                 {% if object.active_diary_plants %}
                                     <div class="profile-diary-card-chips" aria-label="Рослини в щоденнику">
-                                        {% for plant in object.active_diary_plants|slice:":4" %}
-                                            <span>{{ plant.display_name }}</span>
-                                        {% endfor %}
+                                        {% for plant in object.active_diary_plants|slice:":4" %}<span>{{ plant.display_name }}</span>{% endfor %}
                                         {% if object.active_diary_plants|length > 4 %}
                                             <span>+{{ object.active_diary_plants|length|add:"-4" }}</span>
                                         {% endif %}
                                     </div>
                                 {% endif %}
                                 {% if object.description %}
-                                    <div class="profile-diary-card-meta">Опис: <span class="profile-diary-card-meta__inline">{{ object.description|safe }}</span></div>
+                                    <div class="profile-diary-card-meta">
+                                        Опис: <span class="profile-diary-card-meta__inline">{{ object.description|safe }}</span>
+                                    </div>
                                 {% endif %}
                                 <div class="profile-diary-card-metrics" aria-label="Статистика щоденника">
                                     <div>
@@ -202,7 +201,9 @@
                                 {% if not object.active_diary_plants and object.completed_diary_plants %}
                                     <div class="am-state profile-diary-card-state">
                                         <div class="am-state__title profile-diary-card-state__title">У цьому щоденнику немає активних рослин</div>
-                                        <div class="am-state__meta profile-diary-card-state__meta">Усі рослини завершені. Посадіть нову рослину або архівуйте щоденник.</div>
+                                        <div class="am-state__meta profile-diary-card-state__meta">
+                                            Усі рослини завершені. Посадіть нову рослину або архівуйте щоденник.
+                                        </div>
                                         <div class="am-state__actions profile-diary-card-state__actions">
                                             <a class="btn am-btn am-btn--soft"
                                                href="{% url 'pro_auth:profile-diary-plant-add' diary_id=object.id %}">+ Посадити рослину</a>
@@ -229,7 +230,8 @@
                                                             {{ target_plants.0.display_name }}
                                                         {% elif target_plants|length <= 3 %}
                                                             {% for plant in target_plants %}
-                                                                {{ plant.display_name }}{% if not forloop.last %}, {% endif %}
+                                                                {{ plant.display_name }}
+                                                                {% if not forloop.last %},{% endif %}
                                                             {% endfor %}
                                                         {% else %}
                                                             Для {{ target_plants|length }} рослин
@@ -273,7 +275,8 @@
                                  aria-labelledby="diaryCardActionModalTitle{{ object.id }}">
                                 <div class="profile-diary-item-modal__header">
                                     <div>
-                                        <h2 class="profile-confirm-title" id="diaryCardActionModalTitle{{ object.id }}">Додати іншу дію</h2>
+                                        <h2 class="profile-confirm-title"
+                                            id="diaryCardActionModalTitle{{ object.id }}">Додати іншу дію</h2>
                                         <p class="profile-confirm-text">Зафіксуй подію у щоденнику “{{ object.title }}”.</p>
                                     </div>
                                     <button type="button"
@@ -289,9 +292,12 @@
                     {% endif %}
                 {% empty %}
                     {% if not archived_diaries %}
-                        <div class="am-panel profile-diary-onboarding" data-diary-view-static-empty="all">
+                        <div class="am-panel profile-diary-onboarding"
+                             data-diary-view-static-empty="all">
                             <h2 class="profile-diary-onboarding__title">Як почати</h2>
-                            <p class="profile-diary-onboarding__lead">Щоденник рослин працює просто: спочатку створи зону вирощування, потім посади рослину і додавай дії в історію.</p>
+                            <p class="profile-diary-onboarding__lead">
+                                Щоденник рослин працює просто: спочатку створи зону вирощування, потім посади рослину і додавай дії в історію.
+                            </p>
                             <ol class="profile-diary-onboarding__list">
                                 <li class="profile-diary-onboarding__item">
                                     <span class="profile-diary-onboarding__step">1</span>
@@ -307,11 +313,13 @@
                                 </li>
                             </ol>
                             <div class="profile-diary-onboarding__actions">
-                                <a class="btn am-btn am-btn--primary" href="{% url 'pro_auth:profile-diary-add' %}">+ Додати щоденник</a>
+                                <a class="btn am-btn am-btn--primary"
+                                   href="{% url 'pro_auth:profile-diary-add' %}">+ Додати щоденник</a>
                             </div>
                         </div>
                     {% else %}
-                        <div class="am-panel profile-diary-empty-garden" data-diary-view-static-empty="all">
+                        <div class="am-panel profile-diary-empty-garden"
+                             data-diary-view-static-empty="all">
                             <div class="profile-diary-empty-garden__icon" aria-hidden="true">🌱</div>
                             <h2 class="profile-diary-empty-garden__title">У вас поки немає активних щоденників</h2>
                             <p class="profile-diary-empty-garden__text">Створіть новий щоденник для грядки, вазона або зони вирощування.</p>
@@ -334,13 +342,13 @@
                                     <span class="am-badge profile-diary-card-badge">В архіві</span>
                                 </div>
                                 {% if object.description %}
-                                    <div class="profile-diary-card-meta">Опис: <span class="profile-diary-card-meta__inline">{{ object.description|safe }}</span></div>
+                                    <div class="profile-diary-card-meta">
+                                        Опис: <span class="profile-diary-card-meta__inline">{{ object.description|safe }}</span>
+                                    </div>
                                 {% endif %}
                                 <div class="mt-3 d-flex gap-2 flex-wrap justify-content-start profile-diary-card-actions">
                                     <a class="btn am-btn am-btn--soft"
-                                       href="{% url 'pro_auth:profile-diary-restore' pk=object.id %}">
-                                        Відновити
-                                    </a>
+                                       href="{% url 'pro_auth:profile-diary-restore' pk=object.id %}">Відновити</a>
                                     {# TODO: add safe hard-delete flow for archived diaries #}
                                 </div>
                             </div>
@@ -351,25 +359,25 @@
                      data-diary-view-empty="attention"
                      hidden>
                     <h2 class="am-state__title profile-diary-empty-title">Зараз немає щоденників, які потребують уваги</h2>
-                    <p class="am-state__meta profile-diary-empty-text">Коли рослини довго не матимуть поливу або першого запису, їхні щоденники з’являться тут.</p>
+                    <p class="am-state__meta profile-diary-empty-text">
+                        Коли рослини довго не матимуть поливу або першого запису, їхні щоденники з’являться тут.
+                    </p>
                 </div>
                 <div class="am-panel am-state profile-page-panel profile-diary-empty-state profile-diary-view-empty"
                      data-diary-view-empty="archive"
                      hidden>
                     <h2 class="am-state__title profile-diary-empty-title">В архіві поки немає щоденників</h2>
-                    <p class="am-state__meta profile-diary-empty-text">Архівовані щоденники з’являться тут і залишаться доступними для перегляду та відновлення.</p>
+                    <p class="am-state__meta profile-diary-empty-text">
+                        Архівовані щоденники з’являться тут і залишаться доступними для перегляду та відновлення.
+                    </p>
                 </div>
             </div>
         </section>
     </div>
     {% if request.GET.quick_action == "watering_added" %}
-        <div class="profile-diary-toast is-visible" data-profile-diary-toast>
-            Швидку дію “Підлив” додано до історії
-        </div>
+        <div class="profile-diary-toast is-visible" data-profile-diary-toast>Швидку дію “Підлив” додано до історії</div>
     {% endif %}
-    {% if active_diaries %}
-        {{ active_diaries.0.diary_item_form.media }}
-    {% endif %}
+    {% if active_diaries %}{{ active_diaries.0.diary_item_form.media }}{% endif %}
     <div class="profile-confirm-backdrop"
          id="diaryDeleteConfirm"
          aria-hidden="true">
@@ -378,8 +386,12 @@
              aria-modal="true"
              aria-labelledby="diaryDeleteConfirmTitle">
             <h2 class="profile-confirm-title" id="diaryDeleteConfirmTitle">Архівувати щоденник?</h2>
-            <p class="profile-confirm-text">Щоденник буде перенесено в архів. Його рослини, дії та історія залишаться доступними для перегляду. Ви зможете знайти його у вкладці Архів.</p>
-            <p class="profile-confirm-helper">Якщо щоденник знову знадобиться, його можна буде відновити пізніше без втрати історії.</p>
+            <p class="profile-confirm-text">
+                Щоденник буде перенесено в архів. Його рослини, дії та історія залишаться доступними для перегляду. Ви зможете знайти його у вкладці Архів.
+            </p>
+            <p class="profile-confirm-helper">
+                Якщо щоденник знову знадобиться, його можна буде відновити пізніше без втрати історії.
+            </p>
             <div class="profile-confirm-actions">
                 <button type="button" class="btn profile-confirm-cancel" data-confirm-cancel>Ні</button>
                 <button type="button"

@@ -1,0 +1,40 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% load post_extras static %}
+{% block scripts %}
+    {{ block.super }}
+    <script src="{% static "adverts/form.js" %}"></script>
+    {% include "adverts/helpers/photo_input_styles.html" %}
+{% endblock scripts %}
+{% block profile_content %}
+    <div class="profile-page-panel profile-form-panel">
+        <h1 class="profile-page-title">Додати оголошення</h1>
+        <form method="post"
+              action="{% url 'pro_auth:profile-adverts-create' %}"
+              enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="profile-form-group">
+                    <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="profile-form-field">
+                        {% if field.name == "photos" %}
+                            <div class="advert-photo-control"
+                                 data-advert-existing-photo-count="{{ form.existing_photo_count }}"
+                                 data-advert-max-photo-count="{{ form.max_photos }}">
+                                {{ field }}
+                                <span class="advert-photo-summary text-muted" data-advert-photo-summary>Фото не обрано</span>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                    </div>
+                    {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="profile-form-actions">
+                <button type="submit" class="btn btn-success">Додати</button>
+            </div>
+        </form>
+    </div>
+    {{ form.media }}
+{% endblock profile_content %}

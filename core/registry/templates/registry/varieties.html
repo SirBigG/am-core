@@ -26,43 +26,88 @@
     {% endif %}
 {% endblock meta_description %}
 {% block breadcrumbs %}
-    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
-    {% registry_breadcrumbs category %}
-{% endcache %}
 {% endblock breadcrumbs %}
+{% block page_header %}
+{% endblock page_header %}
 {% block extra_meta %}
 {% endblock extra_meta %}
 {% block content %}
-    {% if category.meta and category.meta.text %}
-        <div class="col-lg-12 col-12">
-            <div class="text-justify">{{ category.meta.text|safe }}</div>
+    <div class="site-catalog-shell">
+        <header class="site-catalog-hero">
+            <div class="site-catalog-hero__breadcrumbs">
+                {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug %}
+                {% registry_breadcrumbs category %}
+            {% endcache %}
         </div>
-    {% endif %}
-    {% for group in posts|group_by:2 %}
-        <div class="row">
-            {% for key, list in group %}
-                <div class="col-md-6 col-12 mt-3">
-                    <p class="text-secondary h3">{{ key }}</p>
-                    <ul class="list-unstyled">
-                        {% for post in list %}
-                            <li class="m-2">
-                                {% if post.publication__absolute_url %}
-                                    <a class="list-link no-decoration"
-                                       href="{{ post.publication__absolute_url }}">{{ post.title }}</a>
-                                {% else %}
-                                    {{ post.title }}
-                                {% endif %}
-                                {% if post.original_country__short_slug %}
-                                    <img alt="{{ post.title }}"
-                                         src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
-                                         height="10px"
-                                         width="15px" />
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
+        <p class="site-catalog-hero__eyebrow">Державний реєстр сортів</p>
+        <h1 class="site-catalog-hero__title">
+            {% if category.meta %}
+                {{ category.meta.title }}
+            {% else %}
+                {{ category.title }}
+            {% endif %}
+        </h1>
+        {% if category.meta and category.meta.text %}
+            <div class="site-catalog-hero__text">{{ category.meta.text|safe }}</div>
+        {% else %}
+            <p class="site-catalog-hero__text">
+                Перегляньте сорти за алфавітом і відкрийте публікації з описом, якщо вони доступні.
+            </p>
+        {% endif %}
+        <ul class="site-catalog-stats" aria-label="Огляд списку сортів">
+            <li class="site-catalog-stats__item">{{ variety_count }} сортів</li>
+            <li class="site-catalog-stats__item">{{ linked_variety_count }} з описом</li>
+            <li class="site-catalog-stats__item">{{ group_count }} груп за алфавітом</li>
+        </ul>
+    </header>
+    {% if posts %}
+        <nav class="site-alpha-nav" aria-label="Перейти до літери">
+            {% for group in posts %}
+                <a class="site-alpha-nav__item" href="#letter-{{ forloop.counter }}">{{ group.0 }}</a>
             {% endfor %}
-        </div>
-    {% endfor %}
+        </nav>
+    {% endif %}
+    <div class="site-catalog-groups">
+        {% for group in posts %}
+            <section class="site-alpha-section" id="letter-{{ forloop.counter }}">
+                <h2 class="site-alpha-section__title">{{ group.0 }}</h2>
+                <ul class="site-variety-list">
+                    {% for post in group.1 %}
+                        <li>
+                            {% if post.publication__absolute_url %}
+                                <a class="site-variety-row" href="{{ post.publication__absolute_url }}">
+                                    <span class="site-variety-row__main">
+                                        <span class="site-variety-row__title">{{ post.title }}</span>
+                                    </span>
+                                    {% if post.original_country__short_slug %}
+                                        <img alt="{{ post.title }}"
+                                             src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
+                                             class="site-variety-row__flag"
+                                             height="14"
+                                             width="20" />
+                                    {% endif %}
+                                </a>
+                            {% else %}
+                                <span class="site-variety-row site-variety-row--muted">
+                                    <span class="site-variety-row__main">
+                                        <span class="site-variety-row__title">{{ post.title }}</span>
+                                    </span>
+                                    {% if post.original_country__short_slug %}
+                                        <img alt="{{ post.title }}"
+                                             src="{% static 'posts/flags/'|add:post.original_country__short_slug|add:'.svg' %}"
+                                             class="site-variety-row__flag"
+                                             height="14"
+                                             width="20" />
+                                    {% else %}
+                                        <span class="site-variety-row__status">опис готується</span>
+                                    {% endif %}
+                                </span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endfor %}
+    </div>
+</div>
 {% endblock content %}

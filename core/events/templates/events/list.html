@@ -1,24 +1,39 @@
 {% extends "posts/parent_index.html" %}
-
-{% block title %}Всі агроподії{% endblock title %}
-
-{% block meta_description %}{% endblock meta_description %}
-
-{% block extra_meta %}{% endblock extra_meta %}
-
+{% block title %}
+    Всі агроподії
+{% endblock title %}
+{% block meta_description %}
+{% endblock meta_description %}
+{% block extra_meta %}
+{% endblock extra_meta %}
 {% block second_menu %}
-{% endblock %}
-
-{% block page_title %}Агроподії{% endblock %}
+{% endblock second_menu %}
+{% block page_title %}
+{% endblock page_title %}
 {% block page_title_right %}
-    <a href="/events/create/" class="btn btn-success btn-sm"><i class="icon-plus"></i> Опублікувати подію</a>{% endblock %}
-
+{% endblock page_title_right %}
 {% block breadcrumbs %}
-{% endblock %}
-
+{% endblock breadcrumbs %}
 {% block content %}
-
-    {% include "events/helpers/object_list.html" %}
-
-    {% include "helpers/pagination.html" %}
+    <div class="site-catalog-shell">
+        <header class="site-catalog-hero">
+            <p class="site-catalog-hero__eyebrow">Агроподії</p>
+            <h1 class="site-catalog-hero__title">Події агросфери</h1>
+            <p class="site-catalog-hero__text">
+                Виставки, зустрічі, навчання та інші події для аграрної спільноти. Додавайте подію, щоб її побачили
+                користувачі AgroMega.
+            </p>
+            <ul class="site-catalog-stats" aria-label="Огляд подій">
+                <li class="site-catalog-stats__item">{{ page_obj.paginator.count }} подій</li>
+            </ul>
+            <div>
+                <a href="{% url 'events:event-form' %}" class="btn btn-success">
+                    <i class="icon-plus" aria-hidden="true"></i>
+                    Опублікувати подію
+                </a>
+            </div>
+        </header>
+        {% include "events/helpers/object_list.html" %}
+        {% include "helpers/pagination.html" %}
+    </div>
 {% endblock content %}

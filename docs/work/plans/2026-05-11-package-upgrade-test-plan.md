@@ -23,14 +23,14 @@ Batch 12 moved the main Docker runtime and project metadata to Python 3.14.
 - `python-jose==3.3.0`; fix `3.4.0`.
 - `lxml==5.1.0`; fix `6.1.0`.
 
-The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. The forum was moved out of `am-core` into the sibling `am-dev/forum_instance` project, and forum dependency changes are intentionally out of scope for this `am-core` upgrade thread unless requested separately.
+The forum full dependency audit found `mistune==0.8.4`, pulled by `django-spirit==0.14.3`, with CVEs fixed in `mistune==3.2.1`. The forum was moved out of `am-core` into the sibling `../forum_instance` project, and forum dependency changes are intentionally out of scope for this `am-core` upgrade thread unless requested separately.
 
 ## Upgrade Feasibility
 
 Recommended sequence:
 
 1. Patch within the Django 5 line first: move main app to Django 5.2 LTS if compatible, and apply security updates for DRF, Pillow, requests, social auth, python-jose, and lxml.
-2. Keep forum dependency decisions outside `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
+2. Keep forum dependency decisions outside `am-core`; the forum now lives in the sibling `../forum_instance` project.
 3. Add CSP in report-only mode before enforcing it. Done through Django 6's built-in `ContentSecurityPolicyMiddleware` and `SECURE_CSP_REPORT_ONLY` in Batch 10.
 4. Move the main app to Django 6 after main-app CSP and CKEditor risks are understood. Done for `am-core` in Batch 10. Python 3.11 support was intentionally dropped in Batch 2.
 
@@ -57,7 +57,7 @@ Updated direct pins:
 
 The stale `openidconnect` extra was removed from `social-auth-app-django` because pip reports that version `5.7.0` no longer declares that extra. The installed package still pulls the current `social-auth-core` dependency used by the project OIDC tests.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose exec core python -m pip install -r requirements.txt`: passed.
 - `docker compose exec core python -m pip check`: passed with no broken requirements.
@@ -109,7 +109,7 @@ Forum direct pin updates:
 - `django-storages==1.14.4` to `django-storages==1.14.6`.
 - `boto3==1.35.6` to `boto3==1.43.6`.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose build core forum_instance`: passed.
 - `docker compose up -d core forum_instance`: passed.
@@ -171,7 +171,7 @@ Forum direct pin updates:
 
 - `social-auth-app-django==5.7.0` to `social-auth-app-django==5.9.0`.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose exec core python -m pip install -r requirements.txt`: passed.
 - `docker compose exec forum_instance python -m pip install -r requirements.txt`: passed.
@@ -204,7 +204,7 @@ Changes:
 - Removed `webdriver_manager==4.0.2` from `requirements.txt`.
 - Added a regression test for the configured geckodriver path used by the parser driver factory.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose exec core ./manage.py test core.companies.tests --settings=settings.test_settings`: passed, 4 tests.
 - `docker compose build core`: passed and downloaded the `geckodriver-v0.36.0-linux-aarch64.tar.gz` archive for the current local `arm64` image.
@@ -234,7 +234,7 @@ Changes:
 - Updated the main `Makefile` `update` target to install with constraints.
 - Added `docs/engineering/dependencies/README.md` for the dependency file workflow.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose exec core python -m pip install -r requirements.txt -c constraints.txt`: passed.
 - `docker compose exec forum_instance python -m pip install -r requirements.txt -c constraints.txt`: passed.
@@ -259,17 +259,17 @@ Completed on 2026-05-24 to keep forum dependency decisions out of the `am-core` 
 
 Changes:
 
-- Moved the forum project from `am-core/forum_instance` to the sibling parent path `/Users/andriihots/Projects/am-dev/forum_instance`.
+- Moved the forum project from `am-core/forum_instance` to the sibling path `../forum_instance`.
 - Updated parent `docker-compose.yml` so `forum_instance` builds from `./forum_instance` and mounts `./forum_instance:/app`.
 - Added parent `.gitignore` entries for generated forum artifacts: `forum_instance/staticfiles/`, `forum_instance/st_search/`, and compiled forum translation files.
 - Updated `am-core` docs to treat the forum as an external sibling project.
 
-Verification commands run from `/Users/andriihots/Projects/am-dev`:
+Verification commands run from the parent `am-dev` folder:
 
 - `docker compose config --services`: passed.
 - `docker compose build forum_instance`: passed.
 - `docker compose up -d forum_instance`: passed.
-- `docker inspect am-forum-instance --format '{{json .Mounts}}'`: confirmed `/Users/andriihots/Projects/am-dev/forum_instance` mounts to `/app`.
+- `docker inspect am-forum-instance --format '{{json .Mounts}}'`: confirmed `../forum_instance` mounts to `/app`.
 - `docker compose exec forum_instance python -m pip check`: passed with no broken requirements.
 - `docker compose exec forum_instance python manage.py test`: passed, 23 tests.
 - `docker compose exec core make test`: passed, 232 core tests, 31 API tests, and flake8.

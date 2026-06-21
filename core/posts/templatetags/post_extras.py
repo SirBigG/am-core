@@ -1,16 +1,13 @@
-import base64
-import hashlib
-import hmac
 from urllib.parse import urlparse
 
 from django import template
 from django.conf import settings
 from django.core.files.storage import storages
-from django.urls import reverse
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Post
+from core.utils.images import imgproxy_url as build_image_url
 
 register = template.Library()
 
@@ -47,11 +44,12 @@ def post_adverts():
 
     :return: rubric roots queryset
     """
-    context = {"adverts": Advert.active_objects.values("title", "image", "pk", "slug")[:4]}
-    for advert in context["adverts"]:
-        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
-        if advert["image"]:
-            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
+    context = {"adverts": []}
+    if not settings.ENABLE_ADVERTS:
+        return context
+    for advert in Advert.active_objects.prefetch_related("photos")[:4]:
+        image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""
+        context["adverts"].append({"title": advert.title, "image": image, "url": advert.get_absolute_url()})
     return context
 
 
@@ -61,11 +59,12 @@ def random_adverts():
 
     :return: rubric roots queryset
     """
-    context = {"adverts": Advert.active_objects.order_by("?").values("title", "image", "pk", "slug")[:4]}
-    for advert in context["adverts"]:
-        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
-        if advert["image"]:
-            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
+    context = {"adverts": []}
+    if not settings.ENABLE_ADVERTS:
+        return context
+    for advert in Advert.active_objects.prefetch_related("photos").order_by("?")[:4]:
+        image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""
+        context["adverts"].append({"title": advert.title, "image": image, "url": advert.get_absolute_url()})
     return context
 
 
@@ -121,18 +120,7 @@ def imgproxy_url(image_url, width, height, resize_type="fit", output_format="web
     :param output_format: Output format (default is 'webp')
     :return: Imgproxy URL
     """
-    key = bytes.fromhex(settings.IMGPROXY_KEY)
-    salt = bytes.fromhex(settings.IMGPROXY_SALT)
-    base_url = settings.IMGPROXY_BASE_URL
-
-    encoded_url = base64.urlsafe_b64encode(image_url.encode()).rstrip(b"=").decode()
-    path = f"/rs:{resize_type}:{width}:{height}:f:0/{encoded_url}.{output_format}"
-    path_b = path.encode()
-
-    signature = hmac.new(key, salt + path_b, hashlib.sha256).digest()
-
-    encoded_signature = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
-    return f"{base_url}/{encoded_signature}{path}"
+    return build_image_url(image_url, width, height, resize_type=resize_type, output_format=output_format)
 
 
 # ####################    Filters    ################### #

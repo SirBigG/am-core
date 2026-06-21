@@ -8,187 +8,40 @@ This repo is the `am-core` Django backend for AgroMega. It is usually run locall
 
 Local Docker Compose config:
 
-- Compose file: `/Users/andriihots/Projects/am-dev/docker-compose.yml`
+- Compose file: `../docker-compose.yml`
 - Main service: `core`
 - Forum service: `forum_instance`
 - Database service: `db`
 - Nginx service exposes local port `8000`
 - The compose file mounts this repo as `./am-core:/am-core`
-- The forum project lives outside this repo at `/Users/andriihots/Projects/am-dev/forum_instance` and is mounted as `./forum_instance:/app`
+- The forum project lives outside this repo at `../forum_instance` and is mounted as `./forum_instance:/app`
 
-Useful local commands from the parent folder:
-
-```bash
-docker compose ps
-docker compose up
-docker compose exec core ./manage.py test --settings=settings.test_settings
-docker compose exec core ./manage.py test api --settings=settings.test_settings
-docker compose exec core flake8
-docker compose exec core make test
-docker compose exec core make test_api
-docker compose exec forum_instance python manage.py test
-```
-
-## Dependency Management Findings
-
-Runtime dependencies are currently managed by uv:
-
-- `pyproject.toml`
-- `uv.lock`
-
-`pyproject.toml` is the human-edited top-level dependency input. `uv.lock` is the locked transitive dependency set. The old main-app `requirements.in`, `requirements.txt`, and `constraints.txt` files were removed in Batch 11.
-
-Install dependencies from the lock:
+Useful local commands from this `am-core` folder:
 
 ```bash
-uv sync --frozen --all-groups
+just ps
+just start
+just test
+just test-target core.adverts
+just test-api
+just flake
+just migrate
+just collectstatic
+just forum-test
 ```
 
-Python constraints:
+## Dependency Workflow
 
-- `pyproject.toml` allows `>=3.14,<3.15`
-- Docker uses Python `3.14.5` for `core`
-- Django 6 supports Python 3.12, 3.13, and 3.14. `am-core` intentionally tracks the latest stable Python 3.14 line.
+Main app dependencies are managed with uv through `pyproject.toml` and `uv.lock`.
 
-Security review on 2026-05-11 found direct dependency risks in the main requirements:
+For dependency details, read:
 
-- `Django==5.0.3`, upgraded to `Django==5.2.14` on 2026-05-12.
-- `djangorestframework==3.15.1`, upgraded to `djangorestframework==3.17.1` on 2026-05-12.
-- `Pillow==10.2.0`, upgraded to `Pillow==12.2.0` on 2026-05-12.
-- `requests==2.31.0`, upgraded to `requests==2.34.0` on 2026-05-12.
-- `social-auth-app-django==5.4.0`, upgraded to `social-auth-app-django==5.7.0` on 2026-05-12.
-- `python-jose==3.3.0`, upgraded to `python-jose==3.5.0` on 2026-05-12.
-- `lxml==5.1.0`, upgraded to `lxml==6.1.0` on 2026-05-12.
+- `docs/engineering/dependencies/README.md`
+- `docs/engineering/package-upgrades/`
 
-Batch 1 note:
+Do not reintroduce checked-in main-app `requirements.in`, `requirements.txt`, or `constraints.txt` files unless the dependency workflow intentionally changes again.
 
-- The old `social-auth-app-django[openidconnect]` extra was removed because pip reports that `social-auth-app-django==5.7.0` does not declare it.
-- After the Batch 1 install, `docker compose exec core python -m pip check` passed with no broken requirements.
-- After the Batch 1 install, direct dependency audit passed with no known vulnerabilities.
-
-Batch 2 note:
-
-- `core` and `forum_instance` Docker images were moved to `python:3.12.13-slim`; `pyproject.toml` now declares `>=3.12,<3.13`.
-- Main app ecosystem pins were updated: `psycopg[c]==3.3.4`, `django-storages==1.14.6`, `boto3==1.43.6`, `daphne==4.2.1`, `selenium==4.43.0`, `openpyxl==3.1.5`, `phonenumbers==9.0.30`, `phonenumberslite==9.0.30`, `MarkupSafe==3.0.3`, `python-dateutil==2.9.0.post0`, `xlrd==2.0.2`, and `requests==2.34.0`.
-- The obsolete Python 3 backport `ipaddress==1.0.23` was removed from the main requirements.
-- Forum shared infrastructure pins were updated: `psycopg[c]==3.3.4`, `django-storages==1.14.6`, and `boto3==1.43.6`.
-- `docker compose build core forum_instance`, `docker compose exec core python -m pip check`, `docker compose exec forum_instance python -m pip check`, and the main/forum test suites passed on Python 3.12.13.
-- Direct main dependency audit passed with no known vulnerabilities after Batch 2.
-
-Batch 4 note:
-
-- Main helper/dev pins were updated on 2026-05-12: `django-autocomplete-light==4.0.0`, `django-ckeditor==6.7.3`, `django-mptt==0.18.0`, `django-phonenumber-field==8.4.0`, `django-rosetta==0.10.3`, `social-auth-app-django==5.9.0`, `django-taggit==6.1.0`, `django-recaptcha==4.1.0`, `django-comments-dab==3.0.0`, `django-silk==5.5.0`, `django_http2_push==0.0b2`, `factory-boy==3.3.3`, `flake8==7.3.0`, and `coverage==7.14.0`.
-- Forum `social-auth-app-django` was also moved to `5.9.0`.
-- `docker compose build core forum_instance`, `docker compose exec core make test`, `docker compose exec forum_instance python manage.py test`, both `pip check` commands, and the main direct dependency audit passed after Batch 4.
-
-Batch 5 note:
-
-- Main Docker geckodriver provisioning moved from `0.30.0` to `0.36.0` on 2026-05-12.
-- The Dockerfile now chooses the Linux geckodriver archive for `amd64` or `arm64`, which matches the local Docker Compose setup.
-- `core.companies.parser` now uses the system `geckodriver` or `GECKODRIVER_PATH` instead of downloading a driver at runtime with `webdriver_manager`.
-- `webdriver_manager` was removed from `requirements.txt`.
-- `docker compose build core`, `docker compose up -d core`, `docker compose exec core make test`, `docker compose exec core python -m pip check`, and the main direct dependency audit passed after Batch 5.
-
-Batch 6 note:
-
-- Added top-level input files and transitive constraints for both services on 2026-05-12: `requirements.in`, `constraints.txt`, `forum_instance/requirements.in`, and `forum_instance/constraints.txt`.
-- Docker builds and the main `Makefile` install path now use `pip install -r requirements.txt -c constraints.txt`.
-- `docker compose build core forum_instance`, `docker compose up -d core forum_instance`, both `pip check` commands, `docker compose exec core make test`, `docker compose exec forum_instance python manage.py test`, and the main direct dependency audit passed after Batch 6.
-
-Batch 7 note:
-
-- The forum project was moved out of `am-core` into the parent `/Users/andriihots/Projects/am-dev/forum_instance` folder.
-- Parent Docker Compose now builds and mounts the forum service from `./forum_instance`.
-- `docker compose build forum_instance`, `docker compose up -d forum_instance`, `docker compose exec forum_instance python -m pip check`, `docker compose exec forum_instance python manage.py test`, and `docker compose exec core make test` passed after the move.
-
-Batch 8 note:
-
-- The main app removed the obsolete beta `django_http2_push==0.0b2` dependency on 2026-05-24.
-- A local `static_push` template tag now preserves existing template calls by delegating to Django's built-in static asset URL helper.
-- `django_http2_push` was removed from main `INSTALLED_APPS`, middleware, `requirements.in`, `requirements.txt`, and `constraints.txt`.
-- `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 8.
-
-Batch 9 note:
-
-- CSP report-only settings were moved toward Django 6 naming on 2026-05-24: `SECURE_CSP_REPORT_ONLY` is now the primary setting, with `CONTENT_SECURITY_POLICY_REPORT_ONLY` kept as a Django 5 compatibility alias.
-- The custom Django 5 middleware now reads `SECURE_CSP_REPORT_ONLY` first, matching the Django 6 migration target.
-- Added `/csp/report/` as a CSRF-exempt POST endpoint for browser CSP violation reports, and added `report-uri /csp/report/` to the report-only policy.
-- `docker compose exec core make test` passed after Batch 9 with 236 core tests, 31 API tests, and flake8.
-
-Batch 10 note:
-
-- Main `am-core` dependencies moved from `Django==5.2.14` to `Django==6.0.5` on 2026-05-24.
-- The main app now uses Django's built-in `django.middleware.csp.ContentSecurityPolicyMiddleware` with `SECURE_CSP_REPORT_ONLY`; the temporary custom report-only middleware and Django 5 alias were removed.
-- `django-ckeditor==6.7.3` was intentionally left unchanged. The CKEditor 4 security warning still requires a separate product/licensing decision, not an automatic CKEditor 5 migration.
-- A Django 6 compatibility fix was needed in `core.companies.models.Product.save`, where `super().save()` now passes Django's keyword-only save arguments by name.
-- `docker compose build core`, `docker compose up -d core`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core ./manage.py test core.utils.tests.test_security_headers --settings=settings.test_settings`, `docker compose exec core make test`, and the main direct dependency audit passed after Batch 10.
-
-Batch 11 note:
-
-- Main dependency management moved from requirements/constraints files to uv on 2026-05-24.
-- `pyproject.toml` now contains the direct main app dependencies and a `dev` dependency group for `coverage`, `factory-boy`, and `flake8`.
-- `uv.lock` is now the locked transitive dependency source for the main app.
-- The main `Dockerfile` installs dependencies with `uv sync --frozen --all-groups --no-install-project --inexact` into `/usr/local`, so Docker Compose bind mounts do not hide dependencies under `/am-core/.venv`.
-- The main `Makefile` `update` target now uses uv. The old main `requirements.in`, `requirements.txt`, and `constraints.txt` files were removed.
-- `docker compose build core`, `docker compose up -d core`, `docker compose exec core uv --version`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core make test`, and the lock-export audit passed after Batch 11.
-
-Batch 12 note:
-
-- Main Docker runtime moved from `python:3.12.13-slim` to `python:3.14.5-slim` on 2026-05-24.
-- `pyproject.toml` now requires `>=3.14,<3.15`; Black and pre-commit Python targets were aligned to Python 3.14.
-- `uv.lock` was refreshed for Python 3.14.
-- The Docker build dependency list no longer installs Debian `python3-dev`, avoiding an extra distro Python toolchain beside the official Python image runtime.
-- `docker compose build core`, `docker compose up -d core`, `docker compose exec core python --version`, `docker compose exec core python -m pip check`, `docker compose exec core ./manage.py check --settings=settings.test_settings`, `docker compose exec core make test`, `docker compose exec core uv lock --check`, `docker compose exec core uv sync --frozen --all-groups --no-install-project --inexact --check`, and the lock-export audit passed after Batch 12.
-
-Batch 13 note:
-
-- The stale Poetry pre-commit hook was removed on 2026-05-24 after the uv migration.
-- The main `Makefile` gained `make check-deps`, which runs `uv lock --check` and a frozen uv sync check.
-- The stale `release-forum` Makefile target was removed because the forum project now lives outside `am-core`.
-- `docker compose exec core make check-deps` and `docker compose exec core uv tool run pre-commit validate-config` passed after Batch 13.
-
-Forum-specific risk:
-
-- The forum project was moved out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`.
-- Do not change forum dependencies as part of the `am-core` package upgrade thread unless the user explicitly asks.
-- `django-spirit==0.14.3` pins vulnerable `mistune==0.8.4`.
-- `django-spirit==0.14.3` requires `Django<6,>=4.2`, so the forum still blocks a whole-`am-dev` Django 6 upgrade, but it no longer blocks `am-core` dependency cleanup directly.
-- Forum audit still reports `mistune==0.8.4` vulnerabilities: `CVE-2026-44708`, `CVE-2026-44896`, and `CVE-2026-44897`; `CVE-2026-44897` lists `3.2.1` as a fixed version, but Spirit pins Mistune below that line.
-- PyPI currently lists `django-spirit==0.14.3` as the latest Spirit release. Installed metadata pins `mistune==0.8.4` exactly, and Spirit subclasses Mistune 0.x parser/renderer internals, so upgrading to Mistune 3 requires a fork/vendor migration or forum replacement.
-
-## Upgrade Strategy
-
-Do not jump straight to latest packages without expanding tests around risky areas.
-
-Current verified baseline as of 2026-05-24:
-
-- After Batch 12 Python 3.14.5 upgrade, `docker compose exec core make test`: 234 core tests, 31 API tests, and flake8 passing.
-- After Batch 6 dependency constraints, `docker compose exec forum_instance python manage.py test`: 23 forum tests passing.
-- Batch 3 started forum markdown characterization with regression coverage for basic markdown, HTTPS links, raw HTML escaping, and `javascript:` URL stripping.
-
-Current upgrade-prep progress:
-
-- Step 1 baseline is done.
-- Step 2 auth/OIDC/forum SSO regression coverage is done.
-- Step 3 public page and template smoke coverage is done for the planned high-traffic slices.
-- Step 4 API contract coverage is partly done and now covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
-- Step 5 file/image/storage coverage is partly done and now covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
-- Step 6 security header coverage has started and now covers current `SecurityMiddleware`, clickjacking headers, Django 6 report-only CSP middleware, representative public page groups, authenticated profile/diary pages, and Django admin login/index. Violation cleanup and a path toward nonce/enforcement still remain.
-- Step 7 forum coverage happened before the forum was moved out of `am-core`; future forum work belongs in the sibling `am-dev/forum_instance` project.
-
-Recommended order:
-
-1. Make current tests reliably runnable through Docker Compose.
-2. Add regression tests for auth, OIDC, forum SSO, public page smoke coverage, API contracts, file/image/storage behavior, and security headers.
-3. Upgrade the main app first within the Django 5 line, preferably Django 5.2 LTS. Done for Batch 1 on 2026-05-12.
-4. Add CSP in report-only mode before enforcing it.
-5. Treat forum dependency risk as external to `am-core`; the forum now lives in the sibling `am-dev/forum_instance` project.
-6. Move `am-core` toward Django 6 independently once main-app CSP/CKEditor risks are addressed. Done for `am-core` in Batch 10; CKEditor 4 remains an explicit unresolved risk. Python 3.11 support was dropped in Batch 2, and `am-core` now targets Python 3.14 in Batch 12.
-
-Detailed plan:
-
-- `docs/engineering/package-upgrades/2026-05-11-package-upgrade-test-plan.md`
-- `docs/engineering/testing/README.md`
+Keep forum dependency work isolated in the sibling project at `../forum_instance` unless the task explicitly asks for a coupled main/forum change.
 
 ## Documentation Layout
 
@@ -196,13 +49,32 @@ Use `docs/engineering/` for technical plans, investigations, architecture notes,
 
 Use `docs/business/` for future product, domain, operations, content, and non-code business documentation.
 
+This repository now treats `docs/` as the durable knowledge base for people and agents. Before meaningful implementation work, read:
+
+- `docs/README.md` for the knowledge-base workflow.
+- `docs/business/README.md` and relevant notes under `docs/business/domains/` for domain context.
+- `docs/engineering/decisions/` for accepted or proposed decisions that affect the change.
+- `docs/work/` for the planning and result artifact workflow.
+
+Planning is required before implementation when a change affects product behavior, domain rules, architecture, dependencies, data, security, or a workflow spanning multiple apps/services. Use `docs/work/plans/template.md` and create a dated plan under `docs/work/plans/` unless an equivalent plan already exists.
+
+Small mechanical fixes do not need a full plan. Examples: typo fixes, formatting-only docs edits, small test expectation corrections, or comments that do not change behavior.
+
+Write result artifacts under `docs/work/results/` when the work needs a durable execution summary, verification record, audit output, or follow-up list.
+
+Update the durable knowledge base in the same change when implementation reveals new business rules, domain language, workflows, lifecycle states, constraints, or decisions.
+
 When adding new investigation output, prefer a dated document under a topic folder, for example:
 
+- `docs/work/plans/YYYY-MM-DD-topic.md`
+- `docs/work/results/YYYY-MM-DD-topic.md`
+- `docs/engineering/decisions/YYYY-MM-DD-topic.md`
 - `docs/engineering/package-upgrades/YYYY-MM-DD-topic.md`
 - `docs/engineering/security/YYYY-MM-DD-topic.md`
-- `docs/business/YYYY-MM-DD-topic.md`
+- `docs/business/domains/YYYY-MM-DD-topic.md`
 
 ## Working Rules
+
 
 - Prefer Docker Compose for local verification because the app expects services from the parent `am-dev` environment.
 - Avoid assuming host Python has project dependencies installed.

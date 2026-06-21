@@ -16,6 +16,7 @@ from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
+from core.registry.models import Variety
 
 
 def service_worker(request):
@@ -42,9 +43,11 @@ class IndexView(TemplateView):
         )
         context["object_list"] = Post.objects.select_objects().active().order_by("-publish_date")[:8]
         context["random_posts"] = Post.objects.select_objects().active().order_by("?")[:8]
-        context["random_adverts"] = Advert.objects.filter(updated__gte=datetime.now() - timedelta(days=14)).order_by(
-            "?"
-        )[:8]
+        context["random_adverts"] = []
+        if settings.ENABLE_ADVERTS:
+            context["random_adverts"] = Advert.objects.filter(
+                updated__gte=datetime.now() - timedelta(days=14)
+            ).order_by("?")[:8]
         return context
 
 
@@ -95,6 +98,8 @@ class PostListView(TemplateView):
             Post.objects.filter(rubric_id=category.id).values("title", "absolute_url", "country__short_slug").active()
         )
         posts = self._filter_posts(posts)
+        posts = list(posts)
+        post_count = len(posts)
         posts = [
             [key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]), key=lambda x: x["title"][0])
         ]
@@ -104,6 +109,8 @@ class PostListView(TemplateView):
             "view": self,
             "request": self.request,
             "countries": self._get_post_countries(category.id),
+            "post_count": post_count,
+            "group_count": len(posts),
         }
 
 
@@ -173,6 +180,7 @@ class PostDetail(DetailView):
         context["photo_count"] = context["object"].photo.count()
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
+        context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
         return context
 
 

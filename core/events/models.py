@@ -31,7 +31,7 @@ class Event(models.Model):
     slug = models.CharField(max_length=250, unique=True)
     address = models.CharField(max_length=350)
     text = RichTextField()
-    status = models.BooleanField(default=0)
+    status = models.BooleanField(default=True)
     start = models.DateTimeField()
     stop = models.DateTimeField()
     type = models.ForeignKey(EventType, on_delete=models.CASCADE, related_name="event_types")

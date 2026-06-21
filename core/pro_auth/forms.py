@@ -10,6 +10,10 @@ from core.classifier.models import Location
 from core.pro_auth.models import User
 
 
+class ProfileAvatarInput(forms.ClearableFileInput):
+    template_name = "pro_auth/widgets/profile_avatar_input.html"
+
+
 class AdminUserCreationForm(forms.ModelForm):
     """A form that create a user, with no privileges."""
 
@@ -104,8 +108,11 @@ class AdminUserChangeForm(forms.ModelForm):
 class UserChangeForm(forms.ModelForm):
     location = forms.ModelChoiceField(
         queryset=Location.objects.all(),
-        widget=autocomplete.ModelSelect2(url="location-autocomplete", attrs={"class": "form-control"}),
-        help_text=_("Please select city from list."),
+        widget=autocomplete.ModelSelect2(
+            url="location-autocomplete",
+            attrs={"class": "form-control", "data-placeholder": _("Почніть вводити місто")},
+        ),
+        help_text=_("Почніть вводити назву та виберіть місто зі списку."),
         label=_("City"),
     )
 
@@ -120,12 +127,38 @@ class UserChangeForm(forms.ModelForm):
             "birth_date",
             "avatar",
         )
+        widgets = {
+            "avatar": ProfileAvatarInput(),
+            "birth_date": forms.DateInput(
+                attrs={
+                    "autocomplete": "bday",
+                    "data-profile-datepicker": "",
+                    "placeholder": _("РРРР-ММ-ДД"),
+                }
+            ),
+        }
+        help_texts = {
+            "email": _("Цей email використовується для входу та повідомлень облікового запису."),
+            "first_name": _("Ім'я допоможе іншим користувачам AgroMega впізнавати вас."),
+            "last_name": _("Необов'язково. Додайте прізвище, якщо хочете зробити профіль повнішим."),
+            "phone1": _("Вкажіть номер у міжнародному форматі, наприклад +380991234567."),
+            "location": _("Почніть вводити назву та виберіть місто зі списку."),
+            "birth_date": _("Необов'язково. Вкажіть день, місяць і рік."),
+            "avatar": _("Завантажте квадратне фото або логотип, щоб профіль було легше впізнати."),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        field_attrs = {
+            "email": {"autocomplete": "email", "inputmode": "email", "placeholder": _("you@example.com")},
+            "first_name": {"autocomplete": "given-name", "placeholder": _("Ім'я")},
+            "last_name": {"autocomplete": "family-name", "placeholder": _("Прізвище")},
+            "phone1": {"autocomplete": "tel", "inputmode": "tel", "placeholder": _("+380991234567")},
+        }
         for name, field in self.fields.items():
             if name != "location":
                 field.widget.attrs["class"] = "form-control"
+            field.widget.attrs.update(field_attrs.get(name, {}))
 
 
 class EmailConfirmForm(forms.Form):

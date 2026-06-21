@@ -4,15 +4,12 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.contrib.auth import login, logout
 from django.http import Http404, HttpResponseRedirect, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.http import urlencode as django_urlencode
 from django.views.decorators.http import require_GET
-from django.views.generic import FormView, ListView, TemplateView, UpdateView, View
+from django.views.generic import FormView, TemplateView, View
 
-from core.adverts.forms import AdvertForm
-from core.adverts.models import Advert
 from core.pro_auth.forms import LoginForm, RegistrationForm, UserChangeForm
 
 
@@ -117,68 +114,6 @@ class ChangeProfileView(FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
-
-
-class ProfileAdvertListView(ListView):
-    template_name = "pro_auth/profile/advert_list.html"
-    model = Advert
-    ordering = "-updated"
-
-    def get_queryset(self):
-        return Advert.objects.filter(user=self.request.user)
-
-
-class ProfileAdvertAddView(FormView):
-    form_class = AdvertForm
-    template_name = "pro_auth/profile/advert_add.html"
-
-    def form_valid(self, form):
-        form.save()
-        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
-
-
-class UpdateProfileAdvertsView(UpdateView):
-    form_class = AdvertForm
-    template_name = "pro_auth/profile/advert_update.html"
-
-    def get_queryset(self):
-        return Advert.objects.filter(user=self.request.user)
-
-    def get_success_url(self):
-        return reverse("pro_auth:profile-adverts")
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-
-class UpdateProfileAdvertsDateView(View):
-    def get(self, request, pk):
-        advert = get_object_or_404(Advert, pk=pk, user=request.user)
-        advert.updated = timezone.now()
-        advert.save()
-        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
-
-
-class AdvertDeleteView(View):
-    def get(self, request, pk):
-        advert = get_object_or_404(Advert, pk=pk, user=request.user)
-        advert.delete()
-        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
-
-
-class AdvertDeactivateView(View):
-    def get(self, request, pk):
-        advert = get_object_or_404(Advert, pk=pk, user=request.user)
-        advert.deactivate()
-        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
-
-
-class AdvertActivateView(View):
-    def get(self, request, pk):
-        advert = get_object_or_404(Advert, pk=pk, user=request.user)
-        advert.activate()
-        return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
 
 
 @require_GET

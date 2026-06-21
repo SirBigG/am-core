@@ -62,6 +62,22 @@ class AuthTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
+class ProfileDashboardTests(TestCase):
+    def test_dashboard_renders_personal_entry_points(self):
+        user = UserFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("pro_auth:dashboard"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "pro_auth/profile/dashboard.html")
+        self.assertContains(response, "Особистий кабінет")
+        self.assertContains(response, "Створити оголошення")
+        self.assertContains(response, "Мої щоденники")
+        self.assertContains(response, "Мої рослини")
+        self.assertContains(response, "Перейти на форум через ваш AgroMega акаунт")
+
+
 # class PersonalIndexViewTests(TestCase):
 #     def test_response_ok(self):
 #         user = UserFactory()
