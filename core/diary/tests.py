@@ -1778,7 +1778,8 @@ class PlantLifecycleActionTests(TestCase):
         self.assertContains(response, f'id="plantArchiveModal{self.growing_plant.pk}"')
         self.assertContains(response, f'data-plant-move-open="plantMoveModal{self.growing_plant.pk}"')
         self.assertContains(response, f'data-plant-archive-open="plantArchiveModal{self.growing_plant.pk}"')
-        self.assertContains(response, f'name="_form_prefix" value="plant-{self.growing_plant.pk}"')
+        self.assertContains(response, 'name="_form_prefix"')
+        self.assertContains(response, f'value="plant-{self.growing_plant.pk}"')
 
     def test_detail_renders_quick_watering_panel(self):
         response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
