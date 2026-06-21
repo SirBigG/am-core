@@ -30,6 +30,7 @@
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">⌂</span>
                                 <span>Огляд</span>
                             </a>
+                            <hr class="profile-sidebar-nav__divider">
                             <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-adverts' %} is-active{% endif %}"
                                href="{% url 'pro_auth:profile-adverts' %}">
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">☰</span>
@@ -40,6 +41,7 @@
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">+</span>
                                 <span>Створити оголошення</span>
                             </a>
+                            <hr class="profile-sidebar-nav__divider">
                             <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-diary-list' %} is-active{% endif %}"
                                href="{% url 'pro_auth:profile-diary-list' %}">
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">✍</span>
@@ -50,6 +52,7 @@
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">•</span>
                                 <span>Мої рослини</span>
                             </a>
+                            <hr class="profile-sidebar-nav__divider">
                             <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'change-profile' %} is-active{% endif %}"
                                href="{% url 'pro_auth:change-profile' %}">
                                 <span class="profile-sidebar-nav__icon" aria-hidden="true">◎</span>
