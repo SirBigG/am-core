@@ -1,14 +1,14 @@
 {% load cache %}
 {% load post_extras classifier_extras %}
 {% get_root_categories_links as categories_links %}
-<header class="navbar bg-light navbar-expand-lg border-bottom border-success">
+<header class="navbar navbar-expand-lg site-header">
     <div class="container">
-        <a class="navbar-brand text-success h4" href="{% url 'index' %}">Agro Mega</a>
+        <a class="navbar-brand site-header__brand" href="{% url 'index' %}">Agro Mega</a>
         <div class="collapse navbar-collapse justify-content-center"
              id="main-menu-collapse">
-            <ul class="navbar-nav">
+            <ul class="navbar-nav site-header__nav">
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-success"
+                    <a class="nav-link dropdown-toggle site-header__link"
                        href="#"
                        id="readNavbarDropdown"
                        role="button"
@@ -17,40 +17,44 @@
                     <ul class="dropdown-menu border border-success"
                         aria-labelledby="readNavbarDropdown">
                         <li>
-                            <a class="dropdown-item text-success" href="{% url 'categories' %}">Всі категорії</a>
+                            <a class="dropdown-item site-header__dropdown-link"
+                               href="{% url 'categories' %}">Всі категорії</a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         {% for category in categories_links %}
                             <li>
-                                <a class="dropdown-item text-success" href="{{ category.url }}">{{ category.title }}</a>
+                                <a class="dropdown-item site-header__dropdown-link"
+                                   href="{{ category.url }}">{{ category.title }}</a>
                             </li>
                         {% endfor %}
                         <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item text-success" href="{% url 'registry:index' %}">Державний реєстр
+                            <a class="dropdown-item site-header__dropdown-link"
+                               href="{% url 'registry:index' %}">Державний реєстр
                                 сортів рослин,
                             придатних для поширення в Україні</a>
                         </li>
                     </ul>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{% url 'news:news-list' %}">Новини</a>
+                    <a class="nav-link site-header__link" href="{% url 'news:news-list' %}">Новини</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{% url 'adverts:list' %}">Оголошення</a>
+                    <a class="nav-link site-header__link" href="{% url 'adverts:list' %}">Оголошення</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{% url 'events:event-list' %}">Події</a>
+                    <a class="nav-link site-header__link"
+                       href="{% url 'events:event-list' %}">Події</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{% url 'companies:list' %}">Компанії</a>
+                    <a class="nav-link site-header__link" href="{% url 'companies:list' %}">Компанії</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-success" href="{{ forum_sso_url }}">Форум</a>
+                    <a class="nav-link site-header__link" href="{{ forum_sso_url }}">Форум</a>
                 </li>
             </ul>
         </div>
@@ -60,7 +64,7 @@
                 <div class="nav-item m-1">
                     <button id="search-button"
                             onclick="location.href='/search/'"
-                            class="btn btn-success btn-sm"
+                            class="btn site-header__search-btn"
                             role="button"
                             title="Пошук">
                         <i class="icon-search"></i>
@@ -94,24 +98,24 @@
                             <ul class="dropdown-menu dropdown-menu-end">
                                 {% if request.user.is_authenticated %}
                                     <li>
-                                        <a class="dropdown-item text-success"
+                                        <a class="dropdown-item site-header__dropdown-link"
                                            href="{% url 'pro_auth:dashboard' %}">Огляд профілю</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-success"
+                                        <a class="dropdown-item site-header__dropdown-link"
                                            href="{% url 'pro_auth:profile-adverts' %}">Мої
                                         Оголошення</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-success"
+                                        <a class="dropdown-item site-header__dropdown-link"
                                            href="{% url 'pro_auth:profile-diary-list' %}">Мої Щоденники</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-success"
+                                        <a class="dropdown-item site-header__dropdown-link"
                                            href="{% url 'pro_auth:profile-plant-list' %}">Мої рослини</a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item text-success"
+                                        <a class="dropdown-item site-header__dropdown-link"
                                            href="{% url 'pro_auth:change-profile' %}">Налаштування</a>
                                     </li>
                                     <li>
@@ -122,7 +126,8 @@
                                     </li>
                                 {% else %}
                                     <li>
-                                        <a class="dropdown-item text-success" href="{% url 'pro_auth:login' %}">Увійти</a>
+                                        <a class="dropdown-item site-header__dropdown-link"
+                                           href="{% url 'pro_auth:login' %}">Увійти</a>
                                     </li>
                                 {% endif %}
                             </ul>
