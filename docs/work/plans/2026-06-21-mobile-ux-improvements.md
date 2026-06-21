@@ -1,7 +1,7 @@
 # Plan: Mobile UX Improvements
 
 - Date: 2026-06-21
-- Status: Draft
+- Status: First implementation block complete
 - Owner: TBD
 - Related domain: Cross-domain mobile experience; Advertising Marketplace; Diary And Journals; Catalog Information; Companies And Shops; Events Calendar; Authentication And Identity
 - Related decisions: `docs/engineering/decisions/2026-06-21-knowledge-base-and-planning.md`
@@ -262,12 +262,12 @@ Improve the signed-in mobile workspace so it feels like one coherent personal ar
 - [x] Confirm the first implementation phase and owner.
 - [x] Inventory repeated forms, cards, buttons, listing rows, and empty states.
 - [x] Define the first shared mobile UI patterns.
-- [ ] Decide mobile navigation content and priority.
-- [ ] Confirm logged-out create-page behavior for adverts and events.
+- [ ] Decide final mobile navigation content and priority.
+- [x] Confirm first-pass logged-out create-page behavior for adverts and events.
 - [x] Keep local/test-looking adverts visible while improving how cards handle rough content.
 - [x] Inspect shared mobile templates, CSS, and forum integration points.
-- [ ] Implement Phase 1 shared mobile shell improvements.
-- [ ] Implement Phase 2 create-flow improvements.
+- [x] Implement Phase 1 shared mobile shell improvements.
+- [x] Implement Phase 2 create-flow improvements.
 - [x] Implement selected Phase 3 page-specific improvements.
 - [x] Run targeted automated tests.
 - [x] Run manual mobile verification on public pages.

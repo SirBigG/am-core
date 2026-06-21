@@ -58,7 +58,6 @@
 
 ## Remaining Follow-Ups
 
-- Decide the mobile navigation content and priority for the bottom nav/account menu.
-- Continue shared card/list polish for public listing pages: adverts, companies, events, news, categories, and registry.
-- Review logged-out create-page behavior and whether forms should show a clearer login gate before users invest effort.
-- Align forum navigation and identity handoff with the main signed-in experience.
+- Decide final mobile navigation content and priority for the bottom nav/account menu.
+- Decide whether public advert/event create pages should stay available with sign-in prompts or move to a stronger login gate.
+- Align forum navigation and identity handoff with the main signed-in experience; this likely needs coordinated work with the sibling `forum_instance` project.
