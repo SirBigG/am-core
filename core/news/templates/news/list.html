@@ -1,63 +1,75 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
 {% block extra_meta %}
     <meta content="Аграрні новини України" property="og:title">
-    <meta content="Останні новини з аграрної сфери України." property="og:description">
-    {% if request.GET.page %}
-        <meta name="robots" content="noindex, nofollow">{% endif %}
+    <meta content="Останні новини з аграрної сфери України."
+          property="og:description">
+    {% if request.GET.page %}<meta name="robots" content="noindex, nofollow">{% endif %}
 {% endblock extra_meta %}
-
-{% block title %}Аграрні новини України{% endblock %}
-
-{% block page_title %}Aграрні новини України{% endblock %}
+{% block title %}
+    Аграрні новини України
+{% endblock title %}
+{% block page_title %}
+    Аграрні новини України
+{% endblock page_title %}
 {% block page_title_right %}
-    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram
-        <i class="icon-paper-plane"></i></a>{% endblock %}
-
+    <a href="https://telegram.me/wn_world_news_bot?start=1"
+       target="_blank"
+       class="btn btn-outline-primary btn-sm">Telegram
+        <i class="icon-paper-plane"></i></a>
+{% endblock page_title_right %}
 {% block content %}
-    {% for obj in object_list %}
-        <div class="row">
-            <div class="card mb-3 w-100">
-                <div class="row no-gutters">
-                    <div class="col-md-3 col-12 p-0">
-                        {% if obj.data.image %}
-                            {% if "http" in obj.data.image %}
-                                <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">
-                            {% endif %}
+    <div class="site-card-list">
+        {% for obj in object_list %}
+            <article class="site-list-card{% if not obj.data.image or 'http' not in obj.data.image %} site-list-card--text-only{% endif %}">
+                {% if obj.data.image and "http" in obj.data.image %}
+                    {% if "agromega" in obj.data.link %}
+                        <a class="site-list-card__media"
+                           href="{{ obj.data.link }}"
+                           aria-label="{{ obj.data.title }}">
+                            <img class="site-list-card__image"
+                                 src="{{ obj.data.image }}"
+                                 alt="{{ obj.data.title }}"
+                                 width="350"
+                                 height="260">
+                        </a>
+                    {% else %}
+                        <a class="site-list-card__media"
+                           href="{{ obj.data.link }}"
+                           target="_blank"
+                           rel="noopener"
+                           aria-label="{{ obj.data.title }}">
+                            <img class="site-list-card__image"
+                                 src="{{ obj.data.image }}"
+                                 alt="{{ obj.data.title }}"
+                                 width="350"
+                                 height="260">
+                        </a>
+                    {% endif %}
+                {% endif %}
+                <div class="site-list-card__body">
+                    <h2 class="site-list-card__title">{{ obj.data.title }}</h2>
+                    <ul class="site-list-card__meta" aria-label="Дані новини">
+                        <li class="site-list-card__meta-item">{{ obj.created }}</li>
+                        <li class="site-list-card__meta-item">{{ obj.data.link|get_domain }}</li>
+                    </ul>
+                    <div class="site-list-card__actions">
+                        {% if "agromega" in obj.data.link %}
+                            <a class="site-list-card__link" href="{{ obj.data.link }}">Читати</a>
+                        {% else %}
+                            <a class="site-list-card__link"
+                               href="{{ obj.data.link }}"
+                               target="_blank"
+                               rel="noopener">Читати</a>
                         {% endif %}
                     </div>
-                    <div class="col-md-9 col-12">
-                        <div class="card-body">
-                            <p class="card-title h6">{{ obj.data.title }}</p>
-                            <div class="row justify-content-around">
-                                <div class="col-4">
-                                    <p class="text-danger pt-1">{{ obj.created }}</p>
-                                </div>
-                                <div class="col-8">
-                                    <p>
-                                        {% if "agromega" in obj.data.link %}
-                                            <a class="btn text-success pt-1"
-                                               href="{{ obj.data.link }}">{{ obj.data.link|get_domain }}</a>
-                                        {% else %}
-                                            <button class="btn text-success pt-1"
-                                                    onclick="window.open('{{ obj.data.link }}', '_blank')">{{ obj.data.link|get_domain }}</button>
-                                        {% endif %}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-    {% endfor %}
-
+            </article>
+        {% endfor %}
+    </div>
     {% include "helpers/pagination_short.html" %}
 {% endblock content %}

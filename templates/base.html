@@ -350,6 +350,119 @@
             font-weight: 800;
         }
 
+        .site-card-list {
+            display: grid;
+            gap: 1rem;
+            width: 100%;
+        }
+
+        .site-list-card {
+            display: grid;
+            grid-template-columns: minmax(180px, 34%) minmax(0, 1fr);
+            overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #e1e8e2;
+            border-radius: 20px;
+            box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+        }
+
+        .site-list-card--text-only {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .site-list-card__media {
+            min-height: 100%;
+            background: #eef4ef;
+        }
+
+        .site-list-card__image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 210px;
+            object-fit: cover;
+        }
+
+        .site-list-card__body {
+            display: grid;
+            gap: 0.75rem;
+            padding: 1.15rem;
+        }
+
+        .site-list-card__title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1.25rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .site-list-card__title-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .site-list-card__title-link:hover,
+        .site-list-card__title-link:focus {
+            color: #148543;
+            text-decoration: none;
+        }
+
+        .site-list-card__text {
+            margin: 0;
+            color: #4b5563;
+            font-size: 0.98rem;
+            line-height: 1.55;
+        }
+
+        .site-list-card__meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .site-list-card__meta-item {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            background: #f3fbf3;
+            color: #385442;
+            font-size: 0.9rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .site-list-card__actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.25rem;
+        }
+
+        .site-list-card__link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 46px;
+            padding: 0 1rem;
+            color: #148543;
+            background: #f3fbf3;
+            border-radius: 12px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .site-list-card__link:hover,
+        .site-list-card__link:focus {
+            color: #0f6f37;
+            text-decoration: none;
+            background: #e8f6e9;
+        }
+
         .plant-diary-site-banner {
             display: flex;
             align-items: center;
@@ -443,6 +556,25 @@
 
             .site-action-card {
                 min-height: 0;
+            }
+
+            .site-list-card {
+                grid-template-columns: minmax(0, 1fr);
+                border-radius: 18px;
+            }
+
+            .site-list-card__media {
+                min-height: 0;
+            }
+
+            .site-list-card__image {
+                min-height: 190px;
+                aspect-ratio: 16 / 10;
+            }
+
+            .site-list-card__actions,
+            .site-list-card__link {
+                width: 100%;
             }
         }
 
