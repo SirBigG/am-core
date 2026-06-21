@@ -22,6 +22,7 @@
 - Added mobile-friendly sign-in prompts on public advert and event create forms with `next` links back to the current form, without blocking anonymous posting.
 - Added shared mobile detail/product styles and applied them to event and company detail pages.
 - Reduced plant diary promo fatigue with a compact, dismissible site banner that remembers dismissal when browser storage is available.
+- Improved diary workspace mobile action targets so diary, entry, and plant overflow controls are visible and 48px on mobile.
 
 ## Verification
 
@@ -51,6 +52,7 @@
   - Signed-in `/adverts/create/` and `/events/create/` form rendering
   - Company detail page from `/companies/`
   - Plant diary banner layout and dismiss behavior on `/companies/`
+  - Diary list and diary detail action target sizes at `390px` width.
 
 ## Remaining Follow-Ups
 
@@ -58,4 +60,3 @@
 - Continue shared card/list polish for public listing pages: adverts, companies, events, news, categories, and registry.
 - Review logged-out create-page behavior and whether forms should show a clearer login gate before users invest effort.
 - Align forum navigation and identity handoff with the main signed-in experience.
-- Continue diary and plant workspace touch-target polish for action menus and dense quick actions.
