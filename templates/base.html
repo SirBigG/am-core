@@ -520,6 +520,10 @@
             width: 100%;
         }
 
+        .site-article-shell.post-content {
+            border-bottom: 0 !important;
+        }
+
         .site-catalog-hero,
         .site-article-hero,
         .site-content-section {
@@ -963,6 +967,53 @@
         .site-share-actions a:focus {
             background: #dbeafe;
             text-decoration: none;
+        }
+
+        .site-random-posts {
+            border-bottom-color: #e4ece5 !important;
+        }
+
+        .site-random-posts__grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .site-random-posts__item {
+            min-width: 0;
+        }
+
+        .site-random-posts__link {
+            display: grid;
+            gap: 0.65rem;
+            color: #148543;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .site-random-posts__link:hover,
+        .site-random-posts__link:focus {
+            color: #0b8043;
+            text-decoration: none;
+        }
+
+        .site-random-posts__image {
+            display: block;
+            width: 100%;
+            aspect-ratio: 4 / 3;
+            object-fit: cover;
+            border-radius: 12px;
+            background: #eef4ef;
+        }
+
+        .site-random-posts__title {
+            margin: 0;
+            color: currentColor;
+            font-size: 0.98rem;
+            font-weight: 750;
+            line-height: 1.3;
+            overflow-wrap: anywhere;
         }
 
         .site-table-scroll {
@@ -1506,6 +1557,11 @@
         }
 
         @media (max-width: 767.98px) {
+            body main {
+                margin-bottom: 0 !important;
+                padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
+            }
+
             main > .container {
                 padding-top: 1rem;
             }
@@ -1605,6 +1661,15 @@
             .site-content-section {
                 padding: 1rem;
                 border-radius: 18px;
+            }
+
+            .site-article-shell {
+                padding-bottom: 1.25rem;
+            }
+
+            .site-random-posts__grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 1rem 0.75rem;
             }
 
             .site-catalog-hero__title,
