@@ -2461,7 +2461,28 @@
 
     .profile-diary-detail-menu__toggle {
         width: 48px;
+        height: 48px;
         min-width: 48px;
+        min-height: 48px;
+    }
+
+    .profile-diary-card-menu__toggle,
+    .profile-diary-entry-menu__toggle,
+    .profile-diary-plant-menu__toggle {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+        font-size: 1.25rem;
+    }
+
+    .profile-diary-card-menu__action,
+    .profile-diary-detail-menu__action,
+    .profile-diary-entry-menu__action,
+    .profile-diary-plant-menu__action {
+        justify-content: flex-start;
+        width: 100%;
+        min-height: 48px;
     }
 
     .profile-diary-detail-menu__dropdown,
