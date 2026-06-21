@@ -29,6 +29,11 @@ class EventListViewTests(TestCase):
         response = self.client.get(reverse("events:event-list"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/list.html")
+        self.assertContains(response, "Події агросфери")
+        self.assertContains(response, reverse("events:event-form"))
+        self.assertContains(response, "Опублікувати подію")
+        self.assertContains(response, "site-list-card__meta")
+        self.assertContains(response, "до ")
         # for event, test in zip(response.context["object_list"], events):
         #     self.assertEqual(event.pk, test.pk)
 

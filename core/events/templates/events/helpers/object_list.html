@@ -16,11 +16,35 @@
                     <a class="site-list-card__title-link"
                        href="{{ event.get_absolute_url }}">{{ event.title }}</a>
                 </h2>
+                <ul class="site-list-card__meta" aria-label="Дані події">
+                    {% if event.type %}<li class="site-list-card__meta-item">{{ event.type.title }}</li>{% endif %}
+                    <li class="site-list-card__meta-item">
+                        <i class="icon-calendar" aria-hidden="true"></i>
+                        {{ event.start|date:"d E Y H:i" }}
+                    </li>
+                    {% if event.stop %}
+                        <li class="site-list-card__meta-item">
+                            <i class="icon-clock" aria-hidden="true"></i>
+                            до {{ event.stop|date:"d E Y H:i" }}
+                        </li>
+                    {% endif %}
+                    {% if event.location %}
+                        <li class="site-list-card__meta-item">
+                            <i class="icon-home" aria-hidden="true"></i>
+                            {{ event.location }}
+                        </li>
+                    {% endif %}
+                </ul>
                 <p class="site-list-card__text">{{ event.text|striptags|safe|truncatechars:200 }}</p>
                 <div class="site-list-card__actions">
                     <a class="site-list-card__link" href="{{ event.get_absolute_url }}">Докладніше</a>
                 </div>
             </div>
         </article>
+    {% empty %}
+        <div class="site-form-panel site-search-empty">
+            <h2 class="site-action-panel__title">Подій поки немає</h2>
+            <p class="site-form-help">Ви можете опублікувати першу подію, і вона з'явиться в цьому списку після збереження.</p>
+        </div>
     {% endfor %}
 </div>
