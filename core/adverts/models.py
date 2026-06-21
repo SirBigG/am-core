@@ -12,6 +12,7 @@ from PIL import Image
 from transliterate import slugify
 
 from core.classifier.models import Category
+from core.utils.images import unique_image_name
 
 WIDTH = 350
 DEFAULT_MAX_PHOTOS = 5
@@ -27,6 +28,17 @@ class ActiveAdvertsManager(models.Manager):
                 updated__gte=datetime.now() - timedelta(days=settings.ADVERT_ACTIVE_DAYS),
             )
         )
+
+
+def prepare_advert_image(image):
+    im = Image.open(BytesIO(image.read()))
+    if im.mode != "RGB":
+        im = im.convert("RGB")
+    im = im.resize((WIDTH, int(float(im.size[1]) * float(WIDTH / float(im.size[0])))), Image.LANCZOS)
+    output = BytesIO()
+    im.save(output, format="JPEG", quality=85)
+    output.seek(0)
+    return File(output, unique_image_name(prefix="advert", extension="jpg"))
 
 
 class Advert(models.Model):
@@ -77,13 +89,7 @@ class Advert(models.Model):
                 super().save(*args, **kwargs)
                 return
         if self.image:
-            im = Image.open(BytesIO(self.image.read()))
-            if im.mode != "RGB":
-                im = im.convert("RGB")
-            im = im.resize((WIDTH, int(float(im.size[1]) * float(WIDTH / float(im.size[0])))), Image.LANCZOS)
-            output = BytesIO()
-            im.save(output, format="JPEG", quality=85)
-            self.image = File(output, self.image.name)
+            self.image = prepare_advert_image(self.image)
         super().save(*args, **kwargs)
 
     def activate(self):
@@ -137,13 +143,7 @@ class AdvertImage(models.Model):
                 super().save(*args, **kwargs)
                 return
         if self.image:
-            im = Image.open(BytesIO(self.image.read()))
-            if im.mode != "RGB":
-                im = im.convert("RGB")
-            im = im.resize((WIDTH, int(float(im.size[1]) * float(WIDTH / float(im.size[0])))), Image.LANCZOS)
-            output = BytesIO()
-            im.save(output, format="JPEG", quality=85)
-            self.image = File(output, self.image.name)
+            self.image = prepare_advert_image(self.image)
         super().save(*args, **kwargs)
 
 

@@ -13,7 +13,7 @@
                 {% for photo_url in form.instance.photo_urls %}
                     <div class="col-6 col-md-3 mb-2">
                         <a href="{{ photo_url }}" target="_blank" rel="noopener">
-                            <img src="{{ photo_url }}"
+                            <img src="{% imgproxy_url photo_url 350 260 %}"
                                  alt="{{ form.instance.title }}"
                                  width="350"
                                  height="260"

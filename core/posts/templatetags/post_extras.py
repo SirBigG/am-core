@@ -1,6 +1,3 @@
-import base64
-import hashlib
-import hmac
 from urllib.parse import urlparse
 
 from django import template
@@ -10,6 +7,7 @@ from django.core.files.storage import storages
 from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Post
+from core.utils.images import imgproxy_url as build_image_url
 
 register = template.Library()
 
@@ -122,18 +120,7 @@ def imgproxy_url(image_url, width, height, resize_type="fit", output_format="web
     :param output_format: Output format (default is 'webp')
     :return: Imgproxy URL
     """
-    key = bytes.fromhex(settings.IMGPROXY_KEY)
-    salt = bytes.fromhex(settings.IMGPROXY_SALT)
-    base_url = settings.IMGPROXY_BASE_URL
-
-    encoded_url = base64.urlsafe_b64encode(image_url.encode()).rstrip(b"=").decode()
-    path = f"/rs:{resize_type}:{width}:{height}:f:0/{encoded_url}.{output_format}"
-    path_b = path.encode()
-
-    signature = hmac.new(key, salt + path_b, hashlib.sha256).digest()
-
-    encoded_signature = base64.urlsafe_b64encode(signature).rstrip(b"=").decode()
-    return f"{base_url}/{encoded_signature}{path}"
+    return build_image_url(image_url, width, height, resize_type=resize_type, output_format=output_format)
 
 
 # ####################    Filters    ################### #

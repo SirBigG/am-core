@@ -1,6 +1,8 @@
+import os
 from http import HTTPStatus
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
+from PIL import Image
 
 from core.adverts.models import Advert, AdvertImage, get_advert_max_photos
 from core.utils.tests.factories import UserFactory
@@ -11,6 +13,13 @@ def make_named_image(name):
     image = make_image()
     image.name = name
     return image
+
+
+def assert_safe_advert_image_name(test_case, image_name):
+    basename = os.path.basename(image_name)
+
+    test_case.assertRegex(basename, r"^advert-[0-9a-f]{32}\.jpg$")
+    test_case.assertEqual(image_name, f"adverts/images/{basename}")
 
 
 class TestAdvertFormView(TestCase):
@@ -57,6 +66,31 @@ class TestAdvertFormView(TestCase):
         advert = Advert.objects.get()
         self.assertEqual(advert.photos.count(), 2)
 
+    def test_main_image_uses_safe_unique_name_after_upload(self):
+        advert = Advert.objects.create(
+            title="test",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_named_image("Привіт bad name <script>.png"),
+        )
+
+        assert_safe_advert_image_name(self, advert.image.name)
+        self.assertNotIn("Привіт", advert.image.name)
+        with Image.open(advert.image.path) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertGreater(image.size[0], 0)
+
+    def test_extra_photo_uses_safe_unique_name_after_upload(self):
+        advert = Advert.objects.create(title="test", description="test", price=100, contact="test")
+        photo = AdvertImage.objects.create(advert=advert, image=make_named_image("Привіт bad name <script>.png"))
+
+        assert_safe_advert_image_name(self, photo.image.name)
+        self.assertNotIn("Привіт", photo.image.name)
+        with Image.open(photo.image.path) as image:
+            self.assertEqual(image.format, "JPEG")
+            self.assertGreater(image.size[0], 0)
+
     def test_post_limits_photo_count(self):
         photos = [make_named_image(f"test-{index}.jpg") for index in range(get_advert_max_photos() + 1)]
         response = self.client.post(
@@ -95,6 +129,42 @@ class TestAdvertFormView(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, "test")
 
+    @override_settings(USE_IMGPROXY=False)
+    def test_list_uses_original_advert_image_when_imgproxy_disabled(self):
+        Advert.objects.create(
+            title="test",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_named_image("test.jpg"),
+        )
+
+        response = self.client.get("/adverts/")
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, 'src="/media/adverts/images/')
+        self.assertNotContains(response, "/imgproxy/")
+
+    @override_settings(
+        USE_IMGPROXY=True,
+        IMGPROXY_KEY="0000000000000000000000000000000000000000000000000000000000000000",
+        IMGPROXY_SALT="0000000000000000000000000000000000000000000000000000000000000000",
+        IMGPROXY_BASE_URL="/imgproxy",
+    )
+    def test_list_uses_imgproxy_for_advert_image_when_enabled(self):
+        Advert.objects.create(
+            title="test",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_named_image("test.jpg"),
+        )
+
+        response = self.client.get("/adverts/")
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, 'src="/imgproxy/')
+
 
 class ProfileAdvertTests(TestCase):
     def test_profile_list_uses_adverts_template(self):
@@ -119,3 +189,22 @@ class ProfileAdvertTests(TestCase):
         self.assertEqual(response.status_code, HTTPStatus.FOUND)
         self.assertEqual(response.url, "/profile/adverts")
         self.assertEqual(Advert.objects.filter(user=user).count(), 1)
+
+    @override_settings(USE_IMGPROXY=False)
+    def test_profile_update_uses_original_advert_image_when_imgproxy_disabled(self):
+        user = UserFactory()
+        advert = Advert.objects.create(
+            user=user,
+            title="test",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_named_image("test.jpg"),
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(f"/profile/adverts/update/{advert.pk}")
+
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, 'src="/media/adverts/images/')
+        self.assertNotContains(response, "/imgproxy/")

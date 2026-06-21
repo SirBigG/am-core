@@ -5,7 +5,7 @@
             <div class="row no-gutters">
                 {% if advert.primary_image_url %}
                     <div class="col-md-4 col-12 p-0">
-                        <img src="{{ advert.primary_image_url }}"
+                        <img src="{% imgproxy_url advert.primary_image_url 350 260 %}"
                              alt="{{ advert.title }}"
                              width="350"
                              height="260"
