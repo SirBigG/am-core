@@ -259,17 +259,17 @@ Improve the signed-in mobile workspace so it feels like one coherent personal ar
 
 ## Implementation Checklist
 
-- [ ] Confirm the first implementation phase and owner.
-- [ ] Inventory repeated forms, cards, buttons, listing rows, and empty states.
-- [ ] Define the first shared mobile UI patterns.
+- [x] Confirm the first implementation phase and owner.
+- [x] Inventory repeated forms, cards, buttons, listing rows, and empty states.
+- [x] Define the first shared mobile UI patterns.
 - [ ] Decide mobile navigation content and priority.
 - [ ] Confirm logged-out create-page behavior for adverts and events.
-- [ ] Keep local/test-looking adverts visible while improving how cards handle rough content.
-- [ ] Inspect shared mobile templates, CSS, and forum integration points.
+- [x] Keep local/test-looking adverts visible while improving how cards handle rough content.
+- [x] Inspect shared mobile templates, CSS, and forum integration points.
 - [ ] Implement Phase 1 shared mobile shell improvements.
 - [ ] Implement Phase 2 create-flow improvements.
-- [ ] Implement selected Phase 3 page-specific improvements.
-- [ ] Run targeted automated tests.
-- [ ] Run manual mobile verification on public pages.
-- [ ] Review authenticated personal area after sign-in is available.
-- [ ] Record implementation results and follow-up items.
+- [x] Implement selected Phase 3 page-specific improvements.
+- [x] Run targeted automated tests.
+- [x] Run manual mobile verification on public pages.
+- [x] Review authenticated personal area after sign-in is available.
+- [x] Record implementation results and follow-up items.
