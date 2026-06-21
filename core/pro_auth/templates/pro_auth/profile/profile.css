@@ -305,6 +305,67 @@
     white-space: nowrap;
 }
 
+.profile-avatar-control {
+    display: grid;
+    gap: 0.9rem;
+}
+
+.profile-avatar-current {
+    display: grid;
+    grid-template-columns: 72px minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.85rem;
+    background: #fbfdf9;
+    border: 1px solid #d6e0d7;
+    border-radius: 18px;
+}
+
+.profile-avatar-current__image {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 18px;
+    background: #eef2f7;
+}
+
+.profile-avatar-current__label {
+    color: #1f2937;
+    font-size: 0.98rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.profile-avatar-current__link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    color: #148543;
+    font-size: 0.95rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.profile-avatar-clear {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: 44px;
+    margin: 0;
+    padding: 0.65rem 0.85rem;
+    color: #4b5563;
+    background: #fff;
+    border: 1px solid #e4ece5;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.profile-avatar-clear input {
+    width: 18px;
+    height: 18px;
+}
+
 .profile-diary-item-meta-row {
     grid-template-columns: minmax(0, 30fr) minmax(0, 70fr);
     align-items: end;
