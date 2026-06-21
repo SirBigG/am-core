@@ -18,10 +18,13 @@ The knowledge base is organized around:
 
 - Business domain notes in `docs/business/domains/`.
 - Engineering decision records in `docs/engineering/decisions/`.
-- Implementation plans in `docs/engineering/planning/`.
+- Implementation plans in `docs/work/plans/`.
+- Result artifacts in `docs/work/results/`.
 - Existing technical topic folders such as `dependencies/`, `package-upgrades/`, and `testing/`.
 
-Meaningful implementation work should begin with a short plan when it affects product behavior, domain rules, architecture, dependencies, data, security, or cross-app workflows. The plan should use `docs/engineering/planning/template.md` unless the work already has an equivalent planning artifact.
+Meaningful implementation work should begin with a short plan when it affects product behavior, domain rules, architecture, dependencies, data, security, or cross-app workflows. The plan should use `docs/work/plans/template.md` unless the work already has an equivalent planning artifact.
+
+Work result artifacts should be written under `docs/work/results/` when implementation needs a durable summary of what happened, what was verified, and what follow-up remains.
 
 Domain notes should be updated as work reveals business language, rules, workflows, states, integrations, or open questions.
 

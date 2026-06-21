@@ -1,6 +1,6 @@
 # Testing
 
-Baseline verified on 2026-05-12 using the parent Docker Compose stack in `/Users/andriihots/Projects/am-dev`.
+Baseline verified on 2026-05-12 using the parent Docker Compose stack from the `am-dev` folder.
 
 ## Commands
 

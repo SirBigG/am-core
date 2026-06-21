@@ -1,15 +1,16 @@
 # Engineering Docs
 
-Technical project documentation lives here: upgrade plans, architecture notes, investigations, security findings, implementation plans, decision records, and release notes.
+Technical project documentation lives here: architecture notes, investigations, security findings, dependency notes, decision records, and release notes.
 
 Current topics:
 
 - `decisions/` - accepted, proposed, superseded, and rejected decision records.
 - `dependencies/` - dependency file workflow, constraints, and reproducibility notes.
 - `package-upgrades/` - dependency upgrade research and test plans.
-- `planning/` - planning workflow and implementation plan template.
 - `security/` - security investigations, audit results, threat-model notes, and rollout plans.
 - `testing/` - local test commands, baseline status, and known test-suite warnings.
+
+Plans and result artifacts belong in `docs/work/`.
 
 ## Working Agreements
 

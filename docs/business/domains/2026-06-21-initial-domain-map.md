@@ -13,9 +13,10 @@ This is not a final DDD model. It is a map to improve through real work.
 
 ### Advertising And Promotion
 
-- Likely purpose: manage promotional or advertising content shown in the product.
+- Confirmed purpose: support client-created items about buying or selling something.
 - Implementation starting point: `core/adverts`.
-- Open questions: Who buys or creates adverts? What targeting, approval, billing, or display rules exist?
+- Current domain folder: `advertising-marketplace/`.
+- Open questions: What item types, moderation, expiry, contact, pricing, location, and category rules exist?
 
 ### Analytics And Metrics
 
@@ -25,27 +26,31 @@ This is not a final DDD model. It is a map to improve through real work.
 
 ### Classification And Taxonomy
 
-- Likely purpose: organize content, companies, products, posts, or services into categories and terms.
+- Confirmed purpose: provide a shared tree of categories used by other core project areas.
 - Implementation starting point: `core/classifier`.
-- Open questions: Which taxonomies are controlled by admins, and which are user-generated? Are categories shared across domains?
+- Current domain folder: `classification-and-taxonomy/`.
+- Open questions: Who can maintain the tree, and what happens when categories move or are removed?
 
 ### Companies And Products
 
-- Likely purpose: represent agribusiness companies, company profiles, and products.
+- Confirmed purpose: represent companies, shops, addresses, product information, prices, and other important business details.
 - Implementation starting point: `core/companies`.
-- Open questions: What makes a company verified, active, hidden, or trusted? Who owns company profile data?
+- Current domain folder: `companies-and-shops/`.
+- Open questions: Who owns company data, how verification works, and how product prices are maintained.
 
 ### Diary
 
-- Likely purpose: support user or farm diary workflows.
+- Confirmed purpose: support personalized user plant, field, diary, and journal workflows.
 - Implementation starting point: `core/diary`.
-- Open questions: What business process does the diary support? Is it private user data, shared agronomy data, or both?
+- Current domain folder: `diary-and-journals/`.
+- Open questions: What exact journal types exist, how private they are, and whether sharing exists.
 
 ### Events
 
-- Likely purpose: publish and manage agricultural events.
+- Confirmed purpose: provide a calendar of events that anyone can share with other people.
 - Implementation starting point: `core/events`.
-- Open questions: What event lifecycle exists? Are registrations, attendance, locations, or organizer roles part of the domain?
+- Current domain folder: `events-calendar/`.
+- Open questions: What event lifecycle exists, whether moderation is required, and whether registrations or attendance are tracked.
 
 ### News And Editorial Content
 
@@ -53,11 +58,12 @@ This is not a final DDD model. It is a map to improve through real work.
 - Implementation starting point: `core/news`.
 - Open questions: What editorial workflow exists? Are drafts, approvals, authors, tags, and publication windows modeled?
 
-### Community Posts And Media
+### Catalog Information
 
-- Likely purpose: allow users to publish posts, attach media, and interact with community content.
+- Confirmed purpose: provide the main catalog information area, including varieties, diseases, and similar reference content.
 - Implementation starting point: `core/posts`.
-- Open questions: What moderation rules apply? What visibility, voting, comment, and media constraints exist?
+- Current domain folder: `catalog-information/`.
+- Open questions: Which catalog entity types exist, who maintains them, and how much legacy social post behavior remains.
 
 ### Authentication And Identity
 

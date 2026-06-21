@@ -14,14 +14,14 @@ Prefer business terms. Mention code modules only when they help readers connect 
 
 The current Django app layout suggests these initial domain candidates:
 
-- Advertising and promotion - `core/adverts`.
+- Advertising marketplace - `core/adverts`; see `advertising-marketplace/`.
 - Analytics and metrics - `core/analytics`.
-- Classification and taxonomy - `core/classifier`.
-- Companies and products - `core/companies`.
-- Farm or user diary - `core/diary`.
-- Events - `core/events`.
+- Classification and taxonomy - `core/classifier`; see `classification-and-taxonomy/`.
+- Companies and shops - `core/companies`; see `companies-and-shops/`.
+- Diary and journals - `core/diary`; see `diary-and-journals/`.
+- Events calendar - `core/events`; see `events-calendar/`.
 - News and editorial content - `core/news`.
-- Community posts and media - `core/posts`.
+- Catalog information - `core/posts`; see `catalog-information/`.
 - Authentication and identity - `core/pro_auth`.
 - Registries and reference data - `core/registry`.
 - Services and reviews - `core/services`.
@@ -30,7 +30,9 @@ These are candidates, not final bounded contexts. As the project moves toward DD
 
 ## Domain Note Template
 
-Use this structure for new or expanded domain notes:
+Each current domain should have its own folder with a `README.md` overview. Add supporting notes, investigations, workflow documents, diagrams, or glossary files inside the same folder.
+
+Use this structure for a domain folder `README.md`:
 
 ```md
 # Domain: Name

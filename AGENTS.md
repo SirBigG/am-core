@@ -8,13 +8,13 @@ This repo is the `am-core` Django backend for AgroMega. It is usually run locall
 
 Local Docker Compose config:
 
-- Compose file: `/Users/andriihots/Projects/am-dev/docker-compose.yml`
+- Compose file: `../docker-compose.yml`
 - Main service: `core`
 - Forum service: `forum_instance`
 - Database service: `db`
 - Nginx service exposes local port `8000`
 - The compose file mounts this repo as `./am-core:/am-core`
-- The forum project lives outside this repo at `/Users/andriihots/Projects/am-dev/forum_instance` and is mounted as `./forum_instance:/app`
+- The forum project lives outside this repo at `../forum_instance` and is mounted as `./forum_instance:/app`
 
 Useful local commands from this `am-core` folder:
 
@@ -41,7 +41,7 @@ For dependency details, read:
 
 Do not reintroduce checked-in main-app `requirements.in`, `requirements.txt`, or `constraints.txt` files unless the dependency workflow intentionally changes again.
 
-Keep forum dependency work isolated in the sibling project at `/Users/andriihots/Projects/am-dev/forum_instance` unless the task explicitly asks for a coupled main/forum change.
+Keep forum dependency work isolated in the sibling project at `../forum_instance` unless the task explicitly asks for a coupled main/forum change.
 
 ## Documentation Layout
 
@@ -54,23 +54,27 @@ This repository now treats `docs/` as the durable knowledge base for people and 
 - `docs/README.md` for the knowledge-base workflow.
 - `docs/business/README.md` and relevant notes under `docs/business/domains/` for domain context.
 - `docs/engineering/decisions/` for accepted or proposed decisions that affect the change.
-- `docs/engineering/planning/` for the planning workflow and template.
+- `docs/work/` for the planning and result artifact workflow.
 
-Planning is required before implementation when a change affects product behavior, domain rules, architecture, dependencies, data, security, or a workflow spanning multiple apps/services. Use `docs/engineering/planning/template.md` and create a dated plan under `docs/engineering/planning/` unless an equivalent plan already exists.
+Planning is required before implementation when a change affects product behavior, domain rules, architecture, dependencies, data, security, or a workflow spanning multiple apps/services. Use `docs/work/plans/template.md` and create a dated plan under `docs/work/plans/` unless an equivalent plan already exists.
 
 Small mechanical fixes do not need a full plan. Examples: typo fixes, formatting-only docs edits, small test expectation corrections, or comments that do not change behavior.
 
-Update the knowledge base in the same change when implementation reveals new business rules, domain language, workflows, lifecycle states, constraints, or decisions.
+Write result artifacts under `docs/work/results/` when the work needs a durable execution summary, verification record, audit output, or follow-up list.
+
+Update the durable knowledge base in the same change when implementation reveals new business rules, domain language, workflows, lifecycle states, constraints, or decisions.
 
 When adding new investigation output, prefer a dated document under a topic folder, for example:
 
-- `docs/engineering/planning/YYYY-MM-DD-topic.md`
+- `docs/work/plans/YYYY-MM-DD-topic.md`
+- `docs/work/results/YYYY-MM-DD-topic.md`
 - `docs/engineering/decisions/YYYY-MM-DD-topic.md`
 - `docs/engineering/package-upgrades/YYYY-MM-DD-topic.md`
 - `docs/engineering/security/YYYY-MM-DD-topic.md`
 - `docs/business/domains/YYYY-MM-DD-topic.md`
 
 ## Working Rules
+
 
 - Prefer Docker Compose for local verification because the app expects services from the parent `am-dev` environment.
 - Avoid assuming host Python has project dependencies installed.

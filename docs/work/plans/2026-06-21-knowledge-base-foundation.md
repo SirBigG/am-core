@@ -36,7 +36,7 @@ Add:
 - Business domain documentation guidance in `docs/business/`.
 - An initial domain map in `docs/business/domains/`.
 - Decision record guidance and a first accepted decision in `docs/engineering/decisions/`.
-- Planning workflow and a reusable implementation plan template in `docs/engineering/planning/`.
+- Planning workflow and a reusable implementation plan template in `docs/work/plans/`.
 - Agent instructions in `AGENTS.md` requiring planning for meaningful changes.
 
 ## Risks And Unknowns

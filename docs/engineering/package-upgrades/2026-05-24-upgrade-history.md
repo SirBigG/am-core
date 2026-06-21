@@ -46,7 +46,7 @@ The 2026-05-11 security review found direct dependency risks in the main require
 - Batch 4: updated helper/dev packages and forum `social-auth-app-django`; build, tests, `pip check`, and direct audit passed.
 - Batch 5: moved geckodriver provisioning to `0.36.0`; stopped runtime driver downloads with `webdriver_manager`; core checks and tests passed.
 - Batch 6: added requirements/constraints inputs for both services before the later uv migration; builds, checks, tests, and audit passed.
-- Batch 7: moved the forum project out of `am-core` into `/Users/andriihots/Projects/am-dev/forum_instance`; forum and core verification passed.
+- Batch 7: moved the forum project out of `am-core` into `../forum_instance`; forum and core verification passed.
 - Batch 8: removed obsolete beta `django_http2_push`; added local `static_push`; core verification and audit passed.
 - Batch 9: moved CSP report-only settings toward Django 6 naming and added `/csp/report/`; `make test` passed.
 - Batch 10: upgraded main `am-core` to Django `6.0.5`; switched to Django built-in CSP middleware; fixed Django 6 `Product.save`; verification and audit passed.
@@ -56,7 +56,7 @@ The 2026-05-11 security review found direct dependency risks in the main require
 
 ## Forum-Specific Risk
 
-The forum project now lives outside this repo at `/Users/andriihots/Projects/am-dev/forum_instance`.
+The forum project now lives outside this repo at `../forum_instance`.
 
 Do not change forum dependencies as part of `am-core` package work unless explicitly requested.
 
@@ -85,9 +85,9 @@ Upgrade-prep progress:
 - Step 4 API contract coverage is partly done and covers pagination envelopes, serializer field shape, auth-required endpoints, validation errors, event filtering, user-owned post listing, service reviews, user profile output, post view tracking, and useful-vote idempotency.
 - Step 5 file/image/storage coverage is partly done and covers post-photo WebP conversion, thumbnail file creation, uploaded file deletion, static asset versioning, CKEditor settings/widgets/rich-text fields, main S3 storage settings, and forum S3 storage settings.
 - Step 6 security header coverage has started and covers current `SecurityMiddleware`, clickjacking headers, Django 6 report-only CSP middleware, representative public page groups, authenticated profile/diary pages, and Django admin login/index.
-- Step 7 forum coverage happened before the forum was moved out of `am-core`; future forum work belongs in the sibling `am-dev/forum_instance` project.
+- Step 7 forum coverage happened before the forum was moved out of `am-core`; future forum work belongs in the sibling `../forum_instance` project.
 
 Detailed plan:
 
-- `docs/engineering/package-upgrades/2026-05-11-package-upgrade-test-plan.md`
+- `docs/work/plans/2026-05-11-package-upgrade-test-plan.md`
 - `docs/engineering/testing/README.md`
