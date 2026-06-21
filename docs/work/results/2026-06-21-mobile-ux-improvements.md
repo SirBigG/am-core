@@ -21,6 +21,7 @@
 - Improved the mobile footer navigation with consistent 60px controls and a fuller sections menu for categories, events, companies, forum, registry, about, and contact links.
 - Added mobile-friendly sign-in prompts on public advert and event create forms with `next` links back to the current form, without blocking anonymous posting.
 - Added shared mobile detail/product styles and applied them to event and company detail pages.
+- Reduced plant diary promo fatigue with a compact, dismissible site banner that remembers dismissal when browser storage is available.
 
 ## Verification
 
@@ -49,12 +50,12 @@
   - Mobile footer navigation on `/registry/`
   - Signed-in `/adverts/create/` and `/events/create/` form rendering
   - Company detail page from `/companies/`
+  - Plant diary banner layout and dismiss behavior on `/companies/`
 
 ## Remaining Follow-Ups
 
 - Decide the mobile navigation content and priority for the bottom nav/account menu.
 - Continue shared card/list polish for public listing pages: adverts, companies, events, news, categories, and registry.
 - Review logged-out create-page behavior and whether forms should show a clearer login gate before users invest effort.
-- Reduce plant diary promo fatigue without removing the product pathway.
 - Align forum navigation and identity handoff with the main signed-in experience.
 - Continue diary and plant workspace touch-target polish for action menus and dense quick actions.
