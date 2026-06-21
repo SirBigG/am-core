@@ -16,6 +16,8 @@
 - Reworked the `/create/` chooser into a mobile-friendly action panel with clear event and advert entry points.
 - Introduced shared public listing card styles and applied them to adverts, events, companies, news, and post/category listing helpers.
 - Replaced small listing text links with larger mobile-friendly card actions while keeping local/test-looking content visible.
+- Added shared mobile link-grid styles for long category/catalog lists.
+- Applied larger 48px tap targets to posts catalog category links and registry category/variety links.
 
 ## Verification
 
@@ -26,6 +28,7 @@
 - `just test-target core.posts`
 - `just test-target core.news`
 - `just test-target core.companies`
+- `just test-target core.registry`
 - `just test-target core.diary`
 - `just test-target core.utils.tests.test_ckeditor`
 - Targeted `djlint` checks for changed templates.
@@ -38,6 +41,8 @@
   - `/adverts/`
   - `/companies/`
   - `/news/`
+  - `/categories/`
+  - `/registry/`
 
 ## Remaining Follow-Ups
 
