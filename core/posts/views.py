@@ -16,6 +16,7 @@ from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
+from core.registry.models import Variety
 
 
 def service_worker(request):
@@ -179,6 +180,7 @@ class PostDetail(DetailView):
         context["photo_count"] = context["object"].photo.count()
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
+        context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
         return context
 
 

@@ -120,14 +120,18 @@
                 {% endif %}
             </ul>
         </header>
-        <section class="site-content-section">
-            <div class="site-article-body post-wrapper">{{ object.text|safe }}</div>
-        </section>
-        <section class="site-content-section">
-            <p class="site-content-section__eyebrow">Дані реєстру</p>
-            <h2 class="site-content-section__title">Сорт у реєстрі</h2>
-            <div class="site-table-scroll">{% variety_item_table object.id %}</div>
-        </section>
+        {% if object.text %}
+            <section class="site-content-section">
+                <div class="site-article-body post-wrapper">{{ object.text|safe }}</div>
+            </section>
+        {% endif %}
+        {% if registry_variety_exists %}
+            <section class="site-content-section">
+                <p class="site-content-section__eyebrow">Дані реєстру</p>
+                <h2 class="site-content-section__title">Сорт у реєстрі</h2>
+                <div class="site-table-scroll">{% variety_item_table object.id %}</div>
+            </section>
+        {% endif %}
         {% if object.sources %}
             <section class="site-content-section">
                 <p class="site-content-section__eyebrow">Джерела</p>
@@ -164,18 +168,9 @@
             <h2 class="site-content-section__title">Коментарі</h2>
             {% render_comments object request %}
         </section>
-        <section class="site-content-section">
-            <h2 class="site-content-section__title">Пов'язані товари</h2>
-            <div class="row mb-3">{% products_for_post object.id %}</div>
-        </section>
-        <section class="site-content-section">
-            {% relative_posts category.id %}
-        </section>
-        <section class="site-content-section">
-            {% post_adverts %}
-        </section>
-        <section class="site-content-section">
-            {% random_posts %}
-        </section>
+        {% products_for_post object.id %}
+        {% relative_posts category.id %}
+        {% post_adverts %}
+        {% random_posts %}
     </article>
 {% endblock content %}
