@@ -1,0 +1,47 @@
+<div class="profile-confirm-backdrop profile-quick-action-backdrop"
+     id="quickWateringModal{{ diary.id }}"
+     aria-hidden="true">
+    <form class="profile-confirm-dialog profile-quick-action-dialog"
+          method="post"
+          action="{% url 'pro_auth:profile-diary-quick-watering' pk=diary.id %}"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="quickWateringTitle{{ diary.id }}">
+        {% csrf_token %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <h2 class="profile-confirm-title" id="quickWateringTitle{{ diary.id }}">💧 Підлив</h2>
+        <p class="profile-confirm-text">Оберіть, які рослини підлили у щоденнику “{{ diary.title }}”.</p>
+        <div class="profile-quick-action-options">
+            <label class="profile-quick-action-option">
+                <input type="radio"
+                       name="apply_to_all"
+                       value="1"
+                       checked
+                       data-quick-water-all>
+                <span>Підлити всі активні рослини</span>
+            </label>
+            <label class="profile-quick-action-option">
+                <input type="radio"
+                       name="apply_to_all"
+                       value="0"
+                       data-quick-water-selected>
+                <span>Обрати рослини</span>
+            </label>
+        </div>
+        <div class="profile-quick-action-plants" data-quick-water-plants hidden>
+            {% for plant in plants %}
+                <label class="profile-quick-action-plant">
+                    <input type="checkbox" name="plants" value="{{ plant.id }}" disabled>
+                    <span>{{ plant.display_name }}</span>
+                </label>
+            {% endfor %}
+        </div>
+        <div class="profile-confirm-actions">
+            <button type="button"
+                    class="btn profile-confirm-cancel"
+                    data-quick-water-cancel>Відмінити</button>
+            <button type="submit"
+                    class="btn am-btn am-btn--primary profile-confirm-submit">Зберегти</button>
+        </div>
+    </form>
+</div>

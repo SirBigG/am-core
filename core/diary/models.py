@@ -73,6 +73,13 @@ DIARY_PLANT_STATUS_CHOICES = [
     ("completed", "Завершена"),
 ]
 
+HARVEST_UNIT_CHOICES = [
+    ("kg", "кг"),
+    ("g", "г"),
+    ("pcs", "шт"),
+    ("bunch", "пучок"),
+]
+
 
 class Diary(models.Model):
     user = models.ForeignKey("pro_auth.User", on_delete=models.SET_NULL, null=True)
@@ -190,6 +197,20 @@ class DiaryItem(models.Model):
         verbose_name="Рослини",
     )
     description = RichTextField(blank=True, verbose_name="Опис")
+    harvest_amount = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Кількість урожаю",
+    )
+    harvest_unit = models.CharField(
+        max_length=16,
+        choices=HARVEST_UNIT_CHOICES,
+        blank=True,
+        default="",
+        verbose_name="Одиниця урожаю",
+    )
     image = models.ImageField(upload_to="diaries/images", verbose_name="Фото", null=True, blank=True)
     date = models.DateField(default=date.today, verbose_name="Дата")
     created = models.DateTimeField(auto_now_add=True)
@@ -208,3 +229,21 @@ class DiaryItem(models.Model):
             im.save(output, format="JPEG", quality=85)
             self.image = File(output, self.image.name)
         super().save(*args, **kwargs)
+
+    @property
+    def harvest_summary(self):
+        if self.action_type != "harvest" or self.harvest_amount is None or not self.harvest_unit:
+            return ""
+        amount = self.harvest_amount.normalize()
+        amount_text = format(amount, "f").rstrip("0").rstrip(".")
+        return f"{amount_text} {self.get_harvest_unit_display()}"
+
+    @property
+    def action_icon(self):
+        label = self.get_action_type_display()
+        return label.split(" ", 1)[0] if label else "✏️"
+
+    @property
+    def action_label(self):
+        label = self.get_action_type_display()
+        return label.split(" ", 1)[1] if " " in label else label

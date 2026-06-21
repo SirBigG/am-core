@@ -14,12 +14,18 @@ from core.diary.views import (
     PlantRestoreView,
     ProfileDiaryDetailView,
     ProfileDiaryListView,
+    ProfilePlantListView,
     QuickWateringView,
     UpdateDiaryItemView,
     UpdateProfileDiaryView,
 )
 
 urlpatterns = [
+    path(
+        "profile/plants",
+        login_required(ProfilePlantListView.as_view()),
+        name="profile-plant-list",
+    ),
     path(
         "profile/diary/item/add/<int:diary_id>",
         login_required(AddDiaryItemView.as_view()),

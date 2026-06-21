@@ -1,7 +1,10 @@
 {% extends "pro_auth/profile/profile_base.html" %}
+{% load static %}
 {% load post_extras %}
+{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
+{% block profile_sidebar %}{% endblock profile_sidebar %}
 {% block profile_content %}
-    <div class="profile-page-panel profile-form-panel">
+    <div class="profile-page-panel profile-form-panel profile-diary-form-panel">
         <a class="profile-diary-detail-back"
            href="{% url 'pro_auth:profile-diary-detail' pk=diary.id %}">
             <span aria-hidden="true">←</span>
@@ -31,37 +34,8 @@
         {% include "diary/profile/_diary_item_form_fields.html" with is_modal=False %}
     </div>
     {{ form.media }}
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const actionInput = document.getElementById("id_action_type");
-            const applyToAllInput = document.getElementById("id_apply_to_all");
-            const plantTargets = document.querySelector("[data-plant-targets]");
-            const fileInput = document.getElementById("id_image");
-            const fileName = document.querySelector("[data-file-name]");
-
-            if (!actionInput || !applyToAllInput || !plantTargets) {
-                return;
-            }
-
-            function syncPlantTargetsState() {
-                const applyToAll = applyToAllInput.checked;
-                const inputs = plantTargets.querySelectorAll('input[type="checkbox"]');
-
-                plantTargets.hidden = applyToAll;
-                inputs.forEach(function (input) {
-                    input.disabled = applyToAll;
-                });
-            }
-
-            applyToAllInput.addEventListener("change", syncPlantTargetsState);
-            syncPlantTargetsState();
-
-            if (fileInput && fileName) {
-                fileInput.addEventListener("change", function () {
-                    const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "";
-                    fileName.textContent = selectedFile || "Файл не вибрано";
-                });
-            }
-        });
-    </script>
 {% endblock profile_content %}
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
+{% endblock extra_footerscript %}

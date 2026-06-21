@@ -1,7 +1,10 @@
 {% extends "pro_auth/profile/profile_base.html" %}
+{% load static %}
 {% load post_extras %}
+{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
+{% block profile_sidebar %}{% endblock profile_sidebar %}
 {% block profile_content %}
-    <div class="profile-page-panel profile-form-panel">
+    <div class="profile-page-panel profile-form-panel profile-diary-form-panel profile-diary-form-panel--wide">
         <a class="profile-diary-detail-back"
            href="{% url 'pro_auth:profile-diary-list' %}">
             <span aria-hidden="true">←</span>
@@ -28,10 +31,14 @@
             {% endfor %}
             {% include "diary/profile/plant_formset.html" %}
             <div class="profile-form-actions">
-                <button type="submit" class="btn am-btn am-btn--primary w-100">Додати щоденник</button>
+                <button type="submit" class="btn am-btn am-btn--primary">Додати щоденник</button>
             </div>
         </form>
     </div>
     {{ form.media }}
     {{ plant_formset.media }}
 {% endblock profile_content %}
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
+{% endblock extra_footerscript %}

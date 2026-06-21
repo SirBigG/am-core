@@ -1,10 +1,11 @@
-from datetime import timezone as dt_timezone
+from datetime import timedelta, timezone as dt_timezone
 
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import date_format
 
-from core.classifier.models import Category
+from core.classifier.models import Category, CategoryAIProfile
 from core.diary.forms import (
     PLANT_BLOCKED_TEXT,
     DiaryForm,
@@ -15,9 +16,12 @@ from core.diary.forms import (
 from core.diary.models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, Plant
 from core.diary.recommendations import (
     PlantRecommendationService,
+    buildPlantKnowledgeContext,
     buildPlantRecommendationSystemPrompt,
     buildPlantRecommendationUserPrompt,
+    parsePlantRecommendationRules,
     preparePlantRecommendationPayload,
+    selectRelevantRecommendationRules,
 )
 from core.utils.tests.factories import UserFactory
 
@@ -34,6 +38,14 @@ class DiaryOrderingTests(TestCase):
             list(diary.diary_items.all()),
             [latest_today, first_today, old_item],
         )
+
+    def test_diary_item_exposes_plain_action_label(self):
+        user = UserFactory()
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        item = DiaryItem.objects.create(diary=diary, action_type="watering", date="2026-04-26")
+
+        self.assertEqual(item.action_icon, "💧")
+        self.assertEqual(item.action_label, "Підлив")
 
     def test_profile_diary_list_orders_by_updated(self):
         user = UserFactory()
@@ -91,6 +103,8 @@ class DiaryOrderingTests(TestCase):
 
         self.assertEqual(listed_diary.latest_diary_items[0], latest_item)
         self.assertEqual(listed_diary.latest_diary_items[1], old_item)
+        self.assertEqual(listed_diary.last_diary_item, latest_item)
+        self.assertEqual(listed_diary.diary_items_count, 2)
         self.assertContains(response, date_format(latest_item.date, "j F Y"))
 
     def test_profile_diary_list_summary_uses_active_plants_only(self):
@@ -112,6 +126,155 @@ class DiaryOrderingTests(TestCase):
 
         self.assertEqual(listed_diary.plant_summary, active_plant.display_name)
 
+    def test_profile_diary_list_builds_dashboard_context(self):
+        user = UserFactory()
+        today = timezone.localdate()
+        category = Category.objects.create(slug="dill", value="Кріп")
+        diary = Diary.objects.create(user=user, title="Garden", description="desc")
+        first_plant = Plant.objects.create(user=user, category=category, variety="Mammoth")
+        second_plant = Plant.objects.create(user=user, category=category, variety="Bouquet")
+        third_plant = Plant.objects.create(user=user, category=category, variety="Fernleaf")
+        diary.plants.set([first_plant, second_plant, third_plant])
+        archived_diary = Diary.objects.create(user=user, title="Archived", description="desc", is_archived=True)
+        archived_plant = Plant.objects.create(user=user, category=category, variety="Old")
+        archived_diary.plants.add(archived_plant)
+
+        old_watering = DiaryItem.objects.create(
+            diary=diary,
+            action_type="watering",
+            date=today - timedelta(days=4),
+        )
+        old_watering.plants.add(first_plant)
+        harvest = DiaryItem.objects.create(
+            diary=diary,
+            action_type="harvest",
+            harvest_amount="1.20",
+            harvest_unit="kg",
+            date=today,
+        )
+        harvest.plants.add(first_plant)
+        note = DiaryItem.objects.create(diary=diary, action_type="note", date=today - timedelta(days=1))
+        note.plants.add(second_plant)
+        archived_harvest = DiaryItem.objects.create(
+            diary=archived_diary,
+            action_type="harvest",
+            harvest_amount="99.00",
+            harvest_unit="kg",
+            date=today,
+        )
+        archived_harvest.plants.add(archived_plant)
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-list"))
+        dashboard = response.context["diary_dashboard"]
+
+        self.assertEqual(dashboard["active_plants_count"], 3)
+        self.assertEqual(dashboard["weekly_actions_count"], 3)
+        self.assertEqual(dashboard["last_watering"], old_watering)
+        self.assertEqual(dashboard["harvest_summary"][0]["display"], "1.2 кг")
+        self.assertEqual(dashboard["last_harvest"], harvest)
+        self.assertEqual(dashboard["attention_count"], 3)
+        self.assertEqual(dashboard["plants_without_actions_count"], 1)
+        self.assertEqual(dashboard["plants_without_actions"], [third_plant])
+        self.assertEqual(dashboard["history_days_count"], 5)
+        self.assertEqual(dashboard["oldest_item_date"], today - timedelta(days=4))
+        self.assertEqual(dashboard["most_active_diary"], diary)
+        self.assertEqual(dashboard["most_active_actions_count"], 3)
+        listed_diary = response.context["active_diaries"][0]
+        self.assertTrue(listed_diary.needs_attention)
+        self.assertEqual(response.context["attention_diaries"], [listed_diary])
+
+    def test_profile_diary_dashboard_links_active_plants_card(self):
+        user = UserFactory()
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("pro_auth:profile-diary-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, reverse("pro_auth:profile-plant-list"))
+        self.assertContains(response, "Переглянути всі рослини")
+
+    def test_profile_plant_list_contains_only_current_user_plants_and_full_context(self):
+        user = UserFactory()
+        other_user = UserFactory()
+        today = timezone.localdate()
+        category = Category.objects.create(slug="cucumber", value="Огірок")
+        diary = Diary.objects.create(user=user, title="Теплиця", description="desc")
+        active_plant = Plant.objects.create(
+            user=user,
+            category=category,
+            variety="Артист F1",
+            title="Лівий ряд",
+            description="Перший огірок сезону",
+            plant_date=today - timedelta(days=20),
+        )
+        completed_plant = Plant.objects.create(
+            user=user,
+            category=category,
+            variety="Кураж",
+            plant_date=today - timedelta(days=40),
+            status="completed",
+            completed_at=today - timedelta(days=5),
+        )
+        Plant.objects.create(user=other_user, category=category, variety="Чужа рослина")
+        diary.plants.set([active_plant, completed_plant])
+        old_action = DiaryItem.objects.create(
+            diary=diary,
+            action_type="watering",
+            date=today - timedelta(days=2),
+        )
+        old_action.plants.add(active_plant)
+        latest_action = DiaryItem.objects.create(
+            diary=diary,
+            action_type="note",
+            description="З'явилася нова зав'язь",
+            date=today - timedelta(days=1),
+        )
+        latest_action.plants.add(active_plant)
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-plant-list"))
+
+        self.assertEqual(response.status_code, 200)
+        listed_plants = response.context["plants"]
+        self.assertEqual([plant.pk for plant in listed_plants], [active_plant.pk, completed_plant.pk])
+        listed_active = listed_plants[0]
+        listed_completed = listed_plants[1]
+        self.assertEqual(listed_active.age_days, 20)
+        self.assertEqual(listed_active.diary_items_count, 2)
+        self.assertEqual(listed_active.latest_diary_item, latest_action)
+        self.assertEqual(listed_active.profile_diaries, [diary])
+        self.assertEqual(listed_completed.age_days, 35)
+        self.assertEqual(response.context["active_plants"], [listed_active])
+        self.assertEqual(response.context["completed_plants"], [listed_completed])
+        self.assertContains(response, "Артист F1")
+        self.assertContains(response, "нова зав")
+        self.assertNotContains(response, "Чужа рослина")
+
+    def test_profile_diary_list_renders_diary_view_tabs(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        active_diary = Diary.objects.create(user=user, title="Active", description="desc")
+        attention_plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        active_diary.plants.add(attention_plant)
+        archived_diary = Diary.objects.create(
+            user=user,
+            title="Archived",
+            description="desc",
+            is_archived=True,
+        )
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-list"))
+
+        self.assertContains(response, 'data-diary-view-tab="all"')
+        self.assertContains(response, 'data-diary-view-tab="attention"')
+        self.assertContains(response, 'data-diary-view-tab="archive"')
+        self.assertContains(response, 'data-diary-view-groups="all attention"')
+        self.assertContains(response, 'data-diary-view-groups="archive"')
+        self.assertIn(active_diary, response.context["attention_diaries"])
+        self.assertIn(archived_diary, response.context["archived_diaries"])
+
     def test_profile_diary_list_renders_add_action_modal(self):
         user = UserFactory()
         category = Category.objects.create(slug="basil", value="Базилік")
@@ -125,6 +288,10 @@ class DiaryOrderingTests(TestCase):
         self.assertContains(response, "+ Додати іншу дію")
         self.assertContains(response, f'id="diaryCardActionModal{diary.pk}"')
         self.assertContains(response, f'name="_form_prefix" value="diary-{diary.pk}"')
+        self.assertContains(
+            response,
+            f'name="next" value="{reverse("pro_auth:profile-diary-list")}"',
+        )
 
     def test_prefixed_diary_item_form_from_list_creates_item(self):
         user = UserFactory()
@@ -138,6 +305,7 @@ class DiaryOrderingTests(TestCase):
         response = self.client.post(
             reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
             {
+                "next": reverse("pro_auth:profile-diary-list"),
                 "_form_prefix": prefix,
                 f"{prefix}-action_type": "note",
                 f"{prefix}-apply_to_all": "on",
@@ -146,7 +314,11 @@ class DiaryOrderingTests(TestCase):
             },
         )
 
-        self.assertRedirects(response, diary.get_profile_absolute_url(), fetch_redirect_response=False)
+        self.assertRedirects(
+            response,
+            reverse("pro_auth:profile-diary-list"),
+            fetch_redirect_response=False,
+        )
         item = DiaryItem.objects.get(diary=diary, action_type="note")
         self.assertEqual(item.description, "Підживлення після огляду")
         self.assertTrue(item.apply_to_all)
@@ -163,6 +335,16 @@ class DiaryOrderingTests(TestCase):
         self.assertNotIn(active_diary, response.context["archived_diaries"])
         self.assertIn(archived_diary, response.context["archived_diaries"])
         self.assertNotIn(archived_diary, response.context["active_diaries"])
+
+    def test_profile_diary_list_renders_empty_onboarding_state(self):
+        user = UserFactory()
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("pro_auth:profile-diary-list"))
+
+        self.assertContains(response, "Як почати")
+        self.assertContains(response, "Створи щоденник для грядки")
+        self.assertContains(response, "profile-diary-onboarding")
 
     def test_archived_diaries_are_hidden_from_public_list_and_detail(self):
         user = UserFactory()
@@ -245,6 +427,45 @@ class DiaryOrderingTests(TestCase):
         item = DiaryItem.objects.get(diary=diary, action_type="watering")
         self.assertFalse(item.apply_to_all)
         self.assertEqual(list(item.plants.all()), [second_plant])
+
+    def test_quick_watering_redirects_to_safe_next_url(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        diary.plants.add(plant)
+        next_url = diary.get_profile_absolute_url()
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "1", "next": next_url},
+        )
+
+        self.assertRedirects(
+            response,
+            f"{next_url}?quick_action=watering_added",
+            fetch_redirect_response=False,
+        )
+
+    def test_quick_watering_ignores_external_next_url(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="basil", value="Базилік")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Genovese")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "1", "next": "https://example.com/profile/diary"},
+        )
+
+        self.assertRedirects(
+            response,
+            f"{reverse('pro_auth:profile-diary-list')}?quick_action=watering_added",
+            fetch_redirect_response=False,
+        )
 
     def test_quick_watering_requires_owned_diary(self):
         owner = UserFactory()
@@ -1214,6 +1435,69 @@ class DiaryItemFormPlantTargetTests(TestCase):
         self.assertFalse(item.apply_to_all)
         self.assertEqual(list(item.plants.all()), [self.second_active_plant])
 
+    def test_harvest_action_requires_amount_and_unit(self):
+        form = DiaryItemForm(
+            diary=self.diary,
+            data={
+                "action_type": "harvest",
+                "apply_to_all": "on",
+                "description": "Збір зелені",
+                "date": "2026-04-26",
+            },
+        )
+
+        self.assertFalse(form.is_valid())
+        self.assertIn("harvest_amount", form.errors)
+        self.assertIn("harvest_unit", form.errors)
+
+    def test_harvest_action_saves_amount_and_unit(self):
+        form = DiaryItemForm(
+            diary=self.diary,
+            data={
+                "action_type": "harvest",
+                "apply_to_all": "on",
+                "description": "Збір зелені",
+                "harvest_amount": "1.20",
+                "harvest_unit": "kg",
+                "date": "2026-04-26",
+            },
+        )
+
+        self.assertTrue(form.is_valid())
+        item = form.save()
+
+        self.assertEqual(item.harvest_summary, "1.2 кг")
+
+    def test_non_harvest_action_clears_harvest_fields(self):
+        item = DiaryItem.objects.create(
+            diary=self.diary,
+            action_type="harvest",
+            apply_to_all=True,
+            harvest_amount="1.20",
+            harvest_unit="kg",
+            date="2026-04-25",
+        )
+        item.plants.set([self.active_plant, self.second_active_plant])
+
+        form = DiaryItemForm(
+            diary=self.diary,
+            instance=item,
+            data={
+                "action_type": "watering",
+                "apply_to_all": "on",
+                "description": "Полив",
+                "harvest_amount": "1.20",
+                "harvest_unit": "kg",
+                "date": "2026-04-26",
+            },
+        )
+
+        self.assertTrue(form.is_valid())
+        updated_item = form.save()
+
+        self.assertIsNone(updated_item.harvest_amount)
+        self.assertEqual(updated_item.harvest_unit, "")
+
     def test_edit_item_from_apply_to_all_true_to_false(self):
         item = DiaryItem.objects.create(
             diary=self.diary,
@@ -1492,6 +1776,25 @@ class PlantLifecycleActionTests(TestCase):
         self.assertContains(response, f'data-plant-archive-open="plantArchiveModal{self.growing_plant.pk}"')
         self.assertContains(response, f'name="_form_prefix" value="plant-{self.growing_plant.pk}"')
 
+    def test_detail_renders_quick_watering_panel(self):
+        response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
+
+        self.assertContains(response, "Швидкі дії")
+        self.assertContains(response, f'data-quick-water-open="quickWateringModal{self.diary.pk}"')
+        self.assertContains(response, f'id="quickWateringModal{self.diary.pk}"')
+        self.assertContains(response, f'name="next" value="{self.diary.get_profile_absolute_url()}"')
+
+    def test_detail_without_active_plants_renders_status_banner(self):
+        self.growing_plant.status = "completed"
+        self.growing_plant.completed_at = timezone.localdate()
+        self.growing_plant.save(update_fields=["status", "completed_at"])
+
+        response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
+
+        self.assertContains(response, "У цьому щоденнику зараз немає активних рослин")
+        self.assertContains(response, "profile-diary-status-banner")
+        self.assertNotContains(response, "Швидкі дії")
+
     def test_archive_plant_marks_it_completed_and_creates_finished_item(self):
         response = self.client.post(
             reverse(
@@ -1691,24 +1994,393 @@ class DiaryItemDeleteLifecycleTests(TestCase):
         self.assertEqual(self.plant.completed_at.isoformat(), "2026-04-20")
 
 
+CUCUMBER_TEST_KNOWLEDGE = """
+1. Базова ідентифікація
+
+Культура: огірок
+Наукова назва: Cucumis sativus
+
+5. Полив
+
+Огірок має високі потреби у воді.
+Ознаки нестачі води: в'янення, повільний ріст, гіркі плоди.
+
+17. Хвороби
+
+Борошниста роса: білий порошкоподібний наліт.
+
+24. Severity / Priority Signals
+
+Medium severity: поява борошнистої роси.
+""".strip()
+
+CUCUMBER_TEST_RULES = """
+Rule ID:
+
+cucumber_powdery_mildew_suspected_01
+
+Trigger:
+
+leaves_have_white_powder = true
+
+Additional signals:
+
+Known signals:
+
+user_note_contains: "білий наліт"
+user_note_contains: "наче мука"
+
+Assumption:
+
+можлива борошниста роса
+
+Outcome:
+
+powdery_mildew_risk ↑
+
+Confidence:
+High
+
+Recommendation:
+
+Покращити циркуляцію повітря.
+Прибрати сильно уражене листя.
+
+Do not recommend:
+
+не ставити остаточний діагноз без фото.
+
+Source / basis:
+
+University of Minnesota cucumber guide
+""".strip()
+
+ARUGULA_LEGACY_TEST_RULES = """
+21. AI Rules для руколи
+arugula_heat_bolting_risk_01
+
+Якщо:
+
+температура >29°C;
+рослина на повному сонці;
+з’являється квітконос.
+
+Тоді: ризик bolting ↑
+Confidence: High
+Пояснення: рукола швидко стрілкується в жарку погоду.
+Рекомендація: притінення, регулярний полив або новий посів у прохолодніший період.
+
+arugula_underwatering_stress_01
+
+Якщо:
+
+ґрунт сухий;
+листя в’яне;
+давно не було поливу.
+
+Тоді: ризик нестачі води ↑
+Confidence: High
+Рекомендація: помірний полив, не допускати повного пересихання.
+
+22. Severity / Priority Signals
+""".strip()
+
+CUCUMBER_MATCHER_RULES = [
+    {"id": "cucumber_pollination_failure_01", "noteSignals": ["багато квітів", "немає огірків", "зав'язі не ростуть"]},
+    {"id": "cucumber_parthenocarpic_pollination_confusion_01", "noteSignals": ["потрібні бджоли", "немає запилення", "теплиця"]},
+    {"id": "cucumber_irregular_watering_01", "noteSignals": ["гіркі", "деформовані", "то сухо то мокро"]},
+    {"id": "cucumber_overripe_fruit_reducing_yield_01", "noteSignals": ["переросли", "великі огірки", "нові не ростуть"]},
+    {"id": "cucumber_powdery_mildew_suspected_01", "noteSignals": ["білий наліт", "наче мука", "білі плями"]},
+    {"id": "cucumber_bacterial_wilt_risk_01", "noteSignals": ["раптово зів'яв", "огірковий жук", "листя висить"]},
+    {"id": "cucumber_greenhouse_airflow_01", "noteSignals": ["теплиця", "конденсат", "волога", "погана вентиляція"]},
+    {"id": "cucumber_cold_soil_stress_01", "noteSignals": ["не росте", "після висадки", "холодно"]},
+    {"id": "cucumber_crop_rotation_needed_01", "noteSignals": ["саджу щороку", "те саме місце"]},
+    {"id": "cucumber_unknown_diagnosis_caution_01", "noteSignals": ["жовтіє", "в'яне", "плями", "не росте"]},
+]
+
+CUCUMBER_RECOMMENDATION_SCENARIOS = [
+    ("Багато квітів, але немає огірків", "cucumber_pollination_failure_01"),
+    ("Зав'язі не ростуть уже тиждень", "cucumber_pollination_failure_01"),
+    ("У теплиці немає запилення, потрібні бджоли", "cucumber_parthenocarpic_pollination_confusion_01"),
+    ("Плоди стали гіркі", "cucumber_irregular_watering_01"),
+    ("Полив то сухо то мокро, плоди деформовані", "cucumber_irregular_watering_01"),
+    ("Кілька огірків переросли", "cucumber_overripe_fruit_reducing_yield_01"),
+    ("Залишилися великі огірки, а нові не ростуть", "cucumber_overripe_fruit_reducing_yield_01"),
+    ("На листі білий наліт", "cucumber_powdery_mildew_suspected_01"),
+    ("Білі плями, наче мука", "cucumber_powdery_mildew_suspected_01"),
+    ("Кущ раптово зів'яв", "cucumber_bacterial_wilt_risk_01"),
+    ("Помітила огірковий жук, листя висить", "cucumber_bacterial_wilt_risk_01"),
+    ("У теплиці конденсат і погана вентиляція", "cucumber_greenhouse_airflow_01"),
+    ("У теплиці постійна волога", "cucumber_greenhouse_airflow_01"),
+    ("Після висадки холодно і огірок не росте", "cucumber_cold_soil_stress_01"),
+    ("Саджу щороку на те саме місце", "cucumber_crop_rotation_needed_01"),
+    ("Листя жовтіє, з'явилися плями", "cucumber_unknown_diagnosis_caution_01"),
+    ("Огірок росте нормально, нових симптомів немає", None),
+    ("Рослина в'яне і не росте", "cucumber_unknown_diagnosis_caution_01"),
+]
+
+
 class PlantRecommendationServiceTests(TestCase):
+    def test_cucumber_recommendation_scenarios_choose_expected_primary_rule(self):
+        self.assertEqual(len(CUCUMBER_RECOMMENDATION_SCENARIOS), 18)
+
+        for note, expected_rule_id in CUCUMBER_RECOMMENDATION_SCENARIOS:
+            with self.subTest(note=note):
+                matched_rules = selectRelevantRecommendationRules(
+                    CUCUMBER_MATCHER_RULES,
+                    action_type="note",
+                    note=note,
+                )
+                actual_rule_id = matched_rules[0]["id"] if matched_rules else None
+                self.assertEqual(actual_rule_id, expected_rule_id)
+
+    def test_parser_preserves_existing_admin_rule_meaning(self):
+        rules = parsePlantRecommendationRules(CUCUMBER_TEST_RULES)
+
+        self.assertEqual(len(rules), 1)
+        self.assertEqual(rules[0]["id"], "cucumber_powdery_mildew_suspected_01")
+        self.assertEqual(rules[0]["assumption"], "можлива борошниста роса")
+        self.assertIn("Покращити циркуляцію повітря.", rules[0]["recommendation"])
+        self.assertEqual(rules[0]["doNotRecommend"], "не ставити остаточний діагноз без фото.")
+        self.assertEqual(rules[0]["noteSignals"], ["білий наліт", "наче мука"])
+
+    def test_rule_matcher_finds_cucumber_rule_from_user_note(self):
+        rules = parsePlantRecommendationRules(CUCUMBER_TEST_RULES)
+
+        matched_rules = selectRelevantRecommendationRules(
+            rules,
+            action_type="note",
+            note="На листі з'явився білий наліт, наче мука",
+        )
+
+        self.assertEqual(matched_rules[0]["id"], "cucumber_powdery_mildew_suspected_01")
+        self.assertEqual(matched_rules[0]["matchedSignals"], ["білий наліт", "наче мука"])
+
+    def test_rule_matcher_does_not_fire_without_matching_trigger_signal(self):
+        rules = parsePlantRecommendationRules(CUCUMBER_TEST_RULES)
+
+        matched_rules = selectRelevantRecommendationRules(
+            rules,
+            action_type="disease",
+            note="Потрібно оглянути рослину",
+        )
+
+        self.assertEqual(matched_rules, [])
+
+    def test_parser_supports_existing_ukrainian_rule_format(self):
+        rules = parsePlantRecommendationRules(ARUGULA_LEGACY_TEST_RULES)
+
+        self.assertEqual(len(rules), 2)
+        self.assertEqual(rules[0]["id"], "arugula_heat_bolting_risk_01")
+        self.assertEqual(rules[0]["noteSignals"], [
+            "температура >29°C",
+            "рослина на повному сонці",
+            "з’являється квітконос",
+        ])
+        self.assertEqual(rules[0]["outcome"], "ризик bolting ↑")
+        self.assertEqual(rules[0]["confidence"], "High")
+        self.assertIn("притінення", rules[0]["recommendation"])
+
+    def test_rule_matcher_finds_legacy_arugula_rule(self):
+        rules = parsePlantRecommendationRules(ARUGULA_LEGACY_TEST_RULES)
+
+        matched_rules = selectRelevantRecommendationRules(
+            rules,
+            action_type="note",
+            note="Сьогодні листя в’яне і ґрунт сухий",
+        )
+
+        self.assertEqual(matched_rules[0]["id"], "arugula_underwatering_stress_01")
+        self.assertEqual(matched_rules[0]["matchedSignals"], ["ґрунт сухий", "листя в’яне"])
+
+    def test_rule_matcher_uses_action_interval_condition(self):
+        rules = parsePlantRecommendationRules(
+            """
+Rule ID:
+cucumber_irregular_watering_01
+
+Trigger:
+action_type = watering
+days_since_previous_watering <= 1
+
+Confidence:
+High
+
+Severity:
+medium
+
+Recommendation:
+Перевірити вологість ґрунту перед наступним поливом.
+""".strip()
+        )
+
+        matched_rules = selectRelevantRecommendationRules(
+            rules,
+            action_type="watering",
+            note="",
+            last_actions=[
+                {"action_type": "watering", "date": "2026-06-18"},
+                {"action_type": "watering", "date": "2026-06-17"},
+            ],
+        )
+
+        self.assertEqual(matched_rules[0]["id"], "cucumber_irregular_watering_01")
+        self.assertEqual(
+            matched_rules[0]["matchedConditions"],
+            ["action_type=watering", "days_since_previous_watering=1"],
+        )
+
+        unmatched_rules = selectRelevantRecommendationRules(
+            rules,
+            action_type="watering",
+            note="",
+            last_actions=[
+                {"action_type": "watering", "date": "2026-06-18"},
+                {"action_type": "watering", "date": "2026-06-15"},
+            ],
+        )
+        self.assertEqual(unmatched_rules, [])
+
+    def test_knowledge_context_uses_only_ready_enabled_profile(self):
+        user = UserFactory()
+        cucumber = Category.objects.create(slug="cucumber", value="Огірок")
+        arugula = Category.objects.create(slug="arugula", value="Рукола")
+        cucumber_plant = Plant.objects.create(user=user, category=cucumber, variety="Тепличний")
+        arugula_plant = Plant.objects.create(user=user, category=arugula, variety="Салатна")
+        CategoryAIProfile.objects.create(
+            category=cucumber,
+            status=CategoryAIProfile.STATUS_READY,
+            is_ai_enabled=True,
+            content=CUCUMBER_TEST_KNOWLEDGE,
+            recommendation_rules=CUCUMBER_TEST_RULES,
+        )
+        CategoryAIProfile.objects.create(
+            category=arugula,
+            status=CategoryAIProfile.STATUS_DRAFT,
+            is_ai_enabled=True,
+            content="1. Базова ідентифікація\nКультура: рукола",
+        )
+
+        contexts = buildPlantKnowledgeContext(
+            plants=[cucumber_plant, arugula_plant],
+            action_type="note",
+            note="На листі білий наліт",
+        )
+
+        self.assertEqual([context["category"] for context in contexts], ["Огірок"])
+        self.assertIn("Культура: огірок", contexts[0]["knowledge"])
+        self.assertEqual(
+            contexts[0]["matchedRules"][0]["id"],
+            "cucumber_powdery_mildew_suspected_01",
+        )
+
+    def test_fallback_uses_matched_cucumber_rule(self):
+        user = UserFactory()
+        cucumber = Category.objects.create(slug="cucumber", value="Огірок")
+        plant = Plant.objects.create(user=user, category=cucumber, variety="Тепличний")
+        CategoryAIProfile.objects.create(
+            category=cucumber,
+            status=CategoryAIProfile.STATUS_READY,
+            is_ai_enabled=True,
+            content=CUCUMBER_TEST_KNOWLEDGE,
+            recommendation_rules=CUCUMBER_TEST_RULES,
+        )
+
+        recommendation = PlantRecommendationService().generate(
+            plant_name=plant.display_name,
+            plant_date=plant.plant_date,
+            action_type="note",
+            note="На листі білий наліт",
+            last_actions=[{"action_type": "note", "date": "2026-06-18", "has_photo": False}],
+            has_photo=False,
+            plants=[plant],
+            use_ai=False,
+        )
+
+        self.assertEqual(
+            recommendation["matchedRuleIds"],
+            ["cucumber_powdery_mildew_suspected_01"],
+        )
+        self.assertEqual(recommendation["confidence"], "high")
+        self.assertEqual(recommendation["severity"], "medium")
+        self.assertEqual(recommendation["nextStep"], "Покращити циркуляцію повітря.")
+        self.assertTrue(recommendation["needsMoreData"])
+        self.assertEqual(
+            recommendation["missingData"],
+            [
+                "фото листя зверху і знизу",
+                "середовище вирощування: теплиця чи відкритий ґрунт",
+            ],
+        )
+        self.assertIn("фото листя", recommendation["clarifyingQuestion"])
+        self.assertEqual(recommendation["sourceBasis"], ["University of Minnesota cucumber guide"])
+
+    def test_fallback_does_not_request_known_diagnostic_context(self):
+        user = UserFactory()
+        cucumber = Category.objects.create(slug="cucumber", value="Огірок")
+        plant = Plant.objects.create(user=user, category=cucumber, variety="Тепличний")
+        CategoryAIProfile.objects.create(
+            category=cucumber,
+            status=CategoryAIProfile.STATUS_READY,
+            is_ai_enabled=True,
+            content=CUCUMBER_TEST_KNOWLEDGE,
+            recommendation_rules=CUCUMBER_TEST_RULES,
+        )
+
+        recommendation = PlantRecommendationService().generate(
+            plant_name=plant.display_name,
+            plant_date=plant.plant_date,
+            action_type="note",
+            note="У теплиці на листі білий наліт",
+            last_actions=[{"action_type": "note", "date": "2026-06-19"}],
+            has_photo=True,
+            plants=[plant],
+            use_ai=False,
+        )
+
+        self.assertFalse(recommendation["needsMoreData"])
+        self.assertEqual(recommendation["missingData"], [])
+        self.assertEqual(recommendation["clarifyingQuestion"], "")
+
     def test_prepare_payload_collects_expected_context(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="tomato", value="Помідор")
+        plant = Plant.objects.create(
+            user=user,
+            category=category,
+            title="Cherry",
+            variety="Солодкий 100",
+            plant_date="2026-04-01",
+        )
+        plant.refresh_from_db()
         payload = preparePlantRecommendationPayload(
             plant_name="Cherry",
             plant_date=None,
             action_type="disease",
             note="<p>Плями на листі</p>",
             last_actions=[
-                {"action_type": "watering", "date": "2026-04-15", "has_photo": False},
+                {
+                    "action_type": "watering",
+                    "date": "2026-04-15",
+                    "note": "Полив теплою водою",
+                    "has_photo": False,
+                },
                 {"action_type": "photo", "date": "2026-04-16", "has_photo": True},
             ],
             has_photo=True,
+            plants=[plant],
         )
 
         self.assertEqual(payload["plantName"], "Cherry")
         self.assertEqual(payload["latestAction"]["actionType"], "disease")
         self.assertEqual(payload["note"], "Плями на листі")
         self.assertEqual(len(payload["lastActions"]), 2)
+        self.assertEqual(payload["plants"][0]["category"], "Помідор")
+        self.assertEqual(payload["plants"][0]["variety"], "Солодкий 100")
+        self.assertEqual(payload["plants"][0]["plantDate"], "2026-04-01")
+        self.assertIsNone(payload["plants"][0]["growingEnvironment"])
+        self.assertEqual(payload["recentActivity"]["watering"]["note"], "Полив теплою водою")
+        self.assertIsNone(payload["recentActivity"]["fertilizer"])
         self.assertTrue(payload["hasPhoto"])
         self.assertTrue(payload["preparedAt"])
 
@@ -1848,6 +2520,39 @@ class PlantRecommendationServiceTests(TestCase):
         self.assertEqual(recommendation["details"], "AI details")
         self.assertEqual(recommendation["nextStep"], "AI next step")
 
+    def test_ai_cannot_remove_required_context_or_invent_rule_ids(self):
+        service = PlantRecommendationService()
+        service.request_ai_recommendation = lambda **kwargs: {
+            "severity": "medium",
+            "status": "attention",
+            "title": "AI title",
+            "summary": "AI summary",
+            "details": "AI details",
+            "nextStep": "AI next step",
+            "matchedRuleIds": ["invented_rule_01"],
+            "confidence": "high",
+            "needsMoreData": False,
+            "missingData": [],
+            "clarifyingQuestion": "",
+            "sourceBasis": ["вигадане джерело"],
+        }
+
+        recommendation = service.generate(
+            plant_name="Огірок",
+            plant_date=None,
+            action_type="disease",
+            note="Листя жовтіє",
+            last_actions=[],
+            has_photo=False,
+            use_ai=True,
+        )
+
+        self.assertEqual(recommendation["matchedRuleIds"], [])
+        self.assertTrue(recommendation["needsMoreData"])
+        self.assertIn("фото листя зверху і знизу", recommendation["missingData"])
+        self.assertTrue(recommendation["clarifyingQuestion"])
+        self.assertEqual(recommendation["sourceBasis"], ["журнал дій користувача"])
+
 
 class ProfileDiaryDetailRecommendationTests(TestCase):
     def setUp(self):
@@ -1884,6 +2589,9 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         self.assertEqual(response.context["recommendation"]["severity"], "high")
         self.assertEqual(response.context["recommendation"]["status"], "warning")
         self.assertEqual(response.context["recommendation"]["actionType"], "pest")
+        self.assertTrue(response.context["recommendation"]["needsMoreData"])
+        self.assertContains(response, "Потрібне уточнення:")
+        self.assertContains(response, "фото листя зверху і знизу")
         self.assertEqual(response.context["recommendation_target_label"], plant.display_name)
 
     def test_detail_uses_cached_recommendation_for_latest_action(self):

@@ -1,11 +1,14 @@
 import json
 import logging
+import re
 import urllib.error
 import urllib.request
 
 from django.conf import settings
 from django.utils import timezone
 from django.utils.html import strip_tags
+
+from core.classifier.models import CategoryAIProfile
 
 from .models import DIARY_ITEM_ACTION_CHOICES
 
@@ -31,6 +34,32 @@ SEVERITY_BY_ACTION = {
 }
 
 ACTION_LABELS = dict(DIARY_ITEM_ACTION_CHOICES)
+
+RULE_SECTION_LABELS = {
+    "trigger": "trigger",
+    "additional signals": "additionalSignals",
+    "known signals": "knownSignals",
+    "assumption": "assumption",
+    "outcome": "outcome",
+    "confidence": "confidence",
+    "severity": "severity",
+    "recommendation": "recommendation",
+    "do not recommend": "doNotRecommend",
+    "source / basis": "sourceBasis",
+}
+
+KNOWLEDGE_SECTION_KEYWORDS = {
+    "watering": ("полив", "мульч", "типові проблем", "severity", "priority"),
+    "fertilizer": ("добрив", "живлен", "типові проблем", "severity", "priority"),
+    "planted": ("умови вирощування", "посад", "посів", "пророст", "календар", "помилки"),
+    "transplanted": ("умови вирощування", "посад", "пересад", "коренева", "помилки"),
+    "disease": ("типові проблем", "хвороб", "severity", "priority", "безпек"),
+    "pest": ("типові проблем", "шкідник", "severity", "priority", "безпек"),
+    "pruning": ("обріз", "формув", "типові проблем"),
+    "harvest": ("збір урожаю", "зберігання", "плодонош", "severity", "priority"),
+    "photo": ("типові проблем", "хвороб", "шкідник", "severity", "priority"),
+    "note": ("типові проблем", "хвороб", "шкідник", "severity", "priority"),
+}
 
 SEVERITY_META = {
     "low": {
@@ -58,6 +87,11 @@ PLANT_RECOMMENDATION_SYSTEM_PROMPT_TEMPLATE = """
 Не переказуй журнал подій. Не роби головним змістом просте повторення назви дії.
 Навіть для звичайних дій дай корисний висновок. Для ризиків будь конкретним і прикладним.
 Якщо фото додано без vision-аналізу, не вдавай, що система бачить зображення.
+Використовуй фактичні твердження про культуру лише з plantKnowledge у payload.
+Не став остаточний діагноз, якщо даних недостатньо. У такому разі познач needsMoreData=true.
+Якщо needsMoreData=true, постав одне коротке уточнювальне питання у clarifyingQuestion.
+Не супереч recommendation та doNotRecommend зі знайдених правил.
+Якщо matchedRules порожній, дай обережну загальну пораду без вигаданих деталей про культуру.
 
 Поверни JSON об'єкт з полями:
 - severity: low | medium | high
@@ -66,6 +100,12 @@ PLANT_RECOMMENDATION_SYSTEM_PROMPT_TEMPLATE = """
 - summary: 1-2 короткі речення з висновком
 - details: розширене пояснення
 - nextStep: одна коротка конкретна порада
+- matchedRuleIds: масив Rule ID, на яких базується відповідь
+- confidence: low | medium | high
+- needsMoreData: true | false
+- missingData: масив коротких назв відсутніх даних
+- clarifyingQuestion: одне коротке питання або порожній рядок
+- sourceBasis: масив коротких назв правил або джерел, на яких базується відповідь
 
 Правила по типах дій:
 - watering: оцінюй інтервал від попереднього поливу, відмічай норму або ризик переливу, радь перевірити вологість ґрунту
@@ -86,32 +126,232 @@ PLANT_RECOMMENDATION_USER_PROMPT_TEMPLATE = """
 """.strip()
 
 
-def preparePlantRecommendationPayload(*, plant_name, plant_date, action_type, note, last_actions, has_photo):
+def parsePlantRecommendationRules(rules_text):
+    """Parse the existing human-readable admin format without rewriting its meaning."""
+    blocks = re.split(r"(?im)^\s*Rule ID:\s*$", rules_text or "")
+    parsed_rules = []
+
+    for block in blocks[1:]:
+        lines = [line.rstrip() for line in block.strip().splitlines()]
+        rule_id = next((line.strip() for line in lines if line.strip()), "")
+        if not rule_id:
+            continue
+
+        sections = {"id": rule_id}
+        current_key = None
+        current_lines = []
+
+        def save_section():
+            if current_key:
+                sections[current_key] = "\n".join(line for line in current_lines if line.strip()).strip()
+
+        for line in lines[1:]:
+            normalized_label = line.strip().rstrip(":").lower()
+            next_key = RULE_SECTION_LABELS.get(normalized_label)
+            if next_key:
+                save_section()
+                current_key = next_key
+                current_lines = []
+                continue
+            if current_key:
+                current_lines.append(line.strip())
+        save_section()
+
+        known_signals = sections.get("knownSignals", "")
+        sections["noteSignals"] = re.findall(
+            r'user_note_contains\s*:\s*["“](.+?)["”]',
+            known_signals,
+            flags=re.IGNORECASE,
+        )
+        parsed_rules.append(sections)
+
+    if parsed_rules:
+        return parsed_rules
+
+    return _parse_legacy_ukrainian_recommendation_rules(rules_text)
+
+
+def _parse_legacy_ukrainian_recommendation_rules(rules_text):
+    """Parse the earlier `Якщо`/`Тоді` rule format used by existing profiles."""
+    rule_id_pattern = re.compile(r"(?m)^\s*([a-z][a-z0-9]*(?:_[a-z0-9]+){2,})\s*$")
+    matches = list(rule_id_pattern.finditer(rules_text or ""))
+    parsed_rules = []
+
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(rules_text or "")
+        block = (rules_text or "")[match.end() : end]
+        if_match = re.search(r"(?ims)^\s*Якщо:\s*(.*?)(?=^\s*Тоді:)", block)
+        then_match = re.search(r"(?im)^\s*Тоді:\s*(.+?)\s*$", block)
+        confidence_match = re.search(r"(?im)^\s*Confidence:\s*(.+?)\s*$", block)
+        explanation_match = re.search(r"(?im)^\s*Пояснення:\s*(.+?)\s*$", block)
+        recommendation_match = re.search(r"(?im)^\s*Рекомендація:\s*(.+?)\s*$", block)
+
+        if not if_match or not recommendation_match:
+            continue
+
+        trigger_lines = [
+            line.strip().rstrip(";.")
+            for line in if_match.group(1).splitlines()
+            if line.strip().rstrip(";.")
+        ]
+        parsed_rules.append(
+            {
+                "id": match.group(1),
+                "trigger": "\n".join(trigger_lines),
+                "noteSignals": trigger_lines,
+                "outcome": then_match.group(1).strip() if then_match else "",
+                "confidence": confidence_match.group(1).strip() if confidence_match else "",
+                "assumption": explanation_match.group(1).strip() if explanation_match else "",
+                "recommendation": recommendation_match.group(1).strip(),
+            }
+        )
+
+    return parsed_rules
+
+
+def selectRelevantRecommendationRules(rules, *, action_type, note, last_actions=None, limit=3):
+    normalized_note = _normalize_match_text(note)
+    last_actions = last_actions or []
+    scored_rules = []
+
+    for index, rule in enumerate(rules):
+        rule_id = rule.get("id", "").lower()
+        matched_signals = [
+            signal
+            for signal in rule.get("noteSignals", [])
+            if _signal_matches_note(signal, normalized_note)
+        ]
+        matched_conditions = _match_rule_history_conditions(
+            rule,
+            action_type=action_type,
+            last_actions=last_actions,
+        )
+        if not matched_signals and not matched_conditions:
+            continue
+
+        score = len(matched_signals) * 10 + len(matched_conditions) * 8
+
+        if action_type and action_type.lower() in rule_id:
+            score += 3
+        if action_type in {"disease", "photo", "note"} and any(
+            keyword in rule_id for keyword in ("mildew", "wilt", "diagnosis", "disease")
+        ):
+            score += 1
+        if action_type == "watering" and any(keyword in rule_id for keyword in ("watering", "water", "moisture")):
+            score += 2
+        if action_type == "pest" and any(keyword in rule_id for keyword in ("pest", "aphid", "beetle", "mite")):
+            score += 2
+
+        scored_rules.append(
+            (
+                score,
+                -index,
+                {
+                    **rule,
+                    "matchedSignals": matched_signals,
+                    "matchedConditions": matched_conditions,
+                },
+            )
+        )
+
+    scored_rules.sort(reverse=True, key=lambda item: (item[0], item[1]))
+    return [rule for _, _, rule in scored_rules[:limit]]
+
+
+def selectRelevantKnowledgeSections(content, *, action_type, max_chars=5500):
+    sections = _split_numbered_sections(content)
+    if not sections:
+        return (content or "")[:max_chars]
+
+    keywords = KNOWLEDGE_SECTION_KEYWORDS.get(action_type, KNOWLEDGE_SECTION_KEYWORDS["note"])
+    selected = []
+    for section in sections:
+        normalized_title = section["title"].lower()
+        if section["number"] == "1" or any(keyword in normalized_title for keyword in keywords):
+            selected.append(section["text"])
+
+    return "\n\n".join(selected)[:max_chars]
+
+
+def buildPlantKnowledgeContext(*, plants, action_type, note, last_actions=None):
+    category_ids = {plant.category_id for plant in plants or [] if plant.category_id}
+    if not category_ids:
+        return []
+
+    profiles = (
+        CategoryAIProfile.objects.filter(
+            category_id__in=category_ids,
+            status=CategoryAIProfile.STATUS_READY,
+            is_ai_enabled=True,
+        )
+        .select_related("category")
+        .only(
+            "category_id",
+            "title",
+            "content",
+            "recommendation_rules",
+            "sources",
+            "category__value",
+            "category__slug",
+        )
+        .order_by("category__value")
+    )
+    contexts = []
+    for profile in profiles:
+        parsed_rules = parsePlantRecommendationRules(profile.recommendation_rules)
+        matched_rules = selectRelevantRecommendationRules(
+            parsed_rules,
+            action_type=action_type,
+            note=note,
+            last_actions=last_actions,
+        )
+        contexts.append(
+            {
+                "categoryId": profile.category_id,
+                "category": profile.category.value,
+                "categorySlug": profile.category.slug,
+                "profileTitle": profile.title or profile.category.value,
+                "knowledge": selectRelevantKnowledgeSections(profile.content, action_type=action_type),
+                "matchedRules": [_serialize_rule_for_prompt(rule) for rule in matched_rules],
+                "sources": profile.sources,
+            }
+        )
+    return contexts
+
+
+def preparePlantRecommendationPayload(
+    *,
+    plant_name,
+    plant_date,
+    action_type,
+    note,
+    last_actions,
+    has_photo,
+    plant_knowledge=None,
+    plants=None,
+):
     normalized_note = _normalize_note(note)
     latest_action_date = last_actions[0].get("date") if last_actions else None
 
     return {
         "plantName": plant_name,
         "plantDate": plant_date.isoformat() if plant_date else None,
+        "plants": [_serialize_plant_context(plant) for plant in plants or []],
         "latestAction": {
             "actionType": action_type,
             "actionLabel": ACTION_LABELS.get(action_type, action_type or "Дія"),
             "date": latest_action_date,
         },
         "note": normalized_note,
-        "lastActions": [
-            {
-                "actionType": action.get("action_type") or action.get("actionType"),
-                "actionLabel": ACTION_LABELS.get(
-                    action.get("action_type") or action.get("actionType"),
-                    action.get("action_type") or action.get("actionType") or "Дія",
-                ),
-                "date": action.get("date"),
-                "hasPhoto": bool(action.get("has_photo") or action.get("hasPhoto")),
-            }
-            for action in last_actions[:5]
-        ],
+        "lastActions": [_serialize_action_context(action) for action in last_actions[:10]],
+        "recentActivity": _build_recent_activity(last_actions),
         "hasPhoto": has_photo,
+        "plantKnowledge": plant_knowledge or [],
+        "matchedRuleIds": [
+            rule["id"]
+            for profile in plant_knowledge or []
+            for rule in profile.get("matchedRules", [])
+        ],
         "preparedAt": timezone.localtime().isoformat(),
     }
 
@@ -129,7 +369,24 @@ def buildPlantRecommendationUserPrompt(payload):
 class PlantRecommendationService:
     session_key_prefix = "plant_recommendation"
 
-    def generate(self, *, plant_name, plant_date, action_type, note, last_actions, has_photo, use_ai=False):
+    def generate(
+        self,
+        *,
+        plant_name,
+        plant_date,
+        action_type,
+        note,
+        last_actions,
+        has_photo,
+        plants=None,
+        use_ai=False,
+    ):
+        plant_knowledge = buildPlantKnowledgeContext(
+            plants=plants or [],
+            action_type=action_type,
+            note=note,
+            last_actions=last_actions,
+        )
         payload = preparePlantRecommendationPayload(
             plant_name=plant_name,
             plant_date=plant_date,
@@ -137,6 +394,8 @@ class PlantRecommendationService:
             note=note,
             last_actions=last_actions,
             has_photo=has_photo,
+            plant_knowledge=plant_knowledge,
+            plants=plants,
         )
         system_prompt = buildPlantRecommendationSystemPrompt()
         user_prompt = buildPlantRecommendationUserPrompt(payload)
@@ -174,7 +433,7 @@ class PlantRecommendationService:
             "model": getattr(settings, "PLANT_RECOMMENDATION_OPENAI_MODEL", "gpt-4.1-mini"),
             "instructions": system_prompt,
             "input": user_prompt,
-            "max_output_tokens": getattr(settings, "PLANT_RECOMMENDATION_OPENAI_MAX_OUTPUT_TOKENS", 220),
+            "max_output_tokens": getattr(settings, "PLANT_RECOMMENDATION_OPENAI_MAX_OUTPUT_TOKENS", 420),
             "text": {
                 "format": {
                     "type": "json_schema",
@@ -196,8 +455,39 @@ class PlantRecommendationService:
                             "summary": {"type": "string"},
                             "details": {"type": "string"},
                             "nextStep": {"type": "string"},
+                            "matchedRuleIds": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                            "confidence": {
+                                "type": "string",
+                                "enum": ["low", "medium", "high"],
+                            },
+                            "needsMoreData": {"type": "boolean"},
+                            "missingData": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                            "clarifyingQuestion": {"type": "string"},
+                            "sourceBasis": {
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
                         },
-                        "required": ["severity", "status", "title", "summary", "details", "nextStep"],
+                        "required": [
+                            "severity",
+                            "status",
+                            "title",
+                            "summary",
+                            "details",
+                            "nextStep",
+                            "matchedRuleIds",
+                            "confidence",
+                            "needsMoreData",
+                            "missingData",
+                            "clarifyingQuestion",
+                            "sourceBasis",
+                        ],
                     },
                 }
             },
@@ -259,12 +549,52 @@ class PlantRecommendationService:
     def _build_fallback_recommendation(self, payload):
         action_type = payload["latestAction"]["actionType"]
         rule_based_recommendation = self._build_rule_based_recommendation(payload)
+        matched_rules = _flatten_matched_rules(payload)
+        if matched_rules:
+            primary_rule = matched_rules[0]
+            if primary_rule.get("recommendation"):
+                rule_based_recommendation["nextStep"] = _first_sentence(primary_rule["recommendation"])
+            if primary_rule.get("assumption"):
+                rule_based_recommendation["details"] = " ".join(
+                    part
+                    for part in (
+                        rule_based_recommendation.get("details", ""),
+                        f"Профіль культури: {primary_rule['assumption']}",
+                    )
+                    if part
+                )
         rule_based_recommendation["actionType"] = action_type
+        rule_based_recommendation["matchedRuleIds"] = payload.get("matchedRuleIds", [])
+        rule_based_recommendation["confidence"] = _normalize_confidence(
+            matched_rules[0].get("confidence") if matched_rules else "low"
+        )
+        missing_data = _build_missing_data(payload, matched_rules)
+        rule_based_recommendation["needsMoreData"] = bool(missing_data)
+        rule_based_recommendation["missingData"] = missing_data
+        rule_based_recommendation["clarifyingQuestion"] = _build_clarifying_question(missing_data)
+        rule_based_recommendation["sourceBasis"] = _build_source_basis(payload, matched_rules)
+        rule_severity = _infer_matched_rule_severity(matched_rules)
+        if rule_severity:
+            rule_based_recommendation["severity"] = rule_severity
+            rule_based_recommendation["status"] = STATUS_BY_SEVERITY[rule_severity]
         rule_based_recommendation["generatedAt"] = timezone.localtime().strftime("%d.%m.%Y %H:%M")
         return rule_based_recommendation
 
     def _merge_ai_recommendation(self, payload, ai_recommendation):
         fallback_recommendation = self._build_fallback_recommendation(payload)
+        missing_data = _unique_strings(
+            [
+                *fallback_recommendation["missingData"],
+                *ai_recommendation.get("missingData", []),
+            ]
+        )
+        needs_more_data = bool(missing_data) or ai_recommendation.get("needsMoreData", False)
+        allowed_rule_ids = set(payload.get("matchedRuleIds", []))
+        ai_rule_ids = [
+            rule_id
+            for rule_id in ai_recommendation.get("matchedRuleIds", [])
+            if rule_id in allowed_rule_ids
+        ]
         return {
             "severity": ai_recommendation.get("severity") or fallback_recommendation["severity"],
             "status": ai_recommendation.get("status") or fallback_recommendation["status"],
@@ -272,6 +602,16 @@ class PlantRecommendationService:
             "summary": ai_recommendation.get("summary") or fallback_recommendation["summary"],
             "details": ai_recommendation.get("details") or fallback_recommendation["details"],
             "nextStep": ai_recommendation.get("nextStep") or fallback_recommendation["nextStep"],
+            "matchedRuleIds": ai_rule_ids or fallback_recommendation["matchedRuleIds"],
+            "confidence": ai_recommendation.get("confidence") or fallback_recommendation["confidence"],
+            "needsMoreData": needs_more_data,
+            "missingData": missing_data,
+            "clarifyingQuestion": (
+                ai_recommendation.get("clarifyingQuestion")
+                if needs_more_data and ai_recommendation.get("clarifyingQuestion")
+                else _build_clarifying_question(missing_data)
+            ),
+            "sourceBasis": fallback_recommendation["sourceBasis"],
             "actionType": payload["latestAction"]["actionType"],
             "generatedAt": timezone.localtime().strftime("%d.%m.%Y %H:%M"),
         }
@@ -483,3 +823,296 @@ def _normalize_note(note):
     if len(compact_note) <= 140:
         return compact_note
     return f"{compact_note[:137]}..."
+
+
+def _normalize_match_text(value):
+    return " ".join(strip_tags(value or "").replace("’", "'").lower().split())
+
+
+def _signal_matches_note(signal, normalized_note):
+    normalized_signal = _normalize_match_text(signal)
+    if not normalized_signal:
+        return False
+    return bool(
+        re.search(
+            rf"(?<!\w){re.escape(normalized_signal)}(?!\w)",
+            normalized_note,
+            flags=re.UNICODE,
+        )
+    )
+
+
+def _split_numbered_sections(content):
+    matches = list(re.finditer(r"(?m)^\s*(\d+)\.\s+(.+?)\s*$", content or ""))
+    sections = []
+    for index, match in enumerate(matches):
+        end = matches[index + 1].start() if index + 1 < len(matches) else len(content)
+        sections.append(
+            {
+                "number": match.group(1),
+                "title": match.group(2).strip(),
+                "text": (content or "")[match.start() : end].strip(),
+            }
+        )
+    return sections
+
+
+def _serialize_rule_for_prompt(rule):
+    return {
+        key: rule.get(key, "")
+        for key in (
+            "id",
+            "trigger",
+            "knownSignals",
+            "assumption",
+            "outcome",
+            "confidence",
+            "recommendation",
+            "doNotRecommend",
+            "sourceBasis",
+            "severity",
+            "matchedSignals",
+            "matchedConditions",
+        )
+        if rule.get(key)
+    }
+
+
+def _flatten_matched_rules(payload):
+    return [
+        rule
+        for profile in payload.get("plantKnowledge", [])
+        for rule in profile.get("matchedRules", [])
+    ]
+
+
+def _first_sentence(value):
+    compact = " ".join((value or "").split())
+    if not compact:
+        return ""
+    parts = re.split(r"(?<=[.!?])\s+", compact, maxsplit=1)
+    return parts[0]
+
+
+def _normalize_confidence(value):
+    normalized = (value or "").strip().lower()
+    if "high" in normalized:
+        return "high"
+    if "medium" in normalized:
+        return "medium"
+    return "low"
+
+
+def _normalize_severity(value):
+    normalized = (value or "").strip().lower()
+    return normalized if normalized in STATUS_BY_SEVERITY else ""
+
+
+def _serialize_plant_context(plant):
+    plant_date = getattr(plant, "plant_date", None)
+    age_days = None
+    if plant_date:
+        age_days = max((timezone.localdate() - plant_date).days, 0)
+    category = getattr(plant, "category", None)
+    return {
+        "id": getattr(plant, "pk", None),
+        "category": getattr(category, "value", "") or None,
+        "categorySlug": getattr(category, "slug", "") or None,
+        "variety": getattr(plant, "variety", "") or None,
+        "title": getattr(plant, "title", "") or None,
+        "plantDate": plant_date.isoformat() if plant_date else None,
+        "ageDays": age_days,
+        "growingEnvironment": None,
+    }
+
+
+def _serialize_action_context(action):
+    action_type = action.get("action_type") or action.get("actionType")
+    return {
+        "actionType": action_type,
+        "actionLabel": ACTION_LABELS.get(action_type, action_type or "Дія"),
+        "date": action.get("date"),
+        "note": _normalize_note(action.get("note", "")),
+        "hasPhoto": bool(action.get("has_photo") or action.get("hasPhoto")),
+    }
+
+
+def _build_recent_activity(last_actions):
+    activity = {}
+    for action_type in ("watering", "fertilizer", "disease", "pest"):
+        action = next(
+            (
+                item
+                for item in last_actions
+                if (item.get("action_type") or item.get("actionType")) == action_type
+            ),
+            None,
+        )
+        activity[action_type] = _serialize_action_context(action) if action else None
+    return activity
+
+
+def _match_rule_history_conditions(rule, *, action_type, last_actions):
+    condition_text = "\n".join(
+        value
+        for value in (
+            rule.get("trigger", ""),
+            rule.get("additionalSignals", ""),
+            rule.get("knownSignals", ""),
+        )
+        if value
+    )
+    matches = []
+    action_conditions = re.findall(
+        r"(?:action_type|latest_action)\s*[:=]\s*[\"']?([a-z_]+)",
+        condition_text,
+        flags=re.IGNORECASE,
+    )
+    if action_conditions:
+        if action_type not in {condition.lower() for condition in action_conditions}:
+            return []
+        matches.append(f"action_type={action_type}")
+
+    aliases = {
+        "watering": "watering",
+        "fertilizer": "fertilizer",
+    }
+    for condition_action, history_action in aliases.items():
+        if action_type != condition_action:
+            continue
+        pattern = re.compile(
+            rf"(?:days_since_(?:last|previous)_{history_action}|{history_action}_interval_days)\s*"
+            r"(<=|>=|<|>|=)\s*(\d+)",
+            flags=re.IGNORECASE,
+        )
+        interval_conditions = pattern.findall(condition_text)
+        if not interval_conditions:
+            continue
+        days = _days_between_latest_actions(last_actions, history_action)
+        if days is None:
+            return []
+        for operator, raw_threshold in interval_conditions:
+            threshold = int(raw_threshold)
+            comparisons = {
+                "<": days < threshold,
+                "<=": days <= threshold,
+                ">": days > threshold,
+                ">=": days >= threshold,
+                "=": days == threshold,
+            }
+            if not comparisons[operator]:
+                return []
+            condition_match = f"days_since_previous_{history_action}={days}"
+            if condition_match not in matches:
+                matches.append(condition_match)
+    return matches
+
+
+def _days_between_latest_actions(last_actions, action_type):
+    dates = []
+    for action in last_actions:
+        if (action.get("action_type") or action.get("actionType")) != action_type:
+            continue
+        try:
+            dates.append(timezone.datetime.fromisoformat(action.get("date", "")).date())
+        except (TypeError, ValueError):
+            continue
+        if len(dates) == 2:
+            return (dates[0] - dates[1]).days
+    return None
+
+
+def _build_source_basis(payload, matched_rules):
+    sources = []
+    for rule in matched_rules:
+        source = rule.get("sourceBasis")
+        if source and source not in sources:
+            sources.append(source)
+    if not sources:
+        for profile in payload.get("plantKnowledge", []):
+            source = (profile.get("sources") or "").strip()
+            if source and source not in sources:
+                sources.append(source)
+    return sources or ["журнал дій користувача"]
+
+
+def _build_missing_data(payload, matched_rules):
+    action_type = payload.get("latestAction", {}).get("actionType")
+    note = _normalize_match_text(payload.get("note", ""))
+    rule_ids = " ".join(rule.get("id", "") for rule in matched_rules)
+    missing_data = []
+
+    diagnosis_context = action_type in {"disease", "pest"} or any(
+        keyword in rule_ids
+        for keyword in ("mildew", "wilt", "diagnosis", "disease", "pest", "aphid", "beetle")
+    )
+    needs_photo_by_rule = any(
+        "без фото" in _normalize_match_text(rule.get("doNotRecommend", ""))
+        or "без огляду" in _normalize_match_text(rule.get("doNotRecommend", ""))
+        for rule in matched_rules
+    )
+    if not payload.get("hasPhoto") and (diagnosis_context or needs_photo_by_rule):
+        missing_data.append("фото листя зверху і знизу")
+
+    plants = payload.get("plants", [])
+    variety_sensitive = any(keyword in rule_ids for keyword in ("pollination", "parthenocarpic"))
+    if variety_sensitive and plants and any(not plant.get("variety") for plant in plants):
+        missing_data.append("сорт рослини")
+
+    environment_sensitive = diagnosis_context or any(
+        keyword in rule_ids for keyword in ("pollination", "greenhouse", "cold_soil")
+    )
+    environment_in_note = any(
+        keyword in note
+        for keyword in ("теплиц", "відкрит", "грунт", "ґрунт", "контейнер", "горщик")
+    )
+    has_environment = any(plant.get("growingEnvironment") for plant in plants)
+    if environment_sensitive and not environment_in_note and not has_environment:
+        missing_data.append("середовище вирощування: теплиця чи відкритий ґрунт")
+
+    soil_sensitive = action_type == "watering" or any(
+        keyword in rule_ids for keyword in ("watering", "wilt", "diagnosis")
+    )
+    soil_in_note = any(keyword in note for keyword in ("сух", "мокр", "волог", "перезвол"))
+    if soil_sensitive and not soil_in_note:
+        missing_data.append("стан ґрунту перед поливом")
+
+    if soil_sensitive and _count_actions(payload, "watering") == 0:
+        missing_data.append("дата останнього поливу")
+
+    return _unique_strings(missing_data)[:3]
+
+
+def _count_actions(payload, action_type):
+    return sum(
+        action.get("actionType") == action_type
+        for action in payload.get("lastActions", [])
+    )
+
+
+def _build_clarifying_question(missing_data):
+    if not missing_data:
+        return ""
+    return "Уточни, будь ласка: {}?".format("; ".join(missing_data))
+
+
+def _infer_matched_rule_severity(matched_rules):
+    if not matched_rules:
+        return ""
+    explicit_severity = _normalize_severity(matched_rules[0].get("severity"))
+    if explicit_severity:
+        return explicit_severity
+    rule_id = matched_rules[0].get("id", "").lower()
+    if any(keyword in rule_id for keyword in ("bacterial_wilt", "root_rot", "severe", "critical")):
+        return "high"
+    if any(keyword in rule_id for keyword in ("harvest_young", "succession_sowing")):
+        return "low"
+    return "medium"
+
+
+def _unique_strings(values):
+    unique = []
+    for value in values:
+        if isinstance(value, str) and value and value not in unique:
+            unique.append(value)
+    return unique

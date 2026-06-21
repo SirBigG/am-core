@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from core.classifier.models import Category
 
-from .models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, Plant
+from .models import DIARY_ITEM_ACTION_CHOICES, HARVEST_UNIT_CHOICES, Diary, DiaryItem, Plant
 
 PLANT_DELETE_CONFIRM_TEXT = "Видалити рослину? Ця рослина ще не має історії. Її буде повністю видалено."
 PLANT_FINISH_CONFIRM_TEXT = (
@@ -342,12 +342,14 @@ class DiaryItemForm(ModelForm):
 
     class Meta:
         model = DiaryItem
-        fields = ["apply_to_all", "plants", "description", "date", "image"]
+        fields = ["apply_to_all", "plants", "description", "harvest_amount", "harvest_unit", "date", "image"]
 
     def __init__(self, *args, **kwargs):
         self.diary = kwargs.pop("diary")
         super().__init__(*args, **kwargs)
-        self.order_fields(["action_type", "apply_to_all", "plants", "description", "date", "image"])
+        self.order_fields(
+            ["action_type", "apply_to_all", "plants", "description", "harvest_amount", "harvest_unit", "date", "image"]
+        )
         if not (self.instance and self.instance.pk):
             self.fields["action_type"].choices = [
                 choice
@@ -380,6 +382,24 @@ class DiaryItemForm(ModelForm):
                 "placeholder": "Додайте опис дії",
             }
         )
+        self.fields["harvest_amount"].required = False
+        self.fields["harvest_amount"].widget.attrs.update(
+            {
+                "class": "profile-form-control",
+                "min": "0",
+                "step": "0.01",
+                "placeholder": "Наприклад 1.2",
+                "data-harvest-input": "true",
+            }
+        )
+        self.fields["harvest_unit"].required = False
+        self.fields["harvest_unit"].choices = [("", "Оберіть одиницю"), *HARVEST_UNIT_CHOICES]
+        self.fields["harvest_unit"].widget.attrs.update(
+            {
+                "class": "profile-form-control profile-form-select",
+                "data-harvest-input": "true",
+            }
+        )
         self.fields["date"].widget = forms.DateInput(
             format="%Y-%m-%d",
             attrs={
@@ -401,6 +421,9 @@ class DiaryItemForm(ModelForm):
         active_plants_qs = self.diary.plants.filter(status="active")
         apply_to_all = cleaned_data.get("apply_to_all", False)
         selected_plants = cleaned_data.get("plants")
+        action_type = cleaned_data.get("action_type")
+        harvest_amount = cleaned_data.get("harvest_amount")
+        harvest_unit = cleaned_data.get("harvest_unit")
 
         if not active_plants_qs.exists():
             raise forms.ValidationError(
@@ -409,6 +432,17 @@ class DiaryItemForm(ModelForm):
 
         if not apply_to_all and not selected_plants:
             self.add_error("plants", "Оберіть хоча б одну рослину або застосуйте дію до всіх активних рослин.")
+
+        if action_type == "harvest":
+            if harvest_amount is None:
+                self.add_error("harvest_amount", "Вкажіть кількість зібраного урожаю.")
+            elif harvest_amount <= 0:
+                self.add_error("harvest_amount", "Кількість урожаю має бути більшою за 0.")
+            if not harvest_unit:
+                self.add_error("harvest_unit", "Оберіть одиницю виміру урожаю.")
+        else:
+            cleaned_data["harvest_amount"] = None
+            cleaned_data["harvest_unit"] = ""
 
         return cleaned_data
 

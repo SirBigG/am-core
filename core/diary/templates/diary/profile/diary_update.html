@@ -1,7 +1,10 @@
 {% extends "pro_auth/profile/profile_base.html" %}
+{% load static %}
 {% load post_extras %}
+{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
+{% block profile_sidebar %}{% endblock profile_sidebar %}
 {% block profile_content %}
-    <div class="profile-page-panel profile-form-panel">
+    <div class="profile-page-panel profile-form-panel profile-diary-form-panel profile-diary-form-panel--wide">
         <a class="profile-diary-detail-back"
            href="{% url 'pro_auth:profile-diary-detail' pk=form.instance.pk %}">
             <span aria-hidden="true">←</span>
@@ -34,3 +37,7 @@
     {{ form.media }}
     {{ plant_formset.media }}
 {% endblock profile_content %}
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
+{% endblock extra_footerscript %}
