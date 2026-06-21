@@ -263,29 +263,31 @@
             </div>
         </div>
     </section>
-    <section class="trending-cat section-padding">
-        <div class="container">
-            <h2 class="section-title">Oголошення:</h2>
-            <div class="row">
-                {% for advert in random_adverts %}
-                    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <a href="{{ advert.get_absolute_url }}">
-                            <div class="box">
-                                <div class="icon">
-                                    {% if advert.image.url %}
-                                        <img class="img-fluid"
-                                             src="{{ advert.image.url }}"
-                                             alt="{{ advert.title }}"
-                                             width="350"
-                                             height="280">
-                                    {% endif %}
+    {% if enable_adverts and random_adverts %}
+        <section class="trending-cat section-padding">
+            <div class="container">
+                <h2 class="section-title">Oголошення:</h2>
+                <div class="row">
+                    {% for advert in random_adverts %}
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                            <a href="{{ advert.get_absolute_url }}">
+                                <div class="box">
+                                    <div class="icon">
+                                        {% if advert.primary_image_url %}
+                                            <img class="img-fluid"
+                                                 src="{{ advert.primary_image_url }}"
+                                                 alt="{{ advert.title }}"
+                                                 width="350"
+                                                 height="280">
+                                        {% endif %}
+                                    </div>
+                                    <p class="h4">{{ advert.title }}</p>
                                 </div>
-                                <p class="h4">{{ advert.title }}</p>
-                            </div>
-                        </a>
-                    </div>
-                {% endfor %}
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 {% endblock main %}

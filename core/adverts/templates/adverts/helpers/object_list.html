@@ -3,20 +3,16 @@
     <div class="row">
         <div class="card mb-3 w-100">
             <div class="row no-gutters">
-                <div class="col-md-4 col-12 p-0">
-                    {% if advert.primary_image_url %}
+                {% if advert.primary_image_url %}
+                    <div class="col-md-4 col-12 p-0">
                         <img src="{{ advert.primary_image_url }}"
                              alt="{{ advert.title }}"
                              width="350"
                              height="260"
                              class="card-img">
-                    {% else %}
-                        <div class="card-img advert-list-photo-placeholder d-flex align-items-center justify-content-center bg-light text-muted">
-                            Без фото
-                        </div>
-                    {% endif %}
-                </div>
-                <div class="col-md-8 col-12">
+                    </div>
+                {% endif %}
+                <div class="{% if advert.primary_image_url %}col-md-8{% else %}col-12{% endif %}">
                     <div class="card-body">
                         <h2 class="card-title h4">{{ advert.title }}</h2>
                         <div class="card-text mb-1">{{ advert.description|striptags|truncatechars:160 }}</div>

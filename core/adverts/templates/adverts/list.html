@@ -1,30 +1,28 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
-{% block title %}Аграрні оголошення України{% endblock %}
-{% block meta_description %}Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті{% endblock %}
-
+{% block title %}
+    Аграрні оголошення України
+{% endblock title %}
+{% block meta_description %}
+    Оголошення аграрної сфери від бізнесу та приватних осіб. Оголошення з усіх куточків України. Додати, подивитись оголошення ви можете на нашому сайті
+{% endblock meta_description %}
 {% block canonical %}
-    {% if request.GET %}
-        <link rel="canonical" href="https://agromega.in.ua{{ request.path }}"/>
-    {% endif %}
+    {% if request.GET %}<link rel="canonical" href="https://agromega.in.ua{{ request.path }}" />{% endif %}
 {% endblock canonical %}
-
 {% block extra_meta %}
 {% endblock extra_meta %}
-
-{% block page_title %}Оголошення{% endblock %}
+{% block page_title %}
+    Оголошення
+{% endblock page_title %}
 {% block page_title_right %}
-    <a href="/adverts/create/" class="btn btn-success btn-sm"><i class="icon-plus"></i> Оголошення</a>{% endblock %}
-
+    <a href="{% url 'adverts:adverts-create' %}"
+       class="btn btn-success btn-sm"><i class="icon-plus"></i> Оголошення</a>
+{% endblock page_title_right %}
 {% block content %}
     {% include "adverts/helpers/object_list.html" %}
-
     {% include "helpers/pagination_short.html" %}
 {% endblock content %}

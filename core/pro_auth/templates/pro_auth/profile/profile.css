@@ -925,8 +925,68 @@ span.flatpickr-weekday {
     box-shadow: inset 0 0 0 4px #ffffff;
 }
 
-.profile-advert-photo-placeholder {
-    width: 64px;
-    height: 48px;
-    font-size: 12px;
+.advert-photo-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+.advert-photo-control {
+    display: grid;
+    gap: 0.5rem;
+}
+
+.advert-photo-slots {
+    display: grid;
+    gap: 0.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+}
+
+.advert-photo-slot-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 48px;
+    padding: 0.5rem;
+    color: #0b8043;
+    border: 1px dashed #0b8043;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.advert-photo-slot-button:hover,
+.advert-photo-slot-button:focus {
+    background: #e8f5e9;
+}
+
+.advert-photo-slot--selected .advert-photo-slot-button {
+    border-style: solid;
+    background: #e8f5e9;
+}
+
+.advert-photo-slot-filename {
+    display: none;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.advert-photo-slot--selected .advert-photo-slot-text {
+    display: none;
+}
+
+.advert-photo-slot--selected .advert-photo-slot-filename {
+    display: inline-block;
+}
+
+.advert-photo-summary {
+    font-size: 0.9rem;
 }

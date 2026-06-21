@@ -1,6 +1,7 @@
 from ckeditor.widgets import CKEditorWidget
 from dal import autocomplete
 from django import forms
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 
 from core.classifier.models import Category, Location
@@ -8,8 +9,40 @@ from core.classifier.models import Category, Location
 from .models import Advert, AdvertImage, get_advert_max_photos
 
 
-class MultipleFileInput(forms.ClearableFileInput):
+class MultipleFileInput(forms.FileInput):
     allow_multiple_selected = True
+
+    def __init__(self, attrs=None, slots=5):
+        self.slots = slots
+        super().__init__(attrs)
+
+    def render(self, name, value, attrs=None, renderer=None):
+        attrs = attrs or {}
+        base_id = attrs.get("id")
+        slots = []
+        for index in range(self.slots):
+            slot_attrs = attrs.copy()
+            slot_attrs["data-advert-photo-slot"] = index + 1
+            if base_id and index:
+                slot_attrs["id"] = f"{base_id}_{index + 1}"
+            input_html = super().render(name, value, slot_attrs, renderer)
+            label_for = slot_attrs.get("id", "")
+            slots.append(
+                f'<div class="advert-photo-slot">'
+                f"{input_html}"
+                f'<label class="advert-photo-slot-button" for="{label_for}">'
+                f'<span class="advert-photo-slot-icon"><i class="icon-plus"></i></span>'
+                f'<span class="advert-photo-slot-text">Додати</span>'
+                f'<span class="advert-photo-slot-filename" data-advert-photo-filename></span>'
+                f"</label>"
+                f"</div>"
+            )
+        return mark_safe(f'<div class="advert-photo-slots">{"".join(slots)}</div>')
+
+    def value_from_datadict(self, data, files, name):
+        if hasattr(files, "getlist"):
+            return files.getlist(name)
+        return files.get(name)
 
 
 class MultipleImageField(forms.ImageField):
@@ -19,7 +52,7 @@ class MultipleImageField(forms.ImageField):
         if not data:
             return []
         files = data if isinstance(data, (list, tuple)) else [data]
-        return [super(MultipleImageField, self).clean(file, initial) for file in files]
+        return [super().clean(file, initial) for file in files]
 
 
 class AdvertForm(forms.ModelForm):
@@ -28,7 +61,10 @@ class AdvertForm(forms.ModelForm):
         label=_("Фото"),
         help_text=_("Можна додати до %(count)s фото. Перше фото буде показане в списку оголошень.")
         % {"count": get_advert_max_photos()},
-        widget=MultipleFileInput(attrs={"multiple": True, "accept": "image/*", "class": "form-control"}),
+        widget=MultipleFileInput(
+            attrs={"multiple": True, "accept": "image/*", "class": "visually-hidden advert-photo-input"},
+            slots=get_advert_max_photos(),
+        ),
     )
     category = forms.ModelChoiceField(
         queryset=Category.objects.filter(level=1).order_by("value"), required=False, label=_("Категорія")
@@ -58,7 +94,7 @@ class AdvertForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["description"].widget = CKEditorWidget(config_name="public")
         for name, field in self.fields.items():
-            if name != "location":
+            if name not in {"location", "photos"}:
                 field.widget.attrs["class"] = "form-control"
 
     def clean_photos(self):

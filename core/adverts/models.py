@@ -106,9 +106,9 @@ class Advert(models.Model):
     @property
     def photo_urls(self):
         urls = []
-        if self.image:
+        if self.image and self.image.name:
             urls.append(self.image.url)
-        urls.extend(photo.image.url for photo in self.photos.all())
+        urls.extend(photo.image.url for photo in self.photos.all() if photo.image and photo.image.name)
         return urls[: get_advert_max_photos()]
 
     @property

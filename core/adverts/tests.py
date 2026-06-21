@@ -18,6 +18,12 @@ class TestAdvertFormView(TestCase):
         response = self.client.get("/adverts/create/")
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "adverts/form.html")
+        self.assertContains(response, 'name="photos"', count=get_advert_max_photos())
+        self.assertContains(response, "multiple")
+        self.assertContains(response, 'class="visually-hidden advert-photo-input"')
+        self.assertContains(response, 'class="advert-photo-slot-button"', count=get_advert_max_photos())
+        self.assertContains(response, 'for="id_photos"')
+        self.assertContains(response, 'class="advert-photo-slot-text">Додати', count=get_advert_max_photos())
 
     def test_authenticated(self):
         user = UserFactory()
@@ -75,6 +81,19 @@ class TestAdvertFormView(TestCase):
         self.assertEqual(response.url, "/adverts/")
         # test that advert was created
         self.assertEqual(Advert.objects.filter(user_id=user.pk).count(), 1)
+
+    def test_list_does_not_show_no_photo_placeholder(self):
+        Advert.objects.create(title="test", description="test", price=100, contact="test")
+        response = self.client.get("/adverts/")
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "test")
+        self.assertNotContains(response, "Без фото")
+
+    def test_homepage_handles_advert_without_photo(self):
+        Advert.objects.create(title="test", description="test", price=100, contact="test")
+        response = self.client.get("/")
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertContains(response, "test")
 
 
 class ProfileAdvertTests(TestCase):

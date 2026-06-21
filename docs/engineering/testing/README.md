@@ -4,20 +4,20 @@ Baseline verified on 2026-05-12 using the parent Docker Compose stack in `/Users
 
 ## Commands
 
-Run from the parent `am-dev` folder:
+Run from the `am-core` folder:
 
 ```bash
-docker compose exec core make test
-docker compose exec forum_instance python manage.py test
+just test
+just forum-test
 ```
 
-Use `docker compose exec core make check-deps` after dependency or runtime metadata changes. It verifies that `uv.lock` is current and that the frozen uv sync would not change the installed environment.
+Use `just check-deps` after dependency or runtime metadata changes. It verifies that `uv.lock` is current and that the frozen uv sync would not change the installed environment.
 
-`make test` inside the `core` container runs:
+`just test` runs:
 
-1. `make test_core`
-2. `make test_api`
-3. `make flake`
+1. `just test-core`
+2. `just test-api`
+3. `just flake`
 
 Do not run `test_core` and `test_api` in parallel unless the test database names are separated. Both use the same PostgreSQL test database name and will collide during database creation.
 

@@ -16,17 +16,18 @@ Local Docker Compose config:
 - The compose file mounts this repo as `./am-core:/am-core`
 - The forum project lives outside this repo at `/Users/andriihots/Projects/am-dev/forum_instance` and is mounted as `./forum_instance:/app`
 
-Useful local commands from the parent folder:
+Useful local commands from this `am-core` folder:
 
 ```bash
-docker compose ps
-docker compose up
-docker compose exec core ./manage.py test --settings=settings.test_settings
-docker compose exec core ./manage.py test api --settings=settings.test_settings
-docker compose exec core flake8
-docker compose exec core make test
-docker compose exec core make test_api
-docker compose exec forum_instance python manage.py test
+just ps
+just start
+just test
+just test-target core.adverts
+just test-api
+just flake
+just migrate
+just collectstatic
+just forum-test
 ```
 
 ## Dependency Management Findings

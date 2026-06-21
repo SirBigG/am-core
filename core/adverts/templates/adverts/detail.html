@@ -104,6 +104,8 @@
             </div>
         </div>
     </div>
-    <div class="col-12 mt-3">{% random_adverts %}</div>
+    {% if enable_adverts %}
+        <div class="col-12 mt-3">{% random_adverts %}</div>
+    {% endif %}
     <div class="col-12">{% random_posts %}</div>
 {% endblock content %}

@@ -14,17 +14,17 @@ Compose file:
 /Users/andriihots/Projects/am-dev/docker-compose.yml
 ```
 
-Common commands from the parent folder:
+Common commands from this `am-core` folder:
 
 ```bash
-docker compose up
-docker compose ps
-docker compose exec core make check-deps
-docker compose exec core make test
-docker compose exec core ./manage.py test --settings=settings.test_settings
-docker compose exec core ./manage.py test api --settings=settings.test_settings
-docker compose exec core flake8
-docker compose exec forum_instance python manage.py test
+just start
+just ps
+just check-deps
+just test
+just test-target core.adverts
+just migrate
+just collectstatic
+just forum-test
 ```
 
 Nginx exposes the local app on port `8000`. The compose setup mounts this repo

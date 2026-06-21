@@ -2,19 +2,21 @@
 <!DOCTYPE html>
 {# djlint:off #}<html lang="uk"{% if request.resolver_match.url_name == "plant-diary" %} class="plant-diary-landing-html"{% endif %}>{# djlint:on #}
 <head>
-    <!-- Global site tag (gtag.js) - Google Analytics -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0V6Q0F65LP"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
+    {% if enable_analytics %}
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-0V6Q0F65LP"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
 
-        function gtag() {
-            dataLayer.push(arguments);
-        }
+            function gtag() {
+                dataLayer.push(arguments);
+            }
 
-        gtag('js', new Date());
+            gtag('js', new Date());
 
-        gtag('config', 'G-0V6Q0F65LP');
-    </script>
+            gtag('config', 'G-0V6Q0F65LP');
+        </script>
+    {% endif %}
     <style>
         .btn {
             --bs-border-radius: 0.75rem;
@@ -267,9 +269,11 @@
     {% block scripts %}
     {% endblock scripts %}
     {% block adverts %}
-        <script async
-                src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
-                crossorigin="anonymous"></script>
+        {% if enable_adverts %}
+            <script async
+                    src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4522526101011449"
+                    crossorigin="anonymous"></script>
+        {% endif %}
     {% endblock adverts %}
 </head>
 <body class="d-flex flex-column min-vh-100{% if request.resolver_match.url_name == "plant-diary" %} plant-diary-landing-body{% endif %}">

@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 from django import template
 from django.conf import settings
 from django.core.files.storage import storages
-from django.urls import reverse
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
@@ -47,11 +46,12 @@ def post_adverts():
 
     :return: rubric roots queryset
     """
-    context = {"adverts": Advert.active_objects.values("title", "image", "pk", "slug")[:4]}
-    for advert in context["adverts"]:
-        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
-        if advert["image"]:
-            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
+    context = {"adverts": []}
+    if not settings.ENABLE_ADVERTS:
+        return context
+    for advert in Advert.active_objects.prefetch_related("photos")[:4]:
+        image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""
+        context["adverts"].append({"title": advert.title, "image": image, "url": advert.get_absolute_url()})
     return context
 
 
@@ -61,11 +61,12 @@ def random_adverts():
 
     :return: rubric roots queryset
     """
-    context = {"adverts": Advert.active_objects.order_by("?").values("title", "image", "pk", "slug")[:4]}
-    for advert in context["adverts"]:
-        advert["url"] = reverse("adverts:detail", kwargs={"pk": advert["pk"], "slug": advert["slug"]})
-        if advert["image"]:
-            advert["image"] = imgproxy_url(storages["default"].url(advert["image"]), 200, 150)
+    context = {"adverts": []}
+    if not settings.ENABLE_ADVERTS:
+        return context
+    for advert in Advert.active_objects.prefetch_related("photos").order_by("?")[:4]:
+        image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""
+        context["adverts"].append({"title": advert.title, "image": image, "url": advert.get_absolute_url()})
     return context
 
 
