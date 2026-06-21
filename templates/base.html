@@ -499,6 +499,138 @@
             background: #e8f6e9;
         }
 
+        .site-detail-panel {
+            display: grid;
+            gap: 1.25rem;
+            width: 100%;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            background: #ffffff;
+            border: 1px solid #e1e8e2;
+            border-radius: 22px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .site-detail-panel--media {
+            grid-template-columns: minmax(220px, 42%) minmax(0, 1fr);
+            align-items: start;
+        }
+
+        .site-detail-panel__media {
+            overflow: hidden;
+            border-radius: 18px;
+            background: #eef4ef;
+        }
+
+        .site-detail-panel__image {
+            display: block;
+            width: 100%;
+            height: auto;
+            object-fit: cover;
+        }
+
+        .site-detail-panel__body {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .site-detail-meta {
+            display: grid;
+            gap: 0.75rem;
+            margin: 0;
+        }
+
+        .site-detail-meta__item {
+            padding: 0.85rem;
+            background: #f9fbf8;
+            border: 1px solid #e4ece5;
+            border-radius: 14px;
+        }
+
+        .site-detail-meta__label {
+            margin: 0 0 0.25rem;
+            color: #6b7280;
+            font-size: 0.82rem;
+            font-weight: 800;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .site-detail-meta__value {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .site-detail-content {
+            margin-bottom: 1.5rem;
+            color: #1f2937;
+            font-size: 1rem;
+            line-height: 1.65;
+        }
+
+        .site-product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1rem;
+        }
+
+        .site-product-card {
+            display: grid;
+            gap: 0.6rem;
+            min-height: 100%;
+            padding: 1rem;
+            background: #ffffff;
+            border: 1px solid #e1e8e2;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.07);
+        }
+
+        .site-product-card__title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .site-product-card__text {
+            margin: 0;
+            color: #4b5563;
+            font-size: 0.94rem;
+            line-height: 1.45;
+        }
+
+        .site-product-card__price {
+            margin: 0;
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+
+        .site-product-card__link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 0.85rem;
+            color: #148543;
+            background: #f3fbf3;
+            border-radius: 12px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .site-product-card__link:hover,
+        .site-product-card__link:focus {
+            color: #0f6f37;
+            text-decoration: none;
+            background: #e8f6e9;
+        }
+
         .site-link-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -803,6 +935,16 @@
             .site-list-card__actions,
             .site-list-card__link {
                 width: 100%;
+            }
+
+            .site-detail-panel {
+                padding: 1rem;
+                border-radius: 18px;
+            }
+
+            .site-detail-panel--media,
+            .site-product-grid {
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .site-link-grid {

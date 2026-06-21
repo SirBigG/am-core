@@ -12,6 +12,7 @@ class DetailEventView(TestCase):
         response = self.client.get(reverse("events:event-detail", args=(event.slug,)))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/detail.html")
+        self.assertContains(response, "site-detail-panel")
 
 
 class EventListViewTests(TestCase):
