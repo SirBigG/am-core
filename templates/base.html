@@ -570,6 +570,89 @@
             margin-bottom: 0;
         }
 
+        .site-catalog-hero__breadcrumbs,
+        .site-article-hero__breadcrumbs {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+        }
+
+        .site-breadcrumbs {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .site-breadcrumbs__list {
+            display: flex;
+            flex-wrap: nowrap !important;
+            align-items: center;
+            gap: 0.3rem;
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            margin: 0 !important;
+            padding: 0.15rem 0 0.25rem !important;
+            overflow-x: auto !important;
+            overflow-y: hidden;
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.2;
+            scrollbar-width: none;
+        }
+
+        .site-breadcrumbs__list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .site-breadcrumbs__item {
+            display: inline-flex;
+            align-items: center;
+            flex: 0 0 auto;
+            min-width: 0;
+            padding: 0;
+            color: #6b7280;
+            white-space: nowrap;
+        }
+
+        .site-breadcrumbs__item + .site-breadcrumbs__item::before {
+            flex: 0 0 auto;
+            padding: 0 0.25rem 0 0 !important;
+            color: #9ca3af !important;
+            content: ">" !important;
+        }
+
+        .site-breadcrumbs__item.active {
+            max-width: min(44vw, 320px);
+            overflow: hidden;
+            color: #4b5563;
+            font-weight: 700;
+            text-overflow: ellipsis;
+        }
+
+        .site-breadcrumbs__link {
+            display: inline-flex;
+            align-items: center;
+            min-height: 34px;
+            color: #148543;
+            font-weight: 750;
+            text-decoration: none;
+        }
+
+        .site-breadcrumbs__link:hover,
+        .site-breadcrumbs__link:focus {
+            color: #0b8043;
+            text-decoration: none;
+        }
+
+        .site-breadcrumbs__home {
+            justify-content: center;
+            width: 34px;
+            border-radius: 999px;
+            background: #eef8ef;
+        }
+
         .site-catalog-stats,
         .site-article-meta {
             display: flex;
