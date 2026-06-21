@@ -157,6 +157,111 @@
             text-decoration: none;
         }
 
+        .site-form-panel {
+            width: 100%;
+            max-width: 720px;
+            margin: 0 auto 2rem;
+            padding: 32px;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fbf8 100%);
+            border: 1px solid #e4ece5;
+            border-radius: 28px;
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.10);
+        }
+
+        .site-form-panel__header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .site-form-panel__title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .site-form-panel__lead {
+            margin: 0.65rem 0 0;
+            color: #6b7280;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .site-form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .site-form-label {
+            display: block;
+            margin-bottom: 0.75rem;
+            color: #374151;
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .site-form-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        .site-form-field select,
+        .site-form-field textarea,
+        .site-form-field .form-control,
+        .site-form-field .django-ckeditor-widget {
+            width: 100%;
+        }
+
+        .site-form-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+        .site-form-field select,
+        .site-form-field textarea,
+        .site-form-field .form-control {
+            min-height: 56px;
+            padding: 14px 18px;
+            background: #ffffff;
+            border: 1px solid #d6e0d7;
+            border-radius: 16px;
+            box-shadow: none;
+            color: #1f2937;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+
+        .site-form-field textarea {
+            min-height: 160px;
+        }
+
+        .site-form-field .cke_chrome {
+            border: 1px solid #d6e0d7 !important;
+            border-radius: 16px !important;
+            box-shadow: none !important;
+            overflow: hidden;
+        }
+
+        .site-form-error {
+            margin: 0.5rem 0 0;
+            color: #dc3545;
+            font-size: 0.9rem;
+        }
+
+        .site-form-help {
+            margin: 0.5rem 0 0;
+            color: #6b7280;
+            font-size: 0.9rem;
+            line-height: 1.4;
+        }
+
+        .site-form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 0.75rem;
+        }
+
+        .site-form-actions .btn {
+            min-height: 56px;
+            padding-inline: 24px;
+        }
+
         .plant-diary-site-banner {
             display: flex;
             align-items: center;
@@ -215,6 +320,24 @@
             .plant-diary-site-banner:focus-within .plant-diary-site-banner__link,
             .plant-diary-site-banner__link:focus {
                 font-size: 19px;
+            }
+
+            .site-form-panel {
+                padding: 24px 18px;
+                border-radius: 22px;
+            }
+
+            .site-form-panel__header {
+                display: grid;
+            }
+
+            .site-form-panel__title {
+                font-size: 1.7rem;
+            }
+
+            .site-form-actions .btn,
+            .site-form-panel__header .btn {
+                width: 100%;
             }
         }
 
@@ -295,18 +418,20 @@
             {% endblock second_menu %}
             {# end second menu navbar #}
             <div class="container">
-                <div class="row justify-content-md-center mt-3">
-                    <div class="col-md-6 col-8">
-                        <h1 class="h4">
-                            {% block page_title %}
-                            {% endblock page_title %}
-                        </h1>
+                {% block page_header %}
+                    <div class="row justify-content-md-center mt-3">
+                        <div class="col-md-6 col-8">
+                            <h1 class="h4">
+                                {% block page_title %}
+                                {% endblock page_title %}
+                            </h1>
+                        </div>
+                        <div class="col-md-2 col-4 p-2">
+                            {% block page_title_right %}
+                            {% endblock page_title_right %}
+                        </div>
                     </div>
-                    <div class="col-md-2 col-4 p-2">
-                        {% block page_title_right %}
-                        {% endblock page_title_right %}
-                    </div>
-                </div>
+                {% endblock page_header %}
                 <div class="row justify-content-md-center">
                     <div class="col-md-8 col-12">
                         {% block breadcrumbs %}

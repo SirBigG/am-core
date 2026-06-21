@@ -57,7 +57,7 @@ Observed high-impact issues:
 - Many mobile tap targets are smaller than the expected 44px comfortable touch area.
 - Forum mobile navigation differs from the main site and feels like a separate product.
 - Logged-out users can reach long create forms where the login requirement is not clearly explained before they invest effort.
-- Adverts listing includes test-like or low-trust content and unrelated imagery.
+- Local adverts can contain rough or test-looking data because the local database is intentionally separate from production.
 - Some pages have empty or weak visible headings.
 - Search links and icon-only controls need better accessible names and visible context.
 - The plant diary page has the strongest mobile presentation and can serve as a quality reference.
@@ -122,9 +122,9 @@ Improve the shared mobile shell first because it affects most pages.
 - Fix empty headings:
   - Ensure each public page has one meaningful visible `h1`.
   - Remove empty heading elements from templates.
-- Clean low-trust listing presentation:
-  - Hide draft/test adverts from normal listing pages or clearly separate demo/admin content from public data.
-  - Ensure advert cards use relevant images or a neutral placeholder.
+- Improve listing presentation without hiding local content:
+  - Keep local/test-looking data visible because local data is not production data.
+  - Ensure advert cards still render clearly with whatever title, image, or placeholder data exists.
 
 ### Phase 2: Creation Flow Improvements
 
@@ -215,7 +215,7 @@ Improve the signed-in mobile workspace so it feels like one coherent personal ar
 ## Risks And Unknowns
 
 - The forum lives in the sibling `forum_instance` project, so shared navigation changes may require coordinated work outside this repository.
-- Some low-trust listing content may be local/dev data rather than production content; the implementation should confirm the data source before adding code-level filtering.
+- Local/test-looking listing content should not be hidden or filtered as part of UX work because local data is not connected to production.
 - Login requirements for adverts/events may be policy decisions, not just template decisions.
 - The bottom navigation item set needs product prioritization because mobile space is limited.
 - A persistent plant diary promo may be intentional growth strategy; changing it should preserve marketing value while reducing friction.
@@ -264,7 +264,7 @@ Improve the signed-in mobile workspace so it feels like one coherent personal ar
 - [ ] Define the first shared mobile UI patterns.
 - [ ] Decide mobile navigation content and priority.
 - [ ] Confirm logged-out create-page behavior for adverts and events.
-- [ ] Confirm whether local test adverts should be hidden, deleted, or marked as non-public.
+- [ ] Keep local/test-looking adverts visible while improving how cards handle rough content.
 - [ ] Inspect shared mobile templates, CSS, and forum integration points.
 - [ ] Implement Phase 1 shared mobile shell improvements.
 - [ ] Implement Phase 2 create-flow improvements.

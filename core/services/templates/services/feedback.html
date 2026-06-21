@@ -4,18 +4,30 @@
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/form.css" %}">
 {% endblock scripts %}
+{% block page_header %}
+{% endblock page_header %}
 {% block content %}
-    <p class="text-secondary mb-3 h3">Зв’яжіться з нами</p>
-    <form method="post">
-        {% csrf_token %}
-        {% for error in form.non_field_errors %}<p class="text-justify bg-danger">{{ error }}</p>{% endfor %}
-        {% for field in form %}
-            <div class="form-group">
-                <label>{{ field.label }}</label>
-                {% for error in field.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
-                {{ field }}
+    <div class="site-form-panel">
+        <div class="site-form-panel__header">
+            <div>
+                <h1 class="site-form-panel__title">Зв’яжіться з нами</h1>
+                <p class="site-form-panel__lead">Напишіть тему, контакт для відповіді та короткий опис питання.</p>
             </div>
-        {% endfor %}
-        <button type="submit" class="btn btn-success">Відправити</button>
-    </form>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            {% for error in form.non_field_errors %}<p class="site-form-error">{{ error }}</p>{% endfor %}
+            {% for field in form %}
+                <div class="site-form-group">
+                    <label class="site-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <div class="site-form-field">{{ field }}</div>
+                    {% for error in field.errors %}<p class="site-form-error">{{ error }}</p>{% endfor %}
+                    {% if field.help_text %}<p class="site-form-help">{{ field.help_text }}</p>{% endif %}
+                </div>
+            {% endfor %}
+            <div class="site-form-actions">
+                <button type="submit" class="btn btn-success">Відправити</button>
+            </div>
+        </form>
+    </div>
 {% endblock content %}
