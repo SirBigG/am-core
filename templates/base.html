@@ -262,6 +262,42 @@
             padding-inline: 24px;
         }
 
+        .site-login-prompt {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: #f3fbf3;
+            border: 1px solid #d4e8d6;
+            border-radius: 18px;
+        }
+
+        .site-login-prompt__title {
+            margin: 0;
+            color: #1f2937;
+            font-size: 1rem;
+            font-weight: 800;
+            line-height: 1.3;
+        }
+
+        .site-login-prompt__text {
+            margin: 0.3rem 0 0;
+            color: #4b5563;
+            font-size: 0.92rem;
+            line-height: 1.45;
+        }
+
+        .site-login-prompt__action {
+            flex: 0 0 auto;
+            min-height: 48px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding-inline: 1rem;
+        }
+
         .site-action-panel {
             width: 100%;
             max-width: 760px;
@@ -722,6 +758,14 @@
 
             .site-form-actions .btn,
             .site-form-panel__header .btn {
+                width: 100%;
+            }
+
+            .site-login-prompt {
+                display: grid;
+            }
+
+            .site-login-prompt__action {
                 width: 100%;
             }
 

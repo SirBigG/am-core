@@ -31,6 +31,16 @@
                 <p class="site-form-panel__lead">Додайте назву, опис, місце проведення та дати події.</p>
             </div>
         </div>
+        {% if not request.user.is_authenticated %}
+            <div class="site-login-prompt">
+                <div>
+                    <p class="site-login-prompt__title">Увійдіть, якщо хочете керувати подією з профілю</p>
+                    <p class="site-login-prompt__text">Після входу ми повернемо вас на цю форму.</p>
+                </div>
+                <a href="{% url 'pro_auth:login' %}?next={{ request.get_full_path|urlencode }}"
+                   class="btn btn-success site-login-prompt__action">Увійти</a>
+            </div>
+        {% endif %}
         <form method="post"
               action="{% url 'events:event-form' %}"
               enctype="multipart/form-data">

@@ -33,6 +33,8 @@ class TestAdvertFormView(TestCase):
         self.assertContains(response, 'class="advert-photo-slot-button"', count=get_advert_max_photos())
         self.assertContains(response, 'for="id_photos"')
         self.assertContains(response, 'class="advert-photo-slot-text">Додати', count=get_advert_max_photos())
+        self.assertContains(response, "site-login-prompt")
+        self.assertContains(response, "/login/?next=/adverts/create/")
 
     def test_authenticated(self):
         user = UserFactory()
@@ -40,6 +42,7 @@ class TestAdvertFormView(TestCase):
         response = self.client.get("/adverts/create/")
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "adverts/form.html")
+        self.assertNotContains(response, "Маєте акаунт?")
 
     def test_not_authenticated_post(self):
         response = self.client.post(

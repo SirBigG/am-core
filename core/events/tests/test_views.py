@@ -37,3 +37,5 @@ class EventFormViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "events/form.html")
         self.assertIsInstance(response.context["form"], EventAddForm)
+        self.assertContains(response, "site-login-prompt")
+        self.assertContains(response, "/login/?next=/events/create/")

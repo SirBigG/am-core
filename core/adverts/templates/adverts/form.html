@@ -16,10 +16,19 @@
                 <h1 class="site-form-panel__title">Додати оголошення</h1>
                 <p class="site-form-panel__lead">Заповніть основну інформацію, додайте фото та контакти для зв'язку.</p>
             </div>
-            {% if not request.user.is_authenticated %}
-                <a href="{% url 'pro_auth:login' %}" class="btn btn-success">Увійти</a>
-            {% endif %}
         </div>
+        {% if not request.user.is_authenticated %}
+            <div class="site-login-prompt">
+                <div>
+                    <p class="site-login-prompt__title">Маєте акаунт?</p>
+                    <p class="site-login-prompt__text">
+                        Увійдіть, щоб оголошення було прив'язане до профілю і його можна було редагувати.
+                    </p>
+                </div>
+                <a href="{% url 'pro_auth:login' %}?next={{ request.get_full_path|urlencode }}"
+                   class="btn btn-success site-login-prompt__action">Увійти</a>
+            </div>
+        {% endif %}
         <form method="post"
               action="{% url 'adverts:adverts-create' %}"
               enctype="multipart/form-data">
