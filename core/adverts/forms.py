@@ -93,6 +93,16 @@ class AdvertForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["description"].widget = CKEditorWidget(config_name="public")
+        self.fields["title"].help_text = _("Коротко опишіть, що продаєте або шукаєте.")
+        self.fields["contact"].help_text = _("Ці контакти побачать користувачі, які зацікавляться оголошенням.")
+        self.fields["price"].help_text = _("Вкажіть 0, якщо хочете домовлятися про ціну окремо.")
+        self.fields["title"].widget.attrs.setdefault("placeholder", _("Наприклад: Саджанці яблуні Голден"))
+        self.fields["author"].widget.attrs.setdefault("autocomplete", "name")
+        self.fields["author"].widget.attrs.setdefault("placeholder", _("Ваше ім'я або назва господарства"))
+        self.fields["contact"].widget.attrs.setdefault("autocomplete", "tel")
+        self.fields["contact"].widget.attrs.setdefault("placeholder", _("Телефон, email або інший спосіб зв'язку"))
+        self.fields["price"].widget.attrs.setdefault("inputmode", "decimal")
+        self.fields["price"].widget.attrs.setdefault("min", "0")
         for name, field in self.fields.items():
             if name not in {"location", "photos"}:
                 field.widget.attrs["class"] = "form-control"

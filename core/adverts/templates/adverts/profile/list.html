@@ -1,57 +1,121 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 {% load post_extras %}
 {% block profile_content %}
-    <div class="d-flex justify-content-between justify-content-center align-items-center mb-3 mt-3">
-        <h1 class="text-success">Мої оголошення</h1>
-        <a class="btn btn-success btn-sm text-white"
-           href="{% url 'pro_auth:profile-adverts-create' %}"><i class="fas fa-plus"></i> Додати</a>
-    </div>
-    {% if object_list %}
-        <div class="row">
-            {% for advert in object_list %}
-                <div class="row mb-1">
-                    {% if advert.primary_image_url %}
-                        <div class="col-3 col-md-1 d-flex justify-content-start align-items-center">
-                            <img src="{% imgproxy_url advert.primary_image_url 64 48 %}"
-                                 alt="{{ advert.title }}"
-                                 width="64"
-                                 height="48"
-                                 class="img-fluid rounded">
-                        </div>
-                    {% endif %}
-                    <div class="{% if advert.primary_image_url %}col-9 col-md-3{% else %}col-12 col-md-4{% endif %} d-flex justify-content-start align-items-center">
-                        <a class="no-decoration text-success"
-                           href="{{ advert.get_absolute_url }}">{{ advert.title }}</a>
-                    </div>
-                    <div class="col-12 col-md-4 d-flex justify-content-end  align-items-center mb-2">
-                        <span class="text-success me-2"><small>{{ advert.updated|date:"d.m.Y H:i" }}</small></span>
-                        <span class="text-success me-2"><small><i class="fas fa-eye"></i> {{ advert.views }}</small></span>
-                    </div>
-                    <div class="col-12 col-md-4 d-flex justify-content-end align-items-center">
-                        <a class="btn btn-primary btn-sm me-2"
-                           href="{% url 'pro_auth:profile-adverts-update-date' pk=advert.id %}"
-                           title="Оновити дату"><i class="fas fa-clock"></i></a>
-                        <a class="btn btn-warning btn-sm me-2"
-                           href="{% url 'pro_auth:profile-adverts-update' pk=advert.id %}"
-                           title="Редагувати"><i class="fas fa-pencil-alt text-white"></i></a>
-                        <a class="btn btn-danger btn-sm me-2"
-                           href="{% url 'pro_auth:profile-adverts-delete' pk=advert.id %}"
-                           title="Видалити"><i class="fas fa-trash"></i></a>
-                        {% if advert.is_active %}
-                            <a class="btn btn-secondary btn-sm"
-                               href="{% url 'pro_auth:profile-adverts-deactivate' pk=advert.id %}"
-                               title="Деактивувати"><i class="fas fa-ban"></i></a>
-                        {% else %}
-                            <a class="btn btn-success btn-sm"
-                               href="{% url 'pro_auth:profile-adverts-activate' pk=advert.id %}"
-                               title="Активувати"><i class="fas fa-check"></i></a>
-                        {% endif %}
-                    </div>
-                </div>
-            {% endfor %}
+    <div class="profile-adverts-page">
+        <div class="profile-adverts-header">
+            <div>
+                <h1 class="profile-page-title">Мої оголошення</h1>
+                <p class="profile-page-lead">
+                    Керуйте своїми оголошеннями: оновлюйте дату, редагуйте, активуйте або знімайте з публікації.
+                </p>
+            </div>
+            <a class="am-btn am-btn--primary profile-adverts-header__action"
+               href="{% url 'pro_auth:profile-adverts-create' %}">
+                <i class="fas fa-plus" aria-hidden="true"></i>
+                <span>Додати</span>
+            </a>
         </div>
-        {% include "helpers/pagination_short.html" %}
-    {% else %}
-        <p class="text-warning">У Вас поки немає оголошень</p>
-    {% endif %}
+        {% if object_list %}
+            <div class="profile-advert-list">
+                {% for advert in object_list %}
+                    <article class="am-card am-card--compact profile-advert-card">
+                        <div class="profile-advert-card__media">
+                            {% if advert.primary_image_url %}
+                                <img src="{% imgproxy_url advert.primary_image_url 192 144 %}"
+                                     alt="{{ advert.title }}"
+                                     width="192"
+                                     height="144"
+                                     class="profile-advert-card__image">
+                            {% else %}
+                                <div class="profile-advert-card__placeholder" aria-hidden="true">
+                                    <i class="fas fa-seedling"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="profile-advert-card__body">
+                            <div class="profile-advert-card__main">
+                                <a class="profile-advert-card__title"
+                                   href="{{ advert.get_absolute_url }}">{{ advert.title }}</a>
+                                <div class="profile-advert-card__meta">
+                                    <span>
+                                        <i class="far fa-clock" aria-hidden="true"></i>
+                                        {{ advert.updated|date:"d.m.Y H:i" }}
+                                    </span>
+                                    <span>
+                                        <i class="fas fa-eye" aria-hidden="true"></i>
+                                        {{ advert.views }}
+                                    </span>
+                                    {% if advert.is_active %}
+                                        <span class="profile-advert-card__status profile-advert-card__status--active">Активне</span>
+                                    {% else %}
+                                        <span class="profile-advert-card__status">Неактивне</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="profile-advert-card__actions"
+                                 aria-label="Дії з оголошенням {{ advert.title }}">
+                                <form method="post"
+                                      action="{% url 'pro_auth:profile-adverts-update-date' pk=advert.id %}">
+                                    {% csrf_token %}
+                                    <button class="am-btn am-btn--soft profile-advert-card__action" type="submit">
+                                        <i class="far fa-clock" aria-hidden="true"></i>
+                                        <span>Оновити</span>
+                                    </button>
+                                </form>
+                                <a class="am-btn am-btn--soft profile-advert-card__action"
+                                   href="{% url 'pro_auth:profile-adverts-update' pk=advert.id %}">
+                                    <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+                                    <span>Редагувати</span>
+                                </a>
+                                {% if advert.is_active %}
+                                    <form method="post"
+                                          action="{% url 'pro_auth:profile-adverts-deactivate' pk=advert.id %}"
+                                          onsubmit="return confirm('Деактивувати це оголошення? Воно зникне з публічного списку.');">
+                                        {% csrf_token %}
+                                        <button class="am-btn am-btn--danger profile-advert-card__action"
+                                                type="submit">
+                                            <i class="fas fa-ban" aria-hidden="true"></i>
+                                            <span>Зняти</span>
+                                        </button>
+                                    </form>
+                                {% else %}
+                                    <form method="post"
+                                          action="{% url 'pro_auth:profile-adverts-activate' pk=advert.id %}">
+                                        {% csrf_token %}
+                                        <button class="am-btn am-btn--soft profile-advert-card__action" type="submit">
+                                            <i class="fas fa-check" aria-hidden="true"></i>
+                                            <span>Активувати</span>
+                                        </button>
+                                    </form>
+                                {% endif %}
+                                <form method="post"
+                                      action="{% url 'pro_auth:profile-adverts-delete' pk=advert.id %}"
+                                      onsubmit="return confirm('Видалити це оголошення назавжди?');">
+                                    {% csrf_token %}
+                                    <button class="am-btn am-btn--danger profile-advert-card__action"
+                                            type="submit">
+                                        <i class="fas fa-trash" aria-hidden="true"></i>
+                                        <span>Видалити</span>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+            {% include "helpers/pagination_short.html" %}
+        {% else %}
+            <div class="am-state profile-adverts-empty">
+                <div class="am-state__title">У вас поки немає оголошень</div>
+                <div class="am-state__meta">Створіть перше оголошення, щоб користувачі могли знайти вашу пропозицію.</div>
+                <div class="am-state__actions">
+                    <a class="am-btn am-btn--primary"
+                       href="{% url 'pro_auth:profile-adverts-create' %}">
+                        <i class="fas fa-plus" aria-hidden="true"></i>
+                        <span>Додати оголошення</span>
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 {% endblock profile_content %}

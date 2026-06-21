@@ -225,6 +225,72 @@ class ProfileAdvertTests(TestCase):
         self.assertEqual(response.url, "/profile/adverts")
         self.assertEqual(Advert.objects.filter(user=user).count(), 1)
 
+    def test_profile_advert_update_date_requires_post(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        self.client.force_login(user)
+
+        response = self.client.get(f"/profile/adverts/{advert.pk}/update-date/")
+
+        self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
+
+    def test_profile_advert_update_date_post_updates_advert(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        original_updated = advert.updated
+        self.client.force_login(user)
+
+        response = self.client.post(f"/profile/adverts/{advert.pk}/update-date/")
+
+        advert.refresh_from_db()
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.url, "/profile/adverts")
+        self.assertGreater(advert.updated, original_updated)
+
+    def test_profile_advert_delete_requires_post(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        self.client.force_login(user)
+
+        response = self.client.get(f"/profile/adverts/{advert.pk}/delete/")
+
+        self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
+        self.assertTrue(Advert.objects.filter(pk=advert.pk).exists())
+
+    def test_profile_advert_delete_post_removes_advert(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        self.client.force_login(user)
+
+        response = self.client.post(f"/profile/adverts/{advert.pk}/delete/")
+
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.url, "/profile/adverts")
+        self.assertFalse(Advert.objects.filter(pk=advert.pk).exists())
+
+    def test_profile_advert_deactivate_requires_post(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        self.client.force_login(user)
+
+        response = self.client.get(f"/profile/adverts/{advert.pk}/deactivate/")
+
+        advert.refresh_from_db()
+        self.assertEqual(response.status_code, HTTPStatus.METHOD_NOT_ALLOWED)
+        self.assertTrue(advert.is_active)
+
+    def test_profile_advert_deactivate_post_deactivates_advert(self):
+        user = UserFactory()
+        advert = Advert.objects.create(user=user, title="test", description="test", price=100, contact="test")
+        self.client.force_login(user)
+
+        response = self.client.post(f"/profile/adverts/{advert.pk}/deactivate/")
+
+        advert.refresh_from_db()
+        self.assertEqual(response.status_code, HTTPStatus.FOUND)
+        self.assertEqual(response.url, "/profile/adverts")
+        self.assertFalse(advert.is_active)
+
     @override_settings(USE_IMGPROXY=False)
     def test_profile_update_uses_original_advert_image_when_imgproxy_disabled(self):
         user = UserFactory()

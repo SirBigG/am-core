@@ -37,6 +37,10 @@
     padding: 32px;
 }
 
+.profile-sidebar-col .list-group-item {
+    min-height: 48px;
+}
+
 .am-card {
     position: relative;
     border: 1px solid #d9e1e8;
@@ -989,4 +993,190 @@ span.flatpickr-weekday {
 
 .advert-photo-summary {
     font-size: 0.9rem;
+}
+
+.profile-adverts-page {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.profile-adverts-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.profile-adverts-header .profile-page-lead {
+    margin-bottom: 0;
+}
+
+.profile-adverts-header__action {
+    flex: 0 0 auto;
+}
+
+.profile-advert-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.profile-advert-card {
+    display: grid;
+    grid-template-columns: 128px minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.profile-advert-card__media {
+    min-width: 0;
+}
+
+.profile-advert-card__image,
+.profile-advert-card__placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    border-radius: 1rem;
+}
+
+.profile-advert-card__image {
+    display: block;
+    object-fit: cover;
+}
+
+.profile-advert-card__placeholder {
+    display: grid;
+    place-items: center;
+    color: #6fa575;
+    background: linear-gradient(135deg, #f6fbf4 0%, #edf7ed 100%);
+    font-size: 2rem;
+}
+
+.profile-advert-card__body {
+    display: grid;
+    gap: 1rem;
+    min-width: 0;
+}
+
+.profile-advert-card__main {
+    display: grid;
+    gap: 0.5rem;
+    min-width: 0;
+}
+
+.profile-advert-card__title {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    color: #1f2937;
+    font-size: 1.08rem;
+    font-weight: 800;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+    text-decoration: none;
+}
+
+.profile-advert-card__title:hover,
+.profile-advert-card__title:focus {
+    color: #148543;
+    text-decoration: none;
+}
+
+.profile-advert-card__meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    color: #637083;
+    font-size: 0.88rem;
+    line-height: 1.25;
+}
+
+.profile-advert-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.profile-advert-card__status {
+    min-height: 28px;
+    padding: 0.3rem 0.6rem;
+    border-radius: 999px;
+    background: #eef2f7;
+    color: #52606d;
+    font-size: 0.78rem;
+    font-weight: 800;
+}
+
+.profile-advert-card__status--active {
+    background: #e8f5e9;
+    color: #148543;
+}
+
+.profile-advert-card__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.profile-advert-card__actions form {
+    margin: 0;
+}
+
+.profile-advert-card__action {
+    min-height: 44px;
+    padding-inline: 0.9rem;
+    font-size: 0.92rem;
+}
+
+.profile-adverts-empty {
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 767.98px) {
+    .profile-form-panel {
+        padding: 24px 18px;
+        border-radius: 22px;
+    }
+
+    .profile-page-title {
+        font-size: 1.7rem;
+    }
+
+    .profile-adverts-header {
+        display: grid;
+    }
+
+    .profile-adverts-header__action,
+    .profile-form-actions .am-btn,
+    .profile-form-actions .btn {
+        width: 100%;
+    }
+
+    .profile-advert-card {
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 0.85rem;
+        padding: 0.85rem;
+    }
+
+    .profile-advert-card__actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        width: 100%;
+    }
+
+    .profile-advert-card__actions form,
+    .profile-advert-card__action {
+        width: 100%;
+    }
+}
+
+@media (max-width: 420px) {
+    .profile-advert-card {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .profile-advert-card__media {
+        max-width: 160px;
+    }
 }

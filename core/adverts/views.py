@@ -55,7 +55,9 @@ class UpdateProfileAdvertsView(UpdateView):
 
 
 class UpdateProfileAdvertsDateView(View):
-    def get(self, request, pk):
+    http_method_names = ["post"]
+
+    def post(self, request, pk):
         advert = get_object_or_404(Advert, pk=pk, user=request.user)
         advert.updated = timezone.now()
         advert.save()
@@ -63,21 +65,27 @@ class UpdateProfileAdvertsDateView(View):
 
 
 class AdvertDeleteView(View):
-    def get(self, request, pk):
+    http_method_names = ["post"]
+
+    def post(self, request, pk):
         advert = get_object_or_404(Advert, pk=pk, user=request.user)
         advert.delete()
         return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
 
 
 class AdvertDeactivateView(View):
-    def get(self, request, pk):
+    http_method_names = ["post"]
+
+    def post(self, request, pk):
         advert = get_object_or_404(Advert, pk=pk, user=request.user)
         advert.deactivate()
         return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
 
 
 class AdvertActivateView(View):
-    def get(self, request, pk):
+    http_method_names = ["post"]
+
+    def post(self, request, pk):
         advert = get_object_or_404(Advert, pk=pk, user=request.user)
         advert.activate()
         return HttpResponseRedirect(reverse("pro_auth:profile-adverts"))
