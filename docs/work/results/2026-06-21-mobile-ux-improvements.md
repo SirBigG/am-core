@@ -18,6 +18,7 @@
 - Replaced small listing text links with larger mobile-friendly card actions while keeping local/test-looking content visible.
 - Added shared mobile link-grid styles for long category/catalog lists.
 - Applied larger 48px tap targets to posts catalog category links and registry category/variety links.
+- Improved the mobile footer navigation with consistent 60px controls and a fuller sections menu for categories, events, companies, forum, registry, about, and contact links.
 
 ## Verification
 
@@ -43,6 +44,7 @@
   - `/news/`
   - `/categories/`
   - `/registry/`
+  - Mobile footer navigation on `/registry/`
 
 ## Remaining Follow-Ups
 
