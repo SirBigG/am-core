@@ -15,14 +15,19 @@
     <meta content="{{ object.title }}" property="og:title">
     <meta content="{{ object.text|truncatechars:300|striptags|safe }}"
           property="og:description">
-    <meta content="{% full_url object.photo.first.image.url %}"
-          property="og:image">
+    {% if object.poster %}
+        <meta content="{% full_url object.poster.url %}" property="og:image">
+    {% endif %}
     <meta content="{% full_url object.get_absolute_url %}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
-    <link href="{% full_url object.photo.first.image.url %}" rel="image_src" />
+    {% if object.poster %}
+        <link href="{% full_url object.poster.url %}" rel="image_src" />
+    {% endif %}
 {% endblock extra_meta %}
 {% block second_menu %}
 {% endblock second_menu %}
+{% block page_header %}
+{% endblock page_header %}
 {% block page_title %}
     {{ object.title }}
 {% endblock page_title %}
@@ -31,20 +36,22 @@
     <a href="/events/create/" class="btn btn-success btn-sm"><i class="icon-plus"></i> Опублікувати подію</a>
 {% endblock page_title_right %}
 {% block content %}
-    <div class="site-detail-panel site-detail-panel--media">
-        {% if ended %}
-            <div class="alert alert-danger text-center mb-0" role="alert">
-                <span class="h5">Закінчилась</span>
-            </div>
-        {% endif %}
-        <div class="site-detail-panel__media">
-            <img alt="{{ object.title }}"
-                 src="{{ object.poster.url }}"
-                 class="site-detail-panel__image"
-                 height="416"
-                 width="416" />
-        </div>
-        <div class="site-detail-panel__body">
+    <article class="site-article-shell">
+        <header class="site-detail-hero">
+            {% if object.poster %}
+                <div class="site-detail-hero__media">
+                    <img alt="{{ object.title }}"
+                         src="{{ object.poster.url }}"
+                         class="site-detail-hero__image"
+                         height="416"
+                         width="416" />
+                </div>
+            {% endif %}
+            {% if ended %}<span class="site-detail-status">Подія закінчилась</span>{% endif %}
+            {% if object.type %}<p class="site-catalog-hero__eyebrow">{{ object.type.title }}</p>{% endif %}
+            <h1 class="site-detail-hero__title">{{ object.title }}</h1>
+        </header>
+        <section class="site-detail-panel">
             <dl class="site-detail-meta">
                 <div class="site-detail-meta__item">
                     <dt class="site-detail-meta__label">Локація</dt>
@@ -73,7 +80,12 @@
                     </dd>
                 </div>
             </dl>
-        </div>
-    </div>
-    <div class="site-detail-content">{{ object.text|safe }}</div>
+        </section>
+        {% if object.text %}
+            <section class="site-content-section">
+                <h2 class="site-content-section__title">Опис події</h2>
+                <div class="site-detail-content post-wrapper">{{ object.text|safe }}</div>
+            </section>
+        {% endif %}
+    </article>
 {% endblock content %}

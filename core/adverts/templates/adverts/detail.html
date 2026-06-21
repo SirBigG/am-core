@@ -9,7 +9,6 @@
 {% block scripts %}
     <script src="{% static "posts/j-gallery.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/gallery.css" %}">
-    <link rel="stylesheet" href="{% static "adverts/detail.css" %}">
 {% endblock scripts %}
 {% block extra_meta %}
     <meta content="{% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
@@ -40,18 +39,24 @@
 {% block page_title %}
     {{ object.title }}
 {% endblock page_title %}
+{% block page_header %}
+{% endblock page_header %}
 {% block content %}
-    <div class="advert-detail">
-        <div class="advert-detail__gallery">
+    <article class="site-article-shell">
+        <header class="site-detail-hero">
             {% if object.photo_urls %}
-                <div class="col-12">
+                <div class="site-detail-hero__media">
                     <a href="{% imgproxy_url object.primary_image_url 1200 800 %}"
                        class="advert-detail__main-photo js-smartPhoto"
                        data-id="advert-photo-main"
                        data-group="advert-{{ object.id }}"
                        data-advert-gallery-main="{{ object.id }}"
                        aria-label="{{ object.title }}">
-                        <img src="{{ object.primary_image_url }}" alt="{{ object.title }}">
+                        <img src="{{ object.primary_image_url }}"
+                             class="site-detail-hero__image"
+                             alt="{{ object.title }}"
+                             width="1200"
+                             height="800">
                     </a>
                 </div>
                 {% if object.photo_urls|length > 1 %}
@@ -73,54 +78,80 @@
                     </div>
                 {% endif %}
             {% endif %}
-        </div>
-        <aside class="advert-detail__summary">
-            {% if advert.price %}<div class="advert-detail__price">{{ advert.price }} грн.</div>{% endif %}
-            <dl class="advert-detail__meta">
+            <p class="site-catalog-hero__eyebrow">
+                Оголошення
+                {% if object.category %}· {{ object.category.value }}{% endif %}
+            </p>
+            <h1 class="site-detail-hero__title">{{ object.title }}</h1>
+            {% if advert.price %}<p class="site-detail-price">{{ advert.price }} грн.</p>{% endif %}
+            <ul class="site-article-meta">
+                <li class="site-article-meta__item">
+                    <i class="icon-calendar" aria-hidden="true"></i>
+                    <span>{{ object.updated|date:"d b Y" }}</span>
+                </li>
+                {% if advert.location %}
+                    <li class="site-article-meta__item">
+                        <i class="icon-home" aria-hidden="true"></i>
+                        <span>{{ advert.location }}</span>
+                    </li>
+                {% endif %}
+            </ul>
+        </header>
+        <section class="site-content-section">
+            <h2 class="site-content-section__title">Контакти</h2>
+            <dl class="site-detail-meta">
                 {% if advert.author %}
-                    <div class="advert-detail__meta-item">
-                        <dt class="advert-detail__meta-label">Автор</dt>
-                        <dd class="advert-detail__meta-value mb-0">
+                    <div class="site-detail-meta__item">
+                        <dt class="site-detail-meta__label">Автор</dt>
+                        <dd class="site-detail-meta__value">
                             {{ advert.author }}
                         </dd>
                     </div>
                 {% endif %}
-                <div class="advert-detail__meta-item">
-                    <dt class="advert-detail__meta-label">Контакти</dt>
-                    <dd class="advert-detail__meta-value mb-0">
+                <div class="site-detail-meta__item">
+                    <dt class="site-detail-meta__label">Контакти</dt>
+                    <dd class="site-detail-meta__value">
                         {{ advert.contact }}
                     </dd>
                 </div>
                 {% if advert.location %}
-                    <div class="advert-detail__meta-item">
-                        <dt class="advert-detail__meta-label">Локація</dt>
-                        <dd class="advert-detail__meta-value mb-0">
+                    <div class="site-detail-meta__item">
+                        <dt class="site-detail-meta__label">Локація</dt>
+                        <dd class="site-detail-meta__value">
                             {{ advert.location }}
                         </dd>
                     </div>
                 {% endif %}
-                <div class="advert-detail__meta-item">
-                    <dt class="advert-detail__meta-label">Оновлено</dt>
-                    <dd class="advert-detail__meta-value mb-0">
+                <div class="site-detail-meta__item">
+                    <dt class="site-detail-meta__label">Оновлено</dt>
+                    <dd class="site-detail-meta__value">
                         {{ object.updated|date:"d b Y" }}
                     </dd>
                 </div>
             </dl>
-        </aside>
-    </div>
-    <div class="advert-detail__description post-wrapper">{{ object.description|safe }}</div>
-    <div class="advert-detail__share">
-        <a class="h5 text-primary"
-           tabindex="-1"
-           target="Share-in-facebook"
-           onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-           href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
-           aria-label="Опублікувати у фейсбук">
-            <i class="icon-facebook"></i>
-        </a>
-    </div>
-    {% if enable_adverts %}
-        <div class="col-12 mt-3">{% random_adverts %}</div>
-    {% endif %}
-    <div class="col-12">{% random_posts %}</div>
+        </section>
+        {% if object.description %}
+            <section class="site-content-section">
+                <h2 class="site-content-section__title">Опис оголошення</h2>
+                <div class="site-detail-content post-wrapper">{{ object.description|safe }}</div>
+            </section>
+        {% endif %}
+        <section class="site-content-section">
+            <h2 class="site-content-section__title">Поділитися</h2>
+            <div class="site-share-actions">
+                <a class="site-share-actions__link"
+                   tabindex="-1"
+                   target="Share-in-facebook"
+                   onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+                   href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
+                   aria-label="Опублікувати у фейсбук">
+                    <i class="icon-facebook"></i>
+                </a>
+            </div>
+        </section>
+        {% if enable_adverts %}
+            {% random_adverts %}
+        {% endif %}
+        {% random_posts %}
+    </article>
 {% endblock content %}

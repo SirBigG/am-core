@@ -335,6 +335,102 @@
             overflow: hidden;
         }
 
+        .site-date-field {
+            position: relative;
+        }
+
+        .site-date-field .site-date-field__input,
+        .site-date-field .form-control.input {
+            padding-right: 58px !important;
+        }
+
+        .site-date-field__button {
+            position: absolute;
+            top: 50%;
+            right: 8px;
+            z-index: 3;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 42px;
+            height: 42px;
+            padding: 0;
+            color: #0b8043;
+            background: #eef8ef;
+            border: 1px solid #d4e8d6;
+            border-radius: 12px;
+            transform: translateY(-50%);
+        }
+
+        .site-date-field__button:hover,
+        .site-date-field__button:focus {
+            color: #086a37;
+            background: #e2f2e4;
+            outline: none;
+        }
+
+        .flatpickr-calendar {
+            overflow: hidden;
+            border: 1px solid #dbe7dd !important;
+            border-radius: 18px !important;
+            box-shadow: 0 18px 44px rgba(15, 23, 42, 0.16) !important;
+            font-family: inherit;
+        }
+
+        .flatpickr-months {
+            padding: 0.55rem 0.55rem 0;
+            background: #f8fcf9 !important;
+        }
+
+        .flatpickr-current-month {
+            color: #1f2937 !important;
+            font-size: 1rem !important;
+            font-weight: 800 !important;
+        }
+
+        .flatpickr-weekdays {
+            background: #f8fcf9 !important;
+        }
+
+        span.flatpickr-weekday {
+            color: #4b5563 !important;
+            font-weight: 800 !important;
+        }
+
+        .flatpickr-day {
+            border-radius: 12px !important;
+            color: #1f2937;
+        }
+
+        .flatpickr-day.today {
+            border-color: #8bcf95;
+        }
+
+        .flatpickr-day.selected,
+        .flatpickr-day.startRange,
+        .flatpickr-day.endRange,
+        .flatpickr-day.selected:hover {
+            color: #ffffff !important;
+            background: #0b8043 !important;
+            border-color: #0b8043 !important;
+        }
+
+        .flatpickr-day:hover,
+        .flatpickr-day:focus {
+            background: #eef8ef !important;
+            border-color: #d4e8d6 !important;
+        }
+
+        .flatpickr-time {
+            border-top: 1px solid #e4ece5 !important;
+        }
+
+        .flatpickr-time input,
+        .flatpickr-time .flatpickr-am-pm {
+            color: #1f2937 !important;
+            font-weight: 800 !important;
+        }
+
         .site-form-error {
             margin: 0.5rem 0 0;
             color: #dc3545;
@@ -1217,6 +1313,89 @@
             line-height: 1.65;
         }
 
+        .site-detail-hero {
+            display: grid;
+            gap: 1rem;
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(180deg, #ffffff 0%, #f9fbf8 100%);
+            border: 1px solid #e4ece5;
+            border-radius: 22px;
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .site-detail-hero__media {
+            display: block;
+            overflow: hidden;
+            margin: -1.25rem -1.25rem 0;
+            background: #eef4ef;
+            border-radius: 22px 22px 0 0;
+        }
+
+        .site-detail-hero__media > a {
+            display: block;
+        }
+
+        .site-detail-hero__image {
+            display: block;
+            width: 100%;
+            height: clamp(220px, 45vw, 460px);
+            min-height: 220px;
+            aspect-ratio: 16 / 9;
+            object-fit: cover;
+        }
+
+        .site-detail-hero__title {
+            margin: 0;
+            color: #1f2937;
+            font-size: clamp(2rem, 5vw, 3.1rem);
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .site-detail-status {
+            display: inline-flex;
+            align-items: center;
+            width: fit-content;
+            min-height: 36px;
+            padding: 0.4rem 0.75rem;
+            color: #9f1d2a;
+            background: #fdeced;
+            border: 1px solid #f3c7cc;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .site-detail-gallery {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .site-detail-gallery__main {
+            display: block;
+            overflow: hidden;
+            background: #eef4ef;
+            border-radius: 18px;
+        }
+
+        .site-detail-gallery__main img {
+            display: block;
+            width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            background: #f8fcf9;
+        }
+
+        .site-detail-price {
+            margin: 0;
+            color: #0b8043;
+            font-size: clamp(1.55rem, 6vw, 2.25rem);
+            font-weight: 850;
+            line-height: 1.1;
+        }
+
         .site-product-grid {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1726,6 +1905,21 @@
             .site-detail-panel--media,
             .site-product-grid {
                 grid-template-columns: minmax(0, 1fr);
+            }
+
+            .site-detail-hero {
+                padding: 1rem;
+                border-radius: 18px;
+            }
+
+            .site-detail-hero__media {
+                margin: -1rem -1rem 0;
+                border-radius: 18px 18px 0 0;
+            }
+
+            .site-detail-hero__image {
+                height: 210px;
+                min-height: 0;
             }
 
             .site-link-grid {
