@@ -4,6 +4,8 @@ document.addEventListener("DOMContentLoaded", function () {
       control.querySelectorAll(".advert-photo-input")
     );
     var summary = control.querySelector("[data-advert-photo-summary]");
+    var existingCount = parseInt(control.getAttribute("data-advert-existing-photo-count") || "0", 10);
+    var maxCount = parseInt(control.getAttribute("data-advert-max-photo-count") || inputs.length, 10);
 
     function selectedFiles() {
       return inputs.reduce(function (files, input) {
@@ -30,11 +32,15 @@ document.addEventListener("DOMContentLoaded", function () {
       });
 
       if (summary) {
+        var totalCount = existingCount + files.length;
+
         if (files.length) {
           var names = files.map(function (file) {
             return file.name;
           });
-          summary.textContent = files.length + " / " + inputs.length + " фото: " + names.join(", ");
+          summary.textContent = totalCount + " / " + maxCount + " фото: " + names.join(", ");
+        } else if (existingCount) {
+          summary.textContent = "Вже додано " + existingCount + " / " + maxCount + " фото";
         } else {
           summary.textContent = "Фото не обрано";
         }

@@ -9,17 +9,16 @@
     <div class="profile-page-panel profile-form-panel">
         <h1 class="profile-page-title">Змінити оголошення</h1>
         {% if form.instance.photo_urls %}
-            <div class="row mb-3">
+            <div class="advert-existing-photos" aria-label="Поточні фото оголошення">
                 {% for photo_url in form.instance.photo_urls %}
-                    <div class="col-6 col-md-3 mb-2">
-                        <a href="{{ photo_url }}" target="_blank" rel="noopener">
-                            <img src="{% imgproxy_url photo_url 350 260 %}"
-                                 alt="{{ form.instance.title }}"
-                                 width="350"
-                                 height="260"
-                                 class="img-fluid rounded">
-                        </a>
-                    </div>
+                    <figure class="advert-existing-photo">
+                        <img src="{% imgproxy_url photo_url 350 260 %}"
+                             alt="{{ form.instance.title }} фото {{ forloop.counter }}"
+                             width="350"
+                             height="260"
+                             class="advert-existing-photo__image">
+                        <figcaption class="advert-existing-photo__caption">Фото {{ forloop.counter }} додано</figcaption>
+                    </figure>
                 {% endfor %}
             </div>
         {% endif %}
@@ -32,10 +31,9 @@
                     <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="profile-form-field">
                         {% if field.name == "photos" %}
-                            <div class="advert-photo-control">
-                                {{ field }}
-                                <span class="advert-photo-summary text-muted" data-advert-photo-summary>Фото не обрано</span>
-                            </div>
+                            <div class="advert-photo-control"
+                                 data-advert-existing-photo-count="{{ form.existing_photo_count }}"
+                                 data-advert-max-photo-count="{{ form.max_photos }}">{{ field }}</div>
                         {% else %}
                             {{ field }}
                         {% endif %}

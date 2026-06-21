@@ -20,7 +20,7 @@ class MultipleFileInput(forms.FileInput):
         attrs = attrs or {}
         base_id = attrs.get("id")
         slots = []
-        for index in range(self.slots):
+        for index in range(max(self.slots, 0)):
             slot_attrs = attrs.copy()
             slot_attrs["data-advert-photo-slot"] = index + 1
             if base_id and index:
@@ -103,17 +103,40 @@ class AdvertForm(forms.ModelForm):
         self.fields["contact"].widget.attrs.setdefault("placeholder", _("Телефон, email або інший спосіб зв'язку"))
         self.fields["price"].widget.attrs.setdefault("inputmode", "decimal")
         self.fields["price"].widget.attrs.setdefault("min", "0")
+        remaining_photos = self.remaining_photo_slots
+        self.fields["photos"].widget.slots = remaining_photos
+        if self.existing_photo_count:
+            if remaining_photos:
+                self.fields["photos"].help_text = _("Вже додано %(existing)s фото. Можна додати ще %(available)s.") % {
+                    "existing": self.existing_photo_count,
+                    "available": remaining_photos,
+                }
+            else:
+                self.fields["photos"].help_text = _("Вже додано максимальну кількість фото.")
         for name, field in self.fields.items():
             if name not in {"location", "photos"}:
                 field.widget.attrs["class"] = "form-control"
 
+    @property
+    def max_photos(self):
+        return get_advert_max_photos()
+
+    @property
+    def existing_photo_count(self):
+        if not self.instance or not self.instance.pk:
+            return 0
+        count = self.instance.photos.count()
+        if self.instance.image:
+            count += 1
+        return min(count, self.max_photos)
+
+    @property
+    def remaining_photo_slots(self):
+        return max(self.max_photos - self.existing_photo_count, 0)
+
     def clean_photos(self):
         photos = self.cleaned_data.get("photos", [])
-        existing_count = 0
-        if self.instance and self.instance.pk:
-            existing_count = self.instance.photos.count()
-            if self.instance.image:
-                existing_count += 1
+        existing_count = self.existing_photo_count
         max_photos = get_advert_max_photos()
         if existing_count + len(photos) > max_photos:
             available = max(max_photos - existing_count, 0)

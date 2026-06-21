@@ -17,7 +17,9 @@
                     <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="profile-form-field">
                         {% if field.name == "photos" %}
-                            <div class="advert-photo-control">
+                            <div class="advert-photo-control"
+                                 data-advert-existing-photo-count="{{ form.existing_photo_count }}"
+                                 data-advert-max-photo-count="{{ form.max_photos }}">
                                 {{ field }}
                                 <span class="advert-photo-summary text-muted" data-advert-photo-summary>Фото не обрано</span>
                             </div>

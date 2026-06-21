@@ -203,6 +203,19 @@ class TestAdvertFormView(TestCase):
         self.assertNotContains(response, 'class="advert-detail__thumb js-smartPhoto"')
         self.assertNotContains(response, 'target="_blank" rel="noopener"')
 
+    def test_photo_urls_keep_legacy_main_image_before_extra_photos(self):
+        advert = Advert.objects.create(
+            title="test",
+            description="test",
+            price=100,
+            contact="test",
+            image=make_named_image("legacy.jpg"),
+        )
+        extra = AdvertImage.objects.create(advert=advert, image=make_named_image("extra.jpg"))
+
+        self.assertEqual(advert.primary_image_url, advert.image.url)
+        self.assertEqual(advert.photo_urls, [advert.image.url, extra.image.url])
+
 
 class ProfileAdvertTests(TestCase):
     def test_profile_list_uses_adverts_template(self):
@@ -311,4 +324,8 @@ class ProfileAdvertTests(TestCase):
 
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertContains(response, 'src="/media/adverts/images/')
+        self.assertContains(response, "advert-existing-photo")
+        self.assertContains(response, "Вже додано 1 фото. Можна додати ще 4.")
+        self.assertContains(response, 'name="photos"', count=get_advert_max_photos() - 1)
         self.assertNotContains(response, "/imgproxy/")
+        self.assertNotContains(response, 'target="_blank" rel="noopener"')

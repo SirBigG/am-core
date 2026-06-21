@@ -14,6 +14,11 @@ class DetailEventView(TestCase):
         self.assertTemplateUsed(response, "events/detail.html")
         self.assertContains(response, "site-detail-panel")
 
+    def test_events_are_active_by_default(self):
+        event = EventFactory()
+
+        self.assertTrue(event.status)
+
 
 class EventListViewTests(TestCase):
     def test_response(self):
