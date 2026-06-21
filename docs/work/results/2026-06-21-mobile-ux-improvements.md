@@ -24,6 +24,7 @@
 - Reduced plant diary promo fatigue with a compact, dismissible site banner that remembers dismissal when browser storage is available.
 - Improved diary workspace mobile action targets so diary, entry, and plant overflow controls are visible and 48px on mobile.
 - Reworked `/search/` into the shared public form panel with a mobile-stacked search input and visible submit label.
+- Tightened the home hero on mobile and added clear first-viewport actions for creating content, browsing categories, and opening the plant diary.
 
 ## Verification
 
@@ -55,6 +56,7 @@
   - Plant diary banner layout and dismiss behavior on `/companies/`
   - Diary list and diary detail action target sizes at `390px` width.
   - `/search/?q=...` search panel at `390px` width.
+  - Home hero height, search controls, and action buttons at `390px` width.
 
 ## Remaining Follow-Ups
 
