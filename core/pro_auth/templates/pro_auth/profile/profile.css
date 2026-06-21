@@ -37,8 +37,61 @@
     padding: 32px;
 }
 
-.profile-sidebar-col .list-group-item {
-    min-height: 48px;
+.profile-sidebar-nav {
+    display: grid;
+    gap: 0.45rem;
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    background: linear-gradient(180deg, #ffffff 0%, #f9fbf8 100%);
+    border: 1px solid #e4ece5;
+    border-radius: 22px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.profile-sidebar-nav__item {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr);
+    align-items: center;
+    gap: 0.75rem;
+    min-height: 52px;
+    padding: 0.55rem 0.7rem;
+    color: #374151;
+    border-radius: 16px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+.profile-sidebar-nav__item:hover,
+.profile-sidebar-nav__item:focus,
+.profile-sidebar-nav__item.is-active {
+    color: #148543;
+    background: #f3fbf3;
+    text-decoration: none;
+}
+
+.profile-sidebar-nav__item--forum {
+    color: #1d4f91;
+}
+
+.profile-sidebar-nav__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    color: #148543;
+    background: #eef8ef;
+    font-size: 1.1rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.profile-sidebar-nav__item--forum .profile-sidebar-nav__icon {
+    color: #1d4f91;
+    background: #e8f1ff;
 }
 
 .am-card {
@@ -1295,6 +1348,31 @@ span.flatpickr-weekday {
 
     .profile-page-title {
         font-size: 1.7rem;
+    }
+
+    .profile-sidebar-nav {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+        padding: 0.55rem;
+        border-radius: 18px;
+        scroll-snap-type: x proximity;
+    }
+
+    .profile-sidebar-nav__item {
+        flex: 0 0 164px;
+        grid-template-columns: 32px minmax(0, 1fr);
+        min-height: 48px;
+        padding: 0.45rem 0.55rem;
+        scroll-snap-align: start;
+        font-size: 0.88rem;
+    }
+
+    .profile-sidebar-nav__icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 11px;
     }
 
     .profile-dashboard-panel {

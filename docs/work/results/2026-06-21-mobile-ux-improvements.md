@@ -27,6 +27,7 @@
 - Tightened the home hero on mobile and added clear first-viewport actions for creating content, browsing categories, and opening the plant diary.
 - Added a real personal dashboard at `/profile/` with mobile-friendly entry cards for adverts, diaries, plants, profile settings, creation, and forum handoff.
 - Added current-page state to the mobile bottom navigation and normalized bottom-nav avatar/icon sizing.
+- Expanded the personal-area sidebar into a full shortcut navigation for dashboard, adverts, advert creation, diaries, plants, settings, and forum handoff, with a horizontal mobile rail.
 
 ## Verification
 
@@ -61,6 +62,7 @@
   - Home hero height, search controls, and action buttons at `390px` width.
   - `/profile/` dashboard cards and forum handoff at `390px` width.
   - Mobile bottom navigation active states on `/search/`, `/adverts/`, and `/profile/`.
+  - `/profile/change` personal-area shortcut navigation at `390px` width, including active state and no page-level horizontal overflow.
 
 ## Remaining Follow-Ups
 
