@@ -4,7 +4,7 @@
      class="navbar bg-light fixed-bottom d-md-none mt-3 border-top border-success mobile-bottom-nav">
     <div class="mobile-bottom-nav__item">
         <div class="btn-group dropup">
-            <button class="btn btn-link mobile-bottom-nav__control"
+            <button class="btn btn-link mobile-bottom-nav__control{% if request.resolver_match.url_name == 'categories' or request.resolver_match.url_name == 'plant-diary' or request.resolver_match.namespace == 'events' or request.resolver_match.namespace == 'companies' or request.resolver_match.namespace == 'registry' %} is-active{% endif %}"
                     data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
@@ -60,7 +60,9 @@
         </div>
     </div>
     <div class="mobile-bottom-nav__item">
-        <a class="mobile-bottom-nav__control" href="{% url 'news:news-list' %}">
+        <a class="mobile-bottom-nav__control"
+           href="{% url 'news:news-list' %}"
+           {% if request.resolver_match.namespace == 'news' %}aria-current="page"{% endif %}>
             <span class="mobile-bottom-nav__icon" aria-hidden="true"><i class="icon-book"></i></span>
             <span class="mobile-bottom-nav__label">Новини</span>
         </a>
@@ -68,20 +70,23 @@
     <div class="mobile-bottom-nav__item">
         <a class="mobile-bottom-nav__control"
            href="{% url 'post-search-list' %}"
+           {% if request.resolver_match.url_name == 'post-search-list' %}aria-current="page"{% endif %}
            aria-label="Пошук">
             <span class="mobile-bottom-nav__icon" aria-hidden="true"><i class="icon-search"></i></span>
             <span class="mobile-bottom-nav__label">Пошук</span>
         </a>
     </div>
     <div class="mobile-bottom-nav__item">
-        <a class="mobile-bottom-nav__control" href="{% url 'adverts:list' %}">
+        <a class="mobile-bottom-nav__control"
+           href="{% url 'adverts:list' %}"
+           {% if request.resolver_match.namespace == 'adverts' %}aria-current="page"{% endif %}>
             <span class="mobile-bottom-nav__icon" aria-hidden="true"><i class="icon-newspaper"></i></span>
             <span class="mobile-bottom-nav__label">Оголошення</span>
         </a>
     </div>
     <div class="mobile-bottom-nav__item">
         <div class="btn-group dropup">
-            <button class="btn btn-link mobile-bottom-nav__control"
+            <button class="btn btn-link mobile-bottom-nav__control{% if request.resolver_match.namespace == 'pro_auth' %} is-active{% endif %}"
                     data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"

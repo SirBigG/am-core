@@ -796,9 +796,17 @@
             line-height: 1.1;
         }
 
+        .mobile-bottom-nav__control.is-active,
+        .mobile-bottom-nav__control[aria-current="page"] {
+            color: #0f6f37;
+            background: #eef8ef;
+            font-weight: 800;
+        }
+
         .mobile-bottom-nav__control:hover,
         .mobile-bottom-nav__control:focus {
             color: #0f6f37;
+            background: #f3fbf3;
             text-decoration: none;
         }
 
@@ -808,6 +816,12 @@
             justify-content: center;
             min-height: 24px;
             font-size: 1.25rem;
+        }
+
+        .mobile-bottom-nav__icon img,
+        .mobile-bottom-nav__icon svg {
+            width: 30px;
+            height: 30px;
         }
 
         .mobile-bottom-nav__label {

@@ -26,6 +26,7 @@
 - Reworked `/search/` into the shared public form panel with a mobile-stacked search input and visible submit label.
 - Tightened the home hero on mobile and added clear first-viewport actions for creating content, browsing categories, and opening the plant diary.
 - Added a real personal dashboard at `/profile/` with mobile-friendly entry cards for adverts, diaries, plants, profile settings, creation, and forum handoff.
+- Added current-page state to the mobile bottom navigation and normalized bottom-nav avatar/icon sizing.
 
 ## Verification
 
@@ -59,6 +60,7 @@
   - `/search/?q=...` search panel at `390px` width.
   - Home hero height, search controls, and action buttons at `390px` width.
   - `/profile/` dashboard cards and forum handoff at `390px` width.
+  - Mobile bottom navigation active states on `/search/`, `/adverts/`, and `/profile/`.
 
 ## Remaining Follow-Ups
 
