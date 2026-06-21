@@ -35,6 +35,8 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 ## Implementation Map
 
 - Django app: `core/posts`.
+- Some variety-style public catalog URLs, such as `/cybulevi/sorty-cybuli/`, are rendered through post/category templates even when the content behaves like registry/catalog reference information.
+- Registry-specific category and variety templates also exist in `core/registry`, especially for `/registry/` and registry browsing flows.
 
 ## Open Questions
 

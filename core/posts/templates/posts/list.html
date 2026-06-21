@@ -1,31 +1,45 @@
 {% extends "posts/parent_index.html" %}
-
 {% load post_extras static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
 {% block extra_meta %}
 {% endblock extra_meta %}
-
-{% block page_title %}{% if category.meta and category.meta.h1 %}{{ category.meta.h1 }}{% else %}{{ category.value }}
-{% endif %}{% endblock %}
-
+{% block page_title %}
+    {% if category.meta and category.meta.h1 %}
+        {{ category.meta.h1 }}
+    {% else %}
+        {{ category.value }}
+    {% endif %}
+{% endblock page_title %}
 {% block content %}
-    <div class="row mb-3">
-        <div class="col-12 d-flex justify-content-end">
-            <div class="btn-group" role="group" aria-label="List types">
-                <button type="button" class="btn btn-success"
-                        onclick="location.href='/{{ category.parent.slug }}/{{ category.slug }}/'">А-Я
-                </button>
-                <button type="button" class="btn btn-success disabled" aria-disabled="true">СПИСОК</button>
-            </div>
-        </div>
+    <div class="site-catalog-shell">
+        <header class="site-catalog-hero">
+            <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
+            <p class="site-catalog-hero__eyebrow">Список матеріалів</p>
+            <h1 class="site-catalog-hero__title">
+                {% if category.meta and category.meta.h1 %}
+                    {{ category.meta.h1 }}
+                {% else %}
+                    {{ category.value }}
+                {% endif %}
+            </h1>
+            {% if category.meta and category.meta.text %}
+                <div class="site-catalog-hero__text">{{ category.meta.text|safe }}</div>
+            {% else %}
+                <p class="site-catalog-hero__text">Переглядайте матеріали списком або перемкніться на алфавітний режим.</p>
+            {% endif %}
+            <ul class="site-catalog-stats" aria-label="Огляд списку">
+                <li class="site-catalog-stats__item">{{ page_obj.paginator.count }} матеріалів</li>
+            </ul>
+        </header>
+        <nav class="site-segmented-control" aria-label="Режим перегляду">
+            <a class="site-segmented-control__item"
+               href="{% url 'posts-list-view' parent=category.parent.slug child=category.slug %}">А-Я</a>
+            <span class="site-segmented-control__item is-active" aria-current="page">Список</span>
+        </nav>
+        {% include "posts/helpers/object_list.html" %}
+        {% include "helpers/pagination.html" %}
     </div>
-
-    {% include "posts/helpers/object_list.html" %}
-
-    {% include "helpers/pagination.html" %}
 {% endblock content %}

@@ -97,6 +97,8 @@ class PostListView(TemplateView):
             Post.objects.filter(rubric_id=category.id).values("title", "absolute_url", "country__short_slug").active()
         )
         posts = self._filter_posts(posts)
+        posts = list(posts)
+        post_count = len(posts)
         posts = [
             [key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]), key=lambda x: x["title"][0])
         ]
@@ -106,6 +108,8 @@ class PostListView(TemplateView):
             "view": self,
             "request": self.request,
             "countries": self._get_post_countries(category.id),
+            "post_count": post_count,
+            "group_count": len(posts),
         }
 
 

@@ -60,7 +60,7 @@
     {% second_menu view.kwargs.parent category.slug %}
 {% endblock second_menu %}
 {% block page_title %}
-    {% if object.meta and obj.meta.h1 %}
+    {% if object.meta and object.meta.h1 %}
         {{ object.meta.h1 }}
     {% else %}
         {{ object.title }}
@@ -72,89 +72,110 @@
              width="35px" />
     {% endif %}
 {% endblock page_title %}
+{% block page_header %}
+{% endblock page_header %}
 {% block breadcrumbs %}
-    {#    {% cache 3600 'breadcrumbs' view.kwargs.parent category.slug object.title %}#}
-    {% breadcrumbs category object.title %}
-    {#    {% endcache %}#}
 {% endblock breadcrumbs %}
 {% block content %}
-    <div class="post-content">
-        <div class="row">
-            <div class="col-12 p-0">
-                {% if main_photo_object %}
-                    <div class="card">
-                        <img alt="{{ object.title }}"
-                             width="1000"
-                             height="500"
-                             src="{% thumbnail main_photo_object 1520 800 %}"
-                             class="card-img img-fluid" />
-                        <div class="card-body text-end m-1">
-                            {% if photo_count > 1 %}
-                                <a href="{% url 'gallery' object.id %}"
-                                   class="btn btn-primary btn-circle btn-circle-sm"
-                                   aria-label="Більше фото"
-                                   rel="nofollow"><i class="icon-eye"></i></a>
-                            {% endif %}
-                        </div>
-                    </div>
+    <article class="site-article-shell post-content">
+        <header class="site-article-hero">
+            {% if main_photo_object %}
+                <div class="site-article-hero__media">
+                    <img alt="{{ object.title }}"
+                         width="1000"
+                         height="500"
+                         src="{% thumbnail main_photo_object 1520 800 %}"
+                         class="site-article-hero__image" />
+                </div>
+            {% endif %}
+            <div class="site-article-hero__breadcrumbs">{% breadcrumbs category object.title %}</div>
+            <p class="site-catalog-hero__eyebrow">{{ category.value }}</p>
+            <h1 class="site-article-hero__title">
+                {% if object.meta and object.meta.h1 %}
+                    {{ object.meta.h1 }}
+                {% else %}
+                    {{ object.title }}
                 {% endif %}
+                {% if object.country %}
+                    <img alt="{{ object.country.value }}"
+                         src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"
+                         height="25"
+                         width="35" />
+                {% endif %}
+            </h1>
+            <ul class="site-article-meta" aria-label="Інформація про публікацію">
+                {% if object.author %}<li class="site-article-meta__item">Автор: {{ object.author }}</li>{% endif %}
+                <li class="site-article-meta__item">Опубліковано: {{ object.publish_date|date:"d b Y" }}</li>
+                <li class="site-article-meta__item">Оновлено: {{ object.update_date|date:"d b Y" }}</li>
+                <li class="site-article-meta__item">
+                    <i class="icon-eye"></i> {{ object.hits }}
+                </li>
+                {% if photo_count > 1 %}
+                    <li>
+                        <a href="{% url 'gallery' object.id %}"
+                           class="site-article-meta__item"
+                           aria-label="Більше фото"
+                           rel="nofollow">Більше фото</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </header>
+        <section class="site-content-section">
+            <div class="site-article-body post-wrapper">{{ object.text|safe }}</div>
+        </section>
+        <section class="site-content-section">
+            <p class="site-content-section__eyebrow">Дані реєстру</p>
+            <h2 class="site-content-section__title">Сорт у реєстрі</h2>
+            <div class="site-table-scroll">{% variety_item_table object.id %}</div>
+        </section>
+        {% if object.sources %}
+            <section class="site-content-section">
+                <p class="site-content-section__eyebrow">Джерела</p>
+                <ul class="site-source-list">
+                    {% for source in object.sources %}<li class="site-source-list__item">{{ source }}</li>{% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+        <section class="site-content-section">
+            <p class="site-content-section__eyebrow">Дії</p>
+            <div class="d-flex justify-content-between align-items-center gap-3">
+                <span class="text-success h5 mb-0"><i class="icon-eye"></i> {{ object.hits }}</span>
+                <a class="h5 text-primary mb-0"
+                   tabindex="-1"
+                   target="Share-in-facebook"
+                   onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
+                   href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
+                   aria-label="Опублікувати у фейсбук">
+                    <i class="icon-facebook"></i>
+                </a>
             </div>
-        </div>
-        <div class="row">
-            <div class="col-12 p-0">
-                <div class="m-3 post-wrapper">
-                    {{ object.text|safe }}
-                    {% variety_item_table object.id %}
-                    {% if object.author %}<h6 class="mt-2">Автор: {{ object.author }}</h6>{% endif %}
-                    {% if object.sources %}
-                        <span>Джерела:</span>
-                        <ul>
-                            {# djlint:off #}
-                            {% for source in object.sources %}
-                                <li style="overflow-y: auto;">
-                                    <span class="text-secondary small">{{ source }}</span>
-                                </li>
-                            {% endfor %}
-                            {# djlint:on #}
-                        </ul>
-                    {% endif %}
-                    <p class="m-0">
-                        <span class="h6">Дата публікації: {{ object.publish_date|date:"d b Y" }}</span>
-                    </p>
-                    <p class="m-0">
-                        <span class="h6">Оновлено: {{ object.update_date|date:"d b Y" }}</span>
-                    </p>
+        </section>
+        <section class="site-content-section">
+            <div class="post_id_value" id="{{ object.id }}"></div>
+            <div id="useful__wrapper">
+                <p class="site-content-section__title text-center">Публікація корисна?</p>
+                <div class="d-flex flex-row justify-content-center">
+                    <button class="btn btn-outline-success m-2" id="useful">Так</button>
+                    <button class="btn btn-outline-danger m-2" id="notuseful">Ні</button>
                 </div>
-                <div class="col-12 d-flex justify-content-between p-3">
-                    <span class="text-success h5"><i class="icon-eye"></i> {{ object.hits }}</span>
-                    <a class="h5 text-primary"
-                       tabindex="-1"
-                       target="Share-in-facebook"
-                       onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                       href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
-                       aria-label="Опублікувати у фейсбук">
-                        <i class="icon-facebook"></i>
-                    </a>
-                </div>
             </div>
-        </div>
-    </div>
-    <div class="col-12">
-        <div class="post_id_value" id="{{ object.id }}"></div>
-        <div class="col-12 mt-3 mb-3" id="useful__wrapper">
-            <div class="d-flex flex-row justify-content-center">
-                <span class="pb-2">Публікація корисна?</span>
-            </div>
-            <div class="d-flex flex-row justify-content-center">
-                <button class="btn btn-outline-success m-3" id="useful">Так</button>
-                <button class="btn btn-outline-danger m-3" id="notuseful">Ні</button>
-            </div>
-        </div>
-        {# Comments block #}
-        {% render_comments object request %}
-        <div class="row mb-3">{% products_for_post object.id %}</div>
-        {% relative_posts category.id %}
-        {% post_adverts %}
-    </div>
-    <div class="col-12">{% random_posts %}</div>
+        </section>
+        <section class="site-content-section">
+            <h2 class="site-content-section__title">Коментарі</h2>
+            {% render_comments object request %}
+        </section>
+        <section class="site-content-section">
+            <h2 class="site-content-section__title">Пов'язані товари</h2>
+            <div class="row mb-3">{% products_for_post object.id %}</div>
+        </section>
+        <section class="site-content-section">
+            {% relative_posts category.id %}
+        </section>
+        <section class="site-content-section">
+            {% post_adverts %}
+        </section>
+        <section class="site-content-section">
+            {% random_posts %}
+        </section>
+    </article>
 {% endblock content %}
