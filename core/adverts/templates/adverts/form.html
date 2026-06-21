@@ -27,6 +27,7 @@
                     </label>
                     {% for error in field.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
                     {{ field }}
+                    {% if field.help_text %}<small class="form-text text-muted">{{ field.help_text }}</small>{% endif %}
                 </div>
             </div>
         {% endfor %}

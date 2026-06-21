@@ -1,22 +1,18 @@
 {% extends "pro_auth/profile/profile_base.html" %}
-
 {% load post_extras %}
-
-
 {% block profile_content %}
     <div class="profile-page-panel profile-form-panel">
         <h1 class="profile-page-title">Додати оголошення</h1>
-        <form method="post" action="{% url 'pro_auth:profile-adverts-create' %}" enctype="multipart/form-data">
+        <form method="post"
+              action="{% url 'pro_auth:profile-adverts-create' %}"
+              enctype="multipart/form-data">
             {% csrf_token %}
             {% for field in form %}
                 <div class="profile-form-group">
                     <label class="profile-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    <div class="profile-form-field">
-                        {{ field }}
-                    </div>
-                    {% for error in field.errors %}
-                        <p class="profile-form-error">{{ error }}</p>
-                    {% endfor %}
+                    <div class="profile-form-field">{{ field }}</div>
+                    {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
                 </div>
             {% endfor %}
             <div class="profile-form-actions">
@@ -25,4 +21,4 @@
         </form>
     </div>
     {{ form.media }}
-{% endblock %}
+{% endblock profile_content %}

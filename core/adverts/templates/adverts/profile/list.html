@@ -9,7 +9,20 @@
         <div class="row">
             {% for advert in object_list %}
                 <div class="row mb-1">
-                    <div class="col-12 col-md-4 d-flex justify-content-start align-items-center">
+                    <div class="col-3 col-md-1 d-flex justify-content-start align-items-center">
+                        {% if advert.primary_image_url %}
+                            <img src="{{ advert.primary_image_url }}"
+                                 alt="{{ advert.title }}"
+                                 width="64"
+                                 height="48"
+                                 class="img-fluid rounded">
+                        {% else %}
+                            <div class="profile-advert-photo-placeholder bg-light text-muted d-flex align-items-center justify-content-center rounded">
+                                Фото
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="col-9 col-md-3 d-flex justify-content-start align-items-center">
                         <a class="no-decoration text-success"
                            href="{{ advert.get_absolute_url }}">{{ advert.title }}</a>
                     </div>
