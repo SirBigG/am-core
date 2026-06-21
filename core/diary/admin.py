@@ -6,7 +6,7 @@ from core.diary.models import Diary, DiaryItem, Plant
 class DiaryItemInline(admin.TabularInline):
     model = DiaryItem
     extra = 0
-    fields = ("action_type", "date", "created", "image")
+    fields = ("action_type", "harvest_amount", "harvest_unit", "date", "created", "image")
     readonly_fields = ("created",)
 
 
@@ -23,7 +23,7 @@ class DiaryAdmin(admin.ModelAdmin):
 
 @admin.register(DiaryItem)
 class DiaryItemAdmin(admin.ModelAdmin):
-    list_display = ("diary", "action_type", "date", "created")
+    list_display = ("diary", "action_type", "harvest_summary", "date", "created")
     list_filter = ("action_type", "date", "created")
     search_fields = ("diary__title", "description", "diary__user__email")
     autocomplete_fields = ("diary",)

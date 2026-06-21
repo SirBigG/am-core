@@ -1,5 +1,7 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 {% load static %}
+{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
+{% block profile_sidebar %}{% endblock profile_sidebar %}
 {% block profile_content %}
     <div class="profile-diary-detail-wrap">
         <div class="profile-diary-detail-hero">
@@ -15,6 +17,9 @@
                             <h1 class="profile-diary-detail-title">{{ object.title }}</h1>
                             {% if object.is_archived %}<span class="am-badge profile-diary-card-badge">В архіві</span>{% endif %}
                         </div>
+                        {% if object.plant_summary %}
+                            <p class="profile-diary-detail-subtitle">{{ object.plant_summary }}</p>
+                        {% endif %}
                     </div>
                 </div>
                 <div class="profile-diary-detail-topbar-actions">
@@ -55,6 +60,91 @@
                 </div>
             </div>
         </div>
+        <section class="profile-diary-dashboard profile-diary-detail-dashboard" aria-label="Огляд щоденника">
+            <article class="profile-diary-dashboard-card profile-diary-dashboard-card--advice">
+                <p class="profile-diary-dashboard-card__kicker">AI-підказка</p>
+                {% if recommendation %}
+                    <h2>{{ recommendation.title }}</h2>
+                    <p>{{ recommendation.summary }}</p>
+                {% elif diary_detail_dashboard.last_watering %}
+                    <h2>Останній полив</h2>
+                    <p>Полив був {{ diary_detail_dashboard.last_watering.date|date:"j F" }}. Перевірте вологість ґрунту перед наступною дією.</p>
+                {% else %}
+                    <h2>Почніть історію</h2>
+                    <p>Додайте першу дію, щоб бачити timeline, AI-поради і статистику по цьому щоденнику.</p>
+                {% endif %}
+            </article>
+            <article class="profile-diary-dashboard-card profile-diary-stat-card">
+                <span class="profile-diary-stat-card__icon" aria-hidden="true">🌱</span>
+                <p>Ростуть зараз</p>
+                <strong>{{ diary_detail_dashboard.active_plants_count }}</strong>
+                <small>активні рослини</small>
+            </article>
+            <article class="profile-diary-dashboard-card profile-diary-stat-card">
+                <span class="profile-diary-stat-card__icon" aria-hidden="true">💧</span>
+                <p>Поливів за тиждень</p>
+                <strong>{{ diary_detail_dashboard.weekly_watering_count }}</strong>
+                {% if diary_detail_dashboard.last_watering %}
+                    <small>останній {{ diary_detail_dashboard.last_watering.date|date:"j F" }}</small>
+                {% else %}
+                    <small>ще не було</small>
+                {% endif %}
+            </article>
+            <article class="profile-diary-dashboard-card profile-diary-harvest-card">
+                <p class="profile-diary-dashboard-card__kicker">Урожай</p>
+                {% if diary_detail_dashboard.harvest_summary %}
+                    <strong>
+                        {% for harvest in diary_detail_dashboard.harvest_summary %}
+                            {{ harvest.display }}{% if not forloop.last %}, {% endif %}
+                        {% endfor %}
+                    </strong>
+                    <span>з цього щоденника</span>
+                {% else %}
+                    <strong>0</strong>
+                    <span>додайте збір урожаю</span>
+                {% endif %}
+            </article>
+            <article class="profile-diary-dashboard-card profile-diary-mini-card">
+                <p class="profile-diary-dashboard-card__kicker">Історія</p>
+                <strong>{{ diary_detail_dashboard.entries_count }}</strong>
+                {% if diary_detail_dashboard.history_days_count %}
+                    <span>{{ diary_detail_dashboard.history_days_count }} днів історії</span>
+                {% else %}
+                    <span>почніть з першої дії</span>
+                {% endif %}
+            </article>
+            <article class="profile-diary-dashboard-card profile-diary-mini-card profile-diary-mini-card--warm">
+                <p class="profile-diary-dashboard-card__kicker">Без дій</p>
+                <strong>{{ diary_detail_dashboard.plants_without_actions_count }}</strong>
+                {% if diary_detail_dashboard.plants_without_actions_count %}
+                    <span>активних рослин без записів</span>
+                {% else %}
+                    <span>усі рослини мають історію</span>
+                {% endif %}
+            </article>
+        </section>
+        {% if not object.is_archived and active_diary_plants %}
+            <section class="profile-diary-quick-panel" aria-label="Швидкі дії">
+                <div class="profile-diary-quick-panel__copy">
+                    <p class="profile-diary-dashboard-card__kicker">Швидкі дії</p>
+                    <h2>Зафіксуйте догляд без зайвих кроків</h2>
+                    <p>Підлив створює запис одразу за сьогодні. Для фото, врожаю, нотаток або проблем відкрийте повну форму.</p>
+                </div>
+                <div class="profile-diary-quick-panel__actions">
+                    <button type="button"
+                            class="btn am-btn am-btn--soft profile-diary-quick-water-btn"
+                            data-quick-water-open="quickWateringModal{{ object.id }}">
+                        💧 Підлив
+                    </button>
+                    <button type="button"
+                            class="btn am-btn am-btn--primary profile-diary-detail-add-btn"
+                            data-diary-item-modal-open>
+                        + Додати іншу дію
+                    </button>
+                </div>
+            </section>
+            {% include "diary/profile/_quick_watering_modal.html" with diary=object plants=active_diary_plants next_url=request.path %}
+        {% endif %}
         {% if not has_active_plants %}
             <section class="am-panel am-state profile-page-panel profile-diary-empty-state profile-diary-status-banner">
                 <h2 class="am-state__title profile-diary-empty-title">У цьому щоденнику зараз немає активних рослин</h2>
@@ -152,72 +242,77 @@
                 {% for group in grouped_diary_items %}
                     <div class="profile-diary-entry-group">
                         <h2 class="profile-diary-entry-group-title">{{ group.date|date:"j F Y" }}</h2>
-                        {% for item in group.items %}
-                            <article class="profile-diary-entry-timeline-item">
-                                <div class="profile-diary-entry-marker" aria-hidden="true"></div>
-                                <div class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card profile-diary-entry-card mb-4">
-                                    <div class="card-body p-4 text-start">
-                                        <div class="profile-diary-entry-top">
-                                            <div class="profile-diary-entry-meta">
-                                                {% if item.action_type %}
-                                                    <span class="profile-diary-entry-type">{{ item.get_action_type_display }}</span>
-                                                {% endif %}
-                                            </div>
-                                            <div class="am-menu profile-diary-entry-menu">
-                                                        <button type="button"
-                                                                class="btn am-btn am-btn--soft am-btn--icon am-menu__toggle profile-diary-entry-menu__toggle"
-                                                                data-diary-entry-menu-toggle
-                                                                aria-expanded="false"
-                                                                aria-label="Дії з подією">
-                                                    <span aria-hidden="true">⋯</span>
-                                                </button>
-                                                <div class="am-menu__dropdown profile-diary-entry-menu__dropdown" data-diary-entry-menu-dropdown hidden>
-                                                    {% if item.action_type != "transplanted" %}
-                                                        <a class="btn am-btn am-btn--soft am-menu__action profile-diary-entry-menu__action"
-                                                           href="{% url 'pro_auth:profile-diary-item-update' pk=item.id %}">
-                                                            Змінити
-                                                        </a>
-                                                    {% endif %}
-                                                    <a class="btn am-btn am-btn--danger am-menu__action profile-diary-entry-menu__action profile-diary-item-delete-btn"
-                                                       href="{% url 'pro_auth:profile-diary-item-delete' pk=item.id %}"
-                                                       aria-label="Видалити дію"
-                                                       title="Видалити дію">
-                                                        Видалити
-                                                    </a>
+                        <div class="profile-diary-entry-marker" aria-hidden="true"></div>
+                        <div class="profile-diary-entry-group-grid">
+                            {% for item in group.items %}
+                                <article class="profile-diary-entry-timeline-item">
+                                    <div class="card w-100 border rounded-4 shadow-sm am-card profile-diary-card profile-diary-entry-card profile-diary-entry-card--{{ item.action_type }} mb-4">
+                                        <div class="card-body p-4 text-start">
+                                            <div class="profile-diary-entry-shell">
+                                                <div class="profile-diary-entry-icon" aria-hidden="true">{{ item.action_icon }}</div>
+                                                <div class="profile-diary-entry-content">
+                                                    <div class="profile-diary-entry-top">
+                                                        <div class="profile-diary-entry-heading">
+                                                            {% if item.action_type %}
+                                                                <p class="profile-diary-entry-kicker">{{ item.action_label }}</p>
+                                                            {% endif %}
+                                                        </div>
+                                                        <div class="am-menu profile-diary-entry-menu">
+                                                            <button type="button"
+                                                                    class="btn am-btn am-btn--soft am-btn--icon am-menu__toggle profile-diary-entry-menu__toggle"
+                                                                    data-diary-entry-menu-toggle
+                                                                    aria-expanded="false"
+                                                                    aria-label="Дії з подією">
+                                                                <span aria-hidden="true">⋯</span>
+                                                            </button>
+                                                            <div class="am-menu__dropdown profile-diary-entry-menu__dropdown" data-diary-entry-menu-dropdown hidden>
+                                                                {% if item.action_type != "transplanted" %}
+                                                                    <a class="btn am-btn am-btn--soft am-menu__action profile-diary-entry-menu__action"
+                                                                       href="{% url 'pro_auth:profile-diary-item-update' pk=item.id %}">
+                                                                        Змінити
+                                                                    </a>
+                                                                {% endif %}
+                                                                <a class="btn am-btn am-btn--danger am-menu__action profile-diary-entry-menu__action profile-diary-item-delete-btn"
+                                                                   href="{% url 'pro_auth:profile-diary-item-delete' pk=item.id %}"
+                                                                   aria-label="Видалити дію"
+                                                                   title="Видалити дію">
+                                                                    Видалити
+                                                                </a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </div>
-                                        <div class="profile-diary-entry-target">
-                                            {% if item.apply_to_all %}
-                                                Для всіх активних рослин
-                                            {% else %}
-                                                {% with target_plants=item.plants.all %}
-                                                    {% if target_plants|length == 1 %}
-                                                        {{ target_plants.0.display_name }}
-                                                    {% elif target_plants|length <= 3 %}
-                                                        {% for plant in target_plants %}
-                                                            {{ plant.display_name }}{% if not forloop.last %}, {% endif %}
-                                                        {% endfor %}
+                                                <div class="profile-diary-entry-target-chips" aria-label="Рослини в дії">
+                                                    {% if item.apply_to_all %}
+                                                        <span>Для всіх активних рослин</span>
                                                     {% else %}
-                                                        Для {{ target_plants|length }} рослин
+                                                        {% for plant in item.plants.all %}
+                                                            <span>{{ plant.display_name }}</span>
+                                                        {% endfor %}
                                                     {% endif %}
-                                                {% endwith %}
-                                            {% endif %}
-                                        </div>
-                                        {% if item.image %}
-                                            <div class="profile-diary-entry-image-wrap">
-                                                <img class="profile-diary-entry-image"
-                                                     src="{{ item.image.url }}"
-                                                     alt="Фото рослини"
-                                                     height="200"
-                                                     width="300">
+                                                </div>
+                                                {% if item.harvest_summary or item.image %}
+                                                    <div class="profile-diary-entry-chips">
+                                                        {% if item.harvest_summary %}<span>{{ item.harvest_summary }}</span>{% endif %}
+                                                        {% if item.image %}<span>Фото</span>{% endif %}
+                                                    </div>
+                                                {% endif %}
+                                                {% if item.image %}
+                                                    <div class="profile-diary-entry-image-wrap">
+                                                        <img class="profile-diary-entry-image"
+                                                             src="{{ item.image.url }}"
+                                                             alt="Фото рослини"
+                                                             height="200"
+                                                             width="300">
+                                                    </div>
+                                                {% endif %}
+                                                <div class="profile-diary-entry-description">{{ item.description|safe }}</div>
                                             </div>
-                                        {% endif %}
-                                        <div class="profile-diary-entry-description">{{ item.description|safe }}</div>
+                                        </div>
                                     </div>
-                                </div>
-                            </article>
-                        {% endfor %}
+                                </article>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% empty %}
                     <div class="am-panel profile-page-panel profile-diary-empty-state">
@@ -273,8 +368,16 @@
                                     <div class="profile-diary-plant-management__list">
                                         {% for plant in active_diary_plants %}
                                             <div class="profile-diary-plant-management__item">
+                                                <span class="profile-diary-plant-management__icon" aria-hidden="true">{{ plant.plant_emoji }}</span>
                                                 <div class="profile-diary-plant-management__item-main">
                                                     <span class="profile-diary-plant-management__name">{{ plant.display_name }}</span>
+                                                    {% if plant.latest_diary_item %}
+                                                        <span class="profile-diary-plant-management__meta">
+                                                            {{ plant.latest_diary_item.get_action_type_display }} · {{ plant.latest_diary_item.date|date:"j F" }}
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="profile-diary-plant-management__meta">Ще немає дій</span>
+                                                    {% endif %}
                                                 </div>
                                                 <div class="profile-diary-plant-management__item-actions">
                                                     <div class="am-menu profile-diary-plant-menu">
@@ -367,6 +470,7 @@
                                     <div class="profile-diary-plant-management__list">
                                         {% for plant in completed_diary_plants %}
                                             <div class="profile-diary-plant-management__item profile-diary-plant-management__item--completed">
+                                                <span class="profile-diary-plant-management__icon" aria-hidden="true">{{ plant.plant_emoji }}</span>
                                                 <div class="profile-diary-plant-management__item-main">
                                                     <span class="profile-diary-plant-management__name">{{ plant.display_name }}</span>
                                                     <span class="profile-diary-plant-management__meta">
@@ -374,6 +478,9 @@
                                                             В архіві з {{ plant.completed_at|date:"j F Y" }}
                                                         {% else %}
                                                             В архіві
+                                                        {% endif %}
+                                                        {% if plant.latest_diary_item %}
+                                                            · {{ plant.latest_diary_item.get_action_type_display }}
                                                         {% endif %}
                                                     </span>
                                                 </div>
@@ -418,6 +525,11 @@
                         <p class="profile-diary-recommendation__next-step">
                             <strong>Далі:</strong> {{ recommendation.nextStep }}
                         </p>
+                        {% if recommendation.needsMoreData and recommendation.clarifyingQuestion %}
+                            <p class="profile-diary-recommendation__question">
+                                <strong>Потрібне уточнення:</strong> {{ recommendation.clarifyingQuestion }}
+                            </p>
+                        {% endif %}
                         <button type="button"
                                 class="profile-diary-recommendation__toggle"
                                 data-recommendation-toggle
@@ -486,8 +598,13 @@
         </div>
         {{ diary_item_form.media }}
     {% endif %}
+    {% if request.GET.quick_action == "watering_added" %}
+        <div class="profile-diary-toast is-visible" data-profile-diary-toast>
+            Швидку дію “Підлив” додано до історії
+        </div>
+    {% endif %}
 {% endblock profile_content %}
 {% block extra_footerscript %}
     {{ block.super }}
-    <script src="{% static 'pro_auth/profile/diary.js' %}"></script>
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
 {% endblock extra_footerscript %}

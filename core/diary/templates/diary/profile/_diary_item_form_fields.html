@@ -1,8 +1,9 @@
 <form method="post"
       action="{% if is_edit_mode %}{% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %}{% else %}{% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %}{% endif %}"
       enctype="multipart/form-data"
-      {% if is_modal %}class="profile-diary-item-modal__form"{% endif %}>
+      class="profile-diary-item-form{% if is_modal %} profile-diary-item-modal__form{% endif %}">
     {% csrf_token %}
+    {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
     {% if form.prefix %}<input type="hidden" name="_form_prefix" value="{{ form.prefix }}">{% endif %}
     {% if form.non_field_errors %}
         <div class="profile-form-group am-form-group">
@@ -10,7 +11,7 @@
         </div>
     {% endif %}
     {% for field in form %}
-        {% if field.name != "date" and field.name != "image" %}
+        {% if field.name != "date" and field.name != "image" and field.name != "harvest_amount" and field.name != "harvest_unit" %}
             <div class="profile-form-group am-form-group">
                 {% if field.name == "apply_to_all" %}
                     <label class="profile-event-apply-card am-choice-card" for="{{ field.id_for_label }}">
@@ -39,6 +40,29 @@
             </div>
         {% endif %}
     {% endfor %}
+    <div class="profile-diary-harvest-fields" data-harvest-fields hidden>
+        <div class="profile-diary-harvest-fields__header">
+            <div class="profile-diary-harvest-fields__icon" aria-hidden="true">🧺</div>
+            <div>
+                <h3 class="profile-diary-harvest-fields__title">Скільки зібрали?</h3>
+                <p class="profile-diary-harvest-fields__text">Вкажіть кількість і одиницю, щоб урожай підтягнувся у статистику щоденника.</p>
+            </div>
+        </div>
+        <div class="profile-form-row am-form-row profile-diary-harvest-fields__grid">
+            <div class="profile-form-group am-form-group">
+                <label class="profile-form-label am-form-label" for="{{ form.harvest_amount.id_for_label }}">{{ form.harvest_amount.label }}</label>
+                <div class="profile-form-field am-field">{{ form.harvest_amount }}</div>
+                {% for error in form.harvest_amount.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                {% if form.harvest_amount.help_text %}<p class="profile-form-help">{{ form.harvest_amount.help_text }}</p>{% endif %}
+            </div>
+            <div class="profile-form-group am-form-group">
+                <label class="profile-form-label am-form-label" for="{{ form.harvest_unit.id_for_label }}">{{ form.harvest_unit.label }}</label>
+                <div class="profile-form-field am-field am-field--select">{{ form.harvest_unit }}</div>
+                {% for error in form.harvest_unit.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
+                {% if form.harvest_unit.help_text %}<p class="profile-form-help">{{ form.harvest_unit.help_text }}</p>{% endif %}
+            </div>
+        </div>
+    </div>
     <div class="profile-form-row am-form-row profile-diary-item-meta-row">
         <div class="profile-form-group am-form-group">
             <label class="profile-form-label am-form-label" for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
@@ -65,7 +89,7 @@
                     class="btn profile-confirm-cancel"
                     data-diary-item-modal-cancel>Відмінити</button>
         {% endif %}
-        <button type="submit" class="btn am-btn am-btn--primary{% if not is_modal %} w-100{% endif %}">
+        <button type="submit" class="btn am-btn am-btn--primary">
             {% if is_edit_mode %}
                 Зберегти зміни
             {% else %}

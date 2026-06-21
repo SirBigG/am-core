@@ -35,11 +35,40 @@
     }
 
     function bindDiaryItemForm(formElement, inputSelector) {
+        if (formElement.dataset.diaryItemFormBound === "true") {
+            return;
+        }
+        formElement.dataset.diaryItemFormBound = "true";
+
         const applyToAllInput = formElement.querySelector(inputSelector);
+        const actionInput = formElement.querySelector("select[name$='action_type']");
+        const harvestFields = formElement.querySelector("[data-harvest-fields]");
+        const harvestInputs = harvestFields ? harvestFields.querySelectorAll("[data-harvest-input]") : [];
         const fileInput = formElement.querySelector("input[type='file']");
         const fileName = formElement.querySelector("[data-file-name]");
 
         syncPlantTargetsState(formElement, inputSelector);
+
+        function syncHarvestFields() {
+            if (!actionInput || !harvestFields) {
+                return;
+            }
+
+            const isHarvest = actionInput.value === "harvest";
+            harvestFields.hidden = !isHarvest;
+            harvestInputs.forEach(function (input) {
+                input.disabled = !isHarvest;
+                if (!isHarvest) {
+                    input.value = "";
+                }
+            });
+        }
+
+        syncHarvestFields();
+
+        if (actionInput) {
+            actionInput.addEventListener("change", syncHarvestFields);
+        }
 
         if (applyToAllInput) {
             applyToAllInput.addEventListener("change", function () {
@@ -96,24 +125,9 @@
         });
     }
 
-    function initDiaryList() {
-        if (!document.querySelector(".profile-diary-wrap")) {
-            return;
-        }
-
-        const deleteLinks = document.querySelectorAll(".profile-diary-card-archive-btn, .profile-diary-card-state__actions a[href*='/delete/']");
-        const modal = document.getElementById("diaryDeleteConfirm");
-        const confirmButton = modal ? modal.querySelector("[data-confirm-submit]") : null;
-        const cancelButton = modal ? modal.querySelector("[data-confirm-cancel]") : null;
-        const menuToggles = document.querySelectorAll("[data-diary-card-menu-toggle]");
+    function initQuickWaterActions() {
         const quickWaterButtons = document.querySelectorAll("[data-quick-water-open]");
-        const diaryActionButtons = document.querySelectorAll("[data-diary-card-action-open]");
         const toast = document.querySelector("[data-profile-diary-toast]");
-        let pendingDelete = null;
-
-        function closeAllCardMenus() {
-            closeMenuGroup(".profile-diary-card-menu", "[data-diary-card-menu-toggle]", "[data-diary-card-menu-dropdown]");
-        }
 
         function setQuickWaterPlantSelection(modalElement) {
             const selectedRadio = modalElement.querySelector("[data-quick-water-selected]");
@@ -148,6 +162,73 @@
             }
         }
 
+        if (toast) {
+            window.setTimeout(function () {
+                toast.classList.remove("is-visible");
+            }, 3800);
+        }
+
+        quickWaterButtons.forEach(function (button) {
+            if (button.dataset.quickWaterBound === "true") {
+                return;
+            }
+            button.dataset.quickWaterBound = "true";
+
+            button.addEventListener("click", function () {
+                const modalId = button.getAttribute("data-quick-water-open");
+                openQuickWaterModal(document.getElementById(modalId));
+            });
+        });
+
+        document.querySelectorAll(".profile-quick-action-backdrop").forEach(function (quickModal) {
+            if (quickModal.dataset.quickWaterModalBound === "true") {
+                return;
+            }
+            quickModal.dataset.quickWaterModalBound = "true";
+
+            quickModal.addEventListener("click", function (event) {
+                if (event.target === quickModal || event.target.closest("[data-quick-water-cancel]")) {
+                    closeQuickWaterModal(quickModal);
+                }
+            });
+
+            quickModal.querySelectorAll("input[name='apply_to_all']").forEach(function (input) {
+                input.addEventListener("change", function () {
+                    setQuickWaterPlantSelection(quickModal);
+                });
+            });
+        });
+
+        document.addEventListener("keydown", function (event) {
+            if (event.key !== "Escape") {
+                return;
+            }
+
+            document.querySelectorAll(".profile-quick-action-backdrop.is-open").forEach(closeQuickWaterModal);
+        });
+    }
+
+    function initDiaryList() {
+        if (!document.querySelector(".profile-diary-wrap")) {
+            return;
+        }
+
+        const deleteLinks = document.querySelectorAll(".profile-diary-card-archive-btn, .profile-diary-card-state__actions a[href*='/delete/']");
+        const modal = document.getElementById("diaryDeleteConfirm");
+        const confirmButton = modal ? modal.querySelector("[data-confirm-submit]") : null;
+        const cancelButton = modal ? modal.querySelector("[data-confirm-cancel]") : null;
+        const menuToggles = document.querySelectorAll("[data-diary-card-menu-toggle]");
+        const diaryActionButtons = document.querySelectorAll("[data-diary-card-action-open]");
+        const diaryViewTabs = document.querySelectorAll("[data-diary-view-tab]");
+        const diaryViewCards = document.querySelectorAll("[data-diary-view-card]");
+        const diaryViewEmptyStates = document.querySelectorAll("[data-diary-view-empty]");
+        const diaryViewStaticEmptyStates = document.querySelectorAll("[data-diary-view-static-empty]");
+        let pendingDelete = null;
+
+        function closeAllCardMenus() {
+            closeMenuGroup(".profile-diary-card-menu", "[data-diary-card-menu-toggle]", "[data-diary-card-menu-dropdown]");
+        }
+
         function closeDiaryActionModal(modalElement) {
             setModalOpen(modalElement, false);
         }
@@ -179,13 +260,46 @@
             }
         }
 
+        function setDiaryView(activeView) {
+            let visibleCards = 0;
+
+            diaryViewTabs.forEach(function (tab) {
+                const isActive = tab.getAttribute("data-diary-view-tab") === activeView;
+                tab.classList.toggle("is-active", isActive);
+                tab.setAttribute("aria-selected", String(isActive));
+            });
+
+            diaryViewCards.forEach(function (card) {
+                const groups = (card.getAttribute("data-diary-view-groups") || "").split(/\s+/);
+                const shouldShow = groups.includes(activeView);
+
+                card.hidden = !shouldShow;
+                if (shouldShow) {
+                    visibleCards += 1;
+                }
+            });
+
+            diaryViewStaticEmptyStates.forEach(function (emptyState) {
+                emptyState.hidden = emptyState.getAttribute("data-diary-view-static-empty") !== activeView;
+            });
+
+            diaryViewEmptyStates.forEach(function (emptyState) {
+                const isTarget = emptyState.getAttribute("data-diary-view-empty") === activeView;
+                emptyState.hidden = !isTarget || visibleCards > 0;
+            });
+
+            closeAllCardMenus();
+        }
+
         window.addEventListener("pageshow", closeAllCardMenus);
 
-        if (toast) {
-            window.setTimeout(function () {
-                toast.classList.remove("is-visible");
-            }, 3800);
-        }
+        diaryViewTabs.forEach(function (tab) {
+            tab.addEventListener("click", function () {
+                setDiaryView(tab.getAttribute("data-diary-view-tab") || "all");
+            });
+        });
+
+        setDiaryView("all");
 
         deleteLinks.forEach(function (link) {
             link.addEventListener("click", function (event) {
@@ -212,13 +326,6 @@
             action.addEventListener("click", closeAllCardMenus);
         });
 
-        quickWaterButtons.forEach(function (button) {
-            button.addEventListener("click", function () {
-                const modalId = button.getAttribute("data-quick-water-open");
-                openQuickWaterModal(document.getElementById(modalId));
-            });
-        });
-
         document.querySelectorAll(".profile-diary-item-modal__form").forEach(function (formElement) {
             bindDiaryItemForm(formElement, "input[name$='apply_to_all']");
         });
@@ -239,20 +346,6 @@
                 ) {
                     closeDiaryActionModal(actionModal);
                 }
-            });
-        });
-
-        document.querySelectorAll(".profile-quick-action-backdrop").forEach(function (quickModal) {
-            quickModal.addEventListener("click", function (event) {
-                if (event.target === quickModal || event.target.closest("[data-quick-water-cancel]")) {
-                    closeQuickWaterModal(quickModal);
-                }
-            });
-
-            quickModal.querySelectorAll("input[name='apply_to_all']").forEach(function (input) {
-                input.addEventListener("change", function () {
-                    setQuickWaterPlantSelection(quickModal);
-                });
             });
         });
 
@@ -296,7 +389,6 @@
                 closeArchiveModal();
             }
 
-            document.querySelectorAll(".profile-quick-action-backdrop.is-open").forEach(closeQuickWaterModal);
             document.querySelectorAll(".profile-diary-item-modal.is-open").forEach(closeDiaryActionModal);
             closeAllCardMenus();
         });
@@ -327,7 +419,7 @@
         const entryMenuToggles = document.querySelectorAll("[data-diary-entry-menu-toggle]");
         const detailMenuToggles = document.querySelectorAll("[data-diary-detail-menu-toggle]");
         const diaryItemModal = document.getElementById("diaryItemAddModal");
-        const diaryItemModalOpen = document.querySelector("[data-diary-item-modal-open]");
+        const diaryItemModalOpenButtons = document.querySelectorAll("[data-diary-item-modal-open]");
         const diaryItemModalCancel = diaryItemModal ? diaryItemModal.querySelectorAll("[data-diary-item-modal-cancel]") : [];
         const plantMoveLinks = document.querySelectorAll("[data-plant-move-open]");
         const plantArchiveLinks = document.querySelectorAll("[data-plant-archive-open]");
@@ -410,8 +502,8 @@
             action.addEventListener("click", closeAllMenus);
         });
 
-        if (diaryItemModalOpen) {
-            diaryItemModalOpen.addEventListener("click", function (event) {
+        diaryItemModalOpenButtons.forEach(function (button) {
+            button.addEventListener("click", function (event) {
                 if (!diaryItemModal) {
                     return;
                 }
@@ -419,7 +511,7 @@
                 event.preventDefault();
                 openDiaryItemModal();
             });
-        }
+        });
 
         diaryItemModalCancel.forEach(function (button) {
             button.addEventListener("click", closeDiaryItemModal);
@@ -585,8 +677,116 @@
         });
     }
 
-    document.addEventListener("DOMContentLoaded", function () {
+    function initDiaryItemFormPage() {
+        document.querySelectorAll(".profile-diary-item-form").forEach(function (formElement) {
+            bindDiaryItemForm(formElement, "input[name$='apply_to_all']");
+        });
+    }
+
+    function initPlantFormsets() {
+        document.querySelectorAll("[data-plant-formset]").forEach(function (formset) {
+            if (formset.dataset.plantFormsetBound === "true") {
+                return;
+            }
+            formset.dataset.plantFormsetBound = "true";
+
+            const addButton = formset.querySelector("[data-plant-form-add]");
+            const rows = formset.querySelector("[data-plant-form-rows]");
+            const template = formset.querySelector("[data-plant-form-template]");
+            const totalForms = formset.querySelector('[name="plants-TOTAL_FORMS"]');
+
+            function initAutocomplete(row) {
+                if (!window.django || !window.django.jQuery) {
+                    return;
+                }
+
+                const $ = window.django.jQuery;
+                $(document).trigger("formset:added", [$(row), "plants"]);
+                $(row).find("[data-autocomplete-light-function]").each(function () {
+                    $(this).trigger("autocompleteLightInitialize");
+                });
+            }
+
+            function initDatepickers(row) {
+                if (typeof window.initProfileDatepickers !== "function") {
+                    return;
+                }
+
+                window.initProfileDatepickers(row);
+            }
+
+            function bindRemove(row) {
+                if (!row || row.dataset.plantRemoveBound === "true") {
+                    return;
+                }
+                row.dataset.plantRemoveBound = "true";
+
+                const removeButton = row.querySelector("[data-plant-form-remove]");
+                const deleteInput = row.querySelector('[name$="-DELETE"]');
+
+                if (!removeButton || !deleteInput) {
+                    return;
+                }
+
+                removeButton.addEventListener("click", function () {
+                    const removeMode = row.dataset.plantRemoveMode || "row";
+                    const removeMessage = row.dataset.plantRemoveMessage || "";
+
+                    if (removeMode === "blocked") {
+                        if (removeMessage) {
+                            window.alert(removeMessage);
+                        }
+                        return;
+                    }
+
+                    if ((removeMode === "delete" || removeMode === "finish") && removeMessage) {
+                        if (!window.confirm(removeMessage)) {
+                            return;
+                        }
+                    }
+
+                    deleteInput.checked = true;
+                    row.hidden = true;
+                });
+            }
+
+            if (!rows) {
+                return;
+            }
+
+            rows.querySelectorAll("[data-plant-form-row]").forEach(function (row) {
+                bindRemove(row);
+                initDatepickers(row);
+            });
+
+            if (addButton && template && totalForms) {
+                addButton.addEventListener("click", function () {
+                    const index = Number(totalForms.value);
+                    const html = template.innerHTML.replace(/__prefix__/g, String(index));
+
+                    rows.insertAdjacentHTML("beforeend", html);
+                    totalForms.value = String(index + 1);
+
+                    const row = rows.lastElementChild;
+                    bindRemove(row);
+                    initAutocomplete(row);
+                    initDatepickers(row);
+                });
+            }
+        });
+    }
+
+    function initDiaryInteractions() {
+        initDiaryItemFormPage();
+        initPlantFormsets();
+        initQuickWaterActions();
         initDiaryList();
         initDiaryDetail();
-    });
+    }
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initDiaryInteractions);
+    } else {
+        initDiaryInteractions();
+    }
 })();

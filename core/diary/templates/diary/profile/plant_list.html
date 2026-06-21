@@ -1,0 +1,144 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% block profile_layout_class %}profile-layout-row--full{% endblock profile_layout_class %}
+{% block profile_sidebar %}{% endblock profile_sidebar %}
+{% block profile_content %}
+    <div class="profile-plant-library">
+        <header class="profile-plant-library__hero">
+            <div>
+                <a class="profile-diary-detail-back"
+                   href="{% url 'pro_auth:profile-diary-list' %}">
+                    <span aria-hidden="true">←</span>
+                    <span>До щоденників</span>
+                </a>
+                <p class="profile-diary-eyebrow">Колекція рослин</p>
+                <h1>Мої рослини</h1>
+                <p class="profile-plant-library__lead">
+                    Всі рослини з ваших щоденників, їхній стан, історія та ключові дані в одному місці.
+                </p>
+            </div>
+            <div class="profile-plant-library__summary" aria-label="Статистика рослин">
+                <div>
+                    <strong>{{ plants|length }}</strong>
+                    <span>усього</span>
+                </div>
+                <div>
+                    <strong>{{ active_plants|length }}</strong>
+                    <span>ростуть</span>
+                </div>
+                <div>
+                    <strong>{{ completed_plants|length }}</strong>
+                    <span>завершені</span>
+                </div>
+            </div>
+        </header>
+
+        {% if plants %}
+            <section class="profile-plant-library__grid" aria-label="Всі рослини">
+                {% for plant in plants %}
+                    <article class="profile-plant-library-card profile-plant-library-card--{{ plant.status }}">
+                        <header class="profile-plant-library-card__header">
+                            <span class="profile-plant-library-card__icon" aria-hidden="true">{{ plant.plant_emoji }}</span>
+                            <div class="profile-plant-library-card__heading">
+                                <p>{{ plant.category.value|default:"Без категорії" }}</p>
+                                <h2>{{ plant.display_name }}</h2>
+                            </div>
+                            <span class="profile-plant-library-card__status">
+                                {% if plant.status == "active" %}Росте{% else %}Завершена{% endif %}
+                            </span>
+                        </header>
+
+                        {% if plant.description %}
+                            <p class="profile-plant-library-card__description">
+                                {{ plant.description|striptags|truncatechars:180 }}
+                            </p>
+                        {% else %}
+                            <p class="profile-plant-library-card__description profile-plant-library-card__description--empty">
+                                Опис ще не додано.
+                            </p>
+                        {% endif %}
+
+                        <dl class="profile-plant-library-card__facts">
+                            <div>
+                                <dt>Сорт</dt>
+                                <dd>{{ plant.variety|default:"Не вказано" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Власна назва</dt>
+                                <dd>{{ plant.title|default:"Не вказано" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Посаджено</dt>
+                                <dd>{{ plant.plant_date|date:"d.m.Y" }}</dd>
+                            </div>
+                            <div>
+                                <dt>Вік</dt>
+                                <dd>{{ plant.age_days }} дн.</dd>
+                            </div>
+                            {% if plant.completed_at %}
+                                <div>
+                                    <dt>Завершено</dt>
+                                    <dd>{{ plant.completed_at|date:"d.m.Y" }}</dd>
+                                </div>
+                            {% endif %}
+                            <div>
+                                <dt>Дій</dt>
+                                <dd>{{ plant.diary_items_count }}</dd>
+                            </div>
+                        </dl>
+
+                        <div class="profile-plant-library-card__diaries">
+                            <p>Щоденники</p>
+                            <div>
+                                {% for diary in plant.profile_diaries %}
+                                    <a href="{% url 'pro_auth:profile-diary-detail' pk=diary.id %}">
+                                        {{ diary.title }}{% if diary.is_archived %} · архів{% endif %}
+                                    </a>
+                                {% empty %}
+                                    <span>Не додана до щоденника</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="profile-plant-library-card__latest">
+                            <p>Остання дія</p>
+                            {% if plant.latest_diary_item %}
+                                <div class="profile-plant-library-card__latest-main">
+                                    <strong>{{ plant.latest_diary_item.get_action_type_display }}</strong>
+                                    <time datetime="{{ plant.latest_diary_item.date|date:'Y-m-d' }}">
+                                        {{ plant.latest_diary_item.date|date:"d.m.Y" }}
+                                    </time>
+                                </div>
+                                {% if plant.latest_diary_item.harvest_summary %}
+                                    <span>{{ plant.latest_diary_item.harvest_summary }}</span>
+                                {% endif %}
+                                {% if plant.latest_diary_item.description %}
+                                    <span>{{ plant.latest_diary_item.description|striptags|truncatechars:100 }}</span>
+                                {% endif %}
+                            {% else %}
+                                <span>Дій ще немає.</span>
+                            {% endif %}
+                        </div>
+
+                        <footer class="profile-plant-library-card__footer">
+                            <span>Додано {{ plant.created|date:"d.m.Y" }}</span>
+                            {% if plant.profile_diaries %}
+                                <a href="{% url 'pro_auth:profile-diary-detail' pk=plant.profile_diaries.0.id %}">
+                                    Відкрити щоденник <span aria-hidden="true">→</span>
+                                </a>
+                            {% endif %}
+                        </footer>
+                    </article>
+                {% endfor %}
+            </section>
+        {% else %}
+            <section class="profile-plant-library__empty">
+                <span aria-hidden="true">🌱</span>
+                <h2>Рослин поки немає</h2>
+                <p>Створіть щоденник і додайте першу рослину — вона з’явиться тут автоматично.</p>
+                <a class="btn am-btn am-btn--primary" href="{% url 'pro_auth:profile-diary-add' %}">
+                    + Додати щоденник
+                </a>
+            </section>
+        {% endif %}
+    </div>
+{% endblock profile_content %}

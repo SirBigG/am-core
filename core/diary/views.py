@@ -1,6 +1,7 @@
 import re
 from collections import OrderedDict
-from datetime import date
+from datetime import date, timedelta
+from decimal import Decimal
 
 from dal import autocomplete
 from django.core.exceptions import ValidationError
@@ -10,6 +11,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.formats import date_format
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, UpdateView, View
 
@@ -28,6 +30,227 @@ PLANT_DELETE_TITLE = "Видалити рослину назавжди"
 PLANT_DELETE_LEAD = "Рослина буде повністю видалена разом з її історією, діями та пов’язаними записами. Цю дію не можна скасувати."
 
 
+def _format_harvest_amount(amount):
+    normalized = amount.normalize()
+    return format(normalized, "f").rstrip("0").rstrip(".")
+
+
+def _build_harvest_summary(items):
+    totals = OrderedDict()
+    unit_labels = dict(DiaryItem._meta.get_field("harvest_unit").choices)
+    for item in items:
+        if item.action_type != "harvest" or item.harvest_amount is None or not item.harvest_unit:
+            continue
+        totals[item.harvest_unit] = totals.get(item.harvest_unit, Decimal("0")) + item.harvest_amount
+
+    return [
+        {
+            "unit": unit,
+            "label": unit_labels.get(unit, unit),
+            "amount": amount,
+            "display": f"{_format_harvest_amount(amount)} {unit_labels.get(unit, unit)}",
+        }
+        for unit, amount in totals.items()
+    ]
+
+
+def _build_profile_diary_dashboard(diaries, today=None):
+    today = today or timezone.localdate()
+    week_start = today - timedelta(days=6)
+    attention_cutoff = today - timedelta(days=3)
+    active_diaries = [diary for diary in diaries if not diary.is_archived]
+    active_plants = []
+    all_items = []
+    actions_by_diary = []
+
+    for diary in active_diaries:
+        diary_plants = list(getattr(diary, "active_diary_plants", []))
+        diary_items = list(getattr(diary, "latest_diary_items", []))
+        active_plants.extend(diary_plants)
+        all_items.extend(diary_items)
+        recent_actions_count = sum(1 for item in diary_items if item.date and item.date >= week_start)
+        actions_by_diary.append((recent_actions_count, diary))
+
+    weekly_actions = [item for item in all_items if item.date and item.date >= week_start]
+    watering_items = sorted(
+        [item for item in all_items if item.action_type == "watering"],
+        key=lambda item: (item.date, item.created),
+        reverse=True,
+    )
+    last_watering = watering_items[0] if watering_items else None
+    current_year_harvest_items = [
+        item
+        for item in all_items
+        if item.action_type == "harvest" and item.date and item.date.year == today.year
+    ]
+    current_year_harvest_items.sort(
+        key=lambda item: (item.date, item.created),
+        reverse=True,
+    )
+    last_harvest = current_year_harvest_items[0] if current_year_harvest_items else None
+    oldest_item_date = min((item.date for item in all_items if item.date), default=None)
+
+    plant_last_watering = {}
+    for item in watering_items:
+        for plant in item.plants.all():
+            if plant.pk not in plant_last_watering:
+                plant_last_watering[plant.pk] = item
+
+    plants_with_actions = set()
+    for item in all_items:
+        plants_with_actions.update(plant.pk for plant in item.plants.all())
+    plants_without_actions = [plant for plant in active_plants if plant.pk not in plants_with_actions]
+
+    plants_needing_attention = []
+    for plant in active_plants:
+        last_plant_watering = plant_last_watering.get(plant.pk)
+        if last_plant_watering is None or last_plant_watering.date <= attention_cutoff:
+            reason = (
+                "поливу ще не було"
+                if last_plant_watering is None
+                else f"полив {date_format(last_plant_watering.date, 'j F')}"
+            )
+            plants_needing_attention.append(
+                {
+                    "plant": plant,
+                    "reason": reason,
+                    "last_watering": last_plant_watering,
+                }
+            )
+
+    most_active_diary = None
+    most_active_actions_count = 0
+    if actions_by_diary:
+        most_active_actions_count, most_active_diary = max(actions_by_diary, key=lambda item: item[0])
+        if most_active_actions_count == 0:
+            most_active_diary = None
+
+    return {
+        "active_plants_count": len(active_plants),
+        "weekly_actions_count": len(weekly_actions),
+        "last_watering": last_watering,
+        "harvest_summary": _build_harvest_summary(current_year_harvest_items),
+        "last_harvest": last_harvest,
+        "plants_needing_attention": plants_needing_attention,
+        "attention_count": len(plants_needing_attention),
+        "plants_without_actions": plants_without_actions,
+        "plants_without_actions_count": len(plants_without_actions),
+        "most_active_diary": most_active_diary,
+        "most_active_actions_count": most_active_actions_count,
+        "oldest_item_date": oldest_item_date,
+        "history_days_count": (today - oldest_item_date).days + 1 if oldest_item_date else 0,
+        "week_start": week_start,
+        "today": today,
+    }
+
+
+def _build_diary_detail_dashboard(diary, diary_items, active_plants, today=None):
+    today = today or timezone.localdate()
+    week_start = today - timedelta(days=6)
+    weekly_actions = [item for item in diary_items if item.date and item.date >= week_start]
+    weekly_watering = [item for item in weekly_actions if item.action_type == "watering"]
+    watering_items = sorted(
+        [item for item in diary_items if item.action_type == "watering"],
+        key=lambda item: (item.date, item.created),
+        reverse=True,
+    )
+    current_year_harvest_items = [
+        item
+        for item in diary_items
+        if item.action_type == "harvest" and item.date and item.date.year == today.year
+    ]
+    oldest_item_date = min((item.date for item in diary_items if item.date), default=None)
+    plants_with_actions = set()
+    for item in diary_items:
+        plants_with_actions.update(plant.pk for plant in item.plants.all())
+    plants_without_actions = [plant for plant in active_plants if plant.pk not in plants_with_actions]
+
+    return {
+        "active_plants_count": len(active_plants),
+        "entries_count": len(diary_items),
+        "weekly_actions_count": len(weekly_actions),
+        "weekly_watering_count": len(weekly_watering),
+        "last_watering": watering_items[0] if watering_items else None,
+        "harvest_summary": _build_harvest_summary(current_year_harvest_items),
+        "plants_without_actions": plants_without_actions,
+        "plants_without_actions_count": len(plants_without_actions),
+        "oldest_item_date": oldest_item_date,
+        "history_days_count": (today - oldest_item_date).days + 1 if oldest_item_date else 0,
+        "week_start": week_start,
+        "today": today,
+        "diary": diary,
+    }
+
+
+def _attach_latest_items_to_plants(plants, diary_items):
+    for plant in plants:
+        plant.latest_diary_item = None
+
+    plants_by_id = {plant.pk: plant for plant in plants}
+    for item in diary_items:
+        for plant in item.plants.all():
+            if plant.pk in plants_by_id and plants_by_id[plant.pk].latest_diary_item is None:
+                plants_by_id[plant.pk].latest_diary_item = item
+
+
+def _attach_diary_list_summaries(diaries):
+    for diary in diaries:
+        diary_items = list(getattr(diary, "latest_diary_items", []))
+        diary.last_diary_item = diary_items[0] if diary_items else None
+        diary.diary_items_count = len(diary_items)
+
+
+def _attach_diary_attention_flags(diaries, today=None):
+    today = today or timezone.localdate()
+    attention_cutoff = today - timedelta(days=3)
+
+    for diary in diaries:
+        diary.needs_attention = False
+        if diary.is_archived:
+            continue
+
+        active_plants = list(getattr(diary, "active_diary_plants", []))
+        if not active_plants:
+            continue
+
+        watering_items = sorted(
+            [
+                item
+                for item in getattr(diary, "latest_diary_items", [])
+                if item.action_type == "watering"
+            ],
+            key=lambda item: (item.date, item.created),
+            reverse=True,
+        )
+        plant_last_watering = {}
+        for item in watering_items:
+            for plant in item.plants.all():
+                if plant.pk not in plant_last_watering:
+                    plant_last_watering[plant.pk] = item
+
+        diary.needs_attention = any(
+            plant_last_watering.get(plant.pk) is None
+            or plant_last_watering[plant.pk].date <= attention_cutoff
+            for plant in active_plants
+        )
+
+
+def _append_query_param(url, param):
+    separator = "&" if "?" in url else "?"
+    return f"{url}{separator}{param}"
+
+
+def _get_safe_redirect_url(request, fallback_url):
+    next_url = request.POST.get("next", "").strip()
+    if next_url and url_has_allowed_host_and_scheme(
+        next_url,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return next_url
+    return fallback_url
+
+
 def _build_recommendation_target(item, *, selected_plant_id=None):
     target_plants = list(item.plants.all())
     selected_plant = None
@@ -39,6 +262,7 @@ def _build_recommendation_target(item, *, selected_plant_id=None):
             "label": selected_plant.display_name,
             "plant_name": selected_plant.display_name,
             "plant_date": selected_plant.plant_date,
+            "plants": [selected_plant],
         }
 
     if item.apply_to_all:
@@ -46,6 +270,7 @@ def _build_recommendation_target(item, *, selected_plant_id=None):
             "label": "усіх активних рослин",
             "plant_name": "усіх активних рослин",
             "plant_date": None,
+            "plants": target_plants,
         }
 
     if len(target_plants) == 1:
@@ -54,6 +279,7 @@ def _build_recommendation_target(item, *, selected_plant_id=None):
             "label": plant.display_name,
             "plant_name": plant.display_name,
             "plant_date": plant.plant_date,
+            "plants": [plant],
         }
 
     if len(target_plants) <= 2:
@@ -62,12 +288,14 @@ def _build_recommendation_target(item, *, selected_plant_id=None):
             "label": label,
             "plant_name": label,
             "plant_date": None,
+            "plants": target_plants,
         }
 
     return {
         "label": f"{len(target_plants)} рослин",
         "plant_name": ", ".join(plant.display_name for plant in target_plants[:3]),
         "plant_date": None,
+        "plants": target_plants,
     }
 
 
@@ -235,11 +463,60 @@ class ProfileDiaryListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         diaries = list(context["object_list"])
+        _attach_diary_list_summaries(diaries)
+        _attach_diary_attention_flags(diaries)
         for diary in diaries:
             if not diary.is_archived:
                 diary.diary_item_form = DiaryItemForm(diary=diary, prefix=f"diary-{diary.pk}")
         context["active_diaries"] = [diary for diary in diaries if not diary.is_archived]
         context["archived_diaries"] = [diary for diary in diaries if diary.is_archived]
+        context["attention_diaries"] = [
+            diary for diary in context["active_diaries"] if diary.needs_attention
+        ]
+        context["diary_dashboard"] = _build_profile_diary_dashboard(diaries)
+        return context
+
+
+class ProfilePlantListView(ListView):
+    template_name = "diary/profile/plant_list.html"
+    context_object_name = "plants"
+
+    def get_queryset(self):
+        return (
+            Plant.objects.filter(user=self.request.user)
+            .select_related("category")
+            .prefetch_related(
+                Prefetch(
+                    "diaries",
+                    queryset=Diary.objects.filter(user=self.request.user).order_by("-updated"),
+                    to_attr="profile_diaries",
+                ),
+                Prefetch(
+                    "diary_items",
+                    queryset=DiaryItem.objects.select_related("diary").order_by("-date", "-created"),
+                    to_attr="profile_diary_items",
+                ),
+            )
+            .order_by("status", "-plant_date", "id")
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        plants = list(context["plants"])
+        today = timezone.localdate()
+        for plant in plants:
+            plant.latest_diary_item = (
+                plant.profile_diary_items[0]
+                if plant.profile_diary_items
+                else None
+            )
+            plant.diary_items_count = len(plant.profile_diary_items)
+            lifecycle_end = plant.completed_at or today
+            plant.age_days = max((lifecycle_end - plant.plant_date).days, 0)
+
+        context["plants"] = plants
+        context["active_plants"] = [plant for plant in plants if plant.status == "active"]
+        context["completed_plants"] = [plant for plant in plants if plant.status == "completed"]
         return context
 
 
@@ -312,6 +589,9 @@ class ProfileDiaryDetailView(DetailView):
         latest_item = diary_items[0] if diary_items else None
         active_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "active"]
         completed_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "completed"]
+        all_diary_items = list(self.object.diary_items.all())
+        _attach_latest_items_to_plants(active_diary_plants, all_diary_items)
+        _attach_latest_items_to_plants(completed_diary_plants, all_diary_items)
         for plant in active_diary_plants:
             plant.move_form = PlantMoveForm(
                 user=self.request.user,
@@ -329,6 +609,11 @@ class ProfileDiaryDetailView(DetailView):
         context["diary_filter_plants"] = diary_filter_plants
         context["active_diary_plants"] = active_diary_plants
         context["completed_diary_plants"] = completed_diary_plants
+        context["diary_detail_dashboard"] = _build_diary_detail_dashboard(
+            self.object,
+            all_diary_items,
+            active_diary_plants,
+        )
         context["has_active_plants"] = bool(active_diary_plants)
         context["selected_plant_id"] = selected_plant_id
         selected_action_type = self.request.GET.get("action", "").strip()
@@ -354,11 +639,13 @@ class ProfileDiaryDetailView(DetailView):
                     {
                         "action_type": item.action_type,
                         "date": item.date.isoformat(),
+                        "note": item.description,
                         "has_photo": bool(item.image),
                     }
-                    for item in diary_items[:5]
+                    for item in diary_items[:20]
                 ],
                 has_photo=bool(latest_item.image),
+                plants=recommendation_target["plants"],
                 use_ai=False,
             )
             context["recommendation"] = self.recommendation_service.build_cached_recommendation(
@@ -449,11 +736,13 @@ class AddDiaryItemView(FormView):
                 {
                     "action_type": item.action_type,
                     "date": item.date.isoformat(),
+                    "note": item.description,
                     "has_photo": bool(item.image),
                 }
-                for item in diary_items[:5]
+                for item in diary_items[:20]
             ],
             has_photo=bool(form.instance.image),
+            plants=recommendation_target["plants"],
             use_ai=True,
         )
         self.recommendation_service.cache_recommendation(
@@ -463,7 +752,8 @@ class AddDiaryItemView(FormView):
             recommendation=recommendation,
         )
         diary.save(update_fields=["updated"])
-        return HttpResponseRedirect(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.kwargs["diary_id"]}))
+        fallback_url = reverse("pro_auth:profile-diary-detail", kwargs={"pk": diary.pk})
+        return HttpResponseRedirect(_get_safe_redirect_url(self.request, fallback_url))
 
 
 class PlantingView(FormView):
@@ -542,10 +832,10 @@ class QuickWateringView(View):
     def post(self, request, pk):
         diary = get_object_or_404(Diary, pk=pk, user=request.user, is_archived=False)
         active_plants = diary.plants.filter(status="active")
-        redirect_url = reverse("pro_auth:profile-diary-list")
+        redirect_url = _get_safe_redirect_url(request, reverse("pro_auth:profile-diary-list"))
 
         if not active_plants.exists():
-            return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_empty")
+            return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_empty"))
 
         apply_to_all = request.POST.get("apply_to_all") == "1"
         selected_plant_ids = request.POST.getlist("plants")
@@ -555,7 +845,7 @@ class QuickWateringView(View):
         else:
             target_plants = active_plants.filter(pk__in=selected_plant_ids)
             if not target_plants.exists():
-                return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_missing_plants")
+                return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_missing_plants"))
 
         diary_item = DiaryItem.objects.create(
             diary=diary,
@@ -567,7 +857,7 @@ class QuickWateringView(View):
         diary_item.plants.set(target_plants)
         diary.updated = timezone.now()
         diary.save(update_fields=["updated"])
-        return HttpResponseRedirect(f"{redirect_url}?quick_action=watering_added")
+        return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_added"))
 
 
 class PlantMoveView(FormView):
