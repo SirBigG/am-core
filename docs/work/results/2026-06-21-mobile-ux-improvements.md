@@ -25,6 +25,7 @@
 - Improved diary workspace mobile action targets so diary, entry, and plant overflow controls are visible and 48px on mobile.
 - Reworked `/search/` into the shared public form panel with a mobile-stacked search input and visible submit label.
 - Tightened the home hero on mobile and added clear first-viewport actions for creating content, browsing categories, and opening the plant diary.
+- Added a real personal dashboard at `/profile/` with mobile-friendly entry cards for adverts, diaries, plants, profile settings, creation, and forum handoff.
 
 ## Verification
 
@@ -57,9 +58,10 @@
   - Diary list and diary detail action target sizes at `390px` width.
   - `/search/?q=...` search panel at `390px` width.
   - Home hero height, search controls, and action buttons at `390px` width.
+  - `/profile/` dashboard cards and forum handoff at `390px` width.
 
 ## Remaining Follow-Ups
 
 - Decide final mobile navigation content and priority for the bottom nav/account menu.
 - Decide whether public advert/event create pages should stay available with sign-in prompts or move to a stronger login gate.
-- Align forum navigation and identity handoff with the main signed-in experience; this likely needs coordinated work with the sibling `forum_instance` project.
+- Align forum page navigation and signed-in display inside the sibling `forum_instance` project.

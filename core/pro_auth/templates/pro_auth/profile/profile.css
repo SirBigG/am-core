@@ -90,6 +90,99 @@
     line-height: 1.55;
 }
 
+.profile-dashboard-panel {
+    padding: 32px;
+}
+
+.profile-dashboard-hero {
+    max-width: 680px;
+    margin-bottom: 1.5rem;
+}
+
+.profile-dashboard-eyebrow {
+    margin: 0 0 0.45rem;
+    color: #148543;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    text-transform: uppercase;
+}
+
+.profile-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.profile-dashboard-card {
+    display: grid;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 0.25rem 0.85rem;
+    min-height: 150px;
+    padding: 1rem;
+    border: 1px solid #dbe7dd;
+    border-radius: 20px;
+    background: #ffffff;
+    color: #1f2937;
+    text-decoration: none;
+    box-shadow: 0 8px 20px rgba(148, 163, 184, 0.14);
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
+}
+
+.profile-dashboard-card:hover,
+.profile-dashboard-card:focus {
+    color: #1f2937;
+    border-color: #9dcea7;
+    text-decoration: none;
+    box-shadow: 0 16px 34px rgba(43, 116, 57, 0.14);
+    transform: translateY(-2px);
+}
+
+.profile-dashboard-card--primary {
+    border-color: #9dcea7;
+    background: #f3fbf3;
+}
+
+.profile-dashboard-card--forum {
+    border-color: #c7d7ee;
+    background: #f8fbff;
+}
+
+.profile-dashboard-card__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    grid-row: 1 / span 2;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    color: #148543;
+    background: #eef8ef;
+    font-size: 1.35rem;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.profile-dashboard-card--forum .profile-dashboard-card__icon {
+    color: #1d4f91;
+    background: #e8f1ff;
+}
+
+.profile-dashboard-card__title {
+    align-self: end;
+    color: #1f2937;
+    font-size: 1.02rem;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+.profile-dashboard-card__text {
+    color: #6b7280;
+    font-size: 0.92rem;
+    line-height: 1.45;
+}
+
 .am-choice-card {
     position: relative;
     border-radius: 16px;
@@ -1202,6 +1295,19 @@ span.flatpickr-weekday {
 
     .profile-page-title {
         font-size: 1.7rem;
+    }
+
+    .profile-dashboard-panel {
+        padding: 24px 18px;
+        border-radius: 22px;
+    }
+
+    .profile-dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-dashboard-card {
+        min-height: auto;
     }
 
     .profile-adverts-header {
