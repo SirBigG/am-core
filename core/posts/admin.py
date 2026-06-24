@@ -8,7 +8,32 @@ from mptt.forms import TreeNodeChoiceField
 
 from core.classifier.models import Category
 
+from .apple_attributes import (
+    APPLE_VARIETY_ATTRIBUTE_FIELDS,
+    APPLE_VARIETY_ATTRIBUTE_GROUPS,
+    APPLE_VARIETY_PARENT_SLUG,
+    APPLE_VARIETY_RUBRIC_SLUG,
+    apple_attribute_form_field_name,
+)
 from .models import Photo, Post, SearchStatistic, UsefulStatistic
+
+
+def get_apple_variety_rubric_ids():
+    return list(
+        Category.objects.filter(
+            slug=APPLE_VARIETY_RUBRIC_SLUG,
+            parent__slug=APPLE_VARIETY_PARENT_SLUG,
+        ).values_list("pk", flat=True)
+    )
+
+
+def is_apple_variety_rubric(category):
+    return bool(
+        category
+        and category.slug == APPLE_VARIETY_RUBRIC_SLUG
+        and category.parent_id
+        and category.parent.slug == APPLE_VARIETY_PARENT_SLUG
+    )
 
 
 class PhotoInLine(admin.TabularInline):
@@ -20,10 +45,43 @@ class AdminPostForm(forms.ModelForm):
     sources = SimpleArrayField(
         forms.URLField(), required=False, widget=forms.Textarea, help_text="Enter sources separated by commas"
     )
+    for field_config in APPLE_VARIETY_ATTRIBUTE_FIELDS:
+        field_name = apple_attribute_form_field_name(field_config["key"])
+        if field_config["multiple"]:
+            locals()[field_name] = forms.MultipleChoiceField(
+                label=field_config["label"],
+                choices=field_config["choices"],
+                required=False,
+                widget=forms.SelectMultiple,
+            )
+        else:
+            locals()[field_name] = forms.ChoiceField(
+                label=field_config["label"],
+                choices=(("", "---------"), *field_config["choices"]),
+                required=False,
+            )
+    del field_config, field_name
 
     class Meta:
         model = Post
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        values = self.instance.apple_attributes or {}
+        for field_config in APPLE_VARIETY_ATTRIBUTE_FIELDS:
+            field_name = apple_attribute_form_field_name(field_config["key"])
+            initial = values.get(field_config["key"])
+            self.fields[field_name].initial = initial or ([] if field_config["multiple"] else "")
+
+    def get_apple_attributes(self):
+        attributes = {}
+        for field_config in APPLE_VARIETY_ATTRIBUTE_FIELDS:
+            field_name = apple_attribute_form_field_name(field_config["key"])
+            value = self.cleaned_data.get(field_name)
+            if value:
+                attributes[field_config["key"]] = value
+        return attributes
 
 
 class CategoryFilter(admin.SimpleListFilter):
@@ -111,6 +169,16 @@ class PostAdmin(admin.ModelAdmin):
     fieldsets = (
         ("Main data", {"fields": ("title", "text", "rubric", "country", "sources")}),
         (None, {"fields": ("tags",)}),
+        *(
+            (
+                group["title"],
+                {
+                    "classes": ("apple-variety-attributes",),
+                    "fields": tuple(apple_attribute_form_field_name(field["key"]) for field in group["fields"]),
+                },
+            )
+            for group in APPLE_VARIETY_ATTRIBUTE_GROUPS
+        ),
         ("Metadata", {"fields": ("meta", "meta_description")}),
         (
             "Advanced options",
@@ -134,17 +202,31 @@ class PostAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         form.base_fields["publisher"].initial = request.user
+        form.base_fields["rubric"].widget.attrs["data-apple-rubric-ids"] = ",".join(
+            str(pk) for pk in get_apple_variety_rubric_ids()
+        )
         # print(form.base_fields)
         # form.base_fields['tags'].widget = autocomplete.TaggitSelect2('/taggit-autocomplete/')
         form.base_fields["tags"].widget = TestTaggit("/taggit-autocomplete/")
         form.base_fields["tags"].required = False
         return form
 
+    def save_model(self, request, obj, form, change):
+        if is_apple_variety_rubric(obj.rubric):
+            obj.apple_attributes = form.get_apple_attributes()
+        else:
+            obj.apple_attributes = {}
+        super().save_model(request, obj, form, change)
+
     def tag_list(self, obj):
         return ", ".join(o.name for o in obj.tags.all())
 
     def has_photo(self, obj):
         return obj.photo.count() > 0
+
+    class Media:
+        css = {"all": ("posts/admin/apple-variety-attributes.css",)}
+        js = ("posts/admin/apple-variety-attributes.js",)
 
 
 class UsefulStatisticAdmin(admin.ModelAdmin):

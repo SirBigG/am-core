@@ -91,6 +91,7 @@ class Post(models.Model):
     absolute_url = models.CharField(max_length=512, default="")
 
     tags = TaggableManager()
+    apple_attributes = models.JSONField(blank=True, default=dict, verbose_name=_("apple variety attributes"))
 
     comments = GenericRelation(Comment)
 
