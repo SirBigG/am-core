@@ -1,5 +1,6 @@
 from datetime import timedelta
 from datetime import timezone as dt_timezone
+from decimal import Decimal
 
 from django.test import TestCase
 from django.urls import reverse
@@ -14,7 +15,17 @@ from core.diary.forms import (
     PlantAttachmentFormSet,
     save_diary_plants,
 )
-from core.diary.models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, Plant
+from core.diary.models import (
+    DIARY_ITEM_ACTION_CHOICES,
+    Diary,
+    DiaryItem,
+    Planner,
+    PlannerArea,
+    PlannerPlanting,
+    PlannerTask,
+    Plant,
+)
+from core.diary.planner import extract_planner_spacing_guidance
 from core.diary.recommendations import (
     PlantRecommendationService,
     buildPlantKnowledgeContext,
@@ -482,6 +493,694 @@ class DiaryOrderingTests(TestCase):
 
         self.assertEqual(response.status_code, 404)
         self.assertFalse(DiaryItem.objects.filter(diary=diary, action_type="watering").exists())
+
+
+class ProfilePlannerTests(TestCase):
+    def setUp(self):
+        self.user = UserFactory()
+        self.other_user = UserFactory()
+        self.client.force_login(self.user)
+
+    def test_planner_page_asks_user_for_dimensions_before_creating_workspace(self):
+        response = self.client.get(reverse("pro_auth:profile-planner"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(Planner.objects.filter(user=self.user).exists())
+        self.assertContains(response, "Мій планер")
+        self.assertContains(response, "Створіть свою ділянку")
+        self.assertContains(response, "Ширина, м")
+        self.assertContains(response, "Довжина, м")
+        self.assertContains(response, reverse("pro_auth:profile-planner"))
+
+    def test_create_planner_uses_user_dimensions(self):
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-create"),
+            {
+                "title": "Город біля дому",
+                "width_m": "17.5",
+                "height_m": "9.5",
+                "grid_step_m": "0.25",
+            },
+        )
+
+        planner = Planner.objects.get(user=self.user)
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(planner.title, "Город біля дому")
+        self.assertEqual(planner.width_m, Decimal("17.50"))
+        self.assertEqual(planner.height_m, Decimal("9.50"))
+        self.assertEqual(planner.grid_step_m, Decimal("0.25"))
+
+        page_response = self.client.get(reverse("pro_auth:profile-planner"))
+        self.assertContains(page_response, 'data-width="17.50"')
+        self.assertContains(page_response, 'data-height="9.50"')
+        self.assertContains(page_response, 'data-grid-step="0.25"')
+
+    def test_planner_pages_use_profile_sidebar_layout(self):
+        planner = Planner.objects.create(user=self.user, title="Профільний план")
+
+        planner_page = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        create_page = self.client.get(reverse("pro_auth:profile-planner-create"))
+
+        self.assertContains(planner_page, "planner-profile-shell")
+        self.assertContains(planner_page, "profile-sidebar-nav")
+        self.assertContains(planner_page, "profile-sidebar-col")
+        self.assertContains(planner_page, "Мій планер")
+
+        self.assertContains(create_page, "profile-sidebar-nav")
+        self.assertContains(create_page, "profile-sidebar-col")
+        self.assertContains(create_page, "profile-content-col")
+        self.assertContains(create_page, "Мій планер")
+
+    def test_user_can_create_and_switch_between_multiple_plans(self):
+        first = Planner.objects.create(user=self.user, title="Сезон 2026")
+
+        create_page = self.client.get(reverse("pro_auth:profile-planner-create"))
+        self.assertContains(create_page, "Створіть новий план")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-create"),
+            {
+                "title": "Сезон 2027",
+                "width_m": "30",
+                "height_m": "18",
+                "grid_step_m": "0.5",
+            },
+        )
+        second = Planner.objects.get(user=self.user, title="Сезон 2027")
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={second.pk}',
+            fetch_redirect_response=False,
+        )
+
+        selected_page = self.client.get(
+            reverse("pro_auth:profile-planner"),
+            {"planner": first.pk},
+        )
+        self.assertEqual(selected_page.context["planner"], first)
+        self.assertContains(selected_page, "Сезон 2026")
+        self.assertContains(selected_page, "Сезон 2027")
+
+    def test_delete_planner_only_allows_owned_empty_plan(self):
+        empty_planner = Planner.objects.create(user=self.user, title="Порожній")
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-delete", kwargs={"pk": empty_planner.pk})
+        )
+        self.assertRedirects(response, reverse("pro_auth:profile-planner"), fetch_redirect_response=False)
+        self.assertFalse(Planner.objects.filter(pk=empty_planner.pk).exists())
+
+        used_planner = Planner.objects.create(user=self.user, title="З грядкою")
+        PlannerArea.objects.create(planner=used_planner, title="Грядка")
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-delete", kwargs={"pk": used_planner.pk})
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(Planner.objects.filter(pk=used_planner.pk).exists())
+
+        task_planner = Planner.objects.create(user=self.user, title="Зі справою")
+        PlannerTask.objects.create(planner=task_planner, title="Підготувати грядку")
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-delete", kwargs={"pk": task_planner.pk})
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertTrue(Planner.objects.filter(pk=task_planner.pk).exists())
+
+        foreign_planner = Planner.objects.create(user=self.other_user, title="Чужий")
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-delete", kwargs={"pk": foreign_planner.pk})
+        )
+        self.assertEqual(response.status_code, 404)
+
+    def test_duplicate_planner_copies_layout_without_diaries_or_plantings(self):
+        source = Planner.objects.create(
+            user=self.user,
+            title="Сезон 2026",
+            width_m="28",
+            height_m="16",
+            grid_step_m="0.25",
+        )
+        diary = Diary.objects.create(user=self.user, title="Теплиця", description="desc")
+        area = PlannerArea.objects.create(
+            planner=source,
+            diary=diary,
+            title="Південна теплиця",
+            area_type="greenhouse",
+            color="#4fae91",
+            x_m="3",
+            y_m="4",
+            width_m="8",
+            height_m="5",
+        )
+        plant = Plant.objects.create(user=self.user, title="Огірки")
+        PlannerPlanting.objects.create(area=area, plant=plant, mode="rows", rows=3)
+        PlannerTask.objects.create(planner=source, area=area, title="Полити")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-duplicate", kwargs={"pk": source.pk}),
+            {"title": "Сезон 2027"},
+        )
+
+        source.refresh_from_db()
+        area.refresh_from_db()
+        duplicate = Planner.objects.get(user=self.user, title="Сезон 2027")
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={duplicate.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(duplicate.width_m, source.width_m)
+        self.assertEqual(duplicate.height_m, source.height_m)
+        self.assertEqual(duplicate.grid_step_m, source.grid_step_m)
+        copied_area = duplicate.areas.get()
+        self.assertEqual(copied_area.title, area.title)
+        self.assertEqual(copied_area.area_type, area.area_type)
+        self.assertEqual(copied_area.x_m, area.x_m)
+        self.assertIsNone(copied_area.diary_id)
+        self.assertFalse(copied_area.plantings.exists())
+        self.assertFalse(duplicate.tasks.exists())
+        self.assertTrue(PlannerPlanting.objects.filter(area=area, plant=plant).exists())
+
+    def test_duplicate_planner_rejects_other_users_plan(self):
+        foreign_planner = Planner.objects.create(user=self.other_user, title="Чужий")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-duplicate", kwargs={"pk": foreign_planner.pk}),
+            {"title": "Копія"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(Planner.objects.filter(user=self.user, title="Копія").exists())
+
+    def test_planner_progress_reflects_real_layout_and_season_state(self):
+        planner = Planner.objects.create(user=self.user, title="Сезон")
+
+        response = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        self.assertEqual(response.context["planner_progress_percent"], 25)
+
+        area = PlannerArea.objects.create(planner=planner, title="Грядка")
+        plant = Plant.objects.create(user=self.user, title="Морква")
+        planting = PlannerPlanting.objects.create(
+            area=area,
+            plant=plant,
+            mode="rows",
+            rows=4,
+            status="planned",
+        )
+        response = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        self.assertEqual(response.context["planner_progress_percent"], 75)
+        self.assertFalse(response.context["planner_progress_steps"][-1]["completed"])
+
+        planting.status = "growing"
+        planting.save(update_fields=["status"])
+        response = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        self.assertEqual(response.context["planner_progress_percent"], 100)
+        self.assertTrue(response.context["planner_progress_steps"][-1]["completed"])
+
+    def test_planner_tasks_can_be_created_completed_and_deleted(self):
+        planner = Planner.objects.create(user=self.user, title="Сезон")
+        area = PlannerArea.objects.create(planner=planner, title="Теплиця")
+        due_date = timezone.localdate() + timedelta(days=2)
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-task-add", kwargs={"planner_pk": planner.pk}),
+            {"title": "Підв’язати огірки", "due_date": due_date.isoformat(), "area_id": area.pk},
+        )
+        task = PlannerTask.objects.get(planner=planner)
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(task.title, "Підв’язати огірки")
+        self.assertEqual(task.area, area)
+        self.assertEqual(task.due_date, due_date)
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-task-update", kwargs={"pk": task.pk}),
+            {"title": "Підв’язати й оглянути", "due_date": "", "area_id": ""},
+        )
+        task.refresh_from_db()
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertEqual(task.title, "Підв’язати й оглянути")
+        self.assertIsNone(task.area_id)
+        self.assertIsNone(task.due_date)
+
+        response = self.client.post(reverse("pro_auth:profile-planner-task-toggle", kwargs={"pk": task.pk}))
+        task.refresh_from_db()
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertTrue(task.is_completed)
+        self.assertIsNotNone(task.completed_at)
+
+        self.client.post(reverse("pro_auth:profile-planner-task-toggle", kwargs={"pk": task.pk}))
+        task.refresh_from_db()
+        self.assertFalse(task.is_completed)
+        self.assertIsNone(task.completed_at)
+
+        response = self.client.post(reverse("pro_auth:profile-planner-task-delete", kwargs={"pk": task.pk}))
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        self.assertFalse(PlannerTask.objects.filter(pk=task.pk).exists())
+
+    def test_planner_tasks_are_scoped_and_overdue_count_is_exposed(self):
+        planner = Planner.objects.create(user=self.user, title="Сезон")
+        foreign_planner = Planner.objects.create(user=self.other_user, title="Чужий сезон")
+        foreign_area = PlannerArea.objects.create(planner=foreign_planner, title="Чужа грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-task-add", kwargs={"planner_pk": planner.pk}),
+            {"title": "Неправильна зона", "area_id": foreign_area.pk},
+        )
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(PlannerTask.objects.filter(planner=planner).exists())
+
+        task = PlannerTask.objects.create(
+            planner=planner,
+            title="Прострочена справа",
+            due_date=timezone.localdate() - timedelta(days=1),
+        )
+        update_response = self.client.post(
+            reverse("pro_auth:profile-planner-task-update", kwargs={"pk": task.pk}),
+            {"title": "Спроба переносу", "area_id": foreign_area.pk},
+        )
+        self.assertEqual(update_response.status_code, 404)
+        task.refresh_from_db()
+        self.assertEqual(task.title, "Прострочена справа")
+        self.assertIsNone(task.area_id)
+
+        page = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        self.assertEqual(page.context["planner_open_tasks_count"], 1)
+        self.assertEqual(page.context["planner_overdue_tasks_count"], 1)
+        self.assertTrue(page.context["planner_tasks"][0].is_overdue)
+        self.assertEqual(page.context["planner_tasks"][0].bucket, "overdue")
+        self.assertEqual(page.context["planner_task_groups"][0]["label"], "Прострочено")
+        self.assertEqual(page.context["planner_task_groups"][0]["tasks"], [task])
+
+        toggle_response = self.client.post(
+            reverse("pro_auth:profile-planner-task-toggle", kwargs={"pk": task.pk})
+        )
+        self.assertEqual(toggle_response.status_code, 302)
+
+        foreign_task = PlannerTask.objects.create(planner=foreign_planner, title="Чужа справа")
+        self.assertEqual(
+            self.client.post(reverse("pro_auth:profile-planner-task-toggle", kwargs={"pk": foreign_task.pk})).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.post(reverse("pro_auth:profile-planner-task-delete", kwargs={"pk": foreign_task.pk})).status_code,
+            404,
+        )
+        self.assertEqual(
+            self.client.post(
+                reverse("pro_auth:profile-planner-task-update", kwargs={"pk": foreign_task.pk}),
+                {"title": "Змінити"},
+            ).status_code,
+            404,
+        )
+
+    def test_planner_tasks_are_grouped_by_season_timing(self):
+        planner = Planner.objects.create(user=self.user, title="План справ")
+        today = timezone.localdate()
+        PlannerTask.objects.create(planner=planner, title="Прострочена", due_date=today - timedelta(days=1))
+        PlannerTask.objects.create(planner=planner, title="Сьогодні", due_date=today)
+        PlannerTask.objects.create(planner=planner, title="Найближча", due_date=today + timedelta(days=2))
+        PlannerTask.objects.create(planner=planner, title="Без дати")
+        PlannerTask.objects.create(planner=planner, title="Готова", is_completed=True, due_date=today - timedelta(days=3))
+
+        page = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        group_labels = [group["label"] for group in page.context["planner_task_groups"]]
+        grouped_titles = [
+            [task.title for task in group["tasks"]]
+            for group in page.context["planner_task_groups"]
+        ]
+
+        self.assertEqual(group_labels, ["Прострочено", "Сьогодні", "Найближчі", "Без дати", "Виконані"])
+        self.assertEqual(grouped_titles, [["Прострочена"], ["Сьогодні"], ["Найближча"], ["Без дати"], ["Готова"]])
+
+    def test_planner_area_payload_includes_area_task_summary(self):
+        planner = Planner.objects.create(user=self.user, title="План справ")
+        area = PlannerArea.objects.create(planner=planner, title="Теплиця")
+        today = timezone.localdate()
+        PlannerTask.objects.create(planner=planner, area=area, title="Прострочена", due_date=today - timedelta(days=1))
+        PlannerTask.objects.create(planner=planner, area=area, title="Найближча", due_date=today + timedelta(days=2))
+        PlannerTask.objects.create(planner=planner, area=area, title="Готова", is_completed=True)
+        PlannerTask.objects.create(planner=planner, title="Для всієї ділянки")
+
+        page = self.client.get(reverse("pro_auth:profile-planner"), {"planner": planner.pk})
+        area_payload = page.context["planner_areas_payload"][0]
+
+        self.assertEqual(area_payload["tasks"]["openCount"], 2)
+        self.assertEqual(area_payload["tasks"]["overdueCount"], 1)
+        self.assertEqual(area_payload["tasks"]["nextTitle"], "Прострочена")
+        self.assertEqual(area_payload["tasks"]["nextBucket"], "overdue")
+
+    def test_planner_area_update_payload_keeps_area_task_summary(self):
+        planner = Planner.objects.create(user=self.user, title="План справ")
+        area = PlannerArea.objects.create(planner=planner, title="Теплиця")
+        today = timezone.localdate()
+        PlannerTask.objects.create(
+            planner=planner,
+            area=area,
+            title="Прострочена",
+            due_date=today - timedelta(days=1),
+        )
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-area-update", kwargs={"pk": area.pk}),
+            {
+                "x_m": "1",
+                "y_m": "2",
+                "width_m": "4",
+                "height_m": "2",
+            },
+        )
+        payload = response.json()["area"]
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(payload["tasks"]["openCount"], 1)
+        self.assertEqual(payload["tasks"]["overdueCount"], 1)
+        self.assertEqual(payload["tasks"]["nextTitle"], "Прострочена")
+        self.assertEqual(payload["tasks"]["nextBucket"], "overdue")
+
+    def test_settings_update_user_dimensions_and_keep_areas_inside_canvas(self):
+        planner = Planner.objects.create(user=self.user, width_m="20", height_m="12")
+        area = PlannerArea.objects.create(
+            planner=planner,
+            title="Крайня грядка",
+            x_m="15",
+            y_m="8",
+            width_m="4",
+            height_m="3",
+        )
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-settings", kwargs={"pk": planner.pk}),
+            {
+                "title": "Менший город",
+                "width_m": "10",
+                "height_m": "7",
+                "grid_step_m": "0.5",
+            },
+        )
+
+        self.assertRedirects(
+            response,
+            f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}',
+            fetch_redirect_response=False,
+        )
+        planner.refresh_from_db()
+        area.refresh_from_db()
+        self.assertEqual(planner.width_m, Decimal("10.00"))
+        self.assertEqual(planner.height_m, Decimal("7.00"))
+        self.assertEqual(area.x_m, Decimal("6.00"))
+        self.assertEqual(area.y_m, Decimal("4.00"))
+
+    def test_planner_page_only_exposes_current_user_areas(self):
+        planner = Planner.objects.create(user=self.user, title="Моя ділянка")
+        own_area = PlannerArea.objects.create(planner=planner, title="Моя грядка")
+        other_planner = Planner.objects.create(user=self.other_user, title="Чужа ділянка")
+        PlannerArea.objects.create(planner=other_planner, title="Чужа грядка")
+
+        response = self.client.get(reverse("pro_auth:profile-planner"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["planner_areas"], [own_area])
+        self.assertEqual(
+            [area["title"] for area in response.context["planner_areas_payload"]],
+            ["Моя грядка"],
+        )
+
+    def test_create_area_can_link_existing_diary(self):
+        planner = Planner.objects.create(user=self.user, title="Моя ділянка", width_m="12", height_m="8")
+        diary = Diary.objects.create(user=self.user, title="Теплиця", description="desc")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-area-add", kwargs={"planner_pk": planner.pk}),
+            {
+                "title": "Теплиця біля дому",
+                "area_type": "greenhouse",
+                "width_m": "6",
+                "height_m": "3",
+                "diary_id": diary.pk,
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        area = PlannerArea.objects.get(planner=planner)
+        self.assertEqual(area.diary, diary)
+        self.assertEqual(area.area_type, "greenhouse")
+        self.assertEqual(response.json()["area"]["diaryTitle"], diary.title)
+
+    def test_update_area_clamps_geometry_to_planner_bounds(self):
+        planner = Planner.objects.create(user=self.user, width_m="10", height_m="6")
+        area = PlannerArea.objects.create(planner=planner, title="Грядка", width_m="4", height_m="2")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-area-update", kwargs={"pk": area.pk}),
+            {"x_m": "9", "y_m": "5", "width_m": "5", "height_m": "3"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        area.refresh_from_db()
+        self.assertEqual(area.x_m, 5)
+        self.assertEqual(area.y_m, 3)
+        self.assertEqual(area.width_m, 5)
+        self.assertEqual(area.height_m, 3)
+
+    def test_area_endpoints_reject_other_users(self):
+        other_planner = Planner.objects.create(user=self.other_user)
+        other_area = PlannerArea.objects.create(planner=other_planner, title="Чужа грядка")
+
+        update_response = self.client.post(
+            reverse("pro_auth:profile-planner-area-update", kwargs={"pk": other_area.pk}),
+            {"x_m": "1"},
+        )
+        delete_response = self.client.post(
+            reverse("pro_auth:profile-planner-area-delete", kwargs={"pk": other_area.pk})
+        )
+
+        self.assertEqual(update_response.status_code, 404)
+        self.assertEqual(delete_response.status_code, 404)
+        self.assertTrue(PlannerArea.objects.filter(pk=other_area.pk).exists())
+
+    def test_delete_area_keeps_linked_diary(self):
+        planner = Planner.objects.create(user=self.user)
+        diary = Diary.objects.create(user=self.user, title="Грядка", description="desc")
+        area = PlannerArea.objects.create(planner=planner, diary=diary, title="Грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-area-delete", kwargs={"pk": area.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(PlannerArea.objects.filter(pk=area.pk).exists())
+        self.assertTrue(Diary.objects.filter(pk=diary.pk).exists())
+
+    def test_create_row_planting_uses_existing_plant_and_links_diary(self):
+        category = Category.objects.create(slug="cucumber", value="Огірок")
+        plant = Plant.objects.create(user=self.user, category=category, variety="Артист F1")
+        diary = Diary.objects.create(user=self.user, title="Теплиця", description="desc")
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, diary=diary, title="Права грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-add", kwargs={"area_pk": area.pk}),
+            {
+                "plant_id": plant.pk,
+                "mode": "rows",
+                "rows": "3",
+                "notes": "Посіяно вздовж стінки",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        planting = PlannerPlanting.objects.get(area=area, plant=plant)
+        self.assertEqual(planting.rows, 3)
+        self.assertEqual(planting.layout_summary, "3 ряди")
+        self.assertTrue(diary.plants.filter(pk=plant.pk).exists())
+        self.assertEqual(response.json()["planting"]["summary"], "3 ряди")
+
+    def test_create_broadcast_planting_does_not_require_quantity(self):
+        category = Category.objects.create(slug="arugula", value="Рукола")
+        plant = Plant.objects.create(user=self.user, category=category)
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, title="Зелена грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-add", kwargs={"area_pk": area.pk}),
+            {"plant_id": plant.pk, "mode": "broadcast"},
+        )
+
+        self.assertEqual(response.status_code, 201)
+        planting = PlannerPlanting.objects.get(area=area, plant=plant)
+        self.assertIsNone(planting.quantity)
+        self.assertEqual(planting.layout_summary, "суцільний посів")
+
+    def test_create_new_plant_from_planner_syncs_plant_diary_and_history(self):
+        species_parent = Category.objects.create(slug="roslinnitstvo", value="Рослинництво")
+        category = Category.objects.create(
+            slug="cucumber-planner",
+            value="Огірок",
+            parent=species_parent,
+        )
+        diary = Diary.objects.create(user=self.user, title="Теплиця", description="desc")
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, diary=diary, title="Ліва грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-add", kwargs={"area_pk": area.pk}),
+            {
+                "plant_source": "new",
+                "new_category_id": category.pk,
+                "new_variety": "Артист F1",
+                "new_title": "лівий ряд",
+                "new_plant_date": "2026-06-22",
+                "mode": "approximate",
+                "quantity": "12",
+            },
+        )
+
+        self.assertEqual(response.status_code, 201)
+        plant = Plant.objects.get(user=self.user, category=category)
+        self.assertEqual(plant.variety, "Артист F1")
+        self.assertEqual(plant.title, "лівий ряд")
+        self.assertTrue(diary.plants.filter(pk=plant.pk).exists())
+        self.assertTrue(PlannerPlanting.objects.filter(area=area, plant=plant).exists())
+        planted_item = DiaryItem.objects.get(diary=diary, action_type="planted")
+        self.assertEqual(list(planted_item.plants.all()), [plant])
+        self.assertTrue(response.json()["createdPlant"])
+
+    def test_new_planner_plant_requires_category_variety_or_title(self):
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, title="Грядка")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-add", kwargs={"area_pk": area.pk}),
+            {"plant_source": "new", "mode": "unknown"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(Plant.objects.filter(user=self.user).count(), 0)
+        self.assertEqual(PlannerPlanting.objects.filter(area=area).count(), 0)
+
+    def test_delete_planting_keeps_plant_and_diary_membership(self):
+        category = Category.objects.create(slug="dill", value="Кріп")
+        plant = Plant.objects.create(user=self.user, category=category)
+        diary = Diary.objects.create(user=self.user, title="Грядка", description="desc")
+        diary.plants.add(plant)
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, diary=diary, title="Грядка")
+        planting = PlannerPlanting.objects.create(area=area, plant=plant, mode="unknown")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-delete", kwargs={"pk": planting.pk})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(PlannerPlanting.objects.filter(pk=planting.pk).exists())
+        self.assertTrue(Plant.objects.filter(pk=plant.pk).exists())
+        self.assertTrue(diary.plants.filter(pk=plant.pk).exists())
+
+    def test_update_planting_clamps_geometry_inside_area(self):
+        category = Category.objects.create(slug="basil", value="Базилік")
+        plant = Plant.objects.create(user=self.user, category=category)
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, title="Грядка")
+        planting = PlannerPlanting.objects.create(area=area, plant=plant)
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-update", kwargs={"pk": planting.pk}),
+            {"x_pct": "90", "y_pct": "95", "width_pct": "30", "height_pct": "40"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        planting.refresh_from_db()
+        self.assertEqual(planting.x_pct, Decimal("70.00"))
+        self.assertEqual(planting.y_pct, Decimal("60.00"))
+        self.assertEqual(planting.width_pct, Decimal("30.00"))
+        self.assertEqual(planting.height_pct, Decimal("40.00"))
+
+    def test_ready_ai_profile_provides_confirmed_spacing_guidance(self):
+        category = Category.objects.create(slug="tomato-planner", value="Томат")
+        CategoryAIProfile.objects.create(
+            category=category,
+            title="Томат: база знань",
+            status=CategoryAIProfile.STATUS_READY,
+            is_ai_enabled=True,
+            content=(
+                "## Посадка\n"
+                "- Відстань між рослинами: 35–45 см.\n"
+                "- Між рядами залишайте 70 см.\n"
+                "- Поливати після висадки."
+            ),
+        )
+        plant = Plant.objects.create(user=self.user, category=category)
+
+        guidance = extract_planner_spacing_guidance(plant)
+
+        self.assertEqual(
+            guidance["items"],
+            ["Відстань між рослинами: 35–45 см.", "Між рядами залишайте 70 см."],
+        )
+        self.assertEqual(guidance["source"], "Томат: база знань")
+
+    def test_draft_ai_profile_is_not_used_for_spacing_guidance(self):
+        category = Category.objects.create(slug="pepper-planner", value="Перець")
+        CategoryAIProfile.objects.create(
+            category=category,
+            status=CategoryAIProfile.STATUS_DRAFT,
+            is_ai_enabled=True,
+            content="Відстань між рослинами: 40 см.",
+        )
+        plant = Plant.objects.create(user=self.user, category=category)
+
+        self.assertEqual(extract_planner_spacing_guidance(plant), {"items": [], "source": ""})
+
+    def test_completed_planting_updates_plant_and_diary_history(self):
+        category = Category.objects.create(slug="lettuce-planner", value="Салат")
+        plant = Plant.objects.create(user=self.user, category=category)
+        diary = Diary.objects.create(user=self.user, title="Грядка", description="desc")
+        diary.plants.add(plant)
+        planner = Planner.objects.create(user=self.user)
+        area = PlannerArea.objects.create(planner=planner, diary=diary, title="Грядка")
+        planting = PlannerPlanting.objects.create(area=area, plant=plant, status="growing")
+
+        response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-update", kwargs={"pk": planting.pk}),
+            {"status": "completed"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        planting.refresh_from_db()
+        plant.refresh_from_db()
+        self.assertEqual(planting.status, "completed")
+        self.assertEqual(plant.status, "completed")
+        self.assertEqual(plant.completed_at, timezone.localdate())
+        finished_item = DiaryItem.objects.get(diary=diary, action_type="finished")
+        self.assertEqual(list(finished_item.plants.all()), [plant])
+
+        restore_response = self.client.post(
+            reverse("pro_auth:profile-planner-planting-update", kwargs={"pk": planting.pk}),
+            {"status": "growing"},
+        )
+        self.assertEqual(restore_response.status_code, 200)
+        plant.refresh_from_db()
+        self.assertEqual(plant.status, "active")
+        self.assertIsNone(plant.completed_at)
 
 
 class ProfileDiaryDetailFilterTests(TestCase):

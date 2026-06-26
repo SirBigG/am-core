@@ -14,13 +14,103 @@ from core.diary.views import (
     PlantRestoreView,
     ProfileDiaryDetailView,
     ProfileDiaryListView,
+    ProfilePlannerView,
     ProfilePlantListView,
+    PlannerAreaCreateView,
+    PlannerAreaDeleteView,
+    PlannerAreaUpdateView,
+    PlannerCreateView,
+    PlannerDeleteView,
+    PlannerDuplicateView,
+    PlannerSettingsView,
+    PlannerTaskCreateView,
+    PlannerTaskDeleteView,
+    PlannerTaskToggleView,
+    PlannerTaskUpdateView,
+    PlannerPlantingCreateView,
+    PlannerPlantingDeleteView,
+    PlannerPlantingUpdateView,
     QuickWateringView,
     UpdateDiaryItemView,
     UpdateProfileDiaryView,
 )
 
 urlpatterns = [
+    path(
+        "profile/planner/create/",
+        login_required(PlannerCreateView.as_view()),
+        name="profile-planner-create",
+    ),
+    path(
+        "profile/planner",
+        login_required(ProfilePlannerView.as_view()),
+        name="profile-planner",
+    ),
+    path(
+        "profile/planner/<int:pk>/settings/",
+        login_required(PlannerSettingsView.as_view()),
+        name="profile-planner-settings",
+    ),
+    path(
+        "profile/planner/<int:pk>/delete/",
+        login_required(PlannerDeleteView.as_view()),
+        name="profile-planner-delete",
+    ),
+    path(
+        "profile/planner/<int:pk>/duplicate/",
+        login_required(PlannerDuplicateView.as_view()),
+        name="profile-planner-duplicate",
+    ),
+    path(
+        "profile/planner/<int:planner_pk>/areas/add/",
+        login_required(PlannerAreaCreateView.as_view()),
+        name="profile-planner-area-add",
+    ),
+    path(
+        "profile/planner/<int:planner_pk>/tasks/add/",
+        login_required(PlannerTaskCreateView.as_view()),
+        name="profile-planner-task-add",
+    ),
+    path(
+        "profile/planner/tasks/<int:pk>/toggle/",
+        login_required(PlannerTaskToggleView.as_view()),
+        name="profile-planner-task-toggle",
+    ),
+    path(
+        "profile/planner/tasks/<int:pk>/update/",
+        login_required(PlannerTaskUpdateView.as_view()),
+        name="profile-planner-task-update",
+    ),
+    path(
+        "profile/planner/tasks/<int:pk>/delete/",
+        login_required(PlannerTaskDeleteView.as_view()),
+        name="profile-planner-task-delete",
+    ),
+    path(
+        "profile/planner/areas/<int:pk>/update/",
+        login_required(PlannerAreaUpdateView.as_view()),
+        name="profile-planner-area-update",
+    ),
+    path(
+        "profile/planner/areas/<int:pk>/delete/",
+        login_required(PlannerAreaDeleteView.as_view()),
+        name="profile-planner-area-delete",
+    ),
+    path(
+        "profile/planner/areas/<int:area_pk>/plantings/add/",
+        login_required(PlannerPlantingCreateView.as_view()),
+        name="profile-planner-planting-add",
+    ),
+    path(
+        "profile/planner/plantings/<int:pk>/delete/",
+        login_required(PlannerPlantingDeleteView.as_view()),
+        name="profile-planner-planting-delete",
+    ),
+    path(
+        "profile/planner/plantings/<int:pk>/update/",
+        login_required(PlannerPlantingUpdateView.as_view()),
+        name="profile-planner-planting-update",
+    ),
     path(
         "profile/plants",
         login_required(ProfilePlantListView.as_view()),

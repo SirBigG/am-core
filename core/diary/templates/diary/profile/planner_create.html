@@ -1,0 +1,84 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% load static %}
+{% block scripts %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'pro_auth/profile/planner.css' %}?v=20260623-8">
+{% endblock scripts %}
+{% block profile_content %}
+    <main class="planner-onboarding">
+        <div class="planner-onboarding__copy">
+            <p class="planner-eyebrow">{% if creating_additional_planner %}Ще один простір{% else %}Новий простір{% endif %}</p>
+            <h1>{% if creating_additional_planner %}Створіть новий план{% else %}Створіть свою ділянку{% endif %}</h1>
+            <p>Вкажіть реальні розміри — планер побудує полотно саме під ваш город, теплицю або поле. Ці значення можна буде змінити пізніше.</p>
+            <div class="planner-onboarding__visual" aria-hidden="true">
+                <span class="planner-onboarding__bed planner-onboarding__bed--one">Грядка</span>
+                <span class="planner-onboarding__bed planner-onboarding__bed--two">Теплиця</span>
+                <span class="planner-onboarding__bed planner-onboarding__bed--three">Поле</span>
+            </div>
+        </div>
+        <section class="planner-onboarding__panel">
+            <div>
+                <p class="planner-panel__heading-label">Крок 1</p>
+                <h2>Розмір основної площі</h2>
+                <p>Не обов’язково вимірювати до сантиметра — достатньо приблизних метрів.</p>
+            </div>
+            <form method="post" action="{% url 'pro_auth:profile-planner-create' %}" data-planner-create-form>
+                {% csrf_token %}
+                <label>
+                    <span>Назва ділянки</span>
+                    <input type="text" name="title" value="Моя ділянка" maxlength="255" required>
+                </label>
+                <div class="planner-form-row">
+                    <label>
+                        <span>Ширина, м</span>
+                        <input type="number" name="width_m" value="20" min="2" max="5000" step="0.5" required>
+                    </label>
+                    <label>
+                        <span>Довжина, м</span>
+                        <input type="number" name="height_m" value="12" min="2" max="5000" step="0.5" required>
+                    </label>
+                </div>
+                <label>
+                    <span>Точність сітки</span>
+                    <select name="grid_step_m">
+                        <option value="0.25">Кожні 25 см</option>
+                        <option value="0.50" selected>Кожні 50 см</option>
+                        <option value="1.00">Кожен метр</option>
+                    </select>
+                </label>
+                <div class="planner-presets" aria-label="Швидкі шаблони розміру">
+                    <p>Або оберіть приблизний шаблон</p>
+                    <div>
+                        {% for preset in planner_presets %}
+                            <button type="button"
+                                    data-planner-preset
+                                    data-title="{{ preset.title }}"
+                                    data-width="{{ preset.width }}"
+                                    data-height="{{ preset.height }}">
+                                <strong>{{ preset.width }} × {{ preset.height }} м</strong>
+                                <span>{{ preset.title }}</span>
+                            </button>
+                        {% endfor %}
+                    </div>
+                </div>
+                <button class="planner-button planner-button--primary" type="submit">Створити план ділянки</button>
+                {% if creating_additional_planner %}
+                    <a class="planner-onboarding__back" href="{% url 'pro_auth:profile-planner' %}">Повернутися до планера</a>
+                {% endif %}
+            </form>
+        </section>
+    </main>
+{% endblock profile_content %}
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script>
+        document.querySelectorAll("[data-planner-preset]").forEach(function (button) {
+            button.addEventListener("click", function () {
+                const form = document.querySelector("[data-planner-create-form]");
+                form.elements.title.value = button.dataset.title;
+                form.elements.width_m.value = button.dataset.width;
+                form.elements.height_m.value = button.dataset.height;
+            });
+        });
+    </script>
+{% endblock extra_footerscript %}

@@ -1,0 +1,48 @@
+<div class="col-md-4 col-12 profile-sidebar-col {{ profile_sidebar_extra_class|default:'' }}">
+    <nav class="profile-sidebar-nav"
+         aria-label="Навігація особистого кабінету">
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}"
+           href="{% url 'pro_auth:dashboard' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">⌂</span>
+            <span>Огляд</span>
+        </a>
+        <hr class="profile-sidebar-nav__divider">
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-adverts' %} is-active{% endif %}"
+           href="{% url 'pro_auth:profile-adverts' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">☰</span>
+            <span>Мої оголошення</span>
+        </a>
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-adverts-create' %} is-active{% endif %}"
+           href="{% url 'pro_auth:profile-adverts-create' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">+</span>
+            <span>Створити оголошення</span>
+        </a>
+        <hr class="profile-sidebar-nav__divider">
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-diary-list' %} is-active{% endif %}"
+           href="{% url 'pro_auth:profile-diary-list' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">✍</span>
+            <span>Мої щоденники</span>
+        </a>
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'profile-plant-list' %} is-active{% endif %}"
+           href="{% url 'pro_auth:profile-plant-list' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">•</span>
+            <span>Мої рослини</span>
+        </a>
+        <a class="profile-sidebar-nav__item{% if 'profile-planner' in request.resolver_match.url_name %} is-active{% endif %}"
+           href="{% url 'pro_auth:profile-planner' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">▦</span>
+            <span>Мій планер</span>
+        </a>
+        <hr class="profile-sidebar-nav__divider">
+        <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'change-profile' %} is-active{% endif %}"
+           href="{% url 'pro_auth:change-profile' %}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">◎</span>
+            <span>Налаштування</span>
+        </a>
+        <a class="profile-sidebar-nav__item profile-sidebar-nav__item--forum"
+           href="{{ forum_sso_url }}">
+            <span class="profile-sidebar-nav__icon" aria-hidden="true">↗</span>
+            <span>Форум</span>
+        </a>
+    </nav>
+</div>

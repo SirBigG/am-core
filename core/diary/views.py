@@ -1,22 +1,43 @@
 import re
 from collections import OrderedDict
 from datetime import date, timedelta
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 from dal import autocomplete
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch, Q
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.utils.formats import date_format
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils import timezone
-from django.views.generic import DetailView, FormView, ListView, UpdateView, View
+from django.views.generic import DetailView, FormView, ListView, TemplateView, UpdateView, View
 
-from .forms import DiaryForm, DiaryItemForm, PlantAttachmentFormSet, PlantMoveForm, PlantingForm, save_diary_plants
-from .models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, Plant
+from .forms import (
+    DiaryForm,
+    DiaryItemForm,
+    PlantAttachmentFormSet,
+    PlantMoveForm,
+    PlantingForm,
+    get_plant_category_queryset,
+    save_diary_plants,
+)
+from .models import (
+    DIARY_ITEM_ACTION_CHOICES,
+    PLANNER_AREA_TYPE_CHOICES,
+    PLANNER_PLANTING_MODE_CHOICES,
+    PLANNER_PLANTING_STATUS_CHOICES,
+    Diary,
+    DiaryItem,
+    Planner,
+    PlannerArea,
+    PlannerPlanting,
+    PlannerTask,
+    Plant,
+)
+from .planner import extract_planner_spacing_guidance
 from .recommendations import PlantRecommendationService
 
 TRANSPLANTED_TO_PREFIX = "Рослину пересаджено до щоденника: "
@@ -28,6 +49,131 @@ PLANT_RESTORE_TITLE = "Відновити рослину з архіву"
 PLANT_RESTORE_LEAD = "Рослина знову з’явиться серед тих, що ростуть, і для неї можна буде додавати нові дії."
 PLANT_DELETE_TITLE = "Видалити рослину назавжди"
 PLANT_DELETE_LEAD = "Рослина буде повністю видалена разом з її історією, діями та пов’язаними записами. Цю дію не можна скасувати."
+
+PLANNER_AREA_COLORS = {
+    "bed": "#75ad68",
+    "greenhouse": "#4fae91",
+    "field": "#c09a54",
+    "garden": "#8cab57",
+    "other": "#7c8da6",
+}
+
+
+def _planner_decimal(value, default, minimum=None, maximum=None):
+    try:
+        parsed = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError):
+        parsed = Decimal(str(default))
+    if minimum is not None:
+        parsed = max(parsed, Decimal(str(minimum)))
+    if maximum is not None:
+        parsed = min(parsed, Decimal(str(maximum)))
+    return parsed.quantize(Decimal("0.01"))
+
+
+def _planner_positive_int(value):
+    try:
+        return max(int(value), 1)
+    except (TypeError, ValueError):
+        return None
+
+
+def _planner_date(value):
+    try:
+        return date.fromisoformat(value) if value else None
+    except (TypeError, ValueError):
+        return None
+
+
+def _planner_task_bucket(task, today):
+    if task.is_completed:
+        return "completed", "Виконані"
+    if not task.due_date:
+        return "no-date", "Без дати"
+    if task.due_date < today:
+        return "overdue", "Прострочено"
+    if task.due_date == today:
+        return "today", "Сьогодні"
+    return "upcoming", "Найближчі"
+
+
+def _serialize_planner_planting(planting):
+    guidance = extract_planner_spacing_guidance(planting.plant)
+    return {
+        "id": planting.pk,
+        "plantId": planting.plant_id,
+        "plantName": planting.plant.display_name,
+        "emoji": planting.plant.plant_emoji,
+        "mode": planting.mode,
+        "modeLabel": planting.get_mode_display(),
+        "status": planting.status,
+        "statusLabel": planting.get_status_display(),
+        "summary": planting.layout_summary,
+        "notes": planting.notes,
+        "quantity": planting.quantity,
+        "rows": planting.rows,
+        "occupiedArea": float(planting.occupied_area_m2) if planting.occupied_area_m2 is not None else None,
+        "x": float(planting.x_pct),
+        "y": float(planting.y_pct),
+        "width": float(planting.width_pct),
+        "height": float(planting.height_pct),
+        "guidance": guidance,
+    }
+
+
+def _serialize_planner_area_tasks(area):
+    if hasattr(area, "planner_tasks"):
+        tasks = list(area.planner_tasks)
+    else:
+        tasks = list(area.tasks.all())
+        today = timezone.localdate()
+        for task in tasks:
+            task.is_overdue = bool(not task.is_completed and task.due_date and task.due_date < today)
+            task.bucket, task.bucket_label = _planner_task_bucket(task, today)
+    open_tasks = [task for task in tasks if not task.is_completed]
+    overdue_tasks = [task for task in open_tasks if task.is_overdue]
+    next_task = next((task for task in open_tasks if task.due_date), open_tasks[0] if open_tasks else None)
+    return {
+        "openCount": len(open_tasks),
+        "overdueCount": len(overdue_tasks),
+        "nextTitle": next_task.title if next_task else "",
+        "nextDate": date_format(next_task.due_date, "j E") if next_task and next_task.due_date else "",
+        "nextBucket": next_task.bucket if next_task else "",
+    }
+
+
+def _serialize_planner_area(area):
+    active_plants = []
+    if area.diary_id:
+        active_plants = list(getattr(area.diary, "planner_active_plants", []))
+    return {
+        "id": area.pk,
+        "title": area.title,
+        "areaType": area.area_type,
+        "areaTypeLabel": area.get_area_type_display(),
+        "x": float(area.x_m),
+        "y": float(area.y_m),
+        "width": float(area.width_m),
+        "height": float(area.height_m),
+        "area": float(area.area_m2),
+        "color": area.color,
+        "diaryId": area.diary_id,
+        "diaryTitle": area.diary.title if area.diary_id else "",
+        "diaryUrl": area.diary.get_profile_absolute_url() if area.diary_id else "",
+        "plants": [
+            {
+                "id": plant.pk,
+                "name": plant.display_name,
+                "emoji": plant.plant_emoji,
+            }
+            for plant in active_plants
+        ],
+        "plantings": [
+            _serialize_planner_planting(planting)
+            for planting in area.plantings.all()
+        ],
+        "tasks": _serialize_planner_area_tasks(area),
+    }
 
 
 def _format_harvest_amount(amount):
@@ -518,6 +664,507 @@ class ProfilePlantListView(ListView):
         context["active_plants"] = [plant for plant in plants if plant.status == "active"]
         context["completed_plants"] = [plant for plant in plants if plant.status == "completed"]
         return context
+
+
+class ProfilePlannerView(TemplateView):
+    template_name = "diary/profile/planner.html"
+
+    def get_template_names(self):
+        if not Planner.objects.filter(user=self.request.user).exists():
+            return ["diary/profile/planner_create.html"]
+        return [self.template_name]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        planners = list(Planner.objects.filter(user=self.request.user))
+        requested_planner_id = self.request.GET.get("planner")
+        planner = next(
+            (item for item in planners if str(item.pk) == requested_planner_id),
+            planners[0] if planners else None,
+        )
+        context["planners"] = planners
+        if planner is None:
+            context["planner_presets"] = [
+                {"title": "Невеликий город", "width": 10, "height": 6},
+                {"title": "Ділянка біля дому", "width": 20, "height": 12},
+                {"title": "Велика ділянка", "width": 50, "height": 30},
+            ]
+            return context
+        areas = list(
+            PlannerArea.objects.filter(planner=planner)
+            .select_related("diary")
+            .prefetch_related(
+                Prefetch(
+                    "diary__plants",
+                    queryset=Plant.objects.filter(status="active").select_related("category"),
+                    to_attr="planner_active_plants",
+                ),
+                "plantings__plant__category__ai_profile",
+            )
+        )
+        context["planner"] = planner
+        context["planner_areas"] = areas
+        context["planner_today"] = timezone.localdate()
+        context["planner_tasks"] = list(planner.tasks.select_related("area"))
+        for task in context["planner_tasks"]:
+            task.is_overdue = bool(not task.is_completed and task.due_date and task.due_date < context["planner_today"])
+            task.bucket, task.bucket_label = _planner_task_bucket(task, context["planner_today"])
+        tasks_by_area = {}
+        for task in context["planner_tasks"]:
+            if task.area_id:
+                tasks_by_area.setdefault(task.area_id, []).append(task)
+        for area in areas:
+            area.planner_tasks = tasks_by_area.get(area.pk, [])
+        context["planner_areas_payload"] = [_serialize_planner_area(area) for area in areas]
+        context["planner_area_types"] = PLANNER_AREA_TYPE_CHOICES
+        context["planner_planting_modes"] = PLANNER_PLANTING_MODE_CHOICES
+        context["planner_planting_statuses"] = PLANNER_PLANTING_STATUS_CHOICES
+        context["available_diaries"] = (
+            Diary.objects.filter(
+                user=self.request.user,
+                is_archived=False,
+                planner_area__isnull=True,
+            )
+            .prefetch_related("plants__category")
+            .order_by("-updated")
+        )
+        context["planner_used_area"] = sum((area.area_m2 for area in areas), Decimal("0"))
+        context["planner_linked_diaries_count"] = sum(1 for area in areas if area.diary_id)
+        planner_plantings = [planting for area in areas for planting in area.plantings.all()]
+        progress_checks = [
+            True,
+            bool(areas),
+            bool(planner_plantings),
+            any(planting.status != "planned" for planting in planner_plantings),
+        ]
+        progress_labels = [
+            ("План створено", "Полотно готове"),
+            ("Додано зони", "Є грядка, теплиця або поле"),
+            ("Розміщено рослини", "Культури нанесені на план"),
+            ("Сезон розпочато", "Є посаджені рослини або ті, що ростуть"),
+        ]
+        context["planner_progress_steps"] = [
+            {"title": title, "description": description, "completed": progress_checks[index]}
+            for index, (title, description) in enumerate(progress_labels)
+        ]
+        context["planner_progress_percent"] = sum(progress_checks) * 25
+        context["planner_open_tasks_count"] = sum(not task.is_completed for task in context["planner_tasks"])
+        context["planner_overdue_tasks_count"] = sum(task.is_overdue for task in context["planner_tasks"])
+        task_groups = OrderedDict(
+            (
+                ("overdue", {"label": "Прострочено", "tasks": []}),
+                ("today", {"label": "Сьогодні", "tasks": []}),
+                ("upcoming", {"label": "Найближчі", "tasks": []}),
+                ("no-date", {"label": "Без дати", "tasks": []}),
+                ("completed", {"label": "Виконані", "tasks": []}),
+            )
+        )
+        for task in context["planner_tasks"]:
+            task_groups[task.bucket]["tasks"].append(task)
+        context["planner_task_groups"] = [group for group in task_groups.values() if group["tasks"]]
+        context["available_plants"] = (
+            Plant.objects.filter(
+                user=self.request.user,
+                status="active",
+                planner_placement__isnull=True,
+            )
+            .select_related("category")
+            .order_by("category__value", "variety", "title")
+        )
+        context["planner_plant_categories"] = get_plant_category_queryset()
+        return context
+
+
+class PlannerCreateView(View):
+    template_name = "diary/profile/planner_create.html"
+
+    def get(self, request):
+        return render(
+            request,
+            self.template_name,
+            {
+                "planner_presets": [
+                    {"title": "Невеликий город", "width": 10, "height": 6},
+                    {"title": "Ділянка біля дому", "width": 20, "height": 12},
+                    {"title": "Велика ділянка", "width": 50, "height": 30},
+                ],
+                "creating_additional_planner": Planner.objects.filter(user=request.user).exists(),
+            },
+        )
+
+    def post(self, request):
+        planner = Planner.objects.create(
+            user=request.user,
+            title=request.POST.get("title", "").strip() or "Моя ділянка",
+            width_m=_planner_decimal(request.POST.get("width_m"), 20, minimum=2, maximum=5000),
+            height_m=_planner_decimal(request.POST.get("height_m"), 12, minimum=2, maximum=5000),
+            grid_step_m=_planner_decimal(request.POST.get("grid_step_m"), 0.5, minimum=0.1, maximum=10),
+        )
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}')
+
+
+class PlannerDeleteView(View):
+    def post(self, request, pk):
+        planner = get_object_or_404(Planner, pk=pk, user=request.user)
+        if planner.areas.exists() or planner.tasks.exists():
+            return JsonResponse(
+                {"error": "Спочатку видаліть усі зони та справи з цього плану."},
+                status=400,
+            )
+        planner.delete()
+        return HttpResponseRedirect(reverse("pro_auth:profile-planner"))
+
+
+class PlannerDuplicateView(View):
+    @transaction.atomic
+    def post(self, request, pk):
+        source = get_object_or_404(
+            Planner.objects.prefetch_related("areas"),
+            pk=pk,
+            user=request.user,
+        )
+        title = request.POST.get("title", "").strip() or f"{source.title} — копія"
+        duplicate = Planner.objects.create(
+            user=request.user,
+            title=title[:255],
+            width_m=source.width_m,
+            height_m=source.height_m,
+            grid_step_m=source.grid_step_m,
+        )
+        PlannerArea.objects.bulk_create(
+            [
+                PlannerArea(
+                    planner=duplicate,
+                    title=area.title,
+                    area_type=area.area_type,
+                    color=area.color,
+                    x_m=area.x_m,
+                    y_m=area.y_m,
+                    width_m=area.width_m,
+                    height_m=area.height_m,
+                )
+                for area in source.areas.all()
+            ]
+        )
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={duplicate.pk}')
+
+
+class PlannerSettingsView(View):
+    def post(self, request, pk):
+        planner = get_object_or_404(Planner, pk=pk, user=request.user)
+        planner.title = request.POST.get("title", "").strip() or planner.title
+        planner.width_m = _planner_decimal(request.POST.get("width_m"), planner.width_m, minimum=2, maximum=5000)
+        planner.height_m = _planner_decimal(request.POST.get("height_m"), planner.height_m, minimum=2, maximum=5000)
+        planner.grid_step_m = _planner_decimal(
+            request.POST.get("grid_step_m"),
+            planner.grid_step_m,
+            minimum=0.1,
+            maximum=10,
+        )
+        planner.save(update_fields=["title", "width_m", "height_m", "grid_step_m", "updated"])
+
+        for area in planner.areas.all():
+            area.width_m = min(area.width_m, planner.width_m)
+            area.height_m = min(area.height_m, planner.height_m)
+            area.x_m = min(max(area.x_m, Decimal("0")), planner.width_m - area.width_m)
+            area.y_m = min(max(area.y_m, Decimal("0")), planner.height_m - area.height_m)
+            area.save(update_fields=["x_m", "y_m", "width_m", "height_m", "updated"])
+
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}')
+
+
+class PlannerTaskCreateView(View):
+    def post(self, request, planner_pk):
+        planner = get_object_or_404(Planner, pk=planner_pk, user=request.user)
+        title = request.POST.get("title", "").strip()
+        if title:
+            area = None
+            area_id = request.POST.get("area_id")
+            if area_id:
+                area = get_object_or_404(PlannerArea, pk=area_id, planner=planner)
+            PlannerTask.objects.create(
+                planner=planner,
+                area=area,
+                title=title[:255],
+                due_date=_planner_date(request.POST.get("due_date")),
+            )
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={planner.pk}')
+
+
+class PlannerTaskToggleView(View):
+    def post(self, request, pk):
+        task = get_object_or_404(PlannerTask, pk=pk, planner__user=request.user)
+        task.is_completed = not task.is_completed
+        task.completed_at = timezone.now() if task.is_completed else None
+        task.save(update_fields=["is_completed", "completed_at", "updated"])
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={task.planner_id}')
+
+
+class PlannerTaskUpdateView(View):
+    def post(self, request, pk):
+        task = get_object_or_404(PlannerTask, pk=pk, planner__user=request.user)
+        title = request.POST.get("title", "").strip()
+        if title:
+            area = None
+            area_id = request.POST.get("area_id")
+            if area_id:
+                area = get_object_or_404(PlannerArea, pk=area_id, planner=task.planner)
+            task.title = title[:255]
+            task.due_date = _planner_date(request.POST.get("due_date"))
+            task.area = area
+            task.save(update_fields=["title", "due_date", "area", "updated"])
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={task.planner_id}')
+
+
+class PlannerTaskDeleteView(View):
+    def post(self, request, pk):
+        task = get_object_or_404(PlannerTask, pk=pk, planner__user=request.user)
+        planner_id = task.planner_id
+        task.delete()
+        return HttpResponseRedirect(f'{reverse("pro_auth:profile-planner")}?planner={planner_id}')
+
+
+class PlannerAreaCreateView(View):
+    def post(self, request, planner_pk):
+        planner = get_object_or_404(Planner, pk=planner_pk, user=request.user)
+        area_type_values = {value for value, _label in PLANNER_AREA_TYPE_CHOICES}
+        area_type = request.POST.get("area_type", "bed")
+        if area_type not in area_type_values:
+            area_type = "bed"
+
+        width_m = _planner_decimal(request.POST.get("width_m"), 4, minimum=0.5, maximum=planner.width_m)
+        height_m = _planner_decimal(request.POST.get("height_m"), 1.2, minimum=0.5, maximum=planner.height_m)
+        offset = planner.areas.count() * planner.grid_step_m
+        x_m = min(offset % planner.width_m, planner.width_m - width_m)
+        y_m = min(offset % planner.height_m, planner.height_m - height_m)
+
+        diary = None
+        diary_id = request.POST.get("diary_id", "").strip()
+        if diary_id:
+            diary = get_object_or_404(
+                Diary,
+                pk=diary_id,
+                user=request.user,
+                is_archived=False,
+                planner_area__isnull=True,
+            )
+
+        area = PlannerArea.objects.create(
+            planner=planner,
+            diary=diary,
+            title=request.POST.get("title", "").strip() or dict(PLANNER_AREA_TYPE_CHOICES)[area_type],
+            area_type=area_type,
+            x_m=x_m,
+            y_m=y_m,
+            width_m=width_m,
+            height_m=height_m,
+            color=PLANNER_AREA_COLORS[area_type],
+        )
+        if diary:
+            diary.planner_active_plants = list(diary.plants.filter(status="active").select_related("category"))
+        return JsonResponse({"area": _serialize_planner_area(area)}, status=201)
+
+
+class PlannerAreaUpdateView(View):
+    def post(self, request, pk):
+        area = get_object_or_404(PlannerArea.objects.select_related("planner"), pk=pk, planner__user=request.user)
+        planner = area.planner
+        width_m = _planner_decimal(request.POST.get("width_m"), area.width_m, minimum=0.5, maximum=planner.width_m)
+        height_m = _planner_decimal(request.POST.get("height_m"), area.height_m, minimum=0.5, maximum=planner.height_m)
+        area.width_m = width_m
+        area.height_m = height_m
+        area.x_m = _planner_decimal(request.POST.get("x_m"), area.x_m, minimum=0, maximum=planner.width_m - width_m)
+        area.y_m = _planner_decimal(request.POST.get("y_m"), area.y_m, minimum=0, maximum=planner.height_m - height_m)
+
+        if "title" in request.POST:
+            area.title = request.POST.get("title", "").strip() or area.title
+        area_type_values = {value for value, _label in PLANNER_AREA_TYPE_CHOICES}
+        if request.POST.get("area_type") in area_type_values:
+            area.area_type = request.POST["area_type"]
+            area.color = PLANNER_AREA_COLORS[area.area_type]
+        if "diary_id" in request.POST:
+            diary_id = request.POST.get("diary_id", "").strip()
+            if not diary_id:
+                area.diary = None
+            elif str(area.diary_id) != diary_id:
+                area.diary = get_object_or_404(
+                    Diary,
+                    pk=diary_id,
+                    user=request.user,
+                    is_archived=False,
+                    planner_area__isnull=True,
+                )
+
+        area.save()
+        if area.diary_id:
+            area.diary.planner_active_plants = list(
+                area.diary.plants.filter(status="active").select_related("category")
+            )
+        return JsonResponse({"area": _serialize_planner_area(area)})
+
+
+class PlannerAreaDeleteView(View):
+    def post(self, request, pk):
+        area = get_object_or_404(PlannerArea, pk=pk, planner__user=request.user)
+        area.delete()
+        return JsonResponse({"deleted": True})
+
+
+class PlannerPlantingCreateView(View):
+    def post(self, request, area_pk):
+        area = get_object_or_404(
+            PlannerArea.objects.select_related("planner", "diary"),
+            pk=area_pk,
+            planner__user=request.user,
+        )
+        plant_source = request.POST.get("plant_source", "existing")
+        plant = None
+        if plant_source == "new":
+            category_id = request.POST.get("new_category_id", "").strip()
+            category = None
+            if category_id:
+                category = get_object_or_404(get_plant_category_queryset(), pk=category_id)
+            variety = request.POST.get("new_variety", "").strip()[:255]
+            title = request.POST.get("new_title", "").strip()[:255]
+            if category is None and not variety and not title:
+                return JsonResponse({"error": "Вкажіть категорію, сорт або назву рослини."}, status=400)
+            try:
+                plant_date = date.fromisoformat(request.POST.get("new_plant_date", ""))
+            except (TypeError, ValueError):
+                plant_date = timezone.localdate()
+            plant = Plant.objects.create(
+                user=request.user,
+                category=category,
+                variety=variety,
+                title=title,
+                plant_date=plant_date,
+            )
+        else:
+            plant = get_object_or_404(
+                Plant,
+                pk=request.POST.get("plant_id"),
+                user=request.user,
+                status="active",
+                planner_placement__isnull=True,
+            )
+        mode_values = {value for value, _label in PLANNER_PLANTING_MODE_CHOICES}
+        mode = request.POST.get("mode", "unknown")
+        if mode not in mode_values:
+            mode = "unknown"
+
+        quantity = _planner_positive_int(request.POST.get("quantity")) if mode in {"exact", "approximate"} else None
+        rows = _planner_positive_int(request.POST.get("rows")) if mode == "rows" else None
+        occupied_area_m2 = None
+        if mode == "area":
+            occupied_area_m2 = _planner_decimal(
+                request.POST.get("occupied_area_m2"),
+                "0.01",
+                minimum="0.01",
+                maximum=area.area_m2,
+            )
+
+        planting = PlannerPlanting.objects.create(
+            area=area,
+            plant=plant,
+            mode=mode,
+            status=(
+                "planned"
+                if plant_source == "new" and plant.plant_date > timezone.localdate()
+                else "planted"
+                if plant_source == "new"
+                else "growing"
+            ),
+            quantity=quantity,
+            rows=rows,
+            occupied_area_m2=occupied_area_m2,
+            notes=request.POST.get("notes", "").strip()[:255],
+            x_pct=Decimal("5") + Decimal(area.plantings.count() % 2) * Decimal("45"),
+            y_pct=Decimal("5") + Decimal((area.plantings.count() // 2) % 2) * Decimal("45"),
+        )
+        if area.diary_id:
+            area.diary.plants.add(plant)
+            if plant_source == "new":
+                planted_item = DiaryItem.objects.create(
+                    diary=area.diary,
+                    action_type="planted",
+                    apply_to_all=False,
+                    date=plant.plant_date,
+                    description="Додано через візуальний планер",
+                )
+                planted_item.plants.set([plant])
+        return JsonResponse(
+            {
+                "planting": _serialize_planner_planting(planting),
+                "createdPlant": plant_source == "new",
+            },
+            status=201,
+        )
+
+
+class PlannerPlantingDeleteView(View):
+    def post(self, request, pk):
+        planting = get_object_or_404(
+            PlannerPlanting,
+            pk=pk,
+            area__planner__user=request.user,
+        )
+        planting.delete()
+        return JsonResponse({"deleted": True})
+
+
+class PlannerPlantingUpdateView(View):
+    def post(self, request, pk):
+        planting = get_object_or_404(
+            PlannerPlanting.objects.select_related(
+                "plant",
+                "plant__category",
+                "plant__category__ai_profile",
+                "area__diary",
+            ),
+            pk=pk,
+            area__planner__user=request.user,
+        )
+        width_pct = _planner_decimal(request.POST.get("width_pct"), planting.width_pct, minimum=5, maximum=100)
+        height_pct = _planner_decimal(request.POST.get("height_pct"), planting.height_pct, minimum=5, maximum=100)
+        planting.width_pct = width_pct
+        planting.height_pct = height_pct
+        planting.x_pct = _planner_decimal(
+            request.POST.get("x_pct"),
+            planting.x_pct,
+            minimum=0,
+            maximum=Decimal("100") - width_pct,
+        )
+        planting.y_pct = _planner_decimal(
+            request.POST.get("y_pct"),
+            planting.y_pct,
+            minimum=0,
+            maximum=Decimal("100") - height_pct,
+        )
+        previous_status = planting.status
+        status_values = {value for value, _label in PLANNER_PLANTING_STATUS_CHOICES}
+        requested_status = request.POST.get("status")
+        if requested_status in status_values:
+            planting.status = requested_status
+        planting.save(update_fields=["x_pct", "y_pct", "width_pct", "height_pct", "status", "updated"])
+
+        if planting.status == "completed":
+            planting.plant.status = "completed"
+            planting.plant.completed_at = timezone.localdate()
+            planting.plant.save(update_fields=["status", "completed_at"])
+            if previous_status != "completed" and planting.area.diary_id:
+                finished_item = DiaryItem.objects.create(
+                    diary=planting.area.diary,
+                    action_type="finished",
+                    apply_to_all=False,
+                    date=timezone.localdate(),
+                    description="Завершено через візуальний планер",
+                )
+                finished_item.plants.set([planting.plant])
+        elif planting.plant.status == "completed":
+            planting.plant.status = "active"
+            planting.plant.completed_at = None
+            planting.plant.save(update_fields=["status", "completed_at"])
+        return JsonResponse({"planting": _serialize_planner_planting(planting)})
 
 
 class ProfileDiaryDetailView(DetailView):

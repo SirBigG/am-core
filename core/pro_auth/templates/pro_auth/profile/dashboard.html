@@ -36,6 +36,12 @@
                 <span class="profile-dashboard-card__text">Перегляньте активні рослини та швидко відкрийте їхні щоденники.</span>
             </a>
             <a class="profile-dashboard-card"
+               href="{% url 'pro_auth:profile-planner' %}">
+                <span class="profile-dashboard-card__icon" aria-hidden="true">▦</span>
+                <span class="profile-dashboard-card__title">Мій планер</span>
+                <span class="profile-dashboard-card__text">Розмістіть грядки, теплиці та поля на візуальному плані ділянки.</span>
+            </a>
+            <a class="profile-dashboard-card"
                href="{% url 'pro_auth:change-profile' %}">
                 <span class="profile-dashboard-card__icon" aria-hidden="true">◎</span>
                 <span class="profile-dashboard-card__title">Налаштування профілю</span>

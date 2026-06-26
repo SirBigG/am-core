@@ -1,0 +1,427 @@
+{% extends "pro_auth/profile/profile_base.html" %}
+{% load static l10n %}
+{% block scripts %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'pro_auth/profile/planner.css' %}?v=20260623-9">
+{% endblock scripts %}
+{% block base_content_block %}
+    {% include "pro_auth/profile/profile_styles.html" %}
+    <div class="planner-profile-shell">
+        {% include "pro_auth/profile/_profile_sidebar.html" with profile_sidebar_extra_class="planner-profile-shell__sidebar" %}
+        <main class="planner-page planner-page--flow"
+              data-planner-root
+              data-planner-id="{{ planner.id }}"
+              data-width="{{ planner.width_m|unlocalize }}"
+              data-height="{{ planner.height_m|unlocalize }}"
+              data-grid-step="{{ planner.grid_step_m|unlocalize }}"
+              data-area-update-template="{% url 'pro_auth:profile-planner-area-update' pk=0 %}"
+              data-area-delete-template="{% url 'pro_auth:profile-planner-area-delete' pk=0 %}"
+              data-planting-add-template="{% url 'pro_auth:profile-planner-planting-add' area_pk=0 %}"
+              data-planting-delete-template="{% url 'pro_auth:profile-planner-planting-delete' pk=0 %}"
+              data-planting-update-template="{% url 'pro_auth:profile-planner-planting-update' pk=0 %}">
+        <header class="planner-hero">
+            <div>
+                <p class="planner-eyebrow">Візуальний город</p>
+                <h1>{{ planner.title }}</h1>
+                <p class="planner-hero__lead">Розкладіть грядки, теплиці та поля у реальному масштабі. Перетягуйте зони й змінюйте їхній розмір прямо на плані.</p>
+            </div>
+            <div class="planner-hero__actions">
+                <form class="planner-switcher" method="get">
+                    <label for="planner-switcher">Мої плани</label>
+                    <select id="planner-switcher" name="planner" onchange="this.form.submit()">
+                        {% for item in planners %}
+                            <option value="{{ item.pk }}"{% if item.pk == planner.pk %} selected{% endif %}>{{ item.title }}</option>
+                        {% endfor %}
+                    </select>
+                </form>
+                <a class="planner-button planner-button--secondary" href="{% url 'pro_auth:profile-planner-create' %}">+ Новий план</a>
+                <details class="planner-copy">
+                    <summary>Дублювати</summary>
+                    <form method="post" action="{% url 'pro_auth:profile-planner-duplicate' pk=planner.pk %}">
+                        {% csrf_token %}
+                        <label>
+                            <span>Назва нового плану</span>
+                            <input type="text" name="title" value="{{ planner.title }} — копія" maxlength="255" required>
+                        </label>
+                        <p>Скопіюємо полотно і зони без рослин та щоденників.</p>
+                        <button class="planner-button planner-button--primary" type="submit">Створити копію</button>
+                    </form>
+                </details>
+                <a class="planner-button planner-button--secondary" href="#planner-dimensions">Налаштувати</a>
+            </div>
+        </header>
+
+        <section class="planner-summary" aria-label="Огляд плану">
+            <article><span>Розмір ділянки</span><strong>{{ planner.width_m|floatformat:-2 }} × {{ planner.height_m|floatformat:-2 }} м</strong></article>
+            <article><span>Зон на плані</span><strong data-planner-zone-count>{{ planner_areas|length }}</strong></article>
+            <article><span>Розміщено</span><strong data-planner-used-area>{{ planner_used_area|floatformat:-2 }} м²</strong></article>
+            <article><span>Зі щоденником</span><strong data-planner-linked-count>{{ planner_linked_diaries_count }}</strong></article>
+        </section>
+
+        <section class="planner-progress" aria-label="Прогрес планування">
+            <div class="planner-progress__heading">
+                <div>
+                    <span>Шлях сезону</span>
+                    <strong>Прогрес плану</strong>
+                </div>
+                <b data-planner-progress-value>{{ planner_progress_percent }}%</b>
+            </div>
+            <div class="planner-progress__track" aria-hidden="true">
+                <i data-planner-progress-bar style="width: {{ planner_progress_percent }}%"></i>
+            </div>
+            <ol>
+                {% for step in planner_progress_steps %}
+                    <li class="{% if step.completed %}is-complete{% endif %}" data-planner-progress-step>
+                        <span>{% if step.completed %}✓{% else %}{{ forloop.counter }}{% endif %}</span>
+                        <div><strong>{{ step.title }}</strong><small>{{ step.description }}</small></div>
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
+
+        <details class="planner-tasks" data-task-filter="active"{% if planner_open_tasks_count %} open{% endif %}>
+            <summary>
+                <span class="planner-tasks__icon" aria-hidden="true">✓</span>
+                <span><strong>Справи сезону</strong><small>Плануйте роботи для всієї ділянки або конкретної зони</small></span>
+                <b>{{ planner_open_tasks_count }} активних{% if planner_overdue_tasks_count %} · {{ planner_overdue_tasks_count }} прострочено{% endif %}</b>
+            </summary>
+            <div class="planner-tasks__content">
+                <nav class="planner-task-filters" aria-label="Фільтр справ">
+                    <button class="is-active" type="button" data-task-filter-button="active">Активні</button>
+                    <button type="button" data-task-filter-button="overdue">Прострочені</button>
+                    <button type="button" data-task-filter-button="today">Сьогодні</button>
+                    <button type="button" data-task-filter-button="upcoming">Найближчі</button>
+                    <button type="button" data-task-filter-button="no-date">Без дати</button>
+                    <button type="button" data-task-filter-button="completed">Виконані</button>
+                    <button type="button" data-task-filter-button="all">Усі</button>
+                </nav>
+                <form class="planner-task-form" method="post" action="{% url 'pro_auth:profile-planner-task-add' planner_pk=planner.pk %}">
+                    {% csrf_token %}
+                    <label class="planner-task-form__title">
+                        <span>Нова справа</span>
+                        <input type="text" name="title" maxlength="255" placeholder="Наприклад, підготувати ґрунт" required data-task-title-input>
+                    </label>
+                    <div class="planner-task-templates" aria-label="Швидкі шаблони справ">
+                        <button type="button" data-task-template="Полити">Полити</button>
+                        <button type="button" data-task-template="Підживити">Підживити</button>
+                        <button type="button" data-task-template="Оглянути рослини">Оглянути</button>
+                        <button type="button" data-task-template="Прополоти">Прополоти</button>
+                    </div>
+                    <label>
+                        <span>Дата</span>
+                        <input type="date" name="due_date" data-task-date-input>
+                    </label>
+                    <div class="planner-task-date-shortcuts" aria-label="Швидкий вибір дати">
+                        <button type="button" data-task-date-shortcut="today">Сьогодні</button>
+                        <button type="button" data-task-date-shortcut="tomorrow">Завтра</button>
+                        <button type="button" data-task-date-shortcut="week">Через тиждень</button>
+                        <button type="button" data-task-date-shortcut="clear">Без дати</button>
+                    </div>
+                    <label>
+                        <span>Зона</span>
+                        <select name="area_id" data-task-area-select>
+                            <option value="">Уся ділянка</option>
+                            {% for area in planner_areas %}<option value="{{ area.pk }}">{{ area.title }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <button class="planner-button planner-button--primary" type="submit">+ Додати</button>
+                </form>
+                <div class="planner-task-list">
+                    {% for group in planner_task_groups %}
+                        <section class="planner-task-group" data-task-group="{{ group.tasks.0.bucket }}">
+                            <h3>{{ group.label }}</h3>
+                            {% for task in group.tasks %}
+                                <article class="planner-task{% if task.is_completed %} is-complete{% endif %}{% if task.is_overdue %} is-overdue{% endif %}" data-task-bucket="{{ task.bucket }}">
+                                    <form method="post" action="{% url 'pro_auth:profile-planner-task-toggle' pk=task.pk %}">
+                                        {% csrf_token %}
+                                        <button type="submit" aria-label="{% if task.is_completed %}Повернути справу в активні{% else %}Позначити справу виконаною{% endif %}">{% if task.is_completed %}✓{% endif %}</button>
+                                    </form>
+                                    <div>
+                                        <strong>{{ task.title }}</strong>
+                                        <small>
+                                            {% if task.area %}{{ task.area.title }}{% else %}Уся ділянка{% endif %}
+                                            {% if task.due_date %} · {{ task.due_date|date:"j E" }}{% endif %}
+                                            {% if task.is_overdue %} · Прострочено{% endif %}
+                                        </small>
+                                    </div>
+                                    <details class="planner-task__edit">
+                                        <summary aria-label="Редагувати справу">✎</summary>
+                                        <form method="post" action="{% url 'pro_auth:profile-planner-task-update' pk=task.pk %}">
+                                            {% csrf_token %}
+                                            <label>
+                                                <span>Назва</span>
+                                                <input type="text" name="title" value="{{ task.title }}" maxlength="255" required>
+                                            </label>
+                                            <label>
+                                                <span>Дата</span>
+                                                <input type="date" name="due_date" value="{% if task.due_date %}{{ task.due_date|date:'Y-m-d' }}{% endif %}">
+                                            </label>
+                                            <label>
+                                                <span>Зона</span>
+                                                <select name="area_id">
+                                                    <option value="">Уся ділянка</option>
+                                                    {% for area in planner_areas %}
+                                                        <option value="{{ area.pk }}"{% if area.pk == task.area_id %} selected{% endif %}>{{ area.title }}</option>
+                                                    {% endfor %}
+                                                </select>
+                                            </label>
+                                            <button class="planner-button planner-button--primary" type="submit">Зберегти</button>
+                                        </form>
+                                    </details>
+                                    <form method="post" action="{% url 'pro_auth:profile-planner-task-delete' pk=task.pk %}">
+                                        {% csrf_token %}
+                                        <button class="planner-task__delete" type="submit" aria-label="Видалити справу">×</button>
+                                    </form>
+                                </article>
+                            {% endfor %}
+                        </section>
+                    {% empty %}
+                        <p class="planner-task-list__empty">Справ ще немає. Додайте першу роботу для сезону.</p>
+                    {% endfor %}
+                    {% if planner_tasks %}<p class="planner-task-list__empty" data-task-filter-empty hidden>У цьому списку справ немає.</p>{% endif %}
+                </div>
+            </div>
+        </details>
+
+        <div class="planner-workspace">
+            <aside class="planner-panel planner-library">
+                <section class="planner-dimensions" id="planner-dimensions">
+                    <div class="planner-panel__heading">
+                        <p>Основна площа</p>
+                        <h2>Розмір ділянки</h2>
+                    </div>
+                    <form method="post" action="{% url 'pro_auth:profile-planner-settings' pk=planner.id %}">
+                        {% csrf_token %}
+                        <label>
+                            <span>Назва</span>
+                            <input type="text" name="title" value="{{ planner.title }}" maxlength="255" required>
+                        </label>
+                        <div class="planner-form-row">
+                            <label>
+                                <span>Ширина, м</span>
+                                <input type="number" name="width_m" value="{{ planner.width_m|unlocalize }}" min="2" max="5000" step="0.5" required>
+                            </label>
+                            <label>
+                                <span>Довжина, м</span>
+                                <input type="number" name="height_m" value="{{ planner.height_m|unlocalize }}" min="2" max="5000" step="0.5" required>
+                            </label>
+                        </div>
+                        <label>
+                            <span>Крок сітки</span>
+                            <select name="grid_step_m">
+                                <option value="0.25"{% if planner.grid_step_m == 0.25 %} selected{% endif %}>25 см</option>
+                                <option value="0.50"{% if planner.grid_step_m == 0.50 %} selected{% endif %}>50 см</option>
+                                <option value="1.00"{% if planner.grid_step_m == 1 %} selected{% endif %}>1 м</option>
+                            </select>
+                        </label>
+                        <button class="planner-button planner-button--secondary" type="submit">Оновити полотно</button>
+                    </form>
+                    {% if not planner_areas and not planner_tasks %}
+                        <form class="planner-delete-form"
+                              method="post"
+                              action="{% url 'pro_auth:profile-planner-delete' pk=planner.pk %}"
+                              onsubmit="return confirm('Видалити план «{{ planner.title|escapejs }}»? Цю дію не можна скасувати.');">
+                            {% csrf_token %}
+                            <button class="planner-button planner-button--danger" type="submit">Видалити порожній план</button>
+                        </form>
+                    {% endif %}
+                </section>
+                <hr class="planner-panel__divider">
+                <div class="planner-panel__heading">
+                    <p>Конструктор</p>
+                    <h2>Додати зону</h2>
+                </div>
+                <form class="planner-area-form"
+                      action="{% url 'pro_auth:profile-planner-area-add' planner_pk=planner.id %}"
+                      method="post"
+                      data-planner-area-form>
+                    {% csrf_token %}
+                    <label>
+                        <span>Тип</span>
+                        <select name="area_type" data-planner-area-type>
+                            {% for value, label in planner_area_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <label>
+                        <span>Назва</span>
+                        <input type="text" name="title" placeholder="Наприклад, сонячна грядка" maxlength="255">
+                    </label>
+                    <div class="planner-form-row">
+                        <label>
+                            <span>Ширина, м</span>
+                            <input type="number" name="width_m" value="4" min="0.5" step="0.5" required>
+                        </label>
+                        <label>
+                            <span>Довжина, м</span>
+                            <input type="number" name="height_m" value="1.5" min="0.5" step="0.5" required>
+                        </label>
+                    </div>
+                    <label>
+                        <span>Підключити щоденник</span>
+                        <select name="diary_id" data-planner-diary-select>
+                            <option value="">Поки без щоденника</option>
+                            {% for diary in available_diaries %}
+                                <option value="{{ diary.id }}">{{ diary.title }}{% if diary.active_plants %} · {{ diary.active_plants|length }} рослин{% endif %}</option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    <button class="planner-button planner-button--primary" type="submit">+ Додати на план</button>
+                    <p class="planner-form-status" data-planner-form-status aria-live="polite"></p>
+                </form>
+                <div class="planner-library__tip">
+                    <span aria-hidden="true">✦</span>
+                    <p><strong>Порада</strong> Після додавання перетягніть зону за центр, а за правий нижній кут змініть її розмір.</p>
+                </div>
+            </aside>
+
+            <section class="planner-stage" aria-label="План ділянки">
+                <div class="planner-stage__toolbar">
+                    <div>
+                        <span class="planner-stage__status-dot"></span>
+                        <span>Редактор плану</span>
+                    </div>
+                    <div class="planner-stage__legend">
+                        <span><i class="planner-legend planner-legend--bed"></i>Грядка</span>
+                        <span><i class="planner-legend planner-legend--greenhouse"></i>Теплиця</span>
+                        <span><i class="planner-legend planner-legend--field"></i>Поле</span>
+                    </div>
+                </div>
+                <div class="planner-canvas-scroll">
+                    <div class="planner-canvas-wrap">
+                        <div class="planner-ruler planner-ruler--horizontal"><span>0 м</span><span>{{ planner.width_m|floatformat:-2 }} м</span></div>
+                        <div class="planner-ruler planner-ruler--vertical"><span>0 м</span><span>{{ planner.height_m|floatformat:-2 }} м</span></div>
+                        <div class="planner-canvas"
+                             data-planner-canvas
+                             style="--planner-aspect: {{ planner.width_m|unlocalize }} / {{ planner.height_m|unlocalize }}; --planner-grid-columns: {{ planner.width_m|unlocalize }}; --planner-grid-rows: {{ planner.height_m|unlocalize }};">
+                            <div class="planner-canvas__empty{% if planner_areas %} is-hidden{% endif %}" data-planner-empty>
+                                <span aria-hidden="true">🌱</span>
+                                <strong>План поки порожній</strong>
+                                <p>Додайте першу грядку або теплицю з панелі конструктора.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="planner-stage__footnote">Масштаб умовний, усі підписи та розміри зберігаються в реальних метрах.</p>
+            </section>
+
+            <aside class="planner-panel planner-inspector" data-planner-inspector>
+                <div class="planner-panel__heading">
+                    <p>Інспектор</p>
+                    <h2 data-planner-inspector-title>Оберіть зону</h2>
+                </div>
+                <div class="planner-inspector__empty" data-planner-inspector-empty>
+                    <span aria-hidden="true">↖</span>
+                    <p>Натисніть на зону, щоб побачити розміри та змінити її властивості.</p>
+                </div>
+                <form class="planner-inspector__form" data-planner-inspector-form hidden>
+                    <label>
+                        <span>Назва</span>
+                        <input type="text" name="title" maxlength="255" required>
+                    </label>
+                    <label>
+                        <span>Тип</span>
+                        <select name="area_type">
+                            {% for value, label in planner_area_types %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                        </select>
+                    </label>
+                    <div class="planner-form-row">
+                        <label><span>Ширина, м</span><input type="number" name="width_m" min="0.5" step="0.5"></label>
+                        <label><span>Довжина, м</span><input type="number" name="height_m" min="0.5" step="0.5"></label>
+                    </div>
+                    <div class="planner-inspector__position">
+                        <span>Позиція на плані</span>
+                        <strong data-planner-position>0 × 0 м</strong>
+                    </div>
+                    <button class="planner-button planner-button--secondary" type="button" data-planner-area-rotate>
+                        <span aria-hidden="true">↻</span> Повернути на 90°
+                    </button>
+                    <div class="planner-inspector__diary" data-planner-inspector-diary></div>
+                    <div class="planner-inspector__tasks" data-planner-inspector-tasks></div>
+                    <button class="planner-button planner-button--primary" type="submit">Зберегти зміни</button>
+                    <p class="planner-form-status" data-planner-inspector-status aria-live="polite"></p>
+                </form>
+                <section class="planner-plantings" data-planner-plantings hidden>
+                    <div class="planner-plantings__header">
+                        <div>
+                            <p>Наповнення грядки</p>
+                            <h3>Рослини в зоні</h3>
+                        </div>
+                        <div class="planner-plantings__header-actions">
+                            <button type="button" data-planner-auto-layout title="Рівномірно розкласти рослини">▦</button>
+                            <span data-planner-planting-count>0</span>
+                        </div>
+                    </div>
+                    <div class="planner-plantings__list" data-planner-planting-list></div>
+                    <form class="planner-planting-form" data-planner-planting-form>
+                        <div class="planner-plant-source" role="group" aria-label="Джерело рослини">
+                            <label><input type="radio" name="plant_source" value="existing" checked> З моїх рослин</label>
+                            <label><input type="radio" name="plant_source" value="new"> Створити нову</label>
+                        </div>
+                        <label data-planner-existing-plant>
+                            <span>Рослина</span>
+                            <select name="plant_id" data-planner-plant-select>
+                                <option value="">Оберіть рослину</option>
+                                {% for plant in available_plants %}
+                                    <option value="{{ plant.id }}">{{ plant.plant_emoji }} {{ plant.display_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <div class="planner-new-plant" data-planner-new-plant hidden>
+                            <label>
+                                <span>Категорія</span>
+                                <select name="new_category_id">
+                                    <option value="">Оберіть категорію</option>
+                                    {% for category in planner_plant_categories %}<option value="{{ category.id }}">{{ category.value }}</option>{% endfor %}
+                                </select>
+                            </label>
+                            <label>
+                                <span>Сорт</span>
+                                <input type="text" name="new_variety" maxlength="255" placeholder="Наприклад, Артист F1">
+                            </label>
+                            <label>
+                                <span>Власна назва</span>
+                                <input type="text" name="new_title" maxlength="255" placeholder="Наприклад, лівий ряд">
+                            </label>
+                            <label>
+                                <span>Дата посадки або плану</span>
+                                <input type="date" name="new_plant_date" value="{{ planner_today|date:'Y-m-d' }}">
+                            </label>
+                        </div>
+                        <label>
+                            <span>Як посаджено</span>
+                            <select name="mode" data-planner-planting-mode>
+                                {% for value, label in planner_planting_modes %}<option value="{{ value }}">{{ label }}</option>{% endfor %}
+                            </select>
+                        </label>
+                        <label data-planting-field="quantity">
+                            <span>Кількість</span>
+                            <input type="number" name="quantity" min="1" step="1" placeholder="Наприклад, 12">
+                        </label>
+                        <label data-planting-field="rows" hidden>
+                            <span>Кількість рядів</span>
+                            <input type="number" name="rows" min="1" step="1" placeholder="Наприклад, 3">
+                        </label>
+                        <label data-planting-field="area" hidden>
+                            <span>Зайнята площа, м²</span>
+                            <input type="number" name="occupied_area_m2" min="0.01" step="0.1" placeholder="Наприклад, 2.5">
+                        </label>
+                        <label>
+                            <span>Примітка</span>
+                            <input type="text" name="notes" maxlength="255" placeholder="Необов’язково">
+                        </label>
+                        <button class="planner-button planner-button--primary" type="submit">+ Розмістити рослину</button>
+                        <p class="planner-form-status" data-planner-planting-status aria-live="polite"></p>
+                    </form>
+                </section>
+                <button class="planner-button planner-button--danger planner-inspector__delete" type="button" data-planner-area-delete hidden>Видалити з плану</button>
+            </aside>
+        </div>
+        {{ planner_areas_payload|json_script:"planner-areas-data" }}
+        {{ planner_planting_statuses|json_script:"planner-planting-statuses" }}
+        </main>
+    </div>
+{% endblock base_content_block %}
+{% block extra_footerscript %}
+    {{ block.super }}
+    <script src="{% static 'pro_auth/profile/planner.js' %}?v=20260623-9"></script>
+{% endblock extra_footerscript %}
