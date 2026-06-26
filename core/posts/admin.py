@@ -1,7 +1,7 @@
 from dal import autocomplete
+from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.contrib import admin
-from django.contrib.postgres.forms import SimpleArrayField
 from django.db.models import Count
 from mptt.admin import TreeRelatedFieldListFilter
 from mptt.forms import TreeNodeChoiceField
@@ -17,13 +17,14 @@ class PhotoInLine(admin.TabularInline):
 
 class AdminPostForm(forms.ModelForm):
     rubric = TreeNodeChoiceField(queryset=Category.objects.all())
-    sources = SimpleArrayField(
-        forms.URLField(), required=False, widget=forms.Textarea, help_text="Enter sources separated by commas"
-    )
 
     class Meta:
         model = Post
         fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["sources"].widget = CKEditorWidget()
 
 
 class CategoryFilter(admin.SimpleListFilter):
@@ -145,6 +146,10 @@ class PostAdmin(admin.ModelAdmin):
 
     def has_photo(self, obj):
         return obj.photo.count() > 0
+
+    class Media:
+        css = {"all": ("posts/admin/ckeditor-source.css",)}
+        js = ("posts/admin/ckeditor-source.js",)
 
 
 class UsefulStatisticAdmin(admin.ModelAdmin):

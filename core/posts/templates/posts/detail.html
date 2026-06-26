@@ -134,9 +134,7 @@
         {% if object.sources %}
             <section class="site-content-section">
                 <p class="site-content-section__eyebrow">Джерела</p>
-                <ul class="site-source-list">
-                    {% for source in object.sources %}<li class="site-source-list__item">{{ source }}</li>{% endfor %}
-                </ul>
+                <div class="site-detail-content post-wrapper">{{ object.sources|safe }}</div>
             </section>
         {% endif %}
         <section class="site-content-section">

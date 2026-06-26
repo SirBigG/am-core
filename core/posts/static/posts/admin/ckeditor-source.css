@@ -1,0 +1,15 @@
+.cke_source,
+textarea.cke_source,
+.cke_contents textarea.cke_source,
+.cke_contents textarea {
+    background: #fff !important;
+    color: #111 !important;
+    caret-color: #111 !important;
+    -webkit-text-fill-color: #111 !important;
+    text-shadow: none !important;
+}
+
+.cke_source::selection {
+    background: #b7d7ff;
+    color: #000;
+}

@@ -103,6 +103,15 @@ class PostDetailTests(TestCase):
         self.assertNotContains(response, "/gallery/add/")
         self.assertNotContains(response, "Додати фото до публікації")
 
+    def test_detail_renders_sources_as_rich_text(self):
+        self.post.sources = "<p><strong>Джерело:</strong> довідник садівника</p>"
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<strong>Джерело:</strong>", html=False)
+
 
 class GalleryTests(TestCase):
 

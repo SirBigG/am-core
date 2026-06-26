@@ -50,6 +50,8 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertIn('data-type="ckeditortype"', html)
         self.assertIn("data-config=", html)
         self.assertIn("&lt;p&gt;Hello&lt;/p&gt;", html)
+        self.assertIn(".cke_source", html)
+        self.assertIn("-webkit-text-fill-color: #111", html)
 
     def test_models_keep_rich_text_fields_for_editor_content(self):
         models_and_fields = (

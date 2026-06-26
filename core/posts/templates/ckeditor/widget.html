@@ -2,3 +2,15 @@
 <div class="django-ckeditor-widget" data-field-id="{{widget.attrs.id}}">
     <textarea name="{{ widget.name }}" {% include "django/forms/widgets/attrs.html" %} data-processed="0" data-config="{{ widget.config }}" data-external-plugin-resources="{{ widget.external_plugin_resources }}" data-id="{{widget.attrs.id}}" data-type="ckeditortype">{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
 </div>
+<style>
+    .cke_source,
+    textarea.cke_source,
+    .cke_contents textarea,
+    .cke_contents textarea.cke_source {
+        background: #fff !important;
+        color: #111 !important;
+        caret-color: #111 !important;
+        -webkit-text-fill-color: #111 !important;
+        text-shadow: none !important;
+    }
+</style>
