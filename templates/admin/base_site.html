@@ -1,1 +1,6 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'admin/agromega-theme.css' %}">
+{% endblock extrastyle %}
