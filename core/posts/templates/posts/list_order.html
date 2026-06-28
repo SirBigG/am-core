@@ -28,20 +28,89 @@
                 <li class="site-catalog-stats__item">{{ group_count }} груп за алфавітом</li>
             </ul>
         </header>
-        <form class="site-content-section" method="get" action="{{ request.path }}">
-            <p class="site-content-section__eyebrow">Фільтр</p>
-            <label for="country" class="site-form-label">Країна</label>
-            <select class="form-select" id="country" name="country" aria-label="Країна">
-                <option value="" selected>Всі країни</option>
-                {% for country_slug, country_name in countries.items %}
-                    <option value="{{ country_slug }}"
-                            {% if country_slug == request.GET.country %}selected{% endif %}>{{ country_name }}</option>
+        <details class="site-content-section"
+                 {% if has_active_filters %}open{% endif %}>
+            <summary class="btn btn-outline-success">Фільтри</summary>
+            <form class="mt-3"
+                  id="category-filters"
+                  method="get"
+                  action="{{ request.path }}">
+                <p class="site-content-section__eyebrow">Фільтри</p>
+                <label for="country" class="site-form-label">Країна</label>
+                <select class="form-select" id="country" name="country" aria-label="Країна">
+                    <option value="" selected>Всі країни</option>
+                    {% for country_slug, country_name in countries.items %}
+                        <option value="{{ country_slug }}"
+                                {% if country_slug == request.GET.country %}selected{% endif %}>{{ country_name }}</option>
+                    {% endfor %}
+                </select>
+                {% for filter in attribute_filters %}
+                    <div class="mt-3">
+                        <label for="{{ filter.input_id }}" class="site-form-label">{{ filter.label }}</label>
+                        {% if filter.field_type == "select" %}
+                            <select class="form-select"
+                                    id="{{ filter.param }}"
+                                    name="{{ filter.param }}"
+                                    aria-label="{{ filter.label }}">
+                                <option value="" selected>Всі</option>
+                                {% for option in filter.options %}
+                                    <option value="{{ option.value }}"
+                                            {% if option.value in filter.selected %}selected{% endif %}>{{ option.label }} ({{ option.count }})</option>
+                                {% endfor %}
+                            </select>
+                        {% elif filter.field_type == "multiselect" %}
+                            <div class="d-flex flex-column gap-2">
+                                {% for option in filter.options %}
+                                    <label class="form-check-label">
+                                        <input class="form-check-input"
+                                               type="checkbox"
+                                               name="{{ filter.param }}"
+                                               value="{{ option.value }}"
+                                               {% if option.value in filter.selected %}checked{% endif %}>
+                                        {{ option.label }} ({{ option.count }})
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        {% elif filter.field_type == "boolean" %}
+                            <select class="form-select"
+                                    id="{{ filter.param }}"
+                                    name="{{ filter.param }}"
+                                    aria-label="{{ filter.label }}">
+                                <option value="" selected>Всі</option>
+                                {% for option in filter.options %}
+                                    <option value="{{ option.value }}"
+                                            {% if option.value == filter.selected %}selected{% endif %}>{{ option.label }} ({{ option.count }})</option>
+                                {% endfor %}
+                            </select>
+                        {% else %}
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <input class="form-control"
+                                           id="{{ filter.min_param }}"
+                                           type="number"
+                                           step="any"
+                                           name="{{ filter.min_param }}"
+                                           value="{{ filter.selected_min }}"
+                                           placeholder="від {{ filter.available_min }}">
+                                </div>
+                                <div class="col-6">
+                                    <input class="form-control"
+                                           type="number"
+                                           step="any"
+                                           name="{{ filter.max_param }}"
+                                           value="{{ filter.selected_max }}"
+                                           placeholder="до {{ filter.available_max }}">
+                                </div>
+                            </div>
+                            {% if filter.unit %}<div class="form-text">{{ filter.unit }}</div>{% endif %}
+                        {% endif %}
+                    </div>
                 {% endfor %}
-            </select>
-            <div class="site-form-actions">
-                <input type="submit" class="btn btn-success" value="Фільтрувати">
-            </div>
-        </form>
+                <div class="site-form-actions">
+                    <input type="submit" class="btn btn-success" value="Фільтрувати">
+                </div>
+            </form>
+        </details>
         {% if posts %}
             <nav class="site-alpha-nav" aria-label="Перейти до літери">
                 {% for group in posts %}

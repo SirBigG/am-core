@@ -124,6 +124,27 @@
                 <div class="site-article-body post-wrapper">{{ object.text|safe }}</div>
             </section>
         {% endif %}
+        {% if category_attribute_groups %}
+            <section class="site-content-section">
+                <p class="site-content-section__eyebrow">Характеристики</p>
+                <div class="row g-3">
+                    {% for group in category_attribute_groups %}
+                        <div class="col-12 col-lg-6">
+                            <h2 class="site-content-section__title h5">{{ group.title }}</h2>
+                            <dl class="row mb-0">
+                                {% for field in group.fields %}
+                                    <dt class="col-6 text-muted">{{ field.label }}</dt>
+                                    <dd class="col-6">
+                                        {{ field.value }}
+                                        {% if field.unit %} {{ field.unit }}{% endif %}
+                                    </dd>
+                                {% endfor %}
+                            </dl>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
         {% if registry_variety_exists %}
             <section class="site-content-section">
                 <p class="site-content-section__eyebrow">Дані реєстру</p>
