@@ -1,8 +1,10 @@
 import os
 
 from .settings import *  # noqa
+from .settings import INSTALLED_APPS as BASE_INSTALLED_APPS
 
-INSTALLED_APPS += [
+INSTALLED_APPS = [
+    *BASE_INSTALLED_APPS,
     "storages",
 ]
 

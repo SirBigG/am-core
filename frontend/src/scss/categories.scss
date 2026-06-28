@@ -1,0 +1,19 @@
+$card-border-color: transparent;
+$card-border-radius: 0;
+
+@import "main";
+
+@import "~bootstrap/scss/card";
+
+.card-img {
+  filter: brightness(50%);
+}
+
+.text-small {
+  font-size: smaller!important;
+}
+
+.no-decoration {
+  text-decoration: none!important;
+  outline: 0!important;
+}

@@ -1,0 +1,39 @@
+html {
+  box-sizing: border-box;
+  -ms-overflow-style: scrollbar;
+}
+
+body {
+  background-color: #f9f9f9;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+.no-decoration {
+  text-decoration: none;
+  outline: 0;
+}
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";
+
+@import "~bootstrap/scss/mixins/breakpoints";
+@import "~bootstrap/scss/mixins/grid";
+
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/root";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/utilities/api";
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/vendor/rfs";
+
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/nav";

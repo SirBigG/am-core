@@ -12,6 +12,8 @@ Google Analytics and Google AdSense are no longer rendered as initial third-part
 
 Analytics consent controls loading `gtag.js`. Advertising consent controls loading the Google AdSense script.
 
+Follow-up release note: `ENABLE_ADVERTS` controls Google AdSense/advertising consent only. AgroMega's own marketplace advert blocks are controlled separately by `ENABLE_INTERNAL_ADVERTS`, which stays enabled by default in local dev while AdSense is disabled.
+
 ## Files Changed
 
 - `templates/base.html`

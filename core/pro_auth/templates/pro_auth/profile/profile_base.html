@@ -22,7 +22,7 @@
             {% include "pro_auth/profile/profile_styles.html" %}
             <div class="row profile-layout-row {% block profile_layout_class %}{% endblock profile_layout_class %}">
                 {% block profile_sidebar %}
-                    <div class="col-md-4 col-12 profile-sidebar-col">
+                    <div class="col-lg-4 col-12 profile-sidebar-col">
                         <nav class="profile-sidebar-nav"
                              aria-label="Навігація особистого кабінету">
                             <a class="profile-sidebar-nav__item{% if request.resolver_match.url_name == 'dashboard' %} is-active{% endif %}"
@@ -66,7 +66,7 @@
                         </nav>
                     </div>
                 {% endblock profile_sidebar %}
-                <div class="col-md-8 col-12 profile-content-col">
+                <div class="col-lg-8 col-12 profile-content-col">
                     {% block profile_content %}
                     {% endblock profile_content %}
                 </div>

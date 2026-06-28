@@ -1,43 +1,62 @@
 {% extends "base.html" %}
-
 {% load cache post_extras news_extras static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
+    <style>
+        .external-advert-card__placeholder {
+            width: 100%;
+            height: 180px;
+            background-color: #ffffff;
+        }
+
+        .external-advert-card__domain {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+    </style>
 {% endblock scripts %}
-
 {% block extra_meta %}
-    <meta content="Всі аграрні оголошення {% if category %} в категорії {{ category.value }} {% endif %}" property="og:title">
-    <meta content="Свіжі оголошення аграрної тематики{% if category %} в категорії {{ category.value }}{% endif %}." property="og:description">
+    <meta content="Всі аграрні оголошення {% if category %}в категорії {{ category.value }}{% endif %}"
+          property="og:title">
+    <meta content="Свіжі оголошення аграрної тематики{% if category %} в категорії {{ category.value }}{% endif %}."
+          property="og:description">
     {% if request.GET.page %}
-        <meta name="robots" content="noindex, nofollow">{% endif %}
+        <meta name="robots" content="noindex, nofollow">
+    {% endif %}
 {% endblock extra_meta %}
-
-{% block title %}Всі аграрні оголошення{% if category %} в категорії {{ category.value }} {% endif %}{% endblock %}
-
-{% block page_title %}Всі аграрні оголошення{% if category %} в категорії {{ category.value }}
-{% endif %}{% endblock %}
-
+{% block title %}
+    Всі аграрні оголошення
+    {% if category %}в категорії {{ category.value }}{% endif %}
+{% endblock title %}
+{% block page_title %}
+    Всі аграрні оголошення
+    {% if category %}в категорії {{ category.value }}{% endif %}
+{% endblock page_title %}
 {% block base_content_block %}
     <div class="col-12 p-0">
-        <div class="col-md-4 col-12 mb-3">
+        <div class="col-lg-4 col-12 mb-3">
             {% cache 1800 'categories_filter_block' %}
-                {% categories_filter %}
-            {% endcache %}
-        </div>
-        {% for group in object_list|group_by:4 %}
-            <div class="card-group mb-2">
+            {% categories_filter %}
+        {% endcache %}
+    </div>
+    {% for group in object_list|group_by:4 %}
+        <div class="card-group mb-2">
             {% with external_loop_counter=forloop.counter %}
                 {% for obj in group %}
-                    <div class="col-md-3 col-12 mb-3">
+                    <div class="col-lg-3 col-12 mb-3">
                         <div class="card">
                             {% if obj.data.image %}
-                                <img class="card-img" src="{{ obj.data.image }}" alt="{{ obj.data.title }}">
-                                {% else %}
-                                <div class="card-img" style="width: 100%; height: 180px; background-color: white;"></div>
+                                <img class="card-img"
+                                     src="{{ obj.data.image }}"
+                                     alt="{{ obj.data.title }}"
+                                     width="320"
+                                     height="180">
+                            {% else %}
+                                <div class="card-img external-advert-card__placeholder"></div>
                             {% endif %}
-                               <span class="badge badge-pill badge-success" style="position: absolute; top: 10px; left: 10px;">{{ obj.link|get_domain }}</span>
+                            <span class="badge badge-pill badge-success external-advert-card__domain">{{ obj.link|get_domain }}</span>
                             <div class="card-body">
                                 <h6 class="card-title">{{ obj.data.title }}</h6>
                                 <div class="row mt-3">
@@ -46,12 +65,16 @@
                                     </div>
                                 </div>
                                 {% if obj.data.description %}
-                                    <p class="card-text collapse" id="advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}">{{ obj.data.description }}</p>
-                                    <button class="btn btn-link pl-0" type="button" data-toggle="collapse"
-                                            data-target="#advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}" aria-expanded="false"
+                                    <p class="card-text collapse"
+                                       id="advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}">{{ obj.data.description }}</p>
+                                    <button class="btn btn-link pl-0"
+                                            type="button"
+                                            data-toggle="collapse"
+                                            data-target="#advert{{ forloop.counter|multiply:'a' }}{{ external_loop_counter|multiply:'b' }}"
+                                            aria-expanded="false"
                                             onclick="ga('send', 'event', 'description', 'clicked');">Читати опис</button>
                                 {% endif %}
-                            <div class="row align-content-between">
+                                <div class="row align-content-between">
                                     <div class="col-6 p-0"><span class="btn text-success">{{ obj.data.price }}</span></div>
                                     <div class="col-6 p-0">
                                         <button class="btn text-success"
@@ -65,9 +88,8 @@
                     </div>
                 {% endfor %}
             {% endwith %}
-            </div>
-        {% endfor %}
-
-        {% include "helpers/pagination_short.html" %}
-    </div>
+        </div>
+    {% endfor %}
+    {% include "helpers/pagination_short.html" %}
+</div>
 {% endblock base_content_block %}

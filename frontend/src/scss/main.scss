@@ -1,0 +1,196 @@
+$green: #4CAF50;
+$red: #B22222;
+
+$background-color: #f7f7f7;
+
+// $background-color-light: #dfeae5;
+$background-color-light: #f1f8f4;
+
+$enable-dark-mode: false !default;
+
+
+@import '~typeface-open-sans/index.css';
+
+$font-family-sans-serif: 'Open Sans', sans-serif;
+
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+@import "~bootstrap/scss/maps";
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/root";
+
+// 6. Optionally include any other parts as needed
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/reboot";
+@import "~bootstrap/scss/type";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/containers";
+@import "~bootstrap/scss/grid";
+@import "~bootstrap/scss/helpers";
+
+// 7. Optionally include utilities API last to generate classes based on the Sass map in `_utilities.scss`
+@import "~bootstrap/scss/utilities/api";
+
+@import "~bootstrap/scss/mixins/breakpoints";
+@import "~bootstrap/scss/mixins/grid";
+@import "~bootstrap/scss/mixins/border-radius";
+@import "~bootstrap/scss/mixins/buttons";
+@import "~bootstrap/scss/mixins/transition";
+@import "~bootstrap/scss/mixins/box-shadow";
+@import "~bootstrap/scss/mixins/gradients";
+@import "~bootstrap/scss/mixins/clearfix";
+@import "~bootstrap/scss/list-group";
+@import "~bootstrap/scss/mixins/text-truncate";
+@import "~bootstrap/scss/mixins/deprecate";
+@import "~bootstrap/scss/mixins/caret";
+@import "~bootstrap/scss/mixins/lists";
+@import "~bootstrap/scss/mixins/color-mode";
+
+@import "~bootstrap/scss/vendor/rfs";
+
+@import "~bootstrap/scss/bootstrap-grid";
+
+@import "~bootstrap/scss/mixins";
+@import "~bootstrap/scss/utilities";
+@import "~bootstrap/scss/helpers";
+
+@import "~bootstrap/scss/nav";
+@import "~bootstrap/scss/navbar";
+@import "~bootstrap/scss/buttons";
+@import "~bootstrap/scss/type";
+
+@import "~bootstrap/scss/dropdown";
+@import "~bootstrap/scss/transitions";
+@import "~bootstrap/scss/reboot";
+
+@import "~bootstrap/scss/helpers/position";
+@import "./css/fontello.css";
+
+body {
+  background-color: $background-color;
+
+  main {
+    margin-bottom: 65px;
+  }
+}
+
+.btn-circle {
+  width: 45px;
+  height: 45px;
+  line-height: 45px;
+  text-align: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-circle i {
+  position: relative;
+  top: -1px;
+}
+
+.btn-circle-lg {
+  width: 55px;
+  height: 55px;
+  line-height: 55px;
+  font-size: 1.1rem;
+}
+
+
+.second-menu {
+  flex-wrap: nowrap !important;
+  overflow: auto;
+  white-space: nowrap;
+
+  .nav-link {
+    color: $white;
+  }
+
+  .nav-link.active {
+    border-bottom: 1px solid $white;
+  }
+
+  .nav-link:hover {
+    border-bottom: 1px solid $white;
+    transition: width 0.3s ease 0s, left 0.3s ease 0s;
+  }
+
+  .nav-link:hover:after {
+    width: 80%;
+    left: 0;
+  }
+}
+
+.second-menu::-webkit-scrollbar {
+  display: none;
+}
+
+.second-menu-container {
+  background-color: $green;
+}
+
+.footer-copyright {
+  background-color: #0f0f0f;
+}
+
+.no-decoration {
+  text-decoration: none;
+  outline: 0;
+}
+
+.bg-light {
+  background-color: $background-color-light !important;
+}
+
+.dropdown-menu .dropdown-item:active {
+  background-color: $background-color-light;
+}
+
+.dropdown-menu.show {
+  background-color: $background-color-light;
+  z-index: 1021;
+}
+
+.dropdown-menu {
+  width: 300px;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #333;
+  color: #fff;
+}
+
+.dropdown-menu .profile {
+  text-align: center;
+}
+
+.dropdown-menu .profile img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.dropdown-menu .profile h5 {
+  margin-top: 10px;
+  font-size: 1.25rem;
+}
+
+.dropdown-menu .profile p {
+  font-size: 0.875rem;
+  color: #ccc;
+}
+
+.dropdown-menu .btn {
+  width: 100%;
+  margin: 10px 0;
+}
+
+.dropdown-menu .footer {
+  text-align: center;
+  font-size: 0.875rem;
+}
+
+.dropdown-item {
+  white-space: normal;
+  word-wrap: break-word;
+}

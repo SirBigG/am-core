@@ -23,6 +23,8 @@ just check-deps
 just test
 just test-target core.adverts
 just migrate
+just static-install
+just static-build
 just collectstatic
 just forum-test
 ```
@@ -30,6 +32,32 @@ just forum-test
 Nginx exposes the local app on port `8000`. The compose setup mounts this repo
 into the `core` container at `/am-core` and mounts the sibling
 `../forum_instance/` project into the forum container at `/app`.
+
+Local development disables Google AdSense by default with `ENABLE_ADVERTS=0`,
+but keeps AgroMega's own marketplace advert blocks enabled with
+`ENABLE_INTERNAL_ADVERTS=1`.
+
+## Static Assets
+
+The old `am-front` project is retired. Custom Django-owned SCSS and JavaScript
+now live in `frontend/src/` and build into existing Django static paths under
+`core/posts/static/posts/`.
+
+Typical workflow:
+
+```bash
+just static-install
+just static-build
+just collectstatic
+```
+
+Use `just static-watch` while editing frontend source files. Frontend build
+dependencies are tracked in `frontend/package.json` and
+`frontend/package-lock.json`; Python dependencies remain managed by uv.
+
+Third-party Django package static assets such as CKEditor, autocomplete-light,
+mptt, silk, and comment assets are supplied by installed Python packages. PWA
+root files such as icons, manifest, and service worker live in `pwa/`.
 
 ## Documentation
 

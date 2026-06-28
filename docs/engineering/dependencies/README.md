@@ -14,6 +14,9 @@ The Docker image syncs dependencies into `/usr/local` with `UV_PROJECT_ENVIRONME
 This avoids putting the runtime environment under `/am-core/.venv`, because Docker Compose bind
 mounts the source tree into `/am-core` during local development.
 
+Frontend build dependencies for Django-owned custom static assets are managed separately with npm
+under `frontend/`. See `docs/engineering/static-assets/README.md` for the static asset workflow.
+
 Useful commands:
 
 ```bash

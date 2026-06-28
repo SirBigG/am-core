@@ -21,6 +21,9 @@ Classification is the shared tree of categories used by other AgroMega core proj
 - Categories are hierarchical.
 - Categories are shared infrastructure for other domains, not only a standalone content area.
 - Changes to the tree can affect multiple business apps.
+- Concrete post categories can own structured attribute schemas. These schemas describe category-specific facts such as variety traits, illness traits, breed traits, or numeric intervals.
+- Category attribute schemas can include public fields for user-facing filters and internal fields for admin or service workflows.
+- Structured post attribute data should be preserved when a post changes category, but public filters should only use values indexed for the post's current category.
 
 ## States And Lifecycle
 

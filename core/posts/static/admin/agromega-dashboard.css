@@ -1,0 +1,116 @@
+.admin-dashboard-summary {
+  margin: 0 0 1.5rem;
+}
+
+.admin-dashboard-summary__header h2 {
+  margin: 0 0 0.75rem;
+  color: var(--body-loud-color);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.admin-dashboard-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.admin-dashboard-metric {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--body-bg);
+  color: var(--body-fg);
+}
+
+.admin-dashboard-metric:focus,
+.admin-dashboard-metric:hover {
+  border-color: var(--primary);
+  color: var(--body-fg);
+  text-decoration: none;
+}
+
+.admin-dashboard-metric__label,
+.admin-dashboard-metric__description,
+.admin-dashboard-feedback__meta {
+  display: block;
+  color: var(--body-quiet-color);
+  font-size: 0.8125rem;
+}
+
+.admin-dashboard-metric__value {
+  display: block;
+  margin: 0.25rem 0;
+  color: var(--link-fg);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.admin-dashboard-feedback.module {
+  margin: 0 0 2rem;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--darkened-bg);
+}
+
+.admin-dashboard-feedback.module h2 {
+  margin: -1rem -1rem 1rem;
+  border-radius: 4px 4px 0 0;
+}
+
+.admin-dashboard-feedback__list {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-dashboard-feedback__item {
+  padding: 0 0 0.75rem;
+  border-bottom: 1px solid var(--hairline-color);
+}
+
+.admin-dashboard-feedback__item:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.admin-dashboard-feedback__item p {
+  margin: 0.35rem 0;
+  line-height: 1.35;
+}
+
+.admin-dashboard-feedback__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.admin-dashboard-feedback__empty {
+  margin: 0;
+  color: var(--body-quiet-color);
+}
+
+.dashboard #recent-actions-module {
+  margin-top: 0;
+}
+
+@media (min-width: 1024px) {
+  .dashboard #content {
+    width: auto;
+    max-width: 1180px;
+  }
+
+  .dashboard #content.colMS {
+    margin-right: 420px;
+  }
+
+  .dashboard #content-related {
+    width: 380px;
+    margin-right: -420px;
+  }
+}

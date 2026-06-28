@@ -29,6 +29,15 @@ WORK_STATUS = (
 )
 
 
+class CategoryAttributeFieldType(models.TextChoices):
+    SELECT = "select", _("select")
+    MULTISELECT = "multiselect", _("multiple select")
+    INTEGER = "integer", _("integer")
+    DECIMAL = "decimal", _("decimal")
+    RANGE = "range", _("range")
+    BOOLEAN = "boolean", _("boolean")
+
+
 class PostQuerySet(models.QuerySet):
     def select_objects(self):
         return (
@@ -84,6 +93,7 @@ class Post(models.Model):
     absolute_url = models.CharField(max_length=512, default="")
 
     tags = TaggableManager()
+    category_attributes = models.JSONField(blank=True, default=dict, verbose_name=_("category attributes"))
 
     comments = GenericRelation(Comment)
 
@@ -135,6 +145,173 @@ class Post(models.Model):
         )
         self.save()
         return self.absolute_url
+
+
+class CategoryAttributeGroup(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="attribute_groups",
+        verbose_name=_("category"),
+    )
+    title = models.CharField(max_length=250, verbose_name=_("title"))
+    description = models.TextField(blank=True, verbose_name=_("description"))
+    is_active = models.BooleanField(default=True, verbose_name=_("active"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("sort order"))
+
+    class Meta:
+        db_table = "category_attribute_group"
+        verbose_name = _("Category attribute group")
+        verbose_name_plural = _("Category attribute groups")
+        ordering = ("category__value", "sort_order", "title")
+
+    def __str__(self):
+        return f"{self.category}: {self.title}"
+
+
+class CategoryAttributeField(models.Model):
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.CASCADE,
+        related_name="attribute_fields",
+        verbose_name=_("category"),
+    )
+    group = models.ForeignKey(
+        CategoryAttributeGroup,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="fields",
+        verbose_name=_("group"),
+    )
+    key = models.SlugField(max_length=120, verbose_name=_("key"))
+    label = models.CharField(max_length=250, verbose_name=_("label"))
+    field_type = models.CharField(
+        max_length=20,
+        choices=CategoryAttributeFieldType,
+        verbose_name=_("field type"),
+    )
+    help_text = models.TextField(blank=True, verbose_name=_("help text"))
+    unit = models.CharField(max_length=50, blank=True, verbose_name=_("unit"))
+    decimal_places = models.PositiveSmallIntegerField(default=0, verbose_name=_("decimal places"))
+    min_value = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name=_("minimum value"),
+    )
+    max_value = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name=_("maximum value"),
+    )
+    is_active = models.BooleanField(default=True, verbose_name=_("active"))
+    is_required = models.BooleanField(default=False, verbose_name=_("required"))
+    is_filterable = models.BooleanField(default=True, verbose_name=_("filterable"))
+    is_public = models.BooleanField(default=True, verbose_name=_("public"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("sort order"))
+
+    class Meta:
+        db_table = "category_attribute_field"
+        verbose_name = _("Category attribute field")
+        verbose_name_plural = _("Category attribute fields")
+        ordering = ("category__value", "group__sort_order", "sort_order", "label")
+        constraints = [
+            models.UniqueConstraint(fields=("category", "key"), name="unique_category_attribute_field_key"),
+        ]
+
+    def __str__(self):
+        return f"{self.category}: {self.label}"
+
+
+class CategoryAttributeChoice(models.Model):
+    field = models.ForeignKey(
+        CategoryAttributeField,
+        on_delete=models.CASCADE,
+        related_name="choices",
+        verbose_name=_("field"),
+    )
+    value = models.SlugField(max_length=120, verbose_name=_("value"))
+    label = models.CharField(max_length=250, verbose_name=_("label"))
+    is_active = models.BooleanField(default=True, verbose_name=_("active"))
+    is_public = models.BooleanField(default=True, verbose_name=_("public"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("sort order"))
+
+    class Meta:
+        db_table = "category_attribute_choice"
+        verbose_name = _("Category attribute choice")
+        verbose_name_plural = _("Category attribute choices")
+        ordering = ("field__sort_order", "sort_order", "label")
+        constraints = [
+            models.UniqueConstraint(fields=("field", "value"), name="unique_category_attribute_choice_value"),
+        ]
+
+    def __str__(self):
+        return f"{self.field}: {self.label}"
+
+
+class PostAttributeValue(models.Model):
+    post = models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE,
+        related_name="attribute_values",
+        verbose_name=_("post"),
+    )
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("category"))
+    field = models.ForeignKey(
+        CategoryAttributeField,
+        on_delete=models.CASCADE,
+        related_name="post_values",
+        verbose_name=_("field"),
+    )
+    choice = models.ForeignKey(
+        CategoryAttributeChoice,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="post_values",
+        verbose_name=_("choice"),
+    )
+    value_text = models.CharField(max_length=250, blank=True, verbose_name=_("text value"))
+    value_number = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name=_("number value"),
+    )
+    value_number_min = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name=_("minimum number value"),
+    )
+    value_number_max = models.DecimalField(
+        max_digits=14,
+        decimal_places=4,
+        blank=True,
+        null=True,
+        verbose_name=_("maximum number value"),
+    )
+    value_boolean = models.BooleanField(blank=True, null=True, verbose_name=_("boolean value"))
+
+    class Meta:
+        db_table = "post_attribute_value"
+        verbose_name = _("Post attribute value")
+        verbose_name_plural = _("Post attribute values")
+        indexes = [
+            models.Index(fields=("category", "field")),
+            models.Index(fields=("post", "field")),
+            models.Index(fields=("field", "choice")),
+            models.Index(fields=("field", "value_number_min", "value_number_max")),
+        ]
+
+    def __str__(self):
+        return f"{self.post_id}: {self.field}"
 
 
 class Photo(models.Model):

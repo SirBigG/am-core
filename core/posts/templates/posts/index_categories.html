@@ -4,7 +4,7 @@
         <h2 class="site-category-section__title">{{ root.value }}</h2>
         <div class="row">
             {% for child in root.get_children %}
-                <div class="col-md-3 col-6 mb-2">
+                <div class="col-lg-3 col-6 mb-2">
                     <article class="site-category-card">
                         <a class="site-category-card__media"
                            href="{% url 'parent-category-index' parent=child.slug %}">

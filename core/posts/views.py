@@ -14,6 +14,8 @@ from django.views.generic import DetailView, ListView, RedirectView, TemplateVie
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
+from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
+from core.posts.category_attributes import get_public_category_attribute_groups
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.templatetags.post_extras import full_url
 from core.registry.models import Variety
@@ -44,7 +46,7 @@ class IndexView(TemplateView):
         context["object_list"] = Post.objects.select_objects().active().order_by("-publish_date")[:8]
         context["random_posts"] = Post.objects.select_objects().active().order_by("?")[:8]
         context["random_adverts"] = []
-        if settings.ENABLE_ADVERTS:
+        if settings.ENABLE_INTERNAL_ADVERTS:
             context["random_adverts"] = Advert.objects.filter(
                 updated__gte=datetime.now() - timedelta(days=14)
             ).order_by("?")[:8]
@@ -94,11 +96,11 @@ class PostListView(TemplateView):
         category = Category.objects.select_related("meta").filter(slug=self.kwargs["child"]).first()
         if category is None:
             raise Http404
-        posts = (
-            Post.objects.filter(rubric_id=category.id).values("title", "absolute_url", "country__short_slug").active()
-        )
-        posts = self._filter_posts(posts)
-        posts = list(posts)
+        posts_queryset = Post.objects.filter(rubric_id=category.id).active()
+        posts_queryset = self._filter_posts(posts_queryset)
+        attribute_filters = build_category_attribute_filters(category, posts_queryset, self.request.GET)
+        posts_queryset = apply_category_attribute_filters(posts_queryset, category, self.request.GET)
+        posts = list(posts_queryset.values("title", "absolute_url", "country__short_slug"))
         post_count = len(posts)
         posts = [
             [key, list(g)] for key, g in groupby(sorted(posts, key=lambda x: x["title"]), key=lambda x: x["title"][0])
@@ -109,6 +111,8 @@ class PostListView(TemplateView):
             "view": self,
             "request": self.request,
             "countries": self._get_post_countries(category.id),
+            "attribute_filters": attribute_filters,
+            "has_active_filters": bool(self.request.GET),
             "post_count": post_count,
             "group_count": len(posts),
         }
@@ -181,6 +185,7 @@ class PostDetail(DetailView):
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
         context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
+        context["category_attribute_groups"] = get_public_category_attribute_groups(context["object"])
         return context
 
 

@@ -15,6 +15,7 @@ Local Docker Compose config:
 - Nginx service exposes local port `8000`
 - The compose file mounts this repo as `./am-core:/am-core`
 - The forum project lives outside this repo at `../forum_instance` and is mounted as `./forum_instance:/app`
+- The legacy `am-front` service/submodule is retired. Do not add new work there.
 
 Useful local commands from this `am-core` folder:
 
@@ -26,13 +27,45 @@ just test-target core.adverts
 just test-api
 just flake
 just migrate
+just static-install
+just static-build
 just collectstatic
 just forum-test
 ```
 
+## Static Asset Workflow
+
+Custom Django-owned SCSS and JavaScript live in `frontend/src/` and build into Django app static files under `core/posts/static/posts/`.
+
+Use the local Docker workflow:
+
+```bash
+just static-install
+just static-build
+just collectstatic
+```
+
+For active SCSS/JavaScript work:
+
+```bash
+just static-watch
+```
+
+Important static asset rules:
+
+- Keep custom frontend source in `frontend/src/`.
+- Keep compiled outputs at the existing Django static paths unless templates are intentionally changed.
+- Use Dart Sass through the `sass` npm package; do not reintroduce `node-sass`.
+- Use `frontend/package.json` and `frontend/package-lock.json` for frontend build dependencies.
+- Third-party Django app static assets such as CKEditor, autocomplete-light, mptt, silk, and comment assets come from installed Python packages.
+- PWA/root static files such as icons, manifest, and service worker live in `pwa/`.
+- Forum static work stays in the sibling `../forum_instance` project unless explicitly coupled.
+
 ## Dependency Workflow
 
 Main app dependencies are managed with uv through `pyproject.toml` and `uv.lock`.
+
+Frontend build dependencies for Django-owned custom static assets are managed separately in `frontend/package.json` and `frontend/package-lock.json`.
 
 For dependency details, read:
 
@@ -40,6 +73,8 @@ For dependency details, read:
 - `docs/engineering/package-upgrades/`
 
 Do not reintroduce checked-in main-app `requirements.in`, `requirements.txt`, or `constraints.txt` files unless the dependency workflow intentionally changes again.
+
+Do not reintroduce the retired `am-front` submodule or Docker service unless the static ownership model intentionally changes again.
 
 Keep forum dependency work isolated in the sibling project at `../forum_instance` unless the task explicitly asks for a coupled main/forum change.
 

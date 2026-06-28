@@ -1,0 +1,42 @@
+$breadcrumb-bg: inherit !default;
+$breadcrumb-divider: quote(">") !default;
+$border-radius: 0.8rem;
+
+//$body-color: #F5F5F5;
+//$secondary: #F5F5F5;
+//$text-muted: #F5F5F5;
+//$breadcrumb-divider-color:          #F5F5F5;
+//$breadcrumb-active-color:           #F5F5F5;
+//
+//$background-color: #333333;
+
+
+@import "main";
+
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/mixins/image";
+@import "~bootstrap/scss/mixins/alert";
+@import "~bootstrap/scss/mixins/forms";
+
+// @import "~bootstrap/scss/utilities/borders";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/carousel";
+@import "~bootstrap/scss/images";
+@import "~bootstrap/scss/alert";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/tables";
+
+
+.post-content {
+  border-bottom: 5px solid $green;
+}
+
+.breadcrumb-item {
+  font-size: 0.90rem;
+}
+
+.post-wrapper p {
+  font-size: 18px;
+  line-height: 34px;
+  margin-bottom: 40px;
+}

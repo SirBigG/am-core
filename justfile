@@ -76,6 +76,18 @@ makemigrations *args:
 collectstatic:
     {{manage}} collectstatic --noinput -i node_modules --settings={{dev_settings}}
 
+# Install frontend dependencies inside the mounted am-core workspace.
+static-install:
+    {{core}} npm --prefix frontend install
+
+# Build Django-owned static assets from frontend sources.
+static-build:
+    {{core}} npm --prefix frontend run build:static
+
+# Watch Django-owned static assets while editing SCSS or JavaScript.
+static-watch:
+    {{core}} npm --prefix frontend run watch:static
+
 # Create Ukrainian translation messages inside core.
 messages:
     {{manage}} makemessages -l uk --ignore=env/* --settings={{settings}}

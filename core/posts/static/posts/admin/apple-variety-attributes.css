@@ -1,0 +1,7 @@
+.apple-variety-attributes {
+  display: none;
+}
+
+.apple-variety-attributes.is-visible {
+  display: block;
+}

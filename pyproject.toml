@@ -8,7 +8,7 @@ authors = [
     { name = "Andrii Hots", email = "gotsandriy@gmail.com" },
 ]
 dependencies = [
-    "Django==6.0.5",
+    "Django==6.0.6",
     "MarkupSafe==3.0.3",
     "Pillow==12.2.0",
     "boto3==1.43.6",
@@ -80,12 +80,13 @@ ignore_missing_imports = "True"
 
 [tool.ruff]
 line-length = 120
+fix = true
+src = ["."]
+
+[tool.ruff.lint]
 select = ["E", "F", "ERA", "I"]
 ignore = [
     "TID252",
     "E501",  # line too long, handled by black
     "ERA001",  # Found commented-out code
 ]
-fix = true
-
-src = ["api", "in9", "lifestyle", "search", "world"]
