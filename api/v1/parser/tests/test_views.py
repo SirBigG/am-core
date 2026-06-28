@@ -64,6 +64,24 @@ class ParserWorkerAPITests(APITestCase):
         self.assertEqual(response.data[0]["id"], self.source.id)
         self.assertEqual(response.data[0]["category_slug"], "apples")
 
+    def test_source_list_uses_company_parser_map_when_link_map_is_empty(self):
+        Company.objects.filter(pk=self.company.pk).update(parser_map={"name": "//article/h2", "price": "//span"})
+        Link.objects.filter(pk=self.source.pk).update(parser_map=None)
+
+        response = self.client.get("/api/parser/sources/?category=apples&experiment=apples-phase-1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["parser_map"], {"name": "//article/h2", "price": "//span"})
+
+    def test_source_list_prefers_link_parser_map_over_company_map(self):
+        Company.objects.filter(pk=self.company.pk).update(parser_map={"name": "//company/h2", "price": "//span"})
+        Link.objects.filter(pk=self.source.pk).update(parser_map={"name": "//link/h2", "price": "//strong"})
+
+        response = self.client.get("/api/parser/sources/?category=apples&experiment=apples-phase-1")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["parser_map"], {"name": "//link/h2", "price": "//strong"})
+
     def test_source_list_returns_only_sources_due_for_crawl(self):
         Link.objects.filter(pk=self.source.pk).update(last_crawled=timezone.now(), crawl_interval_minutes=1440)
 

@@ -25,7 +25,7 @@ The main Django site now stays the source of truth for parser source configurati
   - `POST /api/parser/sources/<id>/results/`
   - `POST /api/parser/sources/<id>/failure/`
 - Updated company/product templates so stale prices are not shown as current in related-product blocks, while company detail still keeps products visible.
-- Replaced raw admin parser-map editing for companies and parser sources with minimal structured fields for product name and price XPath selectors.
+- Replaced raw admin parser-map editing for companies and parser sources with minimal structured fields for product name and price XPath selectors. Parser workers receive `Link.parser_map` when present, otherwise the parent `Company.parser_map`, so companies can own the default list-item parser map while links identify concrete list URLs.
 - Improved automatic product-to-post matching so parsed products can link to active posts in the same category by exact title, title contained in the product name, token coverage, or existing full-text fallback.
 - Added `link_product_posts` to backfill existing active products that still have no linked post.
 - Added `run_local_parser_worker` for trusted laptops to pull sources, lease work, parse locally, and submit results or failures through the API.

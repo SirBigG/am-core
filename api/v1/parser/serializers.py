@@ -9,6 +9,10 @@ class ParserSourceSerializer(serializers.ModelSerializer):
     company_name = serializers.CharField(source="company.name", read_only=True)
     category_id = serializers.IntegerField(read_only=True)
     category_slug = serializers.CharField(source="category.slug", read_only=True)
+    parser_map = serializers.SerializerMethodField()
+
+    def get_parser_map(self, source):
+        return source.parser_map or source.company.parser_map or {}
 
     class Meta:
         model = Link
