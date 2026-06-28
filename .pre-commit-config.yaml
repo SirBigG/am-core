@@ -50,7 +50,7 @@ repos:
     rev: 26.5.1
     hooks:
       - id: black
-        args: [ "--config", "pyproject.toml", "--target-version", "py314" ]
+        args: [ "--config", "pyproject.toml", "--target-version", "py314", "--fast" ]
 
   - repo: https://github.com/PyCQA/docformatter
     rev: v1.7.8

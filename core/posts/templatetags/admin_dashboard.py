@@ -1,6 +1,5 @@
 from datetime import timedelta
 
-from django import template
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.utils import timezone
@@ -8,8 +7,6 @@ from django.utils import timezone
 from core.adverts.models import Advert
 from core.posts.models import Post
 from core.services.models import Feedback
-
-register = template.Library()
 
 DASHBOARD_PERIOD_DAYS = 30
 LATEST_FEEDBACK_LIMIT = 5
@@ -89,8 +86,3 @@ def get_admin_dashboard_metrics(user, now=None):
         "feedback_count": feedback_count,
         "feedback_items": feedback_items,
     }
-
-
-@register.simple_tag(takes_context=True)
-def admin_dashboard_metrics(context):
-    return get_admin_dashboard_metrics(context["request"].user)

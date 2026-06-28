@@ -1,5 +1,5 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static post_extras %}
+{% load admin_extras i18n static %}
 {% block extrastyle %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">
@@ -12,7 +12,7 @@
 {% block nav-sidebar %}
 {% endblock nav-sidebar %}
 {% block content %}
-    {% admin_dashboard_metrics request.user as dashboard %}
+    {% admin_dashboard_metrics as dashboard %}
     <div id="content-main" class="app-list">
         {% if dashboard.cards %}
             <section class="admin-dashboard-summary"
@@ -35,7 +35,7 @@
     </div>
 {% endblock content %}
 {% block sidebar %}
-    {% admin_dashboard_metrics request.user as dashboard %}
+    {% admin_dashboard_metrics as dashboard %}
     <div id="content-related">
         {% if dashboard.feedback_count is not None %}
             <section class="admin-dashboard-feedback module"

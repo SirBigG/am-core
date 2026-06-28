@@ -1,4 +1,5 @@
 from datetime import timedelta
+from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
 from django.contrib.sites.models import Site
@@ -8,7 +9,7 @@ from django.utils import timezone
 
 from core.adverts.models import Advert
 from core.posts.models import Post
-from core.posts.templatetags.admin_dashboard import get_admin_dashboard_metrics
+from core.posts.templatetags.admin_dashboard import DASHBOARD_PERIOD_DAYS, get_admin_dashboard_metrics
 from core.services.models import Feedback
 from core.utils.tests.factories import FeedbackFactory, PostFactory, StaffUserFactory, UserFactory
 
@@ -88,3 +89,35 @@ class AdminDashboardIndexTests(TestCase):
         self.assertContains(response, "Seed question")
         self.assertContains(response, "How do I add apple variety details?")
         self.assertContains(response, "admin/agromega-dashboard.css")
+
+    def test_admin_index_reuses_dashboard_metrics_for_content_and_sidebar(self):
+        Site.objects.update_or_create(
+            id=1,
+            defaults={"domain": "localhost:8000", "name": "localhost"},
+        )
+        staff_user = StaffUserFactory(is_superuser=True)
+        self.client.force_login(staff_user)
+        dashboard = {
+            "period_days": DASHBOARD_PERIOD_DAYS,
+            "since": timezone.now() - timedelta(days=DASHBOARD_PERIOD_DAYS),
+            "cards": [
+                {
+                    "label": "Adverts",
+                    "value": 3,
+                    "description": "3 active in the last 30 days",
+                    "url": reverse("admin:adverts_advert_changelist"),
+                }
+            ],
+            "feedback_count": 0,
+            "feedback_items": [],
+        }
+
+        with patch(
+            "core.posts.templatetags.admin_extras.get_admin_dashboard_metrics", return_value=dashboard
+        ) as metrics:
+            response = self.client.get(reverse("admin:index"), headers={"host": "localhost:8000"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Adverts")
+        self.assertContains(response, "Latest feedback (0)")
+        metrics.assert_called_once_with(staff_user)
