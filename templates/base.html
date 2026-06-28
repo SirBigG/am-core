@@ -1764,7 +1764,7 @@
             text-decoration: none !important;
         }
 
-        @media (max-width: 767.98px) {
+        @media (max-width: 991.98px) {
             body main {
                 margin-bottom: 0 !important;
                 padding-bottom: calc(96px + env(safe-area-inset-bottom)) !important;
@@ -2140,28 +2140,28 @@
             {# end second menu navbar #}
             <div class="container">
                 {% block page_header %}
-                    <div class="row justify-content-md-center mt-3">
-                        <div class="col-md-6 col-8">
+                    <div class="row justify-content-lg-center mt-3">
+                        <div class="col-lg-6 col-8">
                             <h1 class="h4">
                                 {% block page_title %}
                                 {% endblock page_title %}
                             </h1>
                         </div>
-                        <div class="col-md-2 col-4 p-2">
+                        <div class="col-lg-2 col-4 p-2">
                             {% block page_title_right %}
                             {% endblock page_title_right %}
                         </div>
                     </div>
                 {% endblock page_header %}
-                <div class="row justify-content-md-center">
-                    <div class="col-md-10 col-lg-8 col-12">
+                <div class="row justify-content-lg-center">
+                    <div class="col-lg-8 col-12">
                         {% block breadcrumbs %}
                         {% endblock breadcrumbs %}
                     </div>
                 </div>
-                <div class="row justify-content-md-center">
+                <div class="row justify-content-lg-center">
                     {% block base_content_block %}
-                        <div class="col-md-10 col-lg-8 col-12">
+                        <div class="col-lg-8 col-12">
                             {% block content %}
                             {% endblock content %}
                         </div>
