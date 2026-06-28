@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
@@ -21,11 +23,14 @@ class CompanyDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = Product.objects.filter(company=self.object)
+        context["products"] = Product.objects.filter(company=self.object, active=True)
         return context
 
 
 def admin_parse_form_view(request, company_id: int):
+    if not settings.ENABLE_IN_PROCESS_COMPANY_PARSING:
+        raise PermissionDenied("In-process company parsing is disabled.")
+
     if request.method == "POST":
         form = AdminParseForm(request.POST, request.FILES)
         if form.is_valid():

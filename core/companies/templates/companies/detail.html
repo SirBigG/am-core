@@ -37,9 +37,13 @@
             {% for product in products %}
                 <article class="site-product-card">
                     <h3 class="site-product-card__title">{{ product.name }}</h3>
-                    {% if product.description %}<p class="site-product-card__text">{{ product.description }}</p>{% endif %}
-                    {% if product.price %}
+                    {% if product.description %}
+                        <p class="site-product-card__text">{{ product.description }}</p>
+                    {% endif %}
+                    {% if product.has_fresh_price %}
                         <p class="site-product-card__price">{{ product.price }} {{ product.get_currency_display }}</p>
+                    {% elif product.price %}
+                        <p class="site-product-card__text">Ціна потребує оновлення.</p>
                     {% endif %}
                     {% if product.post_id %}
                         <a href="{{ product.post.get_absolute_url }}"
