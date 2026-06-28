@@ -1,0 +1,103 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static post_extras %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">
+    <link rel="stylesheet" href="{% static "admin/agromega-dashboard.css" %}">
+{% endblock extrastyle %}
+{% block coltype %}colMS{% endblock coltype %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock bodyclass %}
+{% block nav-breadcrumbs %}
+{% endblock nav-breadcrumbs %}
+{% block nav-sidebar %}
+{% endblock nav-sidebar %}
+{% block content %}
+    {% admin_dashboard_metrics request.user as dashboard %}
+    <div id="content-main" class="app-list">
+        {% if dashboard.cards %}
+            <section class="admin-dashboard-summary"
+                     aria-labelledby="admin-dashboard-summary-title">
+                <div class="admin-dashboard-summary__header">
+                    <h2 id="admin-dashboard-summary-title">Last {{ dashboard.period_days }} days</h2>
+                </div>
+                <div class="admin-dashboard-metrics">
+                    {% for card in dashboard.cards %}
+                        <a class="admin-dashboard-metric" href="{{ card.url }}">
+                            <span class="admin-dashboard-metric__label">{{ card.label }}</span>
+                            <strong class="admin-dashboard-metric__value">{{ card.value }}</strong>
+                            <span class="admin-dashboard-metric__description">{{ card.description }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+        {% include "admin/app_list.html" with app_list=app_list show_changelinks=True %}
+    </div>
+{% endblock content %}
+{% block sidebar %}
+    {% admin_dashboard_metrics request.user as dashboard %}
+    <div id="content-related">
+        {% if dashboard.feedback_count is not None %}
+            <section class="admin-dashboard-feedback module"
+                     aria-labelledby="admin-dashboard-feedback-title">
+                <h2 id="admin-dashboard-feedback-title">Latest feedback ({{ dashboard.feedback_count }})</h2>
+                {% if dashboard.feedback_items %}
+                    <ul class="admin-dashboard-feedback__list">
+                        {% for feedback in dashboard.feedback_items %}
+                            <li class="admin-dashboard-feedback__item">
+                                <a href="{{ feedback.url }}">{{ feedback.title }}</a>
+                                <p>{{ feedback.text|striptags|truncatechars:220 }}</p>
+                                <div class="admin-dashboard-feedback__meta">
+                                    {% if feedback.email %}<span>{{ feedback.email }}</span>{% endif %}
+                                    <time datetime="{{ feedback.created|date:"c" }}">{{ feedback.created|date:"Y-m-d H:i" }}</time>
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="admin-dashboard-feedback__empty">No feedback in the last {{ dashboard.period_days }} days.</p>
+                {% endif %}
+            </section>
+        {% endif %}
+        <div class="module" id="recent-actions-module">
+            <h2>{% translate "Recent actions" %}</h2>
+            <h3>{% translate "My actions" %}</h3>
+            {% load log %}
+            {% get_admin_log 10 as admin_log for_user user %}
+            {% if not admin_log %}
+                <p>{% translate "None available" %}</p>
+            {% else %}
+                <ul class="actionlist">
+                    {% for entry in admin_log %}
+                        <li class="{% if entry.is_addition %}addlink{% endif %}{% if entry.is_change %}changelink{% endif %}{% if entry.is_deletion %}deletelink{% endif %}">
+                            <span class="visually-hidden">
+                                {% if entry.is_addition %}
+                                    {% translate "Added:" %}
+                                {% elif entry.is_change %}
+                                    {% translate "Changed:" %}
+                                {% elif entry.is_deletion %}
+                                    {% translate "Deleted:" %}
+                                {% endif %}
+                            </span>
+                            {% if entry.is_deletion or not entry.get_admin_url %}
+                                {{ entry.object_repr }}
+                            {% else %}
+                                <a href="{{ entry.get_admin_url }}">{{ entry.object_repr }}</a>
+                            {% endif %}
+                            <br>
+                            {% if entry.content_type %}
+                                <span class="mini quiet">
+                                    {% filter capfirst %}
+                                        {{ entry.content_type.name }}
+                                    {% endfilter %}
+                                </span>
+                            {% else %}
+                                <span class="mini quiet">{% translate "Unknown content" %}</span>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+{% endblock sidebar %}

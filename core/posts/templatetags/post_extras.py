@@ -7,6 +7,7 @@ from django.core.files.storage import storages
 from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Post
+from core.posts.templatetags.admin_dashboard import get_admin_dashboard_metrics
 from core.utils.images import imgproxy_url as build_image_url
 
 register = template.Library()
@@ -92,6 +93,11 @@ def random_posts():
         if post["photo__image"]:
             post["photo__image"] = imgproxy_url(storages["default"].url(post["photo__image"]), 200, 150)
     return context
+
+
+@register.simple_tag
+def admin_dashboard_metrics(user):
+    return get_admin_dashboard_metrics(user)
 
 
 @register.simple_tag
