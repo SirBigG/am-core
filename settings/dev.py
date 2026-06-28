@@ -9,6 +9,7 @@ ALLOWED_HOSTS = ["*"]
 DEBUG = True
 
 ENABLE_ADVERTS = os.getenv("ENABLE_ADVERTS", "0") == "1"
+ENABLE_INTERNAL_ADVERTS = os.getenv("ENABLE_INTERNAL_ADVERTS", "1") == "1"
 ENABLE_ANALYTICS = os.getenv("ENABLE_ANALYTICS", "0") == "1"
 USE_IMGPROXY = os.getenv("USE_IMGPROXY", "0") == "1"
 

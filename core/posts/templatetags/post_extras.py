@@ -45,7 +45,7 @@ def post_adverts():
     :return: rubric roots queryset
     """
     context = {"adverts": []}
-    if not settings.ENABLE_ADVERTS:
+    if not settings.ENABLE_INTERNAL_ADVERTS:
         return context
     for advert in Advert.active_objects.prefetch_related("photos")[:4]:
         image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""
@@ -60,7 +60,7 @@ def random_adverts():
     :return: rubric roots queryset
     """
     context = {"adverts": []}
-    if not settings.ENABLE_ADVERTS:
+    if not settings.ENABLE_INTERNAL_ADVERTS:
         return context
     for advert in Advert.active_objects.prefetch_related("photos").order_by("?")[:4]:
         image = imgproxy_url(advert.primary_image_url, 200, 150) if advert.primary_image_url else ""

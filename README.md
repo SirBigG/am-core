@@ -33,6 +33,10 @@ Nginx exposes the local app on port `8000`. The compose setup mounts this repo
 into the `core` container at `/am-core` and mounts the sibling
 `../forum_instance/` project into the forum container at `/app`.
 
+Local development disables Google AdSense by default with `ENABLE_ADVERTS=0`,
+but keeps AgroMega's own marketplace advert blocks enabled with
+`ENABLE_INTERNAL_ADVERTS=1`.
+
 ## Static Assets
 
 The old `am-front` project is retired. Custom Django-owned SCSS and JavaScript

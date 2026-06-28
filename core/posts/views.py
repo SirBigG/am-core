@@ -44,7 +44,7 @@ class IndexView(TemplateView):
         context["object_list"] = Post.objects.select_objects().active().order_by("-publish_date")[:8]
         context["random_posts"] = Post.objects.select_objects().active().order_by("?")[:8]
         context["random_adverts"] = []
-        if settings.ENABLE_ADVERTS:
+        if settings.ENABLE_INTERNAL_ADVERTS:
             context["random_adverts"] = Advert.objects.filter(
                 updated__gte=datetime.now() - timedelta(days=14)
             ).order_by("?")[:8]

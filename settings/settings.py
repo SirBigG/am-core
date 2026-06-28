@@ -46,6 +46,7 @@ ASGI_APPLICATION = "settings.asgi.application"
 ADMIN_HASH = os.getenv("ADMIN_HASH", "")
 
 ENABLE_ADVERTS = os.getenv("ENABLE_ADVERTS", "1") == "1"
+ENABLE_INTERNAL_ADVERTS = os.getenv("ENABLE_INTERNAL_ADVERTS", "1") == "1"
 ENABLE_ANALYTICS = os.getenv("ENABLE_ANALYTICS", "1") == "1"
 USE_IMGPROXY = os.getenv("USE_IMGPROXY", "1") == "1"
 
@@ -180,7 +181,7 @@ LOGGING = {
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": os.getenv("POSTGRES_DB"),
         "USER": os.getenv("POSTGRES_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
@@ -305,7 +306,6 @@ TIME_ZONE = "UTC"
 
 USE_I18N = True
 
-USE_L10N = True
 
 USE_TZ = True
 
