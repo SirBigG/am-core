@@ -29,7 +29,7 @@ RUN set -eux; \
     && rm /tmp/geckodriver.tar.gz
 
 RUN apt-get update && \
-    apt-get install -y gcc build-essential libpq-dev libjpeg-dev gettext  && \
+    apt-get install -y gcc build-essential libpq-dev libjpeg-dev gettext nodejs npm  && \
     apt-get clean && \
     uv sync --frozen --all-groups --no-install-project --inexact
 

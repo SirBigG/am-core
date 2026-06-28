@@ -1,0 +1,37 @@
+$card-border-width: 0px;
+$card-border-radius: 0rem;
+
+$breadcrumb-bg: inherit !default;
+$breadcrumb-divider: quote(">") !default;
+
+@import "main";
+
+@import "~bootstrap/scss/mixins/pagination";
+@import "~bootstrap/scss/badge";
+@import "~bootstrap/scss/mixins/forms";
+
+@import "~bootstrap/scss/card";
+@import "~bootstrap/scss/pagination";
+@import "~bootstrap/scss/breadcrumb";
+@import "~bootstrap/scss/forms";
+@import "~bootstrap/scss/button-group";
+
+.breadcrumb-item {
+  font-size: 0.90rem;
+}
+
+a.list-link:link, a.list-link:active, a.list-link:focus, a.list-link:visited {
+  color: $green;
+  text-decoration: none;
+}
+
+a.list-link:hover {
+  color: $yellow;
+  text-decoration: none;
+  transform: scale(1.1);
+}
+
+a.list-link {
+  display: inline-block;
+  transition: .3s;
+}

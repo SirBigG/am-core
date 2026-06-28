@@ -1,0 +1,26 @@
+{
+  "name": "am-core-static",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Django static asset build for am-core",
+  "scripts": {
+    "build:static": "webpack --config webpack.config.js --mode production",
+    "watch:static": "webpack --config webpack.config.js --mode development --watch"
+  },
+  "dependencies": {
+    "@popperjs/core": "^2.11.8",
+    "bootstrap": "^5.3.0",
+    "smartphoto": "^1.6.5",
+    "typeface-open-sans": "^1.1.13"
+  },
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "css-minimizer-webpack-plugin": "^8.0.0",
+    "mini-css-extract-plugin": "^2.7.6",
+    "sass": "^1.80.0",
+    "sass-loader": "^16.0.0",
+    "terser-webpack-plugin": "^5.3.9",
+    "webpack": "^5.88.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

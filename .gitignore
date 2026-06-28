@@ -9,6 +9,7 @@ env/
 /tmp/*
 /static/*
 /front_static/*
+/frontend/node_modules/
 /forum_instance/staticfiles/*
 /forum_instance/st_search/*
 *~
