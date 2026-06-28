@@ -8,7 +8,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.adverts.models import Advert
-from core.posts.models import Post
+from core.posts.models import Post, UsefulStatistic
 from core.posts.templatetags.admin_dashboard import DASHBOARD_PERIOD_DAYS, get_admin_dashboard_metrics
 from core.services.models import Feedback
 from core.utils.tests.factories import FeedbackFactory, PostFactory, StaffUserFactory, UserFactory
@@ -45,9 +45,33 @@ class AdminDashboardMetricsTests(TestCase):
         Feedback.objects.filter(pk=recent_feedback.pk).update(created=self.since + timedelta(days=1))
         Feedback.objects.filter(pk=old_feedback.pk).update(created=self.since - timedelta(seconds=1))
 
+        recent_useful_vote = UsefulStatistic.objects.create(
+            fingerprint="recent-useful",
+            post_id=recent_post.pk,
+            user_id=recent_user.pk,
+            is_useful=True,
+        )
+        recent_not_useful_vote = UsefulStatistic.objects.create(
+            fingerprint="recent-not-useful",
+            post_id=recent_post.pk,
+            user_id=recent_user.pk,
+            is_useful=False,
+        )
+        old_useful_vote = UsefulStatistic.objects.create(
+            fingerprint="old-useful",
+            post_id=old_post.pk,
+            user_id=old_user.pk,
+            is_useful=True,
+        )
+        UsefulStatistic.objects.filter(pk=recent_useful_vote.pk).update(created=self.since + timedelta(days=1))
+        UsefulStatistic.objects.filter(pk=recent_not_useful_vote.pk).update(created=self.since + timedelta(days=2))
+        UsefulStatistic.objects.filter(pk=old_useful_vote.pk).update(created=self.since - timedelta(seconds=1))
+
         dashboard = get_admin_dashboard_metrics(self.staff_user, now=self.now)
 
-        self.assertEqual([card["value"] for card in dashboard["cards"]], [1, 1, 1])
+        self.assertEqual([card["value"] for card in dashboard["cards"]], [1, 1, 1, 2])
+        self.assertEqual(dashboard["cards"][-1]["label"], "Useful votes")
+        self.assertEqual(dashboard["cards"][-1]["description"], "1 useful, 1 not useful")
         self.assertEqual(dashboard["feedback_count"], 1)
         self.assertEqual([feedback["title"] for feedback in dashboard["feedback_items"]], ["Recent feedback"])
 
@@ -85,6 +109,7 @@ class AdminDashboardIndexTests(TestCase):
         self.assertContains(response, "Adverts")
         self.assertContains(response, "Posts")
         self.assertContains(response, "Users")
+        self.assertContains(response, "Useful votes")
         self.assertContains(response, "Latest feedback")
         self.assertContains(response, "Seed question")
         self.assertContains(response, "How do I add apple variety details?")

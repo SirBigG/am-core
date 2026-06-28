@@ -5,7 +5,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from core.adverts.models import Advert
-from core.posts.models import Post
+from core.posts.models import Post, UsefulStatistic
 from core.services.models import Feedback
 
 DASHBOARD_PERIOD_DAYS = 30
@@ -37,7 +37,10 @@ def get_admin_dashboard_metrics(user, now=None):
             {
                 "label": "Adverts",
                 "value": new_adverts.count(),
-                "description": f"{new_adverts.filter(is_active=True).count()} active in the last {DASHBOARD_PERIOD_DAYS} days",
+                "description": (
+                    f"{new_adverts.filter(is_active=True).count()} active, "
+                    f"{new_adverts.filter(is_active=False).count()} inactive"
+                ),
                 "url": _admin_changelist_url(Advert),
             }
         )
@@ -48,7 +51,10 @@ def get_admin_dashboard_metrics(user, now=None):
             {
                 "label": "Posts",
                 "value": new_posts.count(),
-                "description": f"{new_posts.filter(status=True).count()} published/active in the last {DASHBOARD_PERIOD_DAYS} days",
+                "description": (
+                    f"{new_posts.filter(status=True).count()} published, "
+                    f"{new_posts.filter(status=False).count()} unpublished"
+                ),
                 "url": _admin_changelist_url(Post),
             }
         )
@@ -66,8 +72,9 @@ def get_admin_dashboard_metrics(user, now=None):
         )
 
     if _can_view(user, "services.view_feedback"):
-        latest_feedback = Feedback.objects.filter(created__gte=since).order_by("-created")[:LATEST_FEEDBACK_LIMIT]
-        feedback_count = Feedback.objects.filter(created__gte=since).count()
+        recent_feedback = Feedback.objects.filter(created__gte=since)
+        latest_feedback = recent_feedback.order_by("-created")[:LATEST_FEEDBACK_LIMIT]
+        feedback_count = recent_feedback.count()
         feedback_items = [
             {
                 "title": feedback.title,
@@ -78,6 +85,20 @@ def get_admin_dashboard_metrics(user, now=None):
             }
             for feedback in latest_feedback
         ]
+
+    if _can_view(user, "posts.view_usefulstatistic"):
+        new_useful_votes = UsefulStatistic.objects.filter(created__gte=since)
+        cards.append(
+            {
+                "label": "Useful votes",
+                "value": new_useful_votes.count(),
+                "description": (
+                    f"{new_useful_votes.filter(is_useful=True).count()} useful, "
+                    f"{new_useful_votes.filter(is_useful=False).count()} not useful"
+                ),
+                "url": _admin_changelist_url(UsefulStatistic),
+            }
+        )
 
     return {
         "period_days": DASHBOARD_PERIOD_DAYS,
