@@ -42,6 +42,15 @@ class LiveStorageSettingsTests(SimpleTestCase):
             },
         )
 
+    def test_live_settings_do_not_mutate_base_installed_apps(self):
+        import settings.settings as base_settings
+
+        installed_apps = list(base_settings.INSTALLED_APPS)
+
+        self.load_live_settings({"AWS_S3_ENDPOINT_URL": "storage.example.com"})
+
+        self.assertEqual(base_settings.INSTALLED_APPS, installed_apps)
+
 
 class DevStorageSettingsTests(SimpleTestCase):
     def test_dev_media_root_matches_nginx_media_volume(self):
@@ -49,3 +58,16 @@ class DevStorageSettingsTests(SimpleTestCase):
 
         self.assertEqual(dev_settings.MEDIA_URL, "/media/")
         self.assertEqual(dev_settings.MEDIA_ROOT, "/var/www/media")
+
+    def test_dev_settings_do_not_mutate_base_application_lists(self):
+        import settings.settings as base_settings
+
+        installed_apps = list(base_settings.INSTALLED_APPS)
+        middleware = list(base_settings.MIDDLEWARE)
+
+        import settings.dev as dev_settings
+
+        importlib.reload(dev_settings)
+
+        self.assertEqual(base_settings.INSTALLED_APPS, installed_apps)
+        self.assertEqual(base_settings.MIDDLEWARE, middleware)
