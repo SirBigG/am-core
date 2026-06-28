@@ -1498,6 +1498,7 @@
         .site-link-grid__text {
             display: flex;
             align-items: center;
+            min-width: 0;
             min-height: 48px;
             width: 100%;
             padding: 0.7rem 0.9rem;
@@ -1509,6 +1510,9 @@
             font-weight: 700;
             line-height: 1.35;
             text-decoration: none;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            white-space: normal;
             box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
         }
 
@@ -1580,6 +1584,10 @@
 
         .site-category-card__links {
             padding: 0.65rem;
+        }
+
+        .site-category-card .site-link-grid--compact {
+            grid-template-columns: minmax(0, 1fr);
         }
 
         .mobile-bottom-nav {
