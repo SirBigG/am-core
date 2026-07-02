@@ -324,16 +324,32 @@ CKEDITOR_UPLOAD_PATH = "/media/ckeditor/"
 
 CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
 
+CKEDITOR_ARTICLE_STYLES = [
+    {
+        "name": "Зелена підказка",
+        "element": "div",
+        "attributes": {"class": "article-note"},
+    },
+    {
+        "name": "Важливо",
+        "element": "div",
+        "attributes": {"class": "important-note"},
+    },
+]
+
 CKEDITOR_CONFIGS = {
     "default": {
         "width": "100%",
         "language": "uk",
+        "stylesSet": CKEDITOR_ARTICLE_STYLES,
+        "extraAllowedContent": "div(article-note,important-note);",
     },
     "public": {
         "width": "100%",
         "removePlugins": "exportpdf",
         "toolbar_Full": [
             [
+                "Styles",
                 "Format",
                 "Bold",
                 "Italic",
@@ -344,6 +360,8 @@ CKEDITOR_CONFIGS = {
                 "BulletedList",
             ],
         ],
+        "stylesSet": CKEDITOR_ARTICLE_STYLES,
+        "extraAllowedContent": "div(article-note,important-note);",
         "bodyClass": "col-12",
     },
 }

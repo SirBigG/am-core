@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ckeditor.fields import RichTextField
 from ckeditor.widgets import CKEditorWidget
 from django.conf import settings
@@ -18,11 +20,21 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertEqual(settings.CKEDITOR_UPLOAD_PATH, "/media/ckeditor/")
         self.assertIn("public", settings.CKEDITOR_CONFIGS)
         self.assertEqual(settings.CKEDITOR_CONFIGS["default"]["language"], "uk")
+        self.assertEqual(settings.CKEDITOR_CONFIGS["default"]["stylesSet"], settings.CKEDITOR_ARTICLE_STYLES)
+        self.assertEqual(
+            settings.CKEDITOR_CONFIGS["default"]["extraAllowedContent"],
+            "div(article-note,important-note);",
+        )
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["width"], "100%")
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["removePlugins"], "exportpdf")
         self.assertEqual(
             settings.CKEDITOR_CONFIGS["public"]["toolbar_Full"],
-            [["Format", "Bold", "Italic", "Undo", "Redo", "-", "NumberedList", "BulletedList"]],
+            [["Styles", "Format", "Bold", "Italic", "Undo", "Redo", "-", "NumberedList", "BulletedList"]],
+        )
+        self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["stylesSet"], settings.CKEDITOR_ARTICLE_STYLES)
+        self.assertEqual(
+            settings.CKEDITOR_CONFIGS["public"]["extraAllowedContent"],
+            "div(article-note,important-note);",
         )
 
     def test_public_forms_use_ckeditor_widget_for_rich_text_fields(self):
@@ -52,6 +64,18 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertIn("&lt;p&gt;Hello&lt;/p&gt;", html)
         self.assertIn(".cke_source", html)
         self.assertIn("-webkit-text-fill-color: #111", html)
+        self.assertIn("article-note", html)
+        self.assertIn("important-note", html)
+
+    def test_admin_ckeditor_source_asset_previews_article_tables(self):
+        script = Path(settings.BASE_DIR, "core/posts/static/posts/admin/ckeditor-source.js").read_text()
+
+        self.assertIn("#dcefd7", script)
+        self.assertIn("border-collapse: collapse", script)
+        self.assertIn("width: 100% !important", script)
+        self.assertIn("table-layout: fixed !important", script)
+        self.assertIn("width: auto !important", script)
+        self.assertIn("table tr:first-child th", script)
 
     def test_models_keep_rich_text_fields_for_editor_content(self):
         models_and_fields = (

@@ -35,8 +35,155 @@ $border-radius: 0.8rem;
   font-size: 0.90rem;
 }
 
-.post-wrapper p {
-  font-size: 18px;
-  line-height: 34px;
-  margin-bottom: 40px;
+.site-article-body {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  color: #1f2937;
+  font-size: 1.02rem;
+  line-height: 1.72;
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: #2f7d45;
+    font-weight: 800;
+    line-height: 1.22;
+    overflow-wrap: anywhere;
+  }
+
+  h1 {
+    margin: 0 0 1rem;
+    font-size: clamp(2rem, 5vw, 3.1rem);
+  }
+
+  h2 {
+    margin: 2.1rem 0 1rem;
+    font-size: 1.65rem;
+  }
+
+  h3 {
+    margin: 1.75rem 0 0.75rem;
+    font-size: 1.35rem;
+  }
+
+  h4 {
+    margin: 1.45rem 0 0.65rem;
+    font-size: 1.17rem;
+  }
+
+  h5 {
+    margin: 1.25rem 0 0.55rem;
+    font-size: 1.06rem;
+  }
+
+  h6 {
+    margin: 1.1rem 0 0.5rem;
+    font-size: 0.96rem;
+    text-transform: uppercase;
+  }
+
+  p {
+    margin: 0 0 1.25rem;
+  }
+
+  ul,
+  ol {
+    margin: 0 0 1.35rem 1.35rem;
+    padding: 0;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+    padding-left: 0.15rem;
+
+    &::marker {
+      color: #2f7d45;
+      font-weight: 800;
+    }
+  }
+
+  a {
+    color: #2f7d45;
+    text-decoration-color: rgba(47, 125, 69, 0.35);
+    text-underline-offset: 3px;
+  }
+
+  blockquote,
+  .article-note {
+    margin: 0 0 1.35rem;
+    padding: 0.95rem 1rem;
+    background: #f0f7f2;
+    border-left: 4px solid #2f7d45;
+    color: #203829;
+  }
+
+  .important-note {
+    margin: 0 0 1.35rem;
+    padding: 0.95rem 1rem;
+    background: #f8e2d4;
+    border: 1px solid rgba(178, 34, 34, 0.18);
+    border-left: 4px solid #b22222;
+    color: #223044;
+  }
+
+  img,
+  iframe,
+  video,
+  embed,
+  object {
+    max-width: 100%;
+  }
+
+  img {
+    height: auto;
+  }
+
+  table {
+    width: 100% !important;
+    min-width: 100%;
+    max-width: 100%;
+    table-layout: fixed !important;
+    margin: 1.35rem 0;
+    border: 1px solid rgba(47, 125, 69, 0.18);
+    border-collapse: collapse;
+    color: #223044;
+    font-size: 0.86em;
+    line-height: 1.55;
+  }
+
+  thead th,
+  table tr:first-child th,
+  table tr:first-child td {
+    background: #dcefd7;
+    color: #223044;
+    font-weight: 800;
+  }
+
+  th,
+  td {
+    width: auto !important;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid rgba(47, 125, 69, 0.16);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  col {
+    width: auto !important;
+  }
+
+  tbody tr:nth-child(even) td {
+    background: #fbfdfb;
+  }
+
+  pre {
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
 }
