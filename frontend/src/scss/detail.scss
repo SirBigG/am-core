@@ -131,6 +131,44 @@ $border-radius: 0.8rem;
     color: #223044;
   }
 
+  .article-faq-item {
+    margin: 0 0 1rem;
+    padding: 1rem 1.125rem;
+    background: #f7fbf8;
+    border: 1px solid #d8e8dc;
+    color: #223044;
+
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin: 0 0 0.5rem;
+      color: #2f7d45;
+      font-size: 1.2rem;
+    }
+
+    > p:first-child {
+      margin: 0 0 0.5rem;
+      color: #2f7d45;
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1.22;
+    }
+
+    p:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  .article-sources a {
+    color: inherit !important;
+    text-decoration: none !important;
+    pointer-events: none;
+    cursor: text;
+  }
+
   img,
   iframe,
   video,
@@ -157,8 +195,7 @@ $border-radius: 0.8rem;
   }
 
   thead th,
-  table tr:first-child th,
-  table tr:first-child td {
+  table th {
     background: #dcefd7;
     color: #223044;
     font-weight: 800;
@@ -186,4 +223,11 @@ $border-radius: 0.8rem;
     overflow-x: auto;
     white-space: pre-wrap;
   }
+}
+
+.site-article-sources a {
+  color: inherit !important;
+  text-decoration: none !important;
+  pointer-events: none;
+  cursor: text;
 }

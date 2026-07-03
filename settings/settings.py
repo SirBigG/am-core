@@ -335,6 +335,11 @@ CKEDITOR_ARTICLE_STYLES = [
         "element": "div",
         "attributes": {"class": "important-note"},
     },
+    {
+        "name": "Джерела",
+        "element": "div",
+        "attributes": {"class": "article-sources"},
+    },
 ]
 
 CKEDITOR_CONFIGS = {
@@ -342,7 +347,7 @@ CKEDITOR_CONFIGS = {
         "width": "100%",
         "language": "uk",
         "stylesSet": CKEDITOR_ARTICLE_STYLES,
-        "extraAllowedContent": "div(article-note,important-note);",
+        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);",
     },
     "public": {
         "width": "100%",
@@ -361,7 +366,7 @@ CKEDITOR_CONFIGS = {
             ],
         ],
         "stylesSet": CKEDITOR_ARTICLE_STYLES,
-        "extraAllowedContent": "div(article-note,important-note);",
+        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);",
         "bodyClass": "col-12",
     },
 }
