@@ -340,6 +340,16 @@ CKEDITOR_ARTICLE_STYLES = [
         "element": "div",
         "attributes": {"class": "article-sources"},
     },
+    {
+        "name": "Зелений нумерований список",
+        "element": "ol",
+        "attributes": {"class": "article-list"},
+    },
+    {
+        "name": "Зелений список з точками",
+        "element": "ul",
+        "attributes": {"class": "article-list"},
+    },
 ]
 
 CKEDITOR_CONFIGS = {
@@ -347,7 +357,7 @@ CKEDITOR_CONFIGS = {
         "width": "100%",
         "language": "uk",
         "stylesSet": CKEDITOR_ARTICLE_STYLES,
-        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);",
+        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);ol(article-list);ul(article-list);",
     },
     "public": {
         "width": "100%",
@@ -366,7 +376,7 @@ CKEDITOR_CONFIGS = {
             ],
         ],
         "stylesSet": CKEDITOR_ARTICLE_STYLES,
-        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);",
+        "extraAllowedContent": "div(article-note,important-note,article-faq-item,article-sources);ol(article-list);ul(article-list);",
         "bodyClass": "col-12",
     },
 }

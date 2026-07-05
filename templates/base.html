@@ -650,7 +650,7 @@
         .site-catalog-hero__title,
         .site-article-hero__title {
             margin: 0;
-            color: #1f2937;
+            color: #2f7d45;
             font-size: clamp(2rem, 5vw, 3.1rem);
             font-weight: 800;
             line-height: 1;
@@ -1026,39 +1026,51 @@
         .site-article-body h3,
         .site-article-body h4,
         .site-article-body h5,
-        .site-article-body h6 {
+        .site-article-body h6,
+        .site-article-body .h1,
+        .site-article-body .h2,
+        .site-article-body .h3,
+        .site-article-body .h4,
+        .site-article-body .h5,
+        .site-article-body .h6 {
             color: #2f7d45;
             font-weight: 800;
             line-height: 1.22;
             overflow-wrap: anywhere;
         }
 
-        .site-article-body h1 {
+        .site-article-body h1,
+        .site-article-body .h1 {
             margin: 0 0 1rem;
             font-size: clamp(2rem, 5vw, 3.1rem);
         }
 
-        .site-article-body h2 {
+        .site-article-body h2,
+        .site-article-body .h2 {
             margin: 2.1rem 0 1rem;
             font-size: 1.65rem;
         }
 
-        .site-article-body h3 {
+        .site-article-body h3,
+        .site-article-body .h3 {
             margin: 1.75rem 0 0.75rem;
             font-size: 1.35rem;
         }
 
-        .site-article-body h4 {
+        .site-article-body h4,
+        .site-article-body .h4 {
             margin: 1.45rem 0 0.65rem;
             font-size: 1.17rem;
         }
 
-        .site-article-body h5 {
+        .site-article-body h5,
+        .site-article-body .h5 {
             margin: 1.25rem 0 0.55rem;
             font-size: 1.06rem;
         }
 
-        .site-article-body h6 {
+        .site-article-body h6,
+        .site-article-body .h6 {
             margin: 1.1rem 0 0.5rem;
             font-size: 0.96rem;
             text-transform: uppercase;
@@ -1080,6 +1092,11 @@
         }
 
         .site-article-body li::marker {
+            color: #2f7d45;
+            font-weight: 800;
+        }
+
+        .site-article-body .article-list li::marker {
             color: #2f7d45;
             font-weight: 800;
         }
@@ -1145,6 +1162,12 @@
             text-decoration: none !important;
             pointer-events: none;
             cursor: text;
+        }
+
+        .site-article-body .article-sources li::marker,
+        .site-article-sources li::marker {
+            color: #2f7d45;
+            font-weight: 800;
         }
 
         .site-article-body img,
