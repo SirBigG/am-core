@@ -66,45 +66,181 @@
     }
 
     function removeArticleStyleClasses(element) {
-        ["article-note", "important-note", "article-faq-item", "article-sources"].forEach(function (className) {
+        ["article-note", "important-note", "article-faq-item", "article-sources", "article-list"].forEach(function (className) {
             if (element.hasClass(className)) {
                 element.removeClass(className);
             }
         });
     }
 
+    function hasArticleBlockStyle(element) {
+        return (
+            element &&
+            (
+                element.hasClass("article-note") ||
+                element.hasClass("important-note") ||
+                element.hasClass("article-faq-item") ||
+                element.hasClass("article-sources")
+            )
+        );
+    }
+
+    function getClosestArticleBlock(editor, startElement) {
+        var editable = editor.editable();
+        var current = startElement;
+
+        while (current && !current.equals(editable)) {
+            if (hasArticleBlockStyle(current)) {
+                return current;
+            }
+
+            current = current.getParent();
+        }
+
+        return null;
+    }
+
+    function getOutermostArticleBlock(editor, startElement) {
+        var block = getClosestArticleBlock(editor, startElement);
+        var editable = editor.editable();
+        var parent;
+
+        if (!block) {
+            return null;
+        }
+
+        parent = block.getParent();
+
+        while (parent && !parent.equals(editable)) {
+            if (hasArticleBlockStyle(parent)) {
+                block = parent;
+            }
+
+            parent = parent.getParent();
+        }
+
+        return block;
+    }
+
+    function unwrapNestedArticleBlocks(container) {
+        var blocks = container.find("div");
+
+        for (var index = blocks.count() - 1; index >= 0; index -= 1) {
+            var block = blocks.getItem(index);
+
+            if (hasArticleBlockStyle(block)) {
+                removeArticleStyleClasses(block);
+
+                if (block.getName() === "div" && !block.$.attributes.length) {
+                    unwrapElement(block);
+                }
+            }
+        }
+    }
+
     function removeArticleStyles(editor) {
         var selection = editor.getSelection();
         var startElement = selection && selection.getStartElement();
+        var existingBlock;
+        var list;
 
         if (!startElement) {
             return;
         }
 
-        var editable = editor.editable();
-        var current = startElement;
+        editor.fire("saveSnapshot");
+        existingBlock = getOutermostArticleBlock(editor, startElement);
 
-        while (current && !current.equals(editable)) {
-            if (
-                current.hasClass("article-note") ||
-                current.hasClass("important-note") ||
-                current.hasClass("article-faq-item") ||
-                current.hasClass("article-sources")
-            ) {
-                removeArticleStyleClasses(current);
+        if (existingBlock) {
+            unwrapNestedArticleBlocks(existingBlock);
+            removeArticleStyleClasses(existingBlock);
 
-                if (current.getName() === "div" && !current.$.attributes.length) {
-                    unwrapElement(current);
-                }
-                editor.fire("change");
-                return;
+            if (existingBlock.getName() === "div" && !existingBlock.$.attributes.length) {
+                unwrapElement(existingBlock);
             }
+        }
 
-            current = current.getParent();
+        list = startElement.getAscendant("ol", true) || startElement.getAscendant("ul", true);
+
+        if (list && list.hasClass("article-list")) {
+            list.removeClass("article-list");
+        }
+
+        if (editor.editable && editor.editable()) {
+            removeEmptyArticleFillerBlocks(editor.editable());
+        }
+
+        editor.fire("saveSnapshot");
+        editor.fire("change");
+    }
+
+    function isFillerHtml(html) {
+        return html
+            .replace(/&nbsp;/gi, "")
+            .replace(/\u00a0/g, "")
+            .replace(/<br\s*\/?>/gi, "")
+            .replace(/<[^>]+>/g, "")
+            .replace(/\s/g, "") === "";
+    }
+
+    function isEmptyArticleFillerBlock(element) {
+        if (!element || element.type !== CKEDITOR.NODE_ELEMENT) {
+            return false;
+        }
+
+        if (!/^(p|h1|h2|h3|h4|h5|h6)$/i.test(element.getName())) {
+            return false;
+        }
+
+        return isFillerHtml(element.getHtml());
+    }
+
+    function removeEmptyArticleFillerBlocks(container) {
+        var blocks = container.find("p,h1,h2,h3,h4,h5,h6");
+
+        for (var index = blocks.count() - 1; index >= 0; index -= 1) {
+            var block = blocks.getItem(index);
+
+            if (isEmptyArticleFillerBlock(block)) {
+                block.remove();
+            }
         }
     }
 
-    function wrapSelectionInFaqBlock(editor) {
+    function isWhitespaceTextNode(node) {
+        return node && node.type === CKEDITOR.NODE_TEXT && node.getText().replace(/\s|\u00a0/g, "") === "";
+    }
+
+    function getAdjacentArticleCleanupNode(element, method) {
+        var node = element[method]();
+
+        while (isWhitespaceTextNode(node)) {
+            var emptyTextNode = node;
+            node = node[method]();
+            emptyTextNode.remove();
+        }
+
+        return node;
+    }
+
+    function removeAdjacentEmptyArticleFillerBlocks(element) {
+        var previous = getAdjacentArticleCleanupNode(element, "getPrevious");
+        var next = getAdjacentArticleCleanupNode(element, "getNext");
+
+        while (isEmptyArticleFillerBlock(previous)) {
+            var previousSibling = previous;
+            previous = getAdjacentArticleCleanupNode(previous, "getPrevious");
+            previousSibling.remove();
+        }
+
+        while (isEmptyArticleFillerBlock(next)) {
+            var nextSibling = next;
+            next = getAdjacentArticleCleanupNode(next, "getNext");
+            nextSibling.remove();
+        }
+    }
+
+    function wrapSelectionInArticleBlock(editor, className) {
         var selection = editor.getSelection();
 
         if (!selection) {
@@ -112,6 +248,7 @@
         }
 
         var ranges = selection.getRanges();
+        var existingBlock = getOutermostArticleBlock(editor, selection.getStartElement());
 
         if (!ranges.length || ranges[0].collapsed) {
             return;
@@ -119,18 +256,57 @@
 
         editor.fire("saveSnapshot");
 
+        if (existingBlock) {
+            removeArticleStyleClasses(existingBlock);
+            existingBlock.addClass(className);
+            unwrapNestedArticleBlocks(existingBlock);
+            removeEmptyArticleFillerBlocks(existingBlock);
+            selection.selectElement(existingBlock);
+            editor.fire("saveSnapshot");
+            editor.fire("change");
+            return;
+        }
+
         for (var index = 0; index < ranges.length; index += 1) {
             var range = ranges[index];
             var wrapper = new CKEDITOR.dom.element("div", editor.document);
             var fragment = range.extractContents();
 
-            wrapper.addClass("article-faq-item");
+            wrapper.addClass(className);
             wrapper.append(fragment);
+            unwrapNestedArticleBlocks(wrapper);
+            removeEmptyArticleFillerBlocks(wrapper);
             range.insertNode(wrapper);
+            removeAdjacentEmptyArticleFillerBlocks(wrapper);
             selection.selectElement(wrapper);
         }
 
+        if (editor.editable && editor.editable()) {
+            removeEmptyArticleFillerBlocks(editor.editable());
+        }
+
         editor.fire("saveSnapshot");
+        editor.fire("change");
+    }
+
+    function wrapSelectionInFaqBlock(editor) {
+        wrapSelectionInArticleBlock(editor, "article-faq-item");
+    }
+
+    function applyListClass(editor, commandName) {
+        var selection;
+        var startElement;
+        var list;
+
+        editor.execCommand(commandName);
+        selection = editor.getSelection();
+        startElement = selection && selection.getStartElement();
+        list = startElement && startElement.getAscendant(commandName === "numberedlist" ? "ol" : "ul", true);
+
+        if (list) {
+            list.addClass("article-list");
+        }
+
         editor.fire("change");
     }
 
@@ -148,11 +324,9 @@
             "align-items: center;",
             "padding: 0 6px;",
             "}",
-            ".agro-editor-style-button {",
-            "display: inline-flex;",
-            "align-items: center;",
+            ".agro-editor-style-select {",
             "min-height: 26px;",
-            "padding: 3px 9px;",
+            "padding: 3px 28px 3px 9px;",
             "border: 1px solid #bfc7c2;",
             "border-radius: 3px;",
             "background: #fff;",
@@ -162,10 +336,9 @@
             "line-height: 1.2;",
             "white-space: nowrap;",
             "cursor: pointer;",
-            "user-select: none;",
             "}",
-            ".agro-editor-style-button:hover,",
-            ".agro-editor-style-button:focus {",
+            ".agro-editor-style-select:hover,",
+            ".agro-editor-style-select:focus {",
             "background: #f0f7f2;",
             "border-color: #2f7d45;",
             "color: #2f7d45;",
@@ -175,28 +348,64 @@
         document.head.appendChild(style);
     }
 
-    function makeArticleToolbarButton(label, title, onClick) {
-        var button = document.createElement("span");
-        button.setAttribute("role", "button");
-        button.setAttribute("tabindex", "0");
-        button.className = "agro-editor-style-button";
-        button.textContent = label;
-        button.title = title;
-        button.addEventListener("mousedown", function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-            onClick();
+    function makeArticleToolbarSelect(editor) {
+        var select = document.createElement("select");
+        var actions = {
+            note: function () {
+                wrapSelectionInArticleBlock(editor, "article-note");
+            },
+            important: function () {
+                wrapSelectionInArticleBlock(editor, "important-note");
+            },
+            faq: function () {
+                wrapSelectionInFaqBlock(editor);
+            },
+            numberedList: function () {
+                applyListClass(editor, "numberedlist");
+            },
+            bulletedList: function () {
+                applyListClass(editor, "bulletedlist");
+            },
+            plainText: function () {
+                removeArticleStyles(editor);
+            },
+        };
+        var options = [
+            ["", "Стилі статті"],
+            ["note", "Підказка"],
+            ["important", "Важливо"],
+            ["faq", "FAQ блок"],
+            ["numberedList", "1. Список"],
+            ["bulletedList", "• Список"],
+            ["plainText", "Звичайний текст"],
+        ];
+
+        select.className = "agro-editor-style-select";
+        select.title = "Застосувати стиль до виділення";
+
+        options.forEach(function (optionConfig) {
+            var option = document.createElement("option");
+            option.value = optionConfig[0];
+            option.textContent = optionConfig[1];
+            select.appendChild(option);
         });
-        button.addEventListener("keydown", function (event) {
-            if (event.key !== "Enter" && event.key !== " ") {
+
+        select.addEventListener("mousedown", function (event) {
+            event.stopPropagation();
+        });
+        select.addEventListener("change", function () {
+            var action = actions[select.value];
+
+            if (!action) {
                 return;
             }
 
-            event.preventDefault();
-            event.stopPropagation();
-            onClick();
+            editor.focus();
+            action();
+            select.value = "";
         });
-        return button;
+
+        return select;
     }
 
     function bindArticleToolbar(editor) {
@@ -217,18 +426,7 @@
         toolbar.className = "cke_toolbar agro-editor-style-toolbar";
         toolbar.setAttribute("role", "toolbar");
 
-        toolbar.appendChild(
-            makeArticleToolbarButton("FAQ блок", "Обгорнути виділення в один FAQ блок", function () {
-                editor.focus();
-                wrapSelectionInFaqBlock(editor);
-            })
-        );
-        toolbar.appendChild(
-            makeArticleToolbarButton("Звичайний текст", "Прибрати кастомний стиль блоку", function () {
-                editor.focus();
-                removeArticleStyles(editor);
-            })
-        );
+        toolbar.appendChild(makeArticleToolbarSelect(editor));
 
         toolbox.appendChild(toolbar);
     }
@@ -251,6 +449,11 @@
                 "caret-color: #111 !important;" +
                 "-webkit-text-fill-color: #111 !important;" +
                 "text-shadow: none !important;" +
+            "}" +
+            "h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {" +
+                "color: #2f7d45;" +
+                "font-weight: 800;" +
+                "line-height: 1.22;" +
             "}" +
             ".article-note, .important-note {" +
                 "margin: 0 0 1.35rem;" +
@@ -291,6 +494,10 @@
                 "text-decoration: none !important;" +
                 "pointer-events: none;" +
                 "cursor: text;" +
+            "}" +
+            ".article-list li::marker {" +
+                "color: #2f7d45;" +
+                "font-weight: 800;" +
             "}" +
             "table {" +
                 "width: 100% !important;" +

@@ -23,7 +23,7 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertEqual(settings.CKEDITOR_CONFIGS["default"]["stylesSet"], settings.CKEDITOR_ARTICLE_STYLES)
         self.assertEqual(
             settings.CKEDITOR_CONFIGS["default"]["extraAllowedContent"],
-            "div(article-note,important-note,article-faq-item,article-sources);",
+            "div(article-note,important-note,article-faq-item,article-sources);ol(article-list);ul(article-list);",
         )
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["width"], "100%")
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["removePlugins"], "exportpdf")
@@ -34,10 +34,18 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertEqual(settings.CKEDITOR_CONFIGS["public"]["stylesSet"], settings.CKEDITOR_ARTICLE_STYLES)
         self.assertEqual(
             settings.CKEDITOR_CONFIGS["public"]["extraAllowedContent"],
-            "div(article-note,important-note,article-faq-item,article-sources);",
+            "div(article-note,important-note,article-faq-item,article-sources);ol(article-list);ul(article-list);",
         )
         self.assertIn(
             {"name": "Джерела", "element": "div", "attributes": {"class": "article-sources"}},
+            settings.CKEDITOR_ARTICLE_STYLES,
+        )
+        self.assertIn(
+            {"name": "Зелений нумерований список", "element": "ol", "attributes": {"class": "article-list"}},
+            settings.CKEDITOR_ARTICLE_STYLES,
+        )
+        self.assertIn(
+            {"name": "Зелений список з точками", "element": "ul", "attributes": {"class": "article-list"}},
             settings.CKEDITOR_ARTICLE_STYLES,
         )
 
@@ -72,6 +80,7 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertIn("important-note", html)
         self.assertIn("article-faq-item", html)
         self.assertIn("article-sources", html)
+        self.assertIn("article-list", html)
 
     def test_admin_ckeditor_source_asset_previews_article_tables(self):
         script = Path(settings.BASE_DIR, "core/posts/static/posts/admin/ckeditor-source.js").read_text()
@@ -85,14 +94,36 @@ class CKEditorConfigurationTests(SimpleTestCase):
         self.assertNotIn("table tr:first-child td", script)
         self.assertIn("article-faq-item", script)
         self.assertIn("article-sources a", script)
+        self.assertIn("article-list", script)
+        self.assertIn("h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6", script)
+        self.assertIn("wrapSelectionInArticleBlock", script)
+        self.assertIn("getClosestArticleBlock", script)
+        self.assertIn("getOutermostArticleBlock", script)
+        self.assertIn("hasArticleBlockStyle", script)
+        self.assertIn("unwrapNestedArticleBlocks", script)
         self.assertIn("wrapSelectionInFaqBlock", script)
+        self.assertIn("removeEmptyArticleFillerBlocks", script)
+        self.assertIn("removeAdjacentEmptyArticleFillerBlocks", script)
+        self.assertIn("isWhitespaceTextNode", script)
+        self.assertIn("&nbsp;", script)
         self.assertIn(".article-faq-item > p:first-child", script)
+        self.assertIn("Підказка", script)
+        self.assertIn("Важливо", script)
         self.assertIn("FAQ блок", script)
+        self.assertIn("1. Список", script)
+        self.assertIn("• Список", script)
+        self.assertIn("applyListClass", script)
         self.assertIn("Звичайний текст", script)
         self.assertIn("removeArticleStyles", script)
+        self.assertIn("existingBlock = getOutermostArticleBlock", script)
+        self.assertIn('getAscendant("ol", true)', script)
+        self.assertIn('getAscendant("ul", true)', script)
         self.assertIn("ensureArticleToolbarStyles", script)
-        self.assertIn("agro-editor-style-button", script)
-        self.assertIn('addEventListener("mousedown"', script)
+        self.assertIn("makeArticleToolbarSelect", script)
+        self.assertIn("Стилі статті", script)
+        self.assertIn("agro-editor-style-select", script)
+        self.assertIn('addEventListener("change"', script)
+        self.assertNotIn("agro-editor-style-button", script)
 
     def test_models_keep_rich_text_fields_for_editor_content(self):
         models_and_fields = (
