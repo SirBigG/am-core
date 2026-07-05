@@ -21,6 +21,12 @@ Catalog information is the main knowledge area of the product. It contains struc
 - Catalog content is treated as important reference information, not short-lived social content.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.
+- Registry spreadsheet refreshes should preserve existing variety records and update them in place by variety title plus registry category.
+- Active registry rows clear exclusion metadata when an existing variety is present in the active sheet.
+- Excluded registry rows mark matching varieties as excluded and store the registry end date/year.
+- Registry refreshes can be queued from the `Variety` Django admin by uploading a state registry workbook in `.xlsx` or `.ods` format.
+- Queued registry refreshes are processed only by the `run_registry_import_jobs` Django management command.
+- The command processes one registry import at a time; pending jobs wait while another import is marked running.
 
 ## States And Lifecycle
 
@@ -37,6 +43,7 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Django app: `core/posts`.
 - Some variety-style public catalog URLs, such as `/cybulevi/sorty-cybuli/`, are rendered through post/category templates even when the content behaves like registry/catalog reference information.
 - Registry-specific category and variety templates also exist in `core/registry`, especially for `/registry/` and registry browsing flows.
+- Registry import code starts in `core/registry/parser.py`, with row layout definitions in `core/registry/parser_row_types.py`.
 
 ## Open Questions
 
@@ -44,3 +51,6 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Which catalog entity types are currently supported besides varieties and diseases?
 - Who is responsible for editorial quality and updates?
 - Are catalog records user-generated, admin-managed, or both?
+- Should registry variety descriptions from the state registry spreadsheet be stored in the current `Variety.description` field or in a separate structured reference-data model?
+- Should the registry model support all six applicant, owner, and maintainer columns available in current state registry files?
+- Should the registry import command run continuously with `--poll` under a supervisor, or only be invoked manually after an admin queues a refresh?
