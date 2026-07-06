@@ -106,6 +106,9 @@ class Post(models.Model):
         verbose_name = _("Post")
         verbose_name_plural = _("Posts")
         ordering = ["-publish_date"]
+        permissions = [
+            ("change_own_post", _("Can view and change own posts")),
+        ]
         indexes = [GinIndex(fields=["text_search"])]
 
     def __str__(self):

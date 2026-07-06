@@ -163,6 +163,7 @@ class TestTaggit(autocomplete.TaggitSelect2):
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
+    own_post_permission = "posts.change_own_post"
     form = AdminPostForm
     inlines = [
         PhotoInLine,
@@ -181,6 +182,55 @@ class PostAdmin(admin.ModelAdmin):
         "title",
         "text",
     )
+
+    def has_own_post_permission(self, request):
+        return request.user.has_perm(self.own_post_permission)
+
+    def has_global_post_view_or_change_permission(self, request):
+        return request.user.has_perm("posts.view_post") or request.user.has_perm("posts.change_post")
+
+    def has_module_permission(self, request):
+        return super().has_module_permission(request) or self.has_own_post_permission(request)
+
+    def get_model_perms(self, request):
+        perms = super().get_model_perms(request)
+        if self.has_own_post_permission(request):
+            perms["view"] = True
+            perms["change"] = True
+        return perms
+
+    def get_queryset(self, request):
+        queryset = super().get_queryset(request)
+        if self.has_global_post_view_or_change_permission(request):
+            return queryset
+        if self.has_own_post_permission(request):
+            return queryset.filter(publisher=request.user)
+        return queryset.none()
+
+    def has_view_permission(self, request, obj=None):
+        if super().has_view_permission(request, obj):
+            return True
+        if not self.has_own_post_permission(request):
+            return False
+        return obj is None or obj.publisher_id == request.user.pk
+
+    def has_change_permission(self, request, obj=None):
+        if super().has_change_permission(request, obj):
+            return True
+        if not self.has_own_post_permission(request):
+            return False
+        return obj is None or obj.publisher_id == request.user.pk
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = list(super().get_readonly_fields(request, obj))
+        if self.has_own_post_permission(request) and not request.user.has_perm("posts.change_post"):
+            readonly_fields.append("publisher")
+        return tuple(readonly_fields)
+
+    def save_model(self, request, obj, form, change):
+        if self.has_own_post_permission(request) and not request.user.has_perm("posts.change_post"):
+            obj.publisher = request.user
+        super().save_model(request, obj, form, change)
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = [
@@ -231,7 +281,8 @@ class PostAdmin(admin.ModelAdmin):
         )
         kwargs["form"] = form_class
         form = super().get_form(request, obj, **kwargs)
-        form.base_fields["publisher"].initial = request.user
+        if "publisher" in form.base_fields:
+            form.base_fields["publisher"].initial = request.user
         # print(form.base_fields)
         # form.base_fields['tags'].widget = autocomplete.TaggitSelect2('/taggit-autocomplete/')
         form.base_fields["tags"].widget = TestTaggit("/taggit-autocomplete/")

@@ -1,5 +1,6 @@
 from ckeditor.widgets import CKEditorWidget
 from django.contrib import admin
+from django.contrib.auth.models import Permission
 from django.test import RequestFactory, TestCase
 
 from core.posts.admin import AdminPostForm, PostAdmin
@@ -138,6 +139,15 @@ class AdminPostFormTests(TestCase):
 
 
 class PostAdminTests(TestCase):
+    def grant_permission(self, user, codename):
+        permission = Permission.objects.get(codename=codename)
+        user.user_permissions.add(permission)
+
+    def build_request(self, user):
+        request = RequestFactory().get("/")
+        request.user = user
+        return request
+
     def test_category_attributes_render_in_one_fieldset(self):
         category = CategoryFactory()
         first_group = CategoryAttributeGroupFactory(category=category, title="Fruits")
@@ -166,3 +176,57 @@ class PostAdminTests(TestCase):
         self.assertIn("posts/admin/ckeditor-source.js", media)
         self.assertNotIn("posts/admin/apple-variety-attributes.css", media)
         self.assertNotIn("posts/admin/apple-variety-attributes.js", media)
+
+    def test_own_post_permission_limits_changelist_to_owned_posts(self):
+        staff_user = StaffUserFactory()
+        own_post = PostFactory(publisher=staff_user, title="Own post")
+        other_post = PostFactory(title="Other post")
+        self.grant_permission(staff_user, "change_own_post")
+        request = self.build_request(staff_user)
+        model_admin = PostAdmin(Post, admin.site)
+
+        queryset = model_admin.get_queryset(request)
+
+        self.assertIn(own_post, queryset)
+        self.assertNotIn(other_post, queryset)
+
+    def test_own_post_permission_allows_only_owned_object_view_and_change(self):
+        staff_user = StaffUserFactory()
+        own_post = PostFactory(publisher=staff_user)
+        other_post = PostFactory()
+        self.grant_permission(staff_user, "change_own_post")
+        request = self.build_request(staff_user)
+        model_admin = PostAdmin(Post, admin.site)
+
+        self.assertTrue(model_admin.has_view_permission(request))
+        self.assertTrue(model_admin.has_change_permission(request))
+        self.assertTrue(model_admin.has_view_permission(request, own_post))
+        self.assertTrue(model_admin.has_change_permission(request, own_post))
+        self.assertFalse(model_admin.has_view_permission(request, other_post))
+        self.assertFalse(model_admin.has_change_permission(request, other_post))
+
+    def test_global_post_permission_keeps_full_changelist_access(self):
+        staff_user = StaffUserFactory()
+        own_post = PostFactory(publisher=staff_user)
+        other_post = PostFactory()
+        self.grant_permission(staff_user, "view_post")
+        request = self.build_request(staff_user)
+        model_admin = PostAdmin(Post, admin.site)
+
+        queryset = model_admin.get_queryset(request)
+
+        self.assertIn(own_post, queryset)
+        self.assertIn(other_post, queryset)
+
+    def test_own_post_permission_forces_publisher_to_current_user_on_save(self):
+        staff_user = StaffUserFactory()
+        submitted_publisher = StaffUserFactory()
+        post = PostFactory.build(publisher=submitted_publisher, rubric=CategoryFactory())
+        self.grant_permission(staff_user, "change_own_post")
+        request = self.build_request(staff_user)
+        model_admin = PostAdmin(Post, admin.site)
+
+        model_admin.save_model(request, post, form=None, change=False)
+
+        post.refresh_from_db()
+        self.assertEqual(post.publisher, staff_user)
