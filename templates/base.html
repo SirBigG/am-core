@@ -453,6 +453,17 @@
             padding-inline: 24px;
         }
 
+        .site-filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .site-filter-field {
+            min-width: 0;
+        }
+
         .site-login-prompt {
             display: flex;
             align-items: center;

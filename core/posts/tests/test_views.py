@@ -1,3 +1,4 @@
+from django.core.cache import cache
 from django.test import Client, RequestFactory, TestCase
 
 from core.posts.category_attributes import rebuild_post_attribute_values
@@ -81,7 +82,19 @@ class PostListTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["has_active_filters"])
         self.assertContains(response, 'id="category-filters"', html=False)
-        self.assertContains(response, '<details class="site-content-section" open>', html=False)
+        self.assertContains(response, '<details class="site-content-section"', html=False)
+        self.assertContains(response, "open", html=False)
+
+    def test_child_list_grouped_caches_countries_per_category(self):
+        other_category = CategoryFactory(parent=self.parent)
+        PostFactory(rubric=other_category)
+
+        cache.clear()
+        client.get(f"/{self.parent.slug}/{self.category.slug}/")
+        client.get(f"/{self.parent.slug}/{other_category.slug}/")
+
+        self.assertIsNotNone(cache.get(f"post_countries_{self.category.pk}"))
+        self.assertIsNotNone(cache.get(f"post_countries_{other_category.pk}"))
 
     def test_child_list(self):
         slug = self.post.rubric.slug

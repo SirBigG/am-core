@@ -1,10 +1,17 @@
 from decimal import Decimal
+from io import StringIO
 
+from django.core.management import call_command
 from django.test import TestCase
 
 from core.posts.category_attributes import normalize_range_value, rebuild_post_attribute_values
 from core.posts.models import CategoryAttributeFieldType, PostAttributeValue
-from core.utils.tests.factories import CategoryAttributeFieldFactory, CategoryFactory, PostFactory
+from core.utils.tests.factories import (
+    CategoryAttributeChoiceFactory,
+    CategoryAttributeFieldFactory,
+    CategoryFactory,
+    PostFactory,
+)
 
 
 class CategoryAttributeRangeTests(TestCase):
@@ -65,3 +72,19 @@ class PostAttributeValueIndexTests(TestCase):
 
         self.assertEqual(PostAttributeValue.objects.filter(post=post).count(), 1)
         self.assertEqual(PostAttributeValue.objects.get(post=post).field.key, "current")
+
+    def test_rebuild_post_attribute_values_command_rebuilds_existing_posts(self):
+        category = CategoryFactory(slug="apples")
+        field = CategoryAttributeFieldFactory(category=category, key="ripening")
+        choice = CategoryAttributeChoiceFactory(field=field, value="winter", label="Winter")
+        post = PostFactory(
+            rubric=category,
+            category_attributes={str(category.pk): {"ripening": choice.value}},
+        )
+        PostAttributeValue.objects.filter(post=post).delete()
+
+        output = StringIO()
+        call_command("rebuild_post_attribute_values", category="apples", stdout=output)
+
+        self.assertIn("Rebuilt attribute values for 1 posts.", output.getvalue())
+        self.assertTrue(PostAttributeValue.objects.filter(post=post, field=field, choice=choice).exists())

@@ -76,7 +76,8 @@ class PostListView(TemplateView):
     template_name = "posts/list_order.html"
 
     def _get_post_countries(self, rubric_id):
-        countries = cache.get(f"post_countries_{rubric_id}")
+        cache_key = f"post_countries_{rubric_id}"
+        countries = cache.get(cache_key)
         if not countries:
             countries = (
                 Post.objects.filter(country__isnull=False, rubric_id=rubric_id)
@@ -84,7 +85,7 @@ class PostListView(TemplateView):
                 .distinct()
             )
             countries = dict(countries)
-            cache.set("post_countries", countries, 3600)
+            cache.set(cache_key, countries, 3600)
         return countries
 
     def _filter_posts(self, posts):
