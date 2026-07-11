@@ -433,5 +433,4 @@ SECURE_CSP_REPORT_ONLY = {
     "object-src": ("'none'",),
     "base-uri": ("'self'",),
     "form-action": ("'self'",) + CSP_FORM_ACTION_ORIGINS,
-    "report-uri": ("/csp/report/",),
 }
