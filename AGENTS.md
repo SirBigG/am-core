@@ -97,6 +97,17 @@ Small mechanical fixes do not need a full plan. Examples: typo fixes, formatting
 
 Write result artifacts under `docs/work/results/` when the work needs a durable execution summary, verification record, audit output, or follow-up list.
 
+### Content Operations Workspace
+
+Editorial research, article refreshes, bulk content generation, API publication campaigns, and other content-only operations are an exception to the tracked `docs/work/` workflow.
+
+- Store content plans, research notes, evidence packets, before/after snapshots, API audit logs, rollback data, review bundles, and execution summaries under the gitignored `content_refresh_runs/` directory.
+- Store one-off content scripts under the corresponding run directory instead of the repository root. Keep them locally after the run when they may help reproduce, audit, or analyze the work.
+- Do not add content-only plans or result artifacts to `docs/work/` unless the work also changes product behavior, domain rules, architecture, security, data schema, or a reusable code workflow.
+- Reusable application code, management commands, tests, migrations, and template/API changes still belong in the tracked codebase and follow the normal `docs/work/` planning rules when applicable.
+- Before content work, read the local `content_refresh_runs/README.md` when it exists. That file is intentionally local and may contain the current operational directory convention without secrets.
+- Never store API tokens, passwords, cookies, or other credentials in `content_refresh_runs/`; load them from the approved environment file at runtime.
+
 Update the durable knowledge base in the same change when implementation reveals new business rules, domain language, workflows, lifecycle states, constraints, or decisions.
 
 When adding new investigation output, prefer a dated document under a topic folder, for example:

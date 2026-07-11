@@ -240,6 +240,18 @@ class PostDetailTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<strong>Джерело:</strong>", html=False)
 
+    def test_detail_prefers_post_meta_description(self):
+        self.post.meta_description = "Purpose-written search description."
+        self.post.text = "<p>Article text that should not become the description.</p>"
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        head = response.content.split(b"</head>", 1)[0]
+        self.assertIn(b'<meta name="description"', head)
+        self.assertIn(b"Purpose-written search description.", head)
+        self.assertNotIn(b"Article text that should not become the description.", head)
+
     def test_detail_renders_public_category_attributes(self):
         group = CategoryAttributeGroupFactory(category=self.category, title="Плоди")
         field = CategoryAttributeFieldFactory(category=self.category, group=group, key="fruit_size", label="Розмір")

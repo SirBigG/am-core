@@ -13,6 +13,10 @@ class PostExtrasTests(TestCase):
         url = "/foo/asd.html"
         self.assertEqual(full_url(url), "localhost:8000/foo/asd.html")
 
+    def test_full_url_preserves_absolute_url(self):
+        url = "https://cdn.example.test/media/chicken.jpg"
+        self.assertEqual(full_url(url), url)
+
     def test_grouped(self):
         items = [1, 2, 3, 4]
         group = grouped(items, 2)

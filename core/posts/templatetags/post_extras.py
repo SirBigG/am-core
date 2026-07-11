@@ -279,7 +279,7 @@ def full_url(url):
     :param: absolute url
     :return: full url
     """
-    return settings.HOST + url
+    return public_url(url)
 
 
 @register.simple_tag

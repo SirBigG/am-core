@@ -8,7 +8,9 @@
     {% endif %}
 {% endblock title %}
 {% block meta_description %}
-    {% if object.meta %}
+    {% if object.meta_description %}
+        {{ object.meta_description }}
+    {% elif object.meta %}
         {{ object.meta.description }}
     {% else %}
         {{ object.text|striptags|truncatechars:160 }}
