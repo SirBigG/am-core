@@ -25,8 +25,8 @@
             Агропортал України
         {% endblock title %}
     </title>
+    {% canonical_url request as page_canonical_url %}
     {% block canonical %}
-        {% canonical_url request as page_canonical_url %}
         <link rel="canonical" href="{{ page_canonical_url }}">
     {% endblock canonical %}
     {% block robots %}
@@ -51,7 +51,7 @@
         <meta content="Все про аграрну сферу і навіть більше."
               property="og:description">
         {#        <meta content="" property="og:image">#}
-        <meta content="{{ request.path }}" property="og:url">
+        <meta content="{{ page_canonical_url }}" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
     {% block scripts %}

@@ -3,7 +3,7 @@
     {% for url in urls %}
         <sitemap>
             <loc>{{ url.loc }}</loc>
-            {% if lastmod %}
+            {% if url.lastmod %}
                 <lastmod>{{ url.lastmod|date:"Y-m-d" }}</lastmod>
             {% endif %}
         </sitemap>

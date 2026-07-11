@@ -244,17 +244,19 @@ class SitemapIndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            advert_lastmod = Advert.active_objects.latest("updated").updated
-        except Advert.DoesNotExist:
-            advert_lastmod = datetime.now()
+        base_url = settings.HOST.rstrip("/")
+        latest_post = Post.objects.filter(status=True).order_by("-update_date").first()
+        latest_advert = Advert.active_objects.order_by("-updated").first()
         context["urls"] = [
             {
-                "loc": f"{settings.HOST}/sitemap-main.xml",
-                "lastmod": Post.objects.filter(status=True).latest("update_date").update_date,
+                "loc": f"{base_url}/sitemap-main.xml",
+                "lastmod": latest_post.update_date if latest_post else None,
             },
-            {"loc": f"{settings.HOST}/sitemap-adverts.xml", "lastmod": advert_lastmod},
-            {"loc": f"{settings.HOST}/sitemap-news.xml", "lastmod": datetime.now()},
+            {
+                "loc": f"{base_url}/sitemap-adverts.xml",
+                "lastmod": latest_advert.updated if latest_advert else None,
+            },
+            {"loc": f"{base_url}/sitemap-news.xml"},
         ]
         return context
 

@@ -16,14 +16,30 @@ register = template.Library()
 def canonical_url(request):
     """Return the canonical public URL for the current path without its query
     string."""
-    path = request.path or "/"
-    return f"{settings.HOST.rstrip('/')}{path}"
+    return public_url(request.path or "/")
+
+
+def public_url(path):
+    """Build an absolute URL on the configured public origin."""
+    return f"{settings.HOST.rstrip('/')}/{path.lstrip('/')}"
 
 
 @register.simple_tag
 def robots_content(request):
-    """Keep search results and all query-string variants out of the index."""
-    if request.path.startswith("/search/") or request.GET:
+    """Keep private workflows, search, and query variants out of the index."""
+    non_indexable_prefixes = (
+        "/adverts/create/",
+        "/confirm/",
+        "/feedback/",
+        "/login/",
+        "/logout/",
+        "/profile/",
+        "/register/",
+        "/search/",
+        "/service/feedback/",
+        "/user/",
+    )
+    if request.path.startswith(non_indexable_prefixes) or request.GET:
         return "noindex,follow"
     return "index,follow"
 

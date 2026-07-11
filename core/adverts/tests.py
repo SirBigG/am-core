@@ -37,6 +37,7 @@ class TestAdvertFormView(TestCase):
         self.assertContains(response, 'class="advert-photo-slot-text">Додати', count=get_advert_max_photos())
         self.assertContains(response, "site-login-prompt")
         self.assertContains(response, "/login/?next=/adverts/create/")
+        self.assertContains(response, '<meta name="robots" content="noindex,follow">', html=True)
 
     def test_authenticated(self):
         user = UserFactory()
@@ -254,6 +255,12 @@ class AdvertSitemapTests(TestCase):
         advert = self.create_advert("deactivated", age_days=60, is_active=False)
 
         self.assertNotIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
+
+    @override_settings(HOST="https://agromega.in.ua/")
+    def test_normalizes_trailing_slash_host(self):
+        advert = self.create_advert("normalized URL", age_days=1)
+
+        self.assertIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
 
 
 class ProfileAdvertTests(TestCase):

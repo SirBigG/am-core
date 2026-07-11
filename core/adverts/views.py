@@ -124,12 +124,13 @@ class AdvertSitemap(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        base_url = settings.HOST.rstrip("/")
         sitemap_cutoff = timezone.now() - timedelta(
             days=settings.ADVERT_ACTIVE_DAYS + settings.ADVERT_SITEMAP_RETENTION_DAYS
         )
         context["urls"] = [
             {
-                "loc": f"{settings.HOST}{reverse('adverts:detail', kwargs={'pk': i['pk'], 'slug': i['slug']})}",
+                "loc": f"{base_url}{reverse('adverts:detail', kwargs={'pk': i['pk'], 'slug': i['slug']})}",
                 "lastmod": i["updated"],
             }
             for i in Advert.objects.filter(is_active=True, updated__gte=sitemap_cutoff).values("updated", "slug", "pk")
