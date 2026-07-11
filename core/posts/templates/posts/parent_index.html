@@ -7,9 +7,6 @@
         {{ category.value }}
     {% endif %}
 {% endblock title %}
-{% block canonical %}
-    {% if request.GET %}<link rel="canonical" href="https://agromega.in.ua{{ request.path }}" />{% endif %}
-{% endblock canonical %}
 {% block meta_description %}
     {% if category.meta %}
         {{ category.meta.description }}

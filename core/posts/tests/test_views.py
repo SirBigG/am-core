@@ -1,5 +1,5 @@
 from django.core.cache import cache
-from django.test import Client, RequestFactory, TestCase
+from django.test import Client, RequestFactory, TestCase, override_settings
 
 from core.posts.category_attributes import rebuild_post_attribute_values
 from core.posts.models import CategoryAttributeFieldType, SearchStatistic
@@ -28,6 +28,20 @@ class MainPageTest(TestCase):
         self.assertIn("object_list", response.context)
         self.assertTemplateUsed(response, "index.html")
 
+    @override_settings(HOST="https://agromega.in.ua")
+    def test_homepage_has_trailing_slash_canonical(self):
+        response = self.client.get("/")
+
+        self.assertContains(response, '<link rel="canonical" href="https://agromega.in.ua/">', html=True)
+        self.assertContains(response, '<meta name="robots" content="index,follow">', html=True)
+
+    @override_settings(HOST="https://agromega.in.ua")
+    def test_query_variant_is_noindex_and_canonicalizes_to_path(self):
+        response = self.client.get("/", {"page": "2"})
+
+        self.assertContains(response, '<link rel="canonical" href="https://agromega.in.ua/">', html=True)
+        self.assertContains(response, '<meta name="robots" content="noindex,follow">', html=True)
+
     def test_active_status_filter(self):
         parent = CategoryFactory()
         rubric = CategoryFactory(parent=parent)
@@ -42,6 +56,9 @@ class MainPageTest(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["Content-Type"], "application/javascript")
         self.assertEqual(response.headers["Cache-Control"], "no-cache")
+        content = b"".join(response.streaming_content).decode()
+        self.assertIn('const AGROMEGA_CACHE_VERSION = "agromega-v2";', content)
+        self.assertIn('const NETWORK_FIRST_DESTINATIONS = new Set(["script", "style"]);', content)
 
     def test_plant_diary_landing(self):
         response = self.client.get("/plant-diary")
@@ -270,6 +287,7 @@ class PostSearchTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "posts/search.html")
         self.assertEqual(SearchStatistic.objects.count(), 0)
+        self.assertContains(response, '<meta name="robots" content="noindex,follow">', html=True)
 
     def test_search_query_renders_no_results_and_records_statistic(self):
         response = self.client.get("/search/", {"q": "missing query"})
@@ -292,6 +310,14 @@ class SiteMapTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context["urls"]), 3)
         self.assertTemplateUsed(response, "sitemap_index.xml")
+
+    @override_settings(HOST="https://agromega.in.ua")
+    def test_main_sitemap_has_unique_urls_and_one_slash_homepage(self):
+        response = client.get("/sitemap-main.xml")
+        locations = [url["loc"] for url in response.context["urls"]]
+
+        self.assertEqual(locations.count("https://agromega.in.ua/"), 1)
+        self.assertEqual(len(locations), len(set(locations)))
 
 
 class ErrorsHandlerTests(TestCase):

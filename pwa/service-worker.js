@@ -1,6 +1,7 @@
-const AGROMEGA_CACHE_VERSION = "agromega-v1";
+const AGROMEGA_CACHE_VERSION = "agromega-v2";
 const RUNTIME_CACHE = `${AGROMEGA_CACHE_VERSION}-runtime`;
 const CACHEABLE_DESTINATIONS = new Set(["font", "image", "script", "style"]);
+const NETWORK_FIRST_DESTINATIONS = new Set(["script", "style"]);
 
 self.addEventListener("install", function (event) {
     event.waitUntil(self.skipWaiting());
@@ -42,8 +43,27 @@ self.addEventListener("fetch", function (event) {
         return;
     }
 
-    event.respondWith(staleWhileRevalidate(request));
+    event.respondWith(
+        NETWORK_FIRST_DESTINATIONS.has(request.destination)
+            ? networkFirst(request)
+            : staleWhileRevalidate(request)
+    );
 });
+
+function networkFirst(request) {
+    return caches.open(RUNTIME_CACHE).then(function (cache) {
+        return fetch(request)
+            .then(function (response) {
+                if (isCacheableResponse(response)) {
+                    cache.put(request, response.clone());
+                }
+                return response;
+            })
+            .catch(function () {
+                return cache.match(request);
+            });
+    });
+}
 
 function staleWhileRevalidate(request) {
     return caches.open(RUNTIME_CACHE).then(function (cache) {

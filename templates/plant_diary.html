@@ -1,31 +1,25 @@
 {% extends "base.html" %}
 {% load static static_push %}
-
 {% block title %}
     Щоденник рослин онлайн — догляд за рослинами, полив, добрива та історія догляду
 {% endblock title %}
-
 {% block meta_description %}
     Онлайн-щоденник для рослин і городу: ведіть облік поливу, добрив, пересадки, фото та нотаток. Зберігайте всю історію догляду за рослинами в одному місці.
 {% endblock meta_description %}
-
-{% block canonical %}
-    <link rel="canonical" href="{{ request.build_absolute_uri }}">
-{% endblock canonical %}
-
 {% block extra_meta %}
-    <meta property="og:title" content="Щоденник рослин онлайн — догляд за рослинами, полив, добрива та історія догляду">
-    <meta property="og:description" content="Онлайн-щоденник для рослин і городу: ведіть облік поливу, добрив, пересадки, фото та нотаток. Зберігайте всю історію догляду за рослинами в одному місці.">
+    <meta property="og:title"
+          content="Щоденник рослин онлайн — догляд за рослинами, полив, добрива та історія догляду">
+    <meta property="og:description"
+          content="Онлайн-щоденник для рослин і городу: ведіть облік поливу, добрив, пересадки, фото та нотаток. Зберігайте всю історію догляду за рослинами в одному місці.">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
     <meta property="og:site_name" content="AgroMega">
 {% endblock extra_meta %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static_push "posts/main.css" %}">
-    <link rel="stylesheet" href="{% static_push "posts/plant-diary.css" %}?v=20260528-1">
+    <link rel="stylesheet"
+          href="{% static_push "posts/plant-diary.css" %}?v=20260528-1">
 {% endblock scripts %}
-
 {% block main %}
     <div class="plant-diary-page">
         <section class="plant-diary-hero">
@@ -40,7 +34,8 @@
                             зберігається в одному місці, щоб ви завжди бачили повну картину сезону.
                         </p>
                         <div class="plant-diary-hero__actions">
-                            <a class="plant-diary-cta" href="{% url 'pro_auth:profile-diary-list' %}">
+                            <a class="plant-diary-cta"
+                               href="{% url 'pro_auth:profile-diary-list' %}">
                                 <span>Спробувати</span>
                                 <span class="plant-diary-cta__arrow" aria-hidden="true">➜</span>
                             </a>
@@ -81,7 +76,6 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--flush-bottom">
             <div class="container">
                 <div class="plant-diary-problem-layout">
@@ -107,12 +101,13 @@
                         </div>
                         <img class="plant-diary-problem-visual__image"
                              src="{% static_push "posts/plant-diary-farmer.png" %}"
-                             alt="Збентежений агроном">
+                             alt="Збентежений агроном"
+                             width="1024"
+                             height="1024">
                     </div>
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--tint">
             <div class="container">
                 <div class="plant-diary-principles-layout">
@@ -153,7 +148,6 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section">
             <div class="container">
                 <div class="plant-diary-how plant-diary-how--orbit">
@@ -164,7 +158,6 @@
                         </div>
                         <p>Для грядки, вазона, теплиці або будь-якої окремої зони вирощування.</p>
                     </article>
-
                     <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-how__card plant-diary-how__card--two">
                         <div class="plant-diary-step-card__top">
                             <span class="plant-diary-step-card__number">2</span>
@@ -172,7 +165,6 @@
                         </div>
                         <p>Збережіть назву, категорію та дату посадки, щоб почати історію рослини.</p>
                     </article>
-
                     <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-how__card plant-diary-how__card--three">
                         <div class="plant-diary-step-card__top">
                             <span class="plant-diary-step-card__number">3</span>
@@ -180,7 +172,6 @@
                         </div>
                         <p>Записуйте полив, добрива, фото, хвороби, пересадку та інші події в житті рослини.</p>
                     </article>
-
                     <article class="plant-diary-step-card plant-diary-step-card--compact plant-diary-step-card--summary plant-diary-how__card plant-diary-how__card--four">
                         <div class="plant-diary-step-card__top">
                             <span class="plant-diary-step-card__number">4</span>
@@ -188,11 +179,12 @@
                         </div>
                         <p>Менше хаосу, більше ясності: уся важлива інформація про рослини зібрана в одному місці.</p>
                     </article>
-
-                    <div class="plant-diary-how__line plant-diary-how__line--one-two" aria-hidden="true"></div>
-                    <div class="plant-diary-how__line plant-diary-how__line--two-three" aria-hidden="true"></div>
-                    <div class="plant-diary-how__line plant-diary-how__line--three-four" aria-hidden="true"></div>
-
+                    <div class="plant-diary-how__line plant-diary-how__line--one-two"
+                         aria-hidden="true"></div>
+                    <div class="plant-diary-how__line plant-diary-how__line--two-three"
+                         aria-hidden="true"></div>
+                    <div class="plant-diary-how__line plant-diary-how__line--three-four"
+                         aria-hidden="true"></div>
                     <div class="plant-diary-section__intro plant-diary-how__content">
                         <h2>Як працює щоденник рослин?</h2>
                         <p>Почати легко: створіть щоденник, додайте рослини і фіксуйте все, що важливо для догляду.</p>
@@ -201,7 +193,6 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--tint">
             <div class="container">
                 <div class="plant-diary-split">
@@ -278,7 +269,6 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--benefits">
             <div class="container">
                 <div class="plant-diary-section__intro plant-diary-section__intro--center">
@@ -292,13 +282,14 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--trust">
             <div class="container">
                 <div class="plant-diary-trust-layout">
                     <div class="plant-diary-trust-layout__visual">
                         <img src="{% static_push "posts/plant-diary-farmer-happy.png" %}"
-                             alt="Усміхнений агроном">
+                             alt="Усміхнений агроном"
+                             width="1024"
+                             height="1024">
                     </div>
                     <div class="plant-diary-section__intro plant-diary-trust-layout__content">
                         <h2>Доглядайте за рослинами впевнено</h2>
@@ -311,14 +302,11 @@
                 </div>
             </div>
         </section>
-
         <section class="plant-diary-section plant-diary-section--compact">
             <div class="container">
                 <div class="plant-diary-final-card">
                     <h2>Почніть вести щоденник рослин вже сьогодні 🌱</h2>
-                    <p>
-                        Створіть свій перший щоденник і зберігайте всю історію догляду в одному місці.
-                    </p>
+                    <p>Створіть свій перший щоденник і зберігайте всю історію догляду в одному місці.</p>
                     <a class="plant-diary-cta"
                        href="{% url 'pro_auth:profile-diary-list' %}">
                         <span>Зареєструватись</span>

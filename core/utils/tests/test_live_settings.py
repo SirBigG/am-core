@@ -37,8 +37,13 @@ class LiveStorageSettingsTests(SimpleTestCase):
         self.assertEqual(
             live_settings.STORAGES["staticfiles"],
             {
-                "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-                "OPTIONS": {"location": "static"},
+                "BACKEND": "core.utils.storage.VersionedS3StaticStorage",
+                "OPTIONS": {
+                    "location": "static",
+                    "object_parameters": {
+                        "CacheControl": "public, max-age=31536000, immutable",
+                    },
+                },
             },
         )
 

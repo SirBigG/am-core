@@ -12,6 +12,22 @@ from core.utils.images import imgproxy_url as build_image_url
 register = template.Library()
 
 
+@register.simple_tag
+def canonical_url(request):
+    """Return the canonical public URL for the current path without its query
+    string."""
+    path = request.path or "/"
+    return f"{settings.HOST.rstrip('/')}{path}"
+
+
+@register.simple_tag
+def robots_content(request):
+    """Keep search results and all query-string variants out of the index."""
+    if request.path.startswith("/search/") or request.GET:
+        return "noindex,follow"
+    return "index,follow"
+
+
 @register.inclusion_tag("posts/main_menu.html")
 def main_menu():
     """Creating main page menu.
