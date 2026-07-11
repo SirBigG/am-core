@@ -3,10 +3,11 @@
 {% block extra_meta %}
     <meta content="{{ metadata.title }}" property="og:title">
     <meta content="{{ metadata.description }}" property="og:description">
-    <meta content="" property="og:image">
+    <meta content="{% default_og_image %}" property="og:image">
     <meta content="{{ view.request.scheme }}://{{ view.request.get_host }}{{ view.request.get_full_path }}"
           property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
+    <script type="application/ld+json">{% collection_structured_data metadata.page_title roots %}</script>
 {% endblock extra_meta %}
 {% block title %}
     {{ metadata.page_title }}

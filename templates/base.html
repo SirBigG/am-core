@@ -50,10 +50,13 @@
         <meta content="Агропортал України" property="og:title">
         <meta content="Все про аграрну сферу і навіть більше."
               property="og:description">
-        {#        <meta content="" property="og:image">#}
+        <meta content="{% default_og_image %}" property="og:image">
+        <meta content="1200" property="og:image:width">
+        <meta content="630" property="og:image:height">
         <meta content="{{ page_canonical_url }}" property="og:url">
         <meta content="AgroMega.in.ua" property="og:site_name">
     {% endblock extra_meta %}
+    <script type="application/ld+json">{% site_structured_data %}</script>
     {% block scripts %}
     {% endblock scripts %}
     {% block adverts %}

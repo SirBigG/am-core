@@ -12,6 +12,7 @@
 {% endblock meta_description %}
 {% block extra_meta %}
     {% load post_extras %}
+    <script type="application/ld+json">{% event_structured_data object %}</script>
     <meta content="{{ object.title }}" property="og:title">
     <meta content="{{ object.text|truncatechars:300|striptags|safe }}"
           property="og:description">

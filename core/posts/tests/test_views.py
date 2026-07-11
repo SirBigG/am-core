@@ -1,3 +1,6 @@
+import json
+import re
+
 from django.core.cache import cache
 from django.test import Client, RequestFactory, TestCase, override_settings
 
@@ -35,6 +38,16 @@ class MainPageTest(TestCase):
         self.assertContains(response, '<link rel="canonical" href="https://agromega.in.ua/">', html=True)
         self.assertContains(response, '<meta name="robots" content="index,follow">', html=True)
         self.assertContains(response, '<meta content="https://agromega.in.ua/" property="og:url">', html=True)
+        self.assertContains(
+            response,
+            '<meta content="https://agromega.in.ua/static/posts/og-default.png" property="og:image">',
+            html=True,
+        )
+        payloads = re.findall(rb'<script type="application/ld\+json">(.*?)</script>', response.content, flags=re.DOTALL)
+        structured_data = [json.loads(payload) for payload in payloads]
+        site_graph = next(data["@graph"] for data in structured_data if "@graph" in data)
+        self.assertEqual([item["@type"] for item in site_graph], ["Organization", "WebSite"])
+        self.assertEqual(site_graph[1]["potentialAction"]["@type"], "SearchAction")
 
     @override_settings(HOST="https://agromega.in.ua")
     def test_query_variant_is_noindex_and_canonicalizes_to_path(self):

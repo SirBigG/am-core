@@ -1,36 +1,39 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock scripts %}
-
 {% block extra_meta %}
+    <script type="application/ld+json">{% news_structured_data object %}</script>
     <meta content="{{ object.title }}" property="og:title">
-    <meta content="{{ object.description|striptags|truncatechars:160 }}" property="og:description">
+    <meta content="{{ object.description|striptags|truncatechars:160 }}"
+          property="og:description">
+    <meta content="{% if object.image %}{{ object.image }}{% else %}{% default_og_image %}{% endif %}"
+          property="og:image">
     <meta content="{{ object.url }}" property="og:url">
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
-
-{% block title %}{{ object.title }}{% endblock %}
-
-{% block page_title %}{{ object.title }}{% endblock %}
+{% block title %}{{ object.title }}{% endblock title %}
+{% block page_title %}{{ object.title }}{% endblock page_title %}
 {% block page_title_right %}
-    <a href="https://telegram.me/wn_world_news_bot?start=1" target="_blank" class="btn btn-outline-primary btn-sm">Telegram
-        <i class="icon-paper-plane"></i></a>{% endblock %}
-
+    <a href="https://telegram.me/wn_world_news_bot?start=1"
+       target="_blank"
+       class="btn btn-outline-primary btn-sm">Telegram
+        <i class="icon-paper-plane"></i></a>
+{% endblock page_title_right %}
 {% block content %}
     <div class="post-content">
         {% if object.image %}
             <div class="row">
                 <div class="col-12 p-0">
                     <div class="card">
-                        <img alt="{{ object.title }}" width="1000" height="500"
+                        <img alt="{{ object.title }}"
+                             width="1000"
+                             height="500"
                              src="{{ object.image }}"
-                             class="card-img img-fluid"/>
+                             class="card-img img-fluid" />
                     </div>
                 </div>
             </div>
@@ -44,11 +47,6 @@
             </div>
         </div>
     </div>
-    <div class="col-12 mt-3">
-        {% post_adverts %}
-    </div>
-    <div class="col-12 mt-3">
-        {% random_posts %}
-    </div>
-
+    <div class="col-12 mt-3">{% post_adverts %}</div>
+    <div class="col-12 mt-3">{% random_posts %}</div>
 {% endblock content %}

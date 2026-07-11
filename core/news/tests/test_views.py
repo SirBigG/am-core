@@ -1,3 +1,5 @@
+import json
+import re
 from types import SimpleNamespace
 from unittest.mock import patch
 
@@ -53,7 +55,7 @@ class NewsListViewTests(TestCase):
         self.assertEqual(response.context["object_list"], [])
 
 
-@override_settings(API_HOST="https://api.example.com", HOST="example.com")
+@override_settings(API_HOST="https://api.example.com", HOST="https://example.com")
 class NewsDetailViewTests(TestCase):
     @patch("core.news.views.requests.get")
     def test_renders_news_detail_from_api(self, mocked_get):
@@ -71,7 +73,17 @@ class NewsDetailViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "news/detail.html")
         self.assertEqual(response.context["object"]["title"], "Market update")
-        self.assertEqual(response.context["object"]["url"], "example.com/news/market-update-12.html")
+        self.assertEqual(response.context["object"]["url"], "https://example.com/news/market-update-12.html")
+        self.assertContains(
+            response,
+            '<meta content="https://example.com/static/posts/og-default.png" property="og:image">',
+            html=True,
+        )
+        payloads = re.findall(rb'<script type="application/ld\+json">(.*?)</script>', response.content, flags=re.DOTALL)
+        structured_data = [json.loads(payload) for payload in payloads]
+        news_article = next(data for data in structured_data if data.get("@type") == "NewsArticle")
+        self.assertEqual(news_article["headline"], "Market update")
+        self.assertEqual(news_article["datePublished"], "2026-05-12")
         mocked_get.assert_called_once_with("https://api.example.com/news/12")
 
     @patch("core.news.views.requests.get")

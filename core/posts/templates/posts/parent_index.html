@@ -14,6 +14,21 @@
         {{ category.value }}
     {% endif %}
 {% endblock meta_description %}
+{% block extra_meta %}
+    <meta content="{% if category.meta %}{{ category.meta.title }}{% else %}{{ category.value }}{% endif %}"
+          property="og:title">
+    <meta content="{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }}{% endif %}"
+          property="og:description">
+    {% if category.image %}
+        <meta content="{% full_url category.image.url %}" property="og:image">
+    {% else %}
+        <meta content="{% default_og_image %}" property="og:image">
+    {% endif %}
+    <meta content="{{ page_canonical_url }}" property="og:url">
+    <meta content="AgroMega.in.ua" property="og:site_name">
+    <script type="application/ld+json">{% breadcrumb_structured_data category %}</script>
+    <script type="application/ld+json">{% collection_structured_data category.value object_list %}</script>
+{% endblock extra_meta %}
 {% block scripts %}
     <script async src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">

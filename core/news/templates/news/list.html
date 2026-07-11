@@ -8,6 +8,9 @@
     <meta content="Аграрні новини України" property="og:title">
     <meta content="Останні новини з аграрної сфери України."
           property="og:description">
+    <meta content="{% default_og_image %}" property="og:image">
+    <meta content="{{ page_canonical_url }}" property="og:url">
+    <script type="application/ld+json">{% collection_structured_data 'Аграрні новини України' object_list %}</script>
 {% endblock extra_meta %}
 {% block title %}
     Аграрні новини України

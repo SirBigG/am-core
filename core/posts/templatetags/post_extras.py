@@ -1,8 +1,11 @@
+import json
 from urllib.parse import urlparse
 
 from django import template
 from django.conf import settings
 from django.core.files.storage import storages
+from django.utils.html import strip_tags
+from django.utils.safestring import mark_safe
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
@@ -10,6 +13,147 @@ from core.posts.models import Post
 from core.utils.images import imgproxy_url as build_image_url
 
 register = template.Library()
+
+
+def _json_ld(data):
+    return mark_safe(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+
+
+@register.simple_tag
+def default_og_image():
+    return public_url(settings.STATIC_URL + "posts/og-default.png")
+
+
+@register.simple_tag
+def site_structured_data():
+    origin = settings.HOST.rstrip("/")
+    return _json_ld(
+        {
+            "@context": "https://schema.org",
+            "@graph": [
+                {
+                    "@type": "Organization",
+                    "@id": f"{origin}/#organization",
+                    "name": "AgroMega",
+                    "url": f"{origin}/",
+                    "logo": public_url(settings.STATIC_URL + "posts/logo.png"),
+                },
+                {
+                    "@type": "WebSite",
+                    "@id": f"{origin}/#website",
+                    "url": f"{origin}/",
+                    "name": "AgroMega",
+                    "publisher": {"@id": f"{origin}/#organization"},
+                    "potentialAction": {
+                        "@type": "SearchAction",
+                        "target": {"@type": "EntryPoint", "urlTemplate": f"{origin}/search/?q={{search_term_string}}"},
+                        "query-input": "required name=search_term_string",
+                    },
+                },
+            ],
+        }
+    )
+
+
+@register.simple_tag
+def breadcrumb_structured_data(category, current_title=None):
+    entries = [{"name": "Головна", "item": public_url("/")}]
+    for ancestor in category.get_ancestors(include_self=True)[1:]:
+        entries.append({"name": ancestor.value, "item": public_url(ancestor.get_absolute_url())})
+    if current_title:
+        entries.append({"name": current_title, "item": None})
+    items = []
+    for position, entry in enumerate(entries, 1):
+        item = {"@type": "ListItem", "position": position, "name": entry["name"]}
+        if entry["item"]:
+            item["item"] = entry["item"]
+        items.append(item)
+    return _json_ld({"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": items})
+
+
+@register.simple_tag(takes_context=True)
+def collection_structured_data(context, title, objects):
+    elements = []
+    for position, obj in enumerate(objects, 1):
+        if isinstance(obj, dict):
+            name = obj.get("title") or obj.get("data", {}).get("title")
+            url = obj.get("absolute_url") or obj.get("url") or obj.get("data", {}).get("link")
+        else:
+            name = getattr(obj, "title", None) or getattr(obj, "value", None)
+            url = getattr(obj, "absolute_url", None)
+            if not url and hasattr(obj, "get_absolute_url"):
+                url = obj.get_absolute_url()
+        if name and url:
+            elements.append({"@type": "ListItem", "position": position, "name": str(name), "url": public_url(url)})
+    return _json_ld(
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": title,
+            "url": public_url(context["request"].path),
+            "mainEntity": {"@type": "ItemList", "numberOfItems": len(elements), "itemListElement": elements},
+        }
+    )
+
+
+@register.simple_tag
+def article_structured_data(post, category, image_url="", author_name=""):
+    description = strip_tags(getattr(post, "meta_description", "") or str(post.text))
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": post.meta.title if post.meta else f"{post.title} | {category.value}",
+        "description": description,
+        "datePublished": post.publish_date.isoformat(),
+        "dateModified": post.update_date.isoformat(),
+        "mainEntityOfPage": public_url(post.get_absolute_url()),
+        "author": {"@type": "Person", "name": str(post.author or author_name)},
+        "publisher": {"@id": f"{settings.HOST.rstrip('/')}/#organization"},
+    }
+    if image_url:
+        data["image"] = [image_url]
+    return _json_ld(data)
+
+
+@register.simple_tag
+def news_structured_data(obj):
+    data = {
+        "@context": "https://schema.org",
+        "@type": "NewsArticle",
+        "headline": obj.get("title", ""),
+        "description": strip_tags(obj.get("description", "")),
+        "url": obj.get("url", ""),
+        "publisher": {"@id": f"{settings.HOST.rstrip('/')}/#organization"},
+    }
+    if obj.get("image"):
+        data["image"] = [obj["image"]]
+    if obj.get("created"):
+        data["datePublished"] = obj["created"]
+    return _json_ld(data)
+
+
+@register.simple_tag
+def event_structured_data(event):
+    data = {
+        "@context": "https://schema.org",
+        "@type": "Event",
+        "name": event.title,
+        "description": strip_tags(str(event.text)),
+        "startDate": event.start.isoformat(),
+        "endDate": event.stop.isoformat(),
+        "eventStatus": "https://schema.org/EventScheduled",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "url": public_url(event.get_absolute_url()),
+        "location": {
+            "@type": "Place",
+            "name": str(event.location),
+            "address": event.address,
+        },
+        "organizer": {"@id": f"{settings.HOST.rstrip('/')}/#organization"},
+    }
+    if event.poster:
+        data["image"] = [public_url(event.poster.url)]
+    return _json_ld(data)
 
 
 @register.simple_tag
@@ -21,6 +165,8 @@ def canonical_url(request):
 
 def public_url(path):
     """Build an absolute URL on the configured public origin."""
+    if str(path).startswith(("http://", "https://")):
+        return str(path)
     return f"{settings.HOST.rstrip('/')}/{path.lstrip('/')}"
 
 

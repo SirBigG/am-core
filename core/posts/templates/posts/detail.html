@@ -19,25 +19,8 @@
     <link rel="stylesheet" href="{% static "posts/detail.css" %}">
 {% endblock scripts %}
 {% block extra_meta %}
-    <script type="application/ld+json">
-        {
-           "@context": "https://schema.org",
-            "@type": "Article",
-            "headline": "{% if object.meta %}{{ object.meta.title }}{% else %}{{ object.title }} |
-        {{ category.value }}{% endif %}",
-        "description": "{% if object.meta_description %}{{ object.meta_description }}
-        {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}",
-        "image": [
-            "{{ main_photo_full_url }}"
-        ],
-        "datePublished": "{{ object.publish_date.isoformat }}",
-        "dateModified": "{{ object.update_date.isoformat }}",
-        "author": {
-            "@type": "Person",
-            "name": "{% if object.author %}{{ object.author }}{% else %}{{ publisher_name }}{% endif %}"
-        }
-    }
-    </script>
+    <script type="application/ld+json">{% breadcrumb_structured_data category object.title %}</script>
+    <script type="application/ld+json">{% article_structured_data object category main_photo_full_url publisher_name %}</script>
     <meta content=" {% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
           property="og:title">
     <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"

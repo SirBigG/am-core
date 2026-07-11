@@ -4,7 +4,14 @@
 {% endblock title %}
 {% block meta_description %}
 {% endblock meta_description %}
+{% load post_extras static %}
 {% block extra_meta %}
+    <meta content="Події агросфери" property="og:title">
+    <meta content="Виставки, зустрічі, навчання та інші події для аграрної спільноти."
+          property="og:description">
+    <meta content="{% default_og_image %}" property="og:image">
+    <meta content="{{ page_canonical_url }}" property="og:url">
+    <script type="application/ld+json">{% collection_structured_data 'Події агросфери' object_list %}</script>
 {% endblock extra_meta %}
 {% block second_menu %}
 {% endblock second_menu %}
