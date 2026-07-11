@@ -26,7 +26,7 @@
                 {% endif %}
             </h1>
             {% if category.meta and category.meta.text %}
-                <div class="site-catalog-hero__text">{{ category.meta.text|safe }}</div>
+                <div class="site-catalog-hero__text site-article-body">{{ category.meta.text|safe }}</div>
             {% else %}
                 <p class="site-catalog-hero__text">Переглядайте матеріали списком або перемкніться на алфавітний режим.</p>
             {% endif %}

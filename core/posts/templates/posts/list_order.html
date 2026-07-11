@@ -19,7 +19,7 @@
                 {% endif %}
             </h1>
             {% if category.meta and category.meta.text %}
-                <div class="site-catalog-hero__text">{{ category.meta.text|safe }}</div>
+                <div class="site-catalog-hero__text site-article-body">{{ category.meta.text|safe }}</div>
             {% else %}
                 <p class="site-catalog-hero__text">Швидко знайдіть матеріал за першою літерою або відфільтруйте записи за країною.</p>
             {% endif %}
