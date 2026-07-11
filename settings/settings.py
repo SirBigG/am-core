@@ -403,6 +403,7 @@ RECAPTCHA_PRIVATE_KEY = os.getenv("RECAPTCHA_PRIVATE_KEY", "")
 COMMENT_ALLOW_TRANSLATION = True
 
 ADVERT_ACTIVE_DAYS = int(os.getenv("ADVERT_ACTIVE_DAYS", 30))
+ADVERT_SITEMAP_RETENTION_DAYS = int(os.getenv("ADVERT_SITEMAP_RETENTION_DAYS", 90))
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -432,5 +433,4 @@ SECURE_CSP_REPORT_ONLY = {
     "object-src": ("'none'",),
     "base-uri": ("'self'",),
     "form-action": ("'self'",) + CSP_FORM_ACTION_ORIGINS,
-    "report-uri": ("/csp/report/",),
 }

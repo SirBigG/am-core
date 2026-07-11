@@ -150,12 +150,9 @@
     Здійсніть вхід до системи, щоб отримати доступ до персоналізованого досвіду
     користувача.
 {% endblock meta_description %}
-{% block extra_meta %}
-    <meta name="robots" content="noindex">
-{% endblock extra_meta %}
-{% block canonical %}
-    {% if request.GET %}<link rel="canonical" href="https://agromega.in.ua{{ request.path }}" />{% endif %}
-{% endblock canonical %}
+{% block robots %}
+    <meta name="robots" content="noindex,follow">
+{% endblock robots %}
 {% block base_content_block %}
     <div class="auth-shell d-flex align-items-center justify-content-center">
         <div class="card auth-card shadow-lg">

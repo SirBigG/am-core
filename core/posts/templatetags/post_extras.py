@@ -12,6 +12,38 @@ from core.utils.images import imgproxy_url as build_image_url
 register = template.Library()
 
 
+@register.simple_tag
+def canonical_url(request):
+    """Return the canonical public URL for the current path without its query
+    string."""
+    return public_url(request.path or "/")
+
+
+def public_url(path):
+    """Build an absolute URL on the configured public origin."""
+    return f"{settings.HOST.rstrip('/')}/{path.lstrip('/')}"
+
+
+@register.simple_tag
+def robots_content(request):
+    """Keep private workflows, search, and query variants out of the index."""
+    non_indexable_prefixes = (
+        "/adverts/create/",
+        "/confirm/",
+        "/feedback/",
+        "/login/",
+        "/logout/",
+        "/profile/",
+        "/register/",
+        "/search/",
+        "/service/feedback/",
+        "/user/",
+    )
+    if request.path.startswith(non_indexable_prefixes) or request.GET:
+        return "noindex,follow"
+    return "index,follow"
+
+
 @register.inclusion_tag("posts/main_menu.html")
 def main_menu():
     """Creating main page menu.

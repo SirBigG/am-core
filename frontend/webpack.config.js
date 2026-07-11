@@ -7,6 +7,7 @@ const outputDir = path.resolve(__dirname, "../core/posts/static/posts");
 
 module.exports = {
   entry: {
+    site: "./src/scss/site.scss",
     main: "./src/scss/main.scss",
     detail: "./src/scss/detail.scss",
     add: "./src/scss/add.scss",

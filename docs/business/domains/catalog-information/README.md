@@ -19,6 +19,9 @@ Catalog information is the main knowledge area of the product. It contains struc
 ## Business Rules
 
 - Catalog content is treated as important reference information, not short-lived social content.
+- Token-authenticated integrations can read the shared post catalog and create posts owned by the token user.
+- Integration updates are owner-scoped: a token user cannot update another publisher's post through the content API.
+- Integration post creation derives the publisher from the credential and never trusts a publisher supplied in the request body.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.
 - Registry spreadsheet refreshes should preserve existing variety records and update them in place by variety title plus registry category.
@@ -41,6 +44,7 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 ## Implementation Map
 
 - Django app: `core/posts`.
+- Token-authenticated integration endpoints: `/api/content/posts/` and `/api/content/posts/<id>/`.
 - Some variety-style public catalog URLs, such as `/cybulevi/sorty-cybuli/`, are rendered through post/category templates even when the content behaves like registry/catalog reference information.
 - Registry-specific category and variety templates also exist in `core/registry`, especially for `/registry/` and registry browsing flows.
 - Registry import code starts in `core/registry/parser.py`, with row layout definitions in `core/registry/parser_row_types.py`.

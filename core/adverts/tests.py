@@ -1,7 +1,9 @@
 import os
+from datetime import timedelta
 from http import HTTPStatus
 
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from PIL import Image
 
 from core.adverts.models import Advert, AdvertImage, get_advert_max_photos
@@ -35,6 +37,7 @@ class TestAdvertFormView(TestCase):
         self.assertContains(response, 'class="advert-photo-slot-text">Додати', count=get_advert_max_photos())
         self.assertContains(response, "site-login-prompt")
         self.assertContains(response, "/login/?next=/adverts/create/")
+        self.assertContains(response, '<meta name="robots" content="noindex,follow">', html=True)
 
     def test_authenticated(self):
         user = UserFactory()
@@ -215,6 +218,49 @@ class TestAdvertFormView(TestCase):
 
         self.assertEqual(advert.primary_image_url, advert.image.url)
         self.assertEqual(advert.photo_urls, [advert.image.url, extra.image.url])
+
+
+@override_settings(
+    HOST="https://agromega.in.ua",
+    ADVERT_ACTIVE_DAYS=30,
+    ADVERT_SITEMAP_RETENTION_DAYS=90,
+)
+class AdvertSitemapTests(TestCase):
+    def create_advert(self, title, age_days, is_active=True):
+        return Advert.objects.create(
+            title=title,
+            description="test",
+            price=100,
+            contact="test",
+            updated=timezone.now() - timedelta(days=age_days),
+            is_active=is_active,
+        )
+
+    def sitemap_locations(self):
+        response = self.client.get("/sitemap-adverts.xml")
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        return {url["loc"] for url in response.context["urls"]}
+
+    def test_keeps_recently_expired_advert_during_retention_period(self):
+        advert = self.create_advert("recently expired", age_days=60)
+
+        self.assertIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
+
+    def test_excludes_advert_older_than_active_and_retention_periods(self):
+        advert = self.create_advert("too old", age_days=121)
+
+        self.assertNotIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
+
+    def test_excludes_manually_deactivated_advert_during_retention_period(self):
+        advert = self.create_advert("deactivated", age_days=60, is_active=False)
+
+        self.assertNotIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
+
+    @override_settings(HOST="https://agromega.in.ua/")
+    def test_normalizes_trailing_slash_host(self):
+        advert = self.create_advert("normalized URL", age_days=1)
+
+        self.assertIn(f"https://agromega.in.ua{advert.get_absolute_url()}", self.sitemap_locations())
 
 
 class ProfileAdvertTests(TestCase):

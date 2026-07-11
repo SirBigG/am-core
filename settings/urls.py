@@ -14,6 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include(blog_urls))
 """
 
+from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
+from django.contrib import admin
+from django.urls import include, path
+from django.views.generic import TemplateView
+
 from core.adverts.views import AdvertSitemap
 from core.classifier.views import CategoriesIndex
 from core.companies.views import admin_parse_form_view
@@ -21,15 +27,8 @@ from core.news.views import NewsSitemapView
 from core.posts import views
 from core.pro_auth import views as pro_auth_views
 from core.services.views import FeedbackView
-from core.utils.views import content_security_policy_report
-from django.conf import settings
-from django.conf.urls.i18n import i18n_patterns
-from django.contrib import admin
-from django.urls import include, path
-from django.views.generic import TemplateView
 
 urlpatterns = [
-    path("csp/report/", content_security_policy_report, name="csp-report"),
     path("service-worker.js", views.service_worker, name="service-worker"),
 ] + i18n_patterns(
     path("", views.IndexView.as_view(), name="index"),

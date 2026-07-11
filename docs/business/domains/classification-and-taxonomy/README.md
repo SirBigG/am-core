@@ -19,6 +19,7 @@ Classification is the shared tree of categories used by other AgroMega core proj
 ## Business Rules
 
 - Categories are hierarchical.
+- The token-authenticated integration API exposes only active categories and preserves the complete hierarchy recursively.
 - Categories are shared infrastructure for other domains, not only a standalone content area.
 - Changes to the tree can affect multiple business apps.
 - Concrete post categories can own structured attribute schemas. These schemas describe category-specific facts such as variety traits, illness traits, breed traits, or numeric intervals.
@@ -40,6 +41,7 @@ The confirmed lifecycle is still unknown. Likely states to clarify include activ
 ## Implementation Map
 
 - Django app: `core/classifier`.
+- Token-authenticated integration endpoints: `/api/content/categories/tree/` and `/api/content/countries/`.
 
 ## Open Questions
 

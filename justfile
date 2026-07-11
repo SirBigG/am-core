@@ -18,7 +18,7 @@ default:
 
 # Start the local Docker Compose stack in the background.
 start:
-    {{compose}} up -d
+    {{compose}} up -d --remove-orphans
 
 # Start the local Docker Compose stack in the foreground.
 up:

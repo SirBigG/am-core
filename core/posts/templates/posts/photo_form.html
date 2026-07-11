@@ -1,25 +1,23 @@
 {% extends "base.html" %}
-
 {% load post_extras static %}
-
 {% block extra_meta %}
     <meta content="Поділитись фото {{ post.title }}" property="og:title">
-    <meta content="Поділіться фото ваших улюбленців {{ post.title }} з іншими користувачами" property="og:description">
-    <meta content="{{ request.path }}" property="og:url">
+    <meta content="Поділіться фото ваших улюбленців {{ post.title }} з іншими користувачами"
+          property="og:description">
+    <meta content="{{ page_canonical_url }}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
-
 {% block scripts %}
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static "posts/list.css" %}">
 {% endblock scripts %}
-
-{% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock %}
-{% block title %}Поділитись фото {{ post.title }}{% endblock %}
-{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей.{% endblock %}
-
+{% block page_title %}Завантажити фото публікації: {{ post.title }}{% endblock page_title %}
+{% block title %}Поділитись фото {{ post.title }}{% endblock title %}
+{% block meta_description %}Діліться фото ваших улюбленців {{ post.title }}. Їх обов'язково подивиться багато людей.{% endblock meta_description %}
 {% block content %}
-    <form method="post" action="{{ request.path }}" enctype="multipart/form-data">
+    <form method="post"
+          action="{{ request.path }}"
+          enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
             <div class="form-group">
@@ -33,9 +31,7 @@
                         </div>
                     {% endfor %}
                 {% endif %}
-                <div class="col-12">
-                    {{ field }}
-                </div>
+                <div class="col-12">{{ field }}</div>
             </div>
         {% endfor %}
         <div class="col-12">
@@ -43,4 +39,4 @@
         </div>
     </form>
     {{ form.media }}
-{% endblock %}
+{% endblock content %}

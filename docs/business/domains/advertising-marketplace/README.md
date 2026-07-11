@@ -18,6 +18,9 @@ Advertising marketplace lets AgroMega clients create items about buying or selli
 
 ## Business Rules
 
+- Active adverts appear in public listings for `ADVERT_ACTIVE_DAYS` after their latest update.
+- Unless manually deactivated or deleted, an advert remains in the advert sitemap for an additional `ADVERT_SITEMAP_RETENTION_DAYS` to preserve short-term search discovery after listing expiry.
+
 - Items are created by clients.
 - Items are about buying or selling something.
 - Marketplace content is separate from stable catalog information.

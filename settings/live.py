@@ -33,6 +33,9 @@ AWS_IS_GZIPPED = True
 AWS_S3_OBJECT_PARAMETERS = {
     "CacheControl": "max-age=86400",
 }
+STATIC_OBJECT_PARAMETERS = {
+    "CacheControl": "public, max-age=31536000, immutable",
+}
 AWS_MEDIA_LOCATION = "media"
 AWS_STATIC_LOCATION = "static"
 
@@ -45,9 +48,10 @@ STORAGES = {
         },
     },
     "staticfiles": {
-        "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        "BACKEND": "core.utils.storage.VersionedS3StaticStorage",
         "OPTIONS": {
             "location": AWS_STATIC_LOCATION,
+            "object_parameters": STATIC_OBJECT_PARAMETERS,
         },
     },
 }

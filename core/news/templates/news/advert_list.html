@@ -23,7 +23,7 @@
     <meta content="Свіжі оголошення аграрної тематики{% if category %} в категорії {{ category.value }}{% endif %}."
           property="og:description">
     {% if request.GET.page %}
-        <meta name="robots" content="noindex, nofollow">
+        <meta name="robots" content="noindex,follow">
     {% endif %}
 {% endblock extra_meta %}
 {% block title %}

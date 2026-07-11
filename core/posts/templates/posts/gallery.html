@@ -4,7 +4,7 @@
     <meta content="{{ post.title }} фотогалерея" property="og:title">
     <meta content="Всі фото {{ post.title }}." property="og:description">
     {#        <meta content="" property="og:image">#}
-    <meta content="{{ request.path }}" property="og:url">
+    <meta content="{{ page_canonical_url }}" property="og:url">
     <meta content="AgroMega.in.ua" property="og:site_name">
 {% endblock extra_meta %}
 {% block scripts %}

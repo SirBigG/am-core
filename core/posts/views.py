@@ -202,38 +202,40 @@ class SiteMap(TemplateView):
         from core.events.models import Event
 
         context = super().get_context_data(**kwargs)
-        context["base"] = settings.HOST + "/"
-        context["urls"] = [
-            {"loc": f"{settings.HOST}/events/"},
-            {"loc": f"{settings.HOST}/news/"},
-            {"loc": f"{settings.HOST}/adverts/"},
+        base_url = settings.HOST.rstrip("/")
+        urls = [
+            {"loc": f"{base_url}/"},
+            {"loc": f"{base_url}/events/"},
+            {"loc": f"{base_url}/news/"},
+            {"loc": f"{base_url}/adverts/"},
         ]
-        context["urls"].extend(
+        urls.extend(
             [
-                {"loc": f"{settings.HOST}/{slug}/"}
+                {"loc": f"{base_url}/{slug}/"}
                 for slug in Category.objects.filter(level=1, is_active=True).values_list("slug", flat=True)
             ]
         )
-        context["urls"].extend(
+        urls.extend(
             [
-                {"loc": f"{settings.HOST}{absolute_url}"}
+                {"loc": f"{base_url}{absolute_url}"}
                 for absolute_url in Category.objects.filter(level=2, is_active=True).values_list(
                     "absolute_url", flat=True
                 )
             ]
         )
-        context["urls"].extend(
+        urls.extend(
             [
-                {"loc": f'{settings.HOST}{p["absolute_url"]}', "lastmod": p["update_date"]}
+                {"loc": f'{base_url}{p["absolute_url"]}', "lastmod": p["update_date"]}
                 for p in Post.objects.filter(status=True).values("update_date", "absolute_url")
             ]
         )
-        context["urls"].extend(
+        urls.extend(
             [
-                {"loc": f"{settings.HOST}/events/{slug}.html"}
+                {"loc": f"{base_url}/events/{slug}.html"}
                 for slug in Event.objects.filter(status=1).values_list("slug", flat=True)
             ]
         )
+        context["urls"] = list({url["loc"]: url for url in urls}.values())
         return context
 
 
@@ -242,17 +244,19 @@ class SitemapIndexView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        try:
-            advert_lastmod = Advert.active_objects.latest("updated").updated
-        except Advert.DoesNotExist:
-            advert_lastmod = datetime.now()
+        base_url = settings.HOST.rstrip("/")
+        latest_post = Post.objects.filter(status=True).order_by("-update_date").first()
+        latest_advert = Advert.active_objects.order_by("-updated").first()
         context["urls"] = [
             {
-                "loc": f"{settings.HOST}/sitemap-main.xml",
-                "lastmod": Post.objects.filter(status=True).latest("update_date").update_date,
+                "loc": f"{base_url}/sitemap-main.xml",
+                "lastmod": latest_post.update_date if latest_post else None,
             },
-            {"loc": f"{settings.HOST}/sitemap-adverts.xml", "lastmod": advert_lastmod},
-            {"loc": f"{settings.HOST}/sitemap-news.xml", "lastmod": datetime.now()},
+            {
+                "loc": f"{base_url}/sitemap-adverts.xml",
+                "lastmod": latest_advert.updated if latest_advert else None,
+            },
+            {"loc": f"{base_url}/sitemap-news.xml"},
         ]
         return context
 
