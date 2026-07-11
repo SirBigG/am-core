@@ -8,14 +8,14 @@
 
 ## Goal
 
-Provide token-authenticated endpoints that let an integration read the active category tree and countries, list and filter posts, and create or update posts owned by the token user.
+Provide token-authenticated endpoints that let an integration read the active category tree and countries, list and filter posts, create posts owned by the token user, and let staff-token editors update existing posts.
 
 ## Non-Goals
 
 - Replacing or changing the behavior of the existing public and user-facing API endpoints.
 - Adding a second API-key model or credential format.
 - Adding photo upload support to this JSON-focused integration contract.
-- Allowing a token owner to update another user's posts.
+- Allowing non-staff token owners to update posts.
 
 ## Current Understanding
 
@@ -38,7 +38,7 @@ Provide token-authenticated endpoints that let an integration read the active ca
 - Serialize countries with identifiers and titles.
 - Add a detailed post serializer and a page-number paginator with a configurable `page_size` capped at 100.
 - Support rubric and country query filters by ID or slug.
-- Add create and owner-scoped update operations; never accept `publisher` from request data.
+- Add create operations owned by the token user and staff-only update operations across publishers; never accept `publisher` from request data.
 
 ## Risks And Unknowns
 
@@ -53,7 +53,7 @@ Provide token-authenticated endpoints that let an integration read the active ca
 - Verify country output.
 - Verify post filtering, detailed output, default pagination, custom page size, and the maximum cap.
 - Verify creation assigns the token owner and validates required/optional relations.
-- Verify owner update succeeds, publisher cannot be overridden, and another user's post is hidden from update.
+- Verify staff updates across publishers, publisher cannot be overridden, and non-staff tokens receive `403` on detail/update.
 
 ## Documentation Updates
 

@@ -20,7 +20,7 @@ Catalog information is the main knowledge area of the product. It contains struc
 
 - Catalog content is treated as important reference information, not short-lived social content.
 - Token-authenticated integrations can read the shared post catalog and create posts owned by the token user.
-- Integration updates are owner-scoped: a token user cannot update another publisher's post through the content API.
+- Integration updates require a token-authenticated staff user. Staff editors can update any post through the content API without changing its original publisher; non-staff tokens cannot use the post detail/update endpoint.
 - Integration post creation derives the publisher from the credential and never trusts a publisher supplied in the request body.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.

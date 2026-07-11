@@ -132,10 +132,13 @@ class ContentPostTests(ContentApiTestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(set(response.data), {"title", "text", "rubric"})
 
-    def test_updates_only_token_owners_post(self):
+    def test_staff_token_updates_any_post_without_changing_publisher(self):
+        self.user.is_staff = True
+        self.user.save(update_fields=("is_staff",))
         owned = PostFactory(publisher=self.user, rubric=self.rubric)
         other = PostFactory(rubric=self.rubric)
         attempted_publisher = UserFactory()
+        original_other_publisher = other.publisher
         self.authenticate()
 
         response = self.client.patch(
@@ -143,15 +146,34 @@ class ContentPostTests(ContentApiTestCase):
             {"title": "Updated", "publisher": attempted_publisher.id},
             format="json",
         )
-        forbidden_response = self.client.patch(
+        other_response = self.client.patch(
             f"/api/content/posts/{other.id}/",
-            {"title": "Not allowed"},
+            {"title": "Staff edited", "publisher": attempted_publisher.id},
             format="json",
         )
 
         self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(other_response.status_code, 200, other_response.data)
         owned.refresh_from_db()
+        other.refresh_from_db()
         self.assertEqual(owned.title, "Updated")
         self.assertEqual(owned.publisher, self.user)
-        self.assertEqual(forbidden_response.status_code, 404)
+        self.assertEqual(other.title, "Staff edited")
+        self.assertEqual(other.publisher, original_other_publisher)
         self.assertNotEqual(Category.objects.count(), 0)
+
+    def test_non_staff_token_cannot_retrieve_or_update_posts(self):
+        post = PostFactory(publisher=self.user, rubric=self.rubric)
+        self.authenticate()
+
+        get_response = self.client.get(f"/api/content/posts/{post.id}/")
+        patch_response = self.client.patch(
+            f"/api/content/posts/{post.id}/",
+            {"title": "Not allowed"},
+            format="json",
+        )
+
+        self.assertEqual(get_response.status_code, 403)
+        self.assertEqual(patch_response.status_code, 403)
+        post.refresh_from_db()
+        self.assertNotEqual(post.title, "Not allowed")

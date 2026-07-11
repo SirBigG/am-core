@@ -3,7 +3,7 @@ from django.utils import timezone
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from api.v1.content.serializers import CategoryTreeSerializer, ContentPostSerializer, CountrySerializer
 from core.classifier.models import Category, Country
@@ -61,10 +61,11 @@ class PostListCreateView(ContentTokenMixin, ListCreateAPIView):
 
 class PostUpdateView(ContentTokenMixin, RetrieveUpdateAPIView):
     serializer_class = ContentPostSerializer
+    permission_classes = (IsAdminUser,)
     http_method_names = ("get", "put", "patch", "head", "options")
 
     def get_queryset(self):
-        return Post.objects.select_objects().prefetch_related("tags").filter(publisher=self.request.user)
+        return Post.objects.select_objects().prefetch_related("tags")
 
     def perform_update(self, serializer):
-        serializer.save(publisher=self.request.user, update_date=timezone.now())
+        serializer.save(update_date=timezone.now())
