@@ -1,6 +1,13 @@
 <form method="post"
       action="{% if is_edit_mode %}{% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %}{% else %}{% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %}{% endif %}"
       enctype="multipart/form-data"
+      {% if is_modal %} hx-disable hx-post="{% if is_edit_mode %} {% url 'pro_auth:profile-diary-item-update' pk=form.instance.pk %} {% else %} {% url 'pro_auth:profile-diary-item-add' diary_id=diary.id %} {% endif %}
+      "
+      hx-target="closest [data-diary-item-form-container]"
+      hx-swap="outerHTML"
+      hx-disabled-elt="find button[type='submit']"
+      hx-encoding="multipart/form-data"
+      {% endif %}
       class="profile-diary-item-form{% if is_modal %} profile-diary-item-modal__form{% endif %}">
     {% csrf_token %}
     {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
@@ -14,29 +21,42 @@
         {% if field.name != "date" and field.name != "image" and field.name != "harvest_amount" and field.name != "harvest_unit" %}
             <div class="profile-form-group am-form-group">
                 {% if field.name == "apply_to_all" %}
-                    <label class="profile-event-apply-card am-choice-card" for="{{ field.id_for_label }}">
-                        {{ field }}
-                        <span class="profile-event-apply-card__box" aria-hidden="true"></span>
-                        <span class="profile-event-apply-card__name">{{ field.label }}</span>
-                    </label>
+                    <div class="profile-plant-mode" data-plant-mode-controls>
+                        <span class="profile-visually-hidden">{{ field }}</span>
+                        <button type="button"
+                                class="btn am-btn am-btn--soft is-active"
+                                data-plant-mode="all">▣ Усі активні</button>
+                        <button type="button"
+                                class="btn am-btn am-btn--soft"
+                                data-plant-mode="selected">☑ Обрати рослини</button>
+                    </div>
                 {% elif field.name == "plants" %}
-                    <label class="profile-form-label am-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
-                    {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
-                    <div class="profile-event-plant-grid" data-plant-targets>
-                        {% for choice in field %}
-                            <label class="profile-event-plant-card am-choice-card" for="{{ choice.id_for_label }}">
-                                {{ choice.tag }}
-                                <span class="profile-event-plant-card__box" aria-hidden="true"></span>
-                                <span class="profile-event-plant-card__name">{{ choice.choice_label }}</span>
-                            </label>
-                        {% endfor %}
+                    <div data-plant-target-section hidden>
+                        <label class="profile-form-label am-form-label"
+                               for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.help_text %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                        <div class="profile-event-plant-grid" data-plant-targets>
+                            {% for choice in field %}
+                                <label class="profile-event-plant-card am-choice-card"
+                                       for="{{ choice.id_for_label }}">
+                                    {{ choice.tag }}
+                                    <span class="profile-event-plant-card__box" aria-hidden="true"></span>
+                                    <span class="profile-event-plant-card__name">{{ choice.choice_label }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
                     </div>
                 {% else %}
-                    <label class="profile-form-label am-form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    <label class="profile-form-label am-form-label"
+                           for="{{ field.id_for_label }}">{{ field.label }}</label>
                     <div class="profile-form-field am-field{% if field.name == 'action_type' %} am-field--select{% endif %}">{{ field }}</div>
                 {% endif %}
-                {% for error in field.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-                {% if field.help_text and field.name != "plants" %}<p class="profile-form-help">{{ field.help_text }}</p>{% endif %}
+                {% for error in field.errors %}
+                    <p class="profile-form-error">{{ error }}</p>
+                {% endfor %}
+                {% if field.help_text and field.name != "plants" %}
+                    <p class="profile-form-help">{{ field.help_text }}</p>
+                {% endif %}
             </div>
         {% endif %}
     {% endfor %}
@@ -50,28 +70,50 @@
         </div>
         <div class="profile-form-row am-form-row profile-diary-harvest-fields__grid">
             <div class="profile-form-group am-form-group">
-                <label class="profile-form-label am-form-label" for="{{ form.harvest_amount.id_for_label }}">{{ form.harvest_amount.label }}</label>
+                <label class="profile-form-label am-form-label"
+                       for="{{ form.harvest_amount.id_for_label }}">{{ form.harvest_amount.label }}</label>
                 <div class="profile-form-field am-field">{{ form.harvest_amount }}</div>
-                {% for error in form.harvest_amount.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-                {% if form.harvest_amount.help_text %}<p class="profile-form-help">{{ form.harvest_amount.help_text }}</p>{% endif %}
+                {% for error in form.harvest_amount.errors %}
+                    <p class="profile-form-error">{{ error }}</p>
+                {% endfor %}
+                {% if form.harvest_amount.help_text %}
+                    <p class="profile-form-help">{{ form.harvest_amount.help_text }}</p>
+                {% endif %}
             </div>
             <div class="profile-form-group am-form-group">
-                <label class="profile-form-label am-form-label" for="{{ form.harvest_unit.id_for_label }}">{{ form.harvest_unit.label }}</label>
+                <label class="profile-form-label am-form-label"
+                       for="{{ form.harvest_unit.id_for_label }}">{{ form.harvest_unit.label }}</label>
                 <div class="profile-form-field am-field am-field--select">{{ form.harvest_unit }}</div>
-                {% for error in form.harvest_unit.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-                {% if form.harvest_unit.help_text %}<p class="profile-form-help">{{ form.harvest_unit.help_text }}</p>{% endif %}
+                {% for error in form.harvest_unit.errors %}
+                    <p class="profile-form-error">{{ error }}</p>
+                {% endfor %}
+                {% if form.harvest_unit.help_text %}
+                    <p class="profile-form-help">{{ form.harvest_unit.help_text }}</p>
+                {% endif %}
             </div>
         </div>
     </div>
     <div class="profile-form-row am-form-row profile-diary-item-meta-row">
         <div class="profile-form-group am-form-group">
-            <label class="profile-form-label am-form-label" for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
-            <div class="profile-form-field am-field am-field--date">{{ form.date }}</div>
-            {% for error in form.date.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-            {% if form.date.help_text %}<p class="profile-form-help">{{ form.date.help_text }}</p>{% endif %}
+            <label class="profile-form-label am-form-label"
+                   for="{{ form.date.id_for_label }}">{{ form.date.label }}</label>
+            <div class="profile-date-control-row">
+                <div class="profile-form-field am-field am-field--date">{{ form.date }}</div>
+                <div class="profile-date-shortcuts" data-date-shortcuts>
+                    <button type="button" class="btn am-btn am-btn--soft" data-date-offset="0">Сьогодні</button>
+                    <button type="button" class="btn am-btn am-btn--soft" data-date-offset="-1">Вчора</button>
+                </div>
+            </div>
+            {% for error in form.date.errors %}
+                <p class="profile-form-error">{{ error }}</p>
+            {% endfor %}
+            {% if form.date.help_text %}
+                <p class="profile-form-help">{{ form.date.help_text }}</p>
+            {% endif %}
         </div>
         <div class="profile-form-group am-form-group">
-            <label class="profile-form-label am-form-label" for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            <label class="profile-form-label am-form-label"
+                   for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
             <div class="profile-form-field am-field am-field--file">
                 <label class="profile-file-control" for="{{ form.image.id_for_label }}">
                     {{ form.image }}
@@ -79,8 +121,19 @@
                     <span class="profile-file-control__name" data-file-name>Файл не вибрано</span>
                 </label>
             </div>
-            {% for error in form.image.errors %}<p class="profile-form-error">{{ error }}</p>{% endfor %}
-            {% if form.image.help_text %}<p class="profile-form-help">{{ form.image.help_text }}</p>{% endif %}
+            {% for error in form.image.errors %}
+                <p class="profile-form-error">{{ error }}</p>
+            {% endfor %}
+            {% if form.image.help_text %}
+                <p class="profile-form-help">{{ form.image.help_text }}</p>
+            {% endif %}
+            <div class="profile-image-preview" data-image-preview hidden>
+                <img alt="Попередній перегляд фото"
+                     width="88"
+                     height="88"
+                     data-image-preview-output>
+                <button type="button" class="btn am-btn am-btn--soft" data-image-rotate>↻ Повернути 90°</button>
+            </div>
         </div>
     </div>
     <div class="profile-form-actions{% if is_modal %} profile-diary-item-modal__actions{% endif %}">

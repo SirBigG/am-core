@@ -1,7 +1,7 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 {% load static %}
 {% block profile_content %}
-    <div class="profile-diary-detail-wrap">
+    <div id="profileDiaryDetailContent" class="profile-diary-detail-wrap">
         <div class="profile-diary-detail-hero">
             <div class="profile-diary-detail-topbar">
                 <div class="profile-diary-detail-heading-wrap">
@@ -38,6 +38,7 @@
                     {% else %}
                         <a class="btn am-btn am-btn--primary profile-diary-detail-add-btn"
                            href="{% url 'pro_auth:profile-diary-item-add' diary_id=object.id %}"
+                           data-diary-focus-key="hero-add-action"
                            data-diary-item-modal-open>+ Додати дію</a>
                         <div class="am-menu profile-diary-detail-menu">
                             <button type="button"
@@ -64,10 +65,7 @@
                  aria-label="Огляд щоденника">
             <article class="profile-diary-dashboard-card profile-diary-dashboard-card--advice">
                 <p class="profile-diary-dashboard-card__kicker">AI-підказка</p>
-                {% if recommendation %}
-                    <h2>{{ recommendation.title }}</h2>
-                    <p>{{ recommendation.summary }}</p>
-                {% elif diary_detail_dashboard.last_watering %}
+                {% if diary_detail_dashboard.last_watering %}
                     <h2>Останній полив</h2>
                     <p>
                         Полив був {{ diary_detail_dashboard.last_watering.date|date:"j F" }}. Перевірте вологість ґрунту перед наступною дією.
@@ -131,19 +129,48 @@
             <section class="profile-diary-quick-panel" aria-label="Швидкі дії">
                 <div class="profile-diary-quick-panel__copy">
                     <p class="profile-diary-dashboard-card__kicker">Швидкі дії</p>
-                    <h2>Зафіксуйте догляд без зайвих кроків</h2>
-                    <p>Підлив створює запис одразу за сьогодні. Для фото, врожаю, нотаток або проблем відкрийте повну форму.</p>
+                    <h2>Що сталося?</h2>
+                    <p>Оберіть дію та за потреби змініть дату перед збереженням.</p>
                 </div>
-                <div class="profile-diary-quick-panel__actions">
+                <div class="profile-diary-quick-panel__actions" aria-label="Дії щоденника">
                     <button type="button"
-                            class="btn am-btn am-btn--soft profile-diary-quick-water-btn"
-                            data-quick-water-open="quickWateringModal{{ object.id }}">💧 Підлив</button>
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                            data-diary-action-preset="watering"
+                            data-diary-item-modal-open
+                            title="Підлив"
+                            aria-label="Додати полив">💧</button>
                     <button type="button"
-                            class="btn am-btn am-btn--primary profile-diary-detail-add-btn"
-                            data-diary-item-modal-open>+ Додати іншу дію</button>
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                            data-diary-action-preset="fertilizer"
+                            data-diary-item-modal-open
+                            title="Добриво"
+                            aria-label="Додати добриво">🌿</button>
+                    <button type="button"
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                            data-diary-action-preset="harvest"
+                            data-diary-item-modal-open
+                            title="Збір урожаю"
+                            aria-label="Додати збір урожаю">🧺</button>
+                    <button type="button"
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                            data-diary-action-preset="photo"
+                            data-diary-item-modal-open
+                            title="Фото"
+                            aria-label="Додати фото">📷</button>
+                    <button type="button"
+                            class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                            data-diary-action-preset="note"
+                            data-diary-item-modal-open
+                            title="Нотатка"
+                            aria-label="Додати нотатку">✏️</button>
+                    <button type="button"
+                            class="btn am-btn am-btn--primary am-btn--icon profile-diary-action-icon"
+                            data-diary-focus-key="quick-panel-more-actions"
+                            data-diary-item-modal-open
+                            title="Інші дії"
+                            aria-label="Відкрити інші дії">⋯</button>
                 </div>
             </section>
-            {% include "diary/profile/_quick_watering_modal.html" with diary=object plants=active_diary_plants next_url=request.path %}
         {% endif %}
         {% if not has_active_plants %}
             <section class="am-panel am-state profile-page-panel profile-diary-empty-state profile-diary-status-banner">
@@ -531,46 +558,16 @@
                         </section>
                     {% endif %}
                 {% endif %}
-                {% if recommendation %}
-                    <section class="am-panel profile-diary-recommendation profile-diary-recommendation--{{ recommendation.severity }}">
-                        <div class="profile-diary-recommendation__eyebrow">
-                            <span>AI-порада · {{ recommendation.status }}</span>
-                            <span>{{ recommendation.generatedAt }}</span>
-                        </div>
-                        {% if recommendation_target_label %}
-                            <p class="profile-diary-recommendation__target">Рекомендація для: {{ recommendation_target_label }}</p>
-                        {% endif %}
-                        <h2 class="profile-diary-recommendation__title">{{ recommendation.title }}</h2>
-                        <p class="profile-diary-recommendation__summary">{{ recommendation.summary }}</p>
-                        <p class="profile-diary-recommendation__next-step">
-                            <strong>Далі:</strong> {{ recommendation.nextStep }}
-                        </p>
-                        {% if recommendation.needsMoreData and recommendation.clarifyingQuestion %}
-                            <p class="profile-diary-recommendation__question">
-                                <strong>Потрібне уточнення:</strong> {{ recommendation.clarifyingQuestion }}
-                            </p>
-                        {% endif %}
-                        <button type="button"
-                                class="profile-diary-recommendation__toggle"
-                                data-recommendation-toggle
-                                aria-expanded="false">Детальніше</button>
-                        <div class="profile-diary-recommendation__details"
-                             data-recommendation-details
-                             hidden>
-                            <p>{{ recommendation.details }}</p>
-                        </div>
-                    </section>
-                {% else %}
-                    <section class="am-panel profile-diary-recommendation profile-diary-recommendation--empty">
-                        <div class="profile-diary-recommendation__eyebrow">
-                            <span>AI-порада</span>
-                        </div>
-                        <h2 class="profile-diary-recommendation__title">Підказка з’явиться після першої дії</h2>
-                        <p class="profile-diary-recommendation__summary">
-                            Додайте запис у timeline, і тут з’явиться коротка рекомендація по подіях у цьому щоденнику.
-                        </p>
-                    </section>
-                {% endif %}
+                <div id="diaryRecommendation"
+                     class="am-panel profile-diary-recommendation profile-diary-recommendation--loading"
+                     hx-get="{% url 'pro_auth:profile-diary-recommendation' pk=object.id %}"
+                     hx-trigger="load"
+                     hx-swap="outerHTML"
+                     aria-busy="true">
+                    <div class="profile-diary-recommendation__eyebrow"><span>AI-порада</span></div>
+                    <h2 class="profile-diary-recommendation__title">Готуємо рекомендацію…</h2>
+                    <p class="profile-diary-recommendation__summary">Щоденник уже доступний — порада завантажиться окремо.</p>
+                </div>
             </aside>
         </div>
     </div>
@@ -613,7 +610,7 @@
                         <span aria-hidden="true">×</span>
                     </button>
                 </div>
-                {% include "diary/profile/_diary_item_form_fields.html" with form=diary_item_form diary=object is_edit_mode=False is_modal=True %}
+                {% include "diary/profile/_diary_item_modal_form.html" with form=diary_item_form diary=object is_edit_mode=False %}
             </div>
         </div>
         {{ diary_item_form.media }}
@@ -624,5 +621,6 @@
 {% endblock profile_content %}
 {% block extra_footerscript %}
     {{ block.super }}
-    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
+    <script src="{% static 'posts/htmx.min.js' %}?v=2.0.10"></script>
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-interactions-20260712-5"></script>
 {% endblock extra_footerscript %}

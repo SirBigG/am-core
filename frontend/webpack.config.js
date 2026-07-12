@@ -1,4 +1,5 @@
 const path = require("path");
+const fs = require("fs");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
@@ -18,7 +19,8 @@ module.exports = {
     gallery: "./src/scss/gallery.scss",
     "j-index": "./src/js/index.js",
     "j-detail": "./src/js/detail.js",
-    "j-gallery": "./src/js/gallery.js"
+    "j-gallery": "./src/js/gallery.js",
+    "j-profile": "./src/js/profile.js"
   },
   context: __dirname,
   target: ["web", "es2017"],
@@ -75,6 +77,18 @@ module.exports = {
     ]
   },
   plugins: [
+    {
+      apply(compiler) {
+        compiler.hooks.thisCompilation.tap("CopyHtmxPlugin", (compilation) => {
+          compilation.emitAsset(
+            "htmx.min.js",
+            new compiler.webpack.sources.RawSource(
+              fs.readFileSync(require.resolve("htmx.org/dist/htmx.min.js"))
+            )
+          );
+        });
+      }
+    },
     new MiniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css"

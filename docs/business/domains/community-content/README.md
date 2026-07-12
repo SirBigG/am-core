@@ -33,6 +33,7 @@ The canonical public namespace for **Спільнота AgroMega** is `/communit
 
 ## Business Rules
 
+- The main site's persistent mobile navigation exposes **Спільнота** as a direct destination so visitors arriving on any public page can discover it without opening an overflow menu.
 - User publications require approval before anonymous discovery. Direct publishing is an explicit permission.
 - Drafts, previews, review submissions, changes-requested items, rejected items, and archived items are private to authorized actors and excluded from search, feeds, comments, and sitemaps.
 - Editorial notes and status history are never public.

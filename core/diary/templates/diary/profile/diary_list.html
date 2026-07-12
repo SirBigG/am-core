@@ -1,7 +1,7 @@
 {% extends "pro_auth/profile/profile_base.html" %}
 {% load static %}
 {% block profile_content %}
-    <div class="profile-diary-wrap">
+    <div id="profileDiaryListContent" class="profile-diary-wrap">
         <header class="profile-diary-hero">
             <div class="profile-diary-hero__copy">
                 <p class="profile-diary-eyebrow">Щоденник рослин</p>
@@ -248,24 +248,49 @@
                                     {% endif %}
                                 {% endwith %}
                                 {% if object.active_diary_plants %}
-                                    <div class="profile-diary-card-quick-actions">
+                                    <div class="profile-diary-card-quick-actions"
+                                         aria-label="Дії щоденника {{ object.title }}">
                                         <button type="button"
-                                                class="btn am-btn am-btn--soft profile-diary-quick-water-btn"
-                                                data-quick-water-open="quickWateringModal{{ object.id }}">
-                                            💧 Підлив
-                                        </button>
+                                                class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                data-diary-action-preset="watering"
+                                                title="Підлив"
+                                                aria-label="Додати полив">💧</button>
                                         <button type="button"
-                                                class="btn am-btn am-btn--primary profile-diary-detail-add-btn"
-                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}">
-                                            + Додати іншу дію
-                                        </button>
+                                                class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                data-diary-action-preset="fertilizer"
+                                                title="Добриво"
+                                                aria-label="Додати добриво">🌿</button>
+                                        <button type="button"
+                                                class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                data-diary-action-preset="harvest"
+                                                title="Збір урожаю"
+                                                aria-label="Додати збір урожаю">🧺</button>
+                                        <button type="button"
+                                                class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                data-diary-action-preset="photo"
+                                                title="Фото"
+                                                aria-label="Додати фото">📷</button>
+                                        <button type="button"
+                                                class="btn am-btn am-btn--soft am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                data-diary-action-preset="note"
+                                                title="Нотатка"
+                                                aria-label="Додати нотатку">✏️</button>
+                                        <button type="button"
+                                                class="btn am-btn am-btn--primary am-btn--icon profile-diary-action-icon"
+                                                data-diary-card-action-open="diaryCardActionModal{{ object.id }}"
+                                                title="Інші дії"
+                                                aria-label="Відкрити інші дії">⋯</button>
                                     </div>
                                 {% endif %}
                             </div>
                         </div>
                     </article>
                     {% if object.active_diary_plants %}
-                        {% include "diary/profile/_quick_watering_modal.html" with diary=object plants=object.active_diary_plants next_url=request.path %}
                         <div class="profile-confirm-backdrop profile-diary-item-modal"
                              id="diaryCardActionModal{{ object.id }}"
                              aria-hidden="true">
@@ -286,7 +311,7 @@
                                         <span aria-hidden="true">×</span>
                                     </button>
                                 </div>
-                                {% include "diary/profile/_diary_item_form_fields.html" with form=object.diary_item_form diary=object is_edit_mode=False is_modal=True next_url=request.path %}
+                                {% include "diary/profile/_diary_item_modal_form.html" with form=object.diary_item_form diary=object is_edit_mode=False next_url=request.path %}
                             </div>
                         </div>
                     {% endif %}
@@ -403,5 +428,6 @@
 {% endblock profile_content %}
 {% block extra_footerscript %}
     {{ block.super }}
-    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-bento-20260616-tabs"></script>
+    <script src="{% static 'posts/htmx.min.js' %}?v=2.0.10"></script>
+    <script src="{% static 'pro_auth/profile/diary.js' %}?v=diary-interactions-20260712-5"></script>
 {% endblock extra_footerscript %}

@@ -1,6 +1,8 @@
 (function () {
     "use strict";
 
+    let pendingActionFocusSelector = null;
+
     function setModalOpen(modalElement, isOpen) {
         if (!modalElement) {
             return;
@@ -20,6 +22,7 @@
     function syncPlantTargetsState(formElement, inputSelector) {
         const applyToAllInput = formElement.querySelector(inputSelector);
         const plantTargets = formElement.querySelector("[data-plant-targets]");
+        const plantTargetSection = formElement.querySelector("[data-plant-target-section]");
 
         if (!applyToAllInput || !plantTargets) {
             return;
@@ -29,6 +32,9 @@
         const inputs = plantTargets.querySelectorAll('input[type="checkbox"]');
 
         plantTargets.hidden = applyToAll;
+        if (plantTargetSection) {
+            plantTargetSection.hidden = applyToAll;
+        }
         inputs.forEach(function (input) {
             input.disabled = applyToAll;
         });
@@ -46,6 +52,10 @@
         const harvestInputs = harvestFields ? harvestFields.querySelectorAll("[data-harvest-input]") : [];
         const fileInput = formElement.querySelector("input[type='file']");
         const fileName = formElement.querySelector("[data-file-name]");
+        const plantModeControls = formElement.querySelector("[data-plant-mode-controls]");
+        const imagePreview = formElement.querySelector("[data-image-preview]");
+        const imagePreviewOutput = formElement.querySelector("[data-image-preview-output]");
+        const imageRotate = formElement.querySelector("[data-image-rotate]");
 
         syncPlantTargetsState(formElement, inputSelector);
 
@@ -76,12 +86,363 @@
             });
         }
 
+        if (plantModeControls && applyToAllInput) {
+            const modeButtons = plantModeControls.querySelectorAll("[data-plant-mode]");
+            function syncPlantModeButtons() {
+                modeButtons.forEach(function (button) {
+                    button.classList.toggle(
+                        "is-active",
+                        (button.dataset.plantMode === "all") === applyToAllInput.checked
+                    );
+                });
+            }
+            syncPlantModeButtons();
+            modeButtons.forEach(function (button) {
+                button.addEventListener("click", function () {
+                    applyToAllInput.checked = button.dataset.plantMode === "all";
+                    applyToAllInput.dispatchEvent(new Event("change", {bubbles: true}));
+                    syncPlantModeButtons();
+                });
+            });
+        }
+
         if (fileInput && fileName) {
             fileInput.addEventListener("change", function () {
                 const selectedFile = fileInput.files && fileInput.files.length ? fileInput.files[0].name : "";
                 fileName.textContent = selectedFile || "Файл не вибрано";
+                formElement.dataset.imageRotation = "0";
+                if (imagePreview && imagePreviewOutput) {
+                    if (formElement.dataset.imagePreviewUrl) {
+                        URL.revokeObjectURL(formElement.dataset.imagePreviewUrl);
+                    }
+                    if (selectedFile) {
+                        const previewUrl = URL.createObjectURL(fileInput.files[0]);
+                        formElement.dataset.imagePreviewUrl = previewUrl;
+                        imagePreviewOutput.src = previewUrl;
+                        imagePreviewOutput.style.transform = "rotate(0deg)";
+                        imagePreview.hidden = false;
+                    } else {
+                        imagePreview.hidden = true;
+                        imagePreviewOutput.removeAttribute("src");
+                    }
+                }
             });
         }
+
+        if (imageRotate && imagePreviewOutput) {
+            imageRotate.addEventListener("click", function () {
+                const rotation = (Number(formElement.dataset.imageRotation || 0) + 90) % 360;
+                formElement.dataset.imageRotation = String(rotation);
+                imagePreviewOutput.style.transform = "rotate(" + rotation + "deg)";
+            });
+        }
+    }
+
+    function formatLocalDate(dateValue) {
+        const year = dateValue.getFullYear();
+        const month = String(dateValue.getMonth() + 1).padStart(2, "0");
+        const day = String(dateValue.getDate()).padStart(2, "0");
+        return year + "-" + month + "-" + day;
+    }
+
+    function initDateShortcuts(root) {
+        const container = root || document;
+        container.querySelectorAll("[data-date-shortcuts]").forEach(function (shortcuts) {
+            if (shortcuts.dataset.dateShortcutsBound === "true") {
+                return;
+            }
+            shortcuts.dataset.dateShortcutsBound = "true";
+
+            const formGroup = shortcuts.closest(".profile-form-group");
+            const input = formGroup ? formGroup.querySelector("[data-profile-datepicker]") : null;
+            if (!input) {
+                return;
+            }
+
+            shortcuts.querySelectorAll("[data-date-offset]").forEach(function (button) {
+                button.addEventListener("click", function () {
+                    const selectedDate = new Date();
+                    selectedDate.setHours(12, 0, 0, 0);
+                    selectedDate.setDate(selectedDate.getDate() + Number(button.dataset.dateOffset || 0));
+
+                    if (input._flatpickr) {
+                        input._flatpickr.setDate(selectedDate, true);
+                    } else {
+                        input.value = formatLocalDate(selectedDate);
+                        input.dispatchEvent(new Event("change", {bubbles: true}));
+                    }
+                });
+            });
+        });
+    }
+
+    function announceAsyncStatus(message, isError) {
+        const status = document.querySelector("[data-profile-async-status]");
+        if (!status) {
+            return;
+        }
+        status.textContent = message || "";
+        status.classList.toggle("is-visible", Boolean(message));
+        status.classList.toggle("is-error", Boolean(isError));
+        if (message) {
+            window.setTimeout(function () {
+                status.classList.remove("is-visible");
+            }, 4200);
+        }
+    }
+
+    function closeOpenActionModals() {
+        document.querySelectorAll(".profile-diary-item-modal.is-open, .profile-quick-action-backdrop.is-open").forEach(function (modal) {
+            setModalOpen(modal, false);
+            const form = modal.querySelector("form");
+            if (form) {
+                form.reset();
+            }
+        });
+    }
+
+    function refreshDiaryWorkspace(refreshUrl) {
+        if (!refreshUrl) {
+            return Promise.resolve();
+        }
+
+        const target = document.getElementById("profileDiaryDetailContent") || document.getElementById("profileDiaryListContent");
+        if (!target) {
+            return Promise.resolve();
+        }
+
+        const selector = "#" + target.id;
+        const fragmentUrl = new URL(refreshUrl, window.location.origin);
+        fragmentUrl.searchParams.set("fragment", "workspace");
+        if (!window.htmx) {
+            return window.fetch(fragmentUrl.toString(), {credentials: "same-origin"}).then(function (response) {
+                return response.text();
+            }).then(function (html) {
+                const parsed = new DOMParser().parseFromString(html, "text/html");
+                const replacement = parsed.querySelector(selector);
+                if (replacement) {
+                    target.replaceWith(replacement);
+                    initDiaryInteractions();
+                }
+            });
+        }
+        return window.htmx.ajax("GET", fragmentUrl.toString(), {
+            target: selector,
+            swap: "outerHTML",
+        });
+    }
+
+    function initHtmxDiaryEvents() {
+        if (document.body.dataset.diaryHtmxEventsBound === "true") {
+            return;
+        }
+        document.body.dataset.diaryHtmxEventsBound = "true";
+
+        document.body.addEventListener("diaryActionSaved", function (event) {
+            const detail = event.detail || {};
+            closeOpenActionModals();
+            announceAsyncStatus(detail.message || "Зміни збережено", false);
+            refreshDiaryWorkspace(detail.refreshUrl).then(function () {
+                const nextAction = pendingActionFocusSelector
+                    ? document.querySelector(pendingActionFocusSelector)
+                    : document.querySelector("[data-diary-item-modal-open]");
+                if (nextAction) {
+                    nextAction.focus();
+                }
+                pendingActionFocusSelector = null;
+            });
+        });
+
+        document.body.addEventListener("diaryActionError", function (event) {
+            const detail = event.detail || {};
+            announceAsyncStatus(detail.message || "Не вдалося зберегти зміни", true);
+        });
+
+        document.body.addEventListener("htmx:beforeRequest", function (event) {
+            const form = event.target.closest ? event.target.closest("form") : null;
+            if (form) {
+                form.setAttribute("aria-busy", "true");
+            }
+        });
+
+        document.body.addEventListener("htmx:afterRequest", function (event) {
+            const form = event.target.closest ? event.target.closest("form") : null;
+            if (form) {
+                form.removeAttribute("aria-busy");
+            }
+        });
+
+        document.body.addEventListener("htmx:afterSwap", function (event) {
+            initDateShortcuts(event.target);
+            if (window.initProfileDatepickers) {
+                window.initProfileDatepickers(event.target);
+            }
+            event.target.querySelectorAll(".profile-diary-item-modal__form").forEach(function (form) {
+                bindDiaryItemForm(form, "input[name$='apply_to_all']");
+            });
+            initDiaryInteractions();
+
+            const invalid = event.target.querySelector(".profile-form-error");
+            if (invalid) {
+                invalid.setAttribute("tabindex", "-1");
+                invalid.focus();
+            }
+        });
+    }
+
+    function dispatchResponseTriggers(response) {
+        const triggerHeader = response.headers.get("HX-Trigger");
+        if (!triggerHeader) {
+            return;
+        }
+        const triggers = JSON.parse(triggerHeader);
+        Object.keys(triggers).forEach(function (eventName) {
+            document.body.dispatchEvent(new CustomEvent(eventName, {detail: triggers[eventName]}));
+        });
+    }
+
+    function canvasToBlob(canvas, type, quality) {
+        return new Promise(function (resolve, reject) {
+            canvas.toBlob(function (blob) {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error("Image conversion failed"));
+                }
+            }, type, quality);
+        });
+    }
+
+    async function rotateImageFile(file, rotation) {
+        if (typeof createImageBitmap === "undefined") {
+            return file;
+        }
+        const bitmap = await createImageBitmap(file, {imageOrientation: "from-image"});
+        const scale = Math.min(1, 1920 / Math.max(bitmap.width, bitmap.height));
+        const drawWidth = Math.round(bitmap.width * scale);
+        const drawHeight = Math.round(bitmap.height * scale);
+        const swapSides = rotation === 90 || rotation === 270;
+        const canvas = document.createElement("canvas");
+        canvas.width = swapSides ? drawHeight : drawWidth;
+        canvas.height = swapSides ? drawWidth : drawHeight;
+        const context = canvas.getContext("2d");
+        context.translate(canvas.width / 2, canvas.height / 2);
+        context.rotate((rotation || 0) * Math.PI / 180);
+        context.drawImage(bitmap, -drawWidth / 2, -drawHeight / 2, drawWidth, drawHeight);
+        bitmap.close();
+        const blob = await canvasToBlob(canvas, "image/webp", 0.88);
+        return new File([blob], file.name.replace(/\.[^.]+$/, "") + ".webp", {type: "image/webp"});
+    }
+
+    async function prepareDiaryFormData(form) {
+        const formData = new FormData(form);
+        const imageInput = form.querySelector("input[type='file']");
+        const image = imageInput && imageInput.files ? imageInput.files[0] : null;
+        if (!image) {
+            return formData;
+        }
+        try {
+            const rotated = await rotateImageFile(image, Number(form.dataset.imageRotation || 0));
+            const compressed = window.imageCompression
+                ? await window.imageCompression(rotated, {
+                    maxSizeMB: 1,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    fileType: "image/webp",
+                    initialQuality: 0.82,
+                })
+                : rotated;
+            const prepared = new File(
+                [compressed],
+                image.name.replace(/\.[^.]+$/, "") + ".webp",
+                {type: "image/webp", lastModified: Date.now()}
+            );
+            formData.set(imageInput.name, prepared, prepared.name);
+        } catch (error) {
+            announceAsyncStatus("Фото буде завантажено без оптимізації", false);
+        }
+        return formData;
+    }
+
+    function initLazyRecommendation(root) {
+        if (window.htmx) {
+            return;
+        }
+        const container = root || document;
+        const recommendation = container.querySelector("#diaryRecommendation[hx-get]");
+        if (!recommendation || recommendation.dataset.lazyRecommendationLoading === "true") {
+            return;
+        }
+        recommendation.dataset.lazyRecommendationLoading = "true";
+        window.fetch(recommendation.getAttribute("hx-get"), {credentials: "same-origin"})
+            .then(function (response) { return response.text(); })
+            .then(function (html) {
+                recommendation.outerHTML = html;
+                initDiaryInteractions();
+            })
+            .catch(function () {
+                recommendation.setAttribute("aria-busy", "false");
+                const title = recommendation.querySelector(".profile-diary-recommendation__title");
+                if (title) {
+                    title.textContent = "Порада тимчасово недоступна";
+                }
+            });
+    }
+
+    function initAsyncFormFallback(root) {
+        const container = root || document;
+        container.querySelectorAll("form[hx-post]").forEach(function (form) {
+            if (form.dataset.asyncFallbackBound === "true") {
+                return;
+            }
+            form.dataset.asyncFallbackBound = "true";
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                if (form.getAttribute("aria-busy") === "true") {
+                    return;
+                }
+                form.setAttribute("aria-busy", "true");
+                const submitButton = form.querySelector("button[type='submit']");
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+
+                const formData = await prepareDiaryFormData(form);
+                window.fetch(form.getAttribute("hx-post"), {
+                    method: "POST",
+                    body: formData,
+                    headers: {"HX-Request": "true"},
+                    credentials: "same-origin",
+                }).then(function (response) {
+                    dispatchResponseTriggers(response);
+                    if (response.status === 204 || form.getAttribute("hx-swap") === "none") {
+                        return "";
+                    }
+                    return response.text();
+                }).then(function (html) {
+                    if (!html) {
+                        return;
+                    }
+                    const target = form.closest("[data-diary-item-form-container]");
+                    if (target) {
+                        target.outerHTML = html;
+                        initDiaryInteractions();
+                        const error = document.querySelector("[data-diary-item-form-container] .profile-form-error");
+                        if (error) {
+                            error.setAttribute("tabindex", "-1");
+                            error.focus();
+                        }
+                    }
+                }).catch(function () {
+                    announceAsyncStatus("Не вдалося зберегти зміни. Перевірте з’єднання і спробуйте ще раз.", true);
+                }).finally(function () {
+                    form.removeAttribute("aria-busy");
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                });
+            });
+        });
     }
 
     function closeMenuGroup(menuSelector, toggleSelector, dropdownSelector) {
@@ -102,6 +463,10 @@
 
     function bindMenuToggles(toggles, options) {
         toggles.forEach(function (toggle) {
+            if (toggle.dataset.menuToggleBound === "true") {
+                return;
+            }
+            toggle.dataset.menuToggleBound = "true";
             toggle.addEventListener("click", function (event) {
                 event.preventDefault();
                 event.stopPropagation();
@@ -176,6 +541,7 @@
 
             button.addEventListener("click", function () {
                 const modalId = button.getAttribute("data-quick-water-open");
+                pendingActionFocusSelector = '[data-quick-water-open="' + modalId + '"]';
                 openQuickWaterModal(document.getElementById(modalId));
             });
         });
@@ -333,7 +699,19 @@
         diaryActionButtons.forEach(function (button) {
             button.addEventListener("click", function () {
                 const modalId = button.getAttribute("data-diary-card-action-open");
-                openDiaryActionModal(document.getElementById(modalId));
+                const actionPreset = button.getAttribute("data-diary-action-preset");
+                pendingActionFocusSelector = actionPreset
+                    ? '[data-diary-card-action-open="' + modalId + '"][data-diary-action-preset="' + actionPreset + '"]'
+                    : '[data-diary-card-action-open="' + modalId + '"]';
+                const actionModal = document.getElementById(modalId);
+                openDiaryActionModal(actionModal);
+                if (actionPreset && actionModal) {
+                    const actionInput = actionModal.querySelector("select[name$='action_type']");
+                    if (actionInput) {
+                        actionInput.value = actionPreset;
+                        actionInput.dispatchEvent(new Event("change", {bubbles: true}));
+                    }
+                }
             });
         });
 
@@ -509,7 +887,21 @@
                 }
 
                 event.preventDefault();
+                const focusKey = button.getAttribute("data-diary-focus-key");
+                const actionPreset = button.getAttribute("data-diary-action-preset");
+                pendingActionFocusSelector = focusKey
+                    ? '[data-diary-focus-key="' + focusKey + '"]'
+                    : actionPreset
+                        ? '[data-diary-action-preset="' + actionPreset + '"]'
+                        : "[data-diary-item-modal-open]";
                 openDiaryItemModal();
+                if (actionPreset) {
+                    const actionInput = diaryItemModal.querySelector("select[name$='action_type']");
+                    if (actionInput) {
+                        actionInput.value = actionPreset;
+                        actionInput.dispatchEvent(new Event("change", {bubbles: true}));
+                    }
+                }
             });
         });
 
@@ -777,6 +1169,10 @@
     }
 
     function initDiaryInteractions() {
+        initHtmxDiaryEvents();
+        initAsyncFormFallback(document);
+        initLazyRecommendation(document);
+        initDateShortcuts(document);
         initDiaryItemFormPage();
         initPlantFormsets();
         initQuickWaterActions();

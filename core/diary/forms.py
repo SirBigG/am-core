@@ -17,8 +17,7 @@ PLANT_FINISH_CONFIRM_TEXT = (
     "Ви впевнені?"
 )
 PLANT_BLOCKED_TEXT = (
-    "Ця рослина використовується в інших щоденниках. "
-    "Для неї потрібен окремий сценарій перенесення або керування."
+    "Ця рослина використовується в інших щоденниках. " "Для неї потрібен окремий сценарій перенесення або керування."
 )
 
 
@@ -119,10 +118,9 @@ class PlantAttachmentForm(forms.Form):
         widget=forms.DateInput(
             format="%Y-%m-%d",
             attrs={
-                "type": "text",
+                "type": "date",
                 "data-profile-datepicker": "true",
                 "autocomplete": "off",
-                "placeholder": "ДД.ММ.РРРР",
             },
         ),
     )
@@ -352,9 +350,7 @@ class DiaryItemForm(ModelForm):
         )
         if not (self.instance and self.instance.pk):
             self.fields["action_type"].choices = [
-                choice
-                for choice in DIARY_ITEM_ACTION_CHOICES
-                if choice[0] not in {"planted", "transplanted"}
+                choice for choice in DIARY_ITEM_ACTION_CHOICES if choice[0] not in {"planted", "transplanted"}
             ]
         self.fields["apply_to_all"].label = "Застосувати до всіх активних рослин"
         self.fields["apply_to_all"].required = False
@@ -404,12 +400,11 @@ class DiaryItemForm(ModelForm):
             format="%Y-%m-%d",
             attrs={
                 "class": "profile-form-control",
-                "type": "text",
                 "data-profile-datepicker": "true",
                 "autocomplete": "off",
-                "placeholder": "ДД.ММ.РРРР",
             },
         )
+        self.fields["date"].widget.input_type = "date"
         self.fields["image"].widget.attrs.update(
             {
                 "class": "profile-form-control",

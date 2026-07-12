@@ -1,3 +1,4 @@
+import json
 import re
 from collections import OrderedDict
 from datetime import date, timedelta
@@ -5,17 +6,19 @@ from decimal import Decimal
 
 from dal import autocomplete
 from django.core.exceptions import ValidationError
-from django.db.models import Prefetch, Q
 from django.db import transaction
-from django.http import HttpResponseRedirect
+from django.db.models import Prefetch, Q
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.formats import date_format
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, UpdateView, View
+from lxml import html
 
-from .forms import DiaryForm, DiaryItemForm, PlantAttachmentFormSet, PlantMoveForm, PlantingForm, save_diary_plants
+from .forms import DiaryForm, DiaryItemForm, PlantAttachmentFormSet, PlantingForm, PlantMoveForm, save_diary_plants
 from .models import DIARY_ITEM_ACTION_CHOICES, Diary, DiaryItem, Plant
 from .recommendations import PlantRecommendationService
 
@@ -27,7 +30,32 @@ PLANT_ARCHIVE_LEAD = "Рослина зникне зі списку тих, що
 PLANT_RESTORE_TITLE = "Відновити рослину з архіву"
 PLANT_RESTORE_LEAD = "Рослина знову з’явиться серед тих, що ростуть, і для неї можна буде додавати нові дії."
 PLANT_DELETE_TITLE = "Видалити рослину назавжди"
-PLANT_DELETE_LEAD = "Рослина буде повністю видалена разом з її історією, діями та пов’язаними записами. Цю дію не можна скасувати."
+PLANT_DELETE_LEAD = (
+    "Рослина буде повністю видалена разом з її історією, діями та пов’язаними записами. Цю дію не можна скасувати."
+)
+
+
+def _is_htmx(request):
+    return request.headers.get("HX-Request") == "true"
+
+
+def _htmx_diary_response(event_name, refresh_url=None, message=None):
+    detail = {}
+    if refresh_url:
+        detail["refreshUrl"] = refresh_url
+    if message:
+        detail["message"] = message
+    response = HttpResponse(status=204)
+    response["HX-Trigger"] = json.dumps({event_name: detail})
+    return response
+
+
+def _render_element_fragment(request, template_name, context, element_id):
+    document = html.fromstring(render_to_string(template_name, context, request=request))
+    matches = document.xpath(f'//*[@id="{element_id}"]')
+    if not matches:
+        return HttpResponse(status=500)
+    return HttpResponse(html.tostring(matches[0], encoding="unicode"))
 
 
 def _format_harvest_amount(amount):
@@ -79,9 +107,7 @@ def _build_profile_diary_dashboard(diaries, today=None):
     )
     last_watering = watering_items[0] if watering_items else None
     current_year_harvest_items = [
-        item
-        for item in all_items
-        if item.action_type == "harvest" and item.date and item.date.year == today.year
+        item for item in all_items if item.action_type == "harvest" and item.date and item.date.year == today.year
     ]
     current_year_harvest_items.sort(
         key=lambda item: (item.date, item.created),
@@ -155,9 +181,7 @@ def _build_diary_detail_dashboard(diary, diary_items, active_plants, today=None)
         reverse=True,
     )
     current_year_harvest_items = [
-        item
-        for item in diary_items
-        if item.action_type == "harvest" and item.date and item.date.year == today.year
+        item for item in diary_items if item.action_type == "harvest" and item.date and item.date.year == today.year
     ]
     oldest_item_date = min((item.date for item in diary_items if item.date), default=None)
     plants_with_actions = set()
@@ -214,11 +238,7 @@ def _attach_diary_attention_flags(diaries, today=None):
             continue
 
         watering_items = sorted(
-            [
-                item
-                for item in getattr(diary, "latest_diary_items", [])
-                if item.action_type == "watering"
-            ],
+            [item for item in getattr(diary, "latest_diary_items", []) if item.action_type == "watering"],
             key=lambda item: (item.date, item.created),
             reverse=True,
         )
@@ -229,8 +249,7 @@ def _attach_diary_attention_flags(diaries, today=None):
                     plant_last_watering[plant.pk] = item
 
         diary.needs_attention = any(
-            plant_last_watering.get(plant.pk) is None
-            or plant_last_watering[plant.pk].date <= attention_cutoff
+            plant_last_watering.get(plant.pk) is None or plant_last_watering[plant.pk].date <= attention_cutoff
             for plant in active_plants
         )
 
@@ -341,8 +360,10 @@ class DiaryListView(ListView):
     ordering = "-updated"
 
     def get_queryset(self):
-        return Diary.objects.filter(public=True, is_archived=False).prefetch_related("plants__category").order_by(
-            "-updated"
+        return (
+            Diary.objects.filter(public=True, is_archived=False)
+            .prefetch_related("plants__category")
+            .order_by("-updated")
         )
 
 
@@ -470,11 +491,14 @@ class ProfileDiaryListView(ListView):
                 diary.diary_item_form = DiaryItemForm(diary=diary, prefix=f"diary-{diary.pk}")
         context["active_diaries"] = [diary for diary in diaries if not diary.is_archived]
         context["archived_diaries"] = [diary for diary in diaries if diary.is_archived]
-        context["attention_diaries"] = [
-            diary for diary in context["active_diaries"] if diary.needs_attention
-        ]
+        context["attention_diaries"] = [diary for diary in context["active_diaries"] if diary.needs_attention]
         context["diary_dashboard"] = _build_profile_diary_dashboard(diaries)
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("fragment") == "workspace":
+            return _render_element_fragment(self.request, self.template_name, context, "profileDiaryListContent")
+        return super().render_to_response(context, **response_kwargs)
 
 
 class ProfilePlantListView(ListView):
@@ -505,11 +529,7 @@ class ProfilePlantListView(ListView):
         plants = list(context["plants"])
         today = timezone.localdate()
         for plant in plants:
-            plant.latest_diary_item = (
-                plant.profile_diary_items[0]
-                if plant.profile_diary_items
-                else None
-            )
+            plant.latest_diary_item = plant.profile_diary_items[0] if plant.profile_diary_items else None
             plant.diary_items_count = len(plant.profile_diary_items)
             lifecycle_end = plant.completed_at or today
             plant.age_days = max((lifecycle_end - plant.plant_date).days, 0)
@@ -586,7 +606,6 @@ class ProfileDiaryDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         diary_items = self.get_filtered_diary_items()
         grouped_diary_items = self.get_grouped_diary_items(diary_items)
-        latest_item = diary_items[0] if diary_items else None
         active_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "active"]
         completed_diary_plants = [plant for plant in self.object.plants.all() if plant.status == "completed"]
         all_diary_items = list(self.object.diary_items.all())
@@ -623,14 +642,38 @@ class ProfileDiaryDetailView(DetailView):
         context["action_filter_options"] = [("", "Всі дії"), *DIARY_ITEM_ACTION_CHOICES]
         context["period_filter_options"] = self.get_period_filter_options()
         context["event_search_query"] = event_search_query
-        context["has_active_filters"] = bool(selected_plant_id or selected_action_type or selected_period or event_search_query)
+        context["has_active_filters"] = bool(
+            selected_plant_id or selected_action_type or selected_period or event_search_query
+        )
         context["diary_item_form"] = DiaryItemForm(diary=self.object)
-        context["recommendation"] = None
-        context["recommendation_target_label"] = None
+        return context
 
-        if latest_item:
-            recommendation_target = _build_recommendation_target(latest_item, selected_plant_id=selected_plant_id)
-            fallback_recommendation = self.recommendation_service.generate(
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("fragment") == "workspace":
+            return _render_element_fragment(self.request, self.template_name, context, "profileDiaryDetailContent")
+        return super().render_to_response(context, **response_kwargs)
+
+
+class DiaryRecommendationView(View):
+    recommendation_service = PlantRecommendationService()
+
+    def get(self, request, pk):
+        diary = get_object_or_404(
+            Diary.objects.prefetch_related("plants__category", "diary_items__plants__category"),
+            pk=pk,
+            user=request.user,
+        )
+        diary_items = list(diary.diary_items.all())
+        if not diary_items:
+            return render(request, "diary/profile/_recommendation.html", {"recommendation": None})
+
+        latest_item = diary_items[0]
+        recommendation_target = _build_recommendation_target(latest_item, selected_plant_id=request.GET.get("plant"))
+        recommendation = self.recommendation_service.get_cached_recommendation(
+            request, diary_id=diary.id, item_id=latest_item.id
+        )
+        if recommendation is None:
+            recommendation = self.recommendation_service.generate(
                 plant_name=recommendation_target["plant_name"],
                 plant_date=recommendation_target["plant_date"],
                 action_type=latest_item.action_type,
@@ -646,17 +689,22 @@ class ProfileDiaryDetailView(DetailView):
                 ],
                 has_photo=bool(latest_item.image),
                 plants=recommendation_target["plants"],
-                use_ai=False,
+                use_ai=True,
             )
-            context["recommendation"] = self.recommendation_service.build_cached_recommendation(
-                self.request,
-                diary_id=self.object.id,
+            self.recommendation_service.cache_recommendation(
+                request,
+                diary_id=diary.id,
                 item_id=latest_item.id,
-                fallback_recommendation=fallback_recommendation,
+                recommendation=recommendation,
             )
-            context["recommendation_target_label"] = recommendation_target["label"]
-
-        return context
+        return render(
+            request,
+            "diary/profile/_recommendation.html",
+            {
+                "recommendation": recommendation,
+                "recommendation_target_label": recommendation_target["label"],
+            },
+        )
 
 
 class UpdateProfileDiaryView(DiaryPlantFormSetMixin, UpdateView):
@@ -710,12 +758,16 @@ class AddDiaryItemView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["diary"] = get_object_or_404(Diary, pk=self.kwargs["diary_id"], user=self.request.user)
+        context["diary"] = get_object_or_404(
+            Diary, pk=self.kwargs["diary_id"], user=self.request.user, is_archived=False
+        )
         return context
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        kwargs["diary"] = get_object_or_404(Diary, pk=self.kwargs["diary_id"], user=self.request.user)
+        kwargs["diary"] = get_object_or_404(
+            Diary, pk=self.kwargs["diary_id"], user=self.request.user, is_archived=False
+        )
         form_prefix = self.request.POST.get("_form_prefix", "").strip()
         if self.request.method == "POST" and form_prefix:
             kwargs["prefix"] = form_prefix
@@ -724,36 +776,32 @@ class AddDiaryItemView(FormView):
     def form_valid(self, form):
         form.save()
         diary = form.instance.diary
-        diary_items = list(diary.diary_items.all())
-        recommendation_target = _build_recommendation_target(form.instance)
-
-        recommendation = self.recommendation_service.generate(
-            plant_name=recommendation_target["plant_name"],
-            plant_date=recommendation_target["plant_date"],
-            action_type=form.instance.action_type,
-            note=form.instance.description,
-            last_actions=[
-                {
-                    "action_type": item.action_type,
-                    "date": item.date.isoformat(),
-                    "note": item.description,
-                    "has_photo": bool(item.image),
-                }
-                for item in diary_items[:20]
-            ],
-            has_photo=bool(form.instance.image),
-            plants=recommendation_target["plants"],
-            use_ai=True,
-        )
-        self.recommendation_service.cache_recommendation(
-            self.request,
-            diary_id=diary.id,
-            item_id=form.instance.id,
-            recommendation=recommendation,
-        )
+        self.recommendation_service.clear_cached_recommendation(self.request, diary_id=diary.id)
         diary.save(update_fields=["updated"])
         fallback_url = reverse("pro_auth:profile-diary-detail", kwargs={"pk": diary.pk})
-        return HttpResponseRedirect(_get_safe_redirect_url(self.request, fallback_url))
+        redirect_url = _get_safe_redirect_url(self.request, fallback_url)
+        if _is_htmx(self.request):
+            return _htmx_diary_response(
+                "diaryActionSaved",
+                refresh_url=redirect_url,
+                message="Дію додано до щоденника",
+            )
+        return HttpResponseRedirect(redirect_url)
+
+    def form_invalid(self, form):
+        if not _is_htmx(self.request):
+            return super().form_invalid(form)
+        diary = get_object_or_404(Diary, pk=self.kwargs["diary_id"], user=self.request.user, is_archived=False)
+        return render(
+            self.request,
+            "diary/profile/_diary_item_modal_form.html",
+            {
+                "form": form,
+                "diary": diary,
+                "is_edit_mode": False,
+                "next_url": self.request.POST.get("next", ""),
+            },
+        )
 
 
 class PlantingView(FormView):
@@ -835,6 +883,8 @@ class QuickWateringView(View):
         redirect_url = _get_safe_redirect_url(request, reverse("pro_auth:profile-diary-list"))
 
         if not active_plants.exists():
+            if _is_htmx(request):
+                return _htmx_diary_response("diaryActionError", message="У щоденнику немає активних рослин")
             return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_empty"))
 
         apply_to_all = request.POST.get("apply_to_all") == "1"
@@ -845,6 +895,8 @@ class QuickWateringView(View):
         else:
             target_plants = active_plants.filter(pk__in=selected_plant_ids)
             if not target_plants.exists():
+                if _is_htmx(request):
+                    return _htmx_diary_response("diaryActionError", message="Оберіть хоча б одну рослину")
                 return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_missing_plants"))
 
         diary_item = DiaryItem.objects.create(
@@ -857,6 +909,12 @@ class QuickWateringView(View):
         diary_item.plants.set(target_plants)
         diary.updated = timezone.now()
         diary.save(update_fields=["updated"])
+        if _is_htmx(request):
+            return _htmx_diary_response(
+                "diaryActionSaved",
+                refresh_url=redirect_url,
+                message="Швидку дію “Підлив” додано до історії",
+            )
         return HttpResponseRedirect(_append_query_param(redirect_url, "quick_action=watering_added"))
 
 

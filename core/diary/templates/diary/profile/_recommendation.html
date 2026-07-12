@@ -1,0 +1,34 @@
+<div id="diaryRecommendation">
+    {% if recommendation %}
+        <section class="am-panel profile-diary-recommendation profile-diary-recommendation--{{ recommendation.severity }}">
+            <div class="profile-diary-recommendation__eyebrow">
+                <span>AI-порада · {{ recommendation.status }}</span>
+                <span>{{ recommendation.generatedAt }}</span>
+            </div>
+            {% if recommendation_target_label %}
+                <p class="profile-diary-recommendation__target">Рекомендація для: {{ recommendation_target_label }}</p>
+            {% endif %}
+            <h2 class="profile-diary-recommendation__title">{{ recommendation.title }}</h2>
+            <p class="profile-diary-recommendation__summary">{{ recommendation.summary }}</p>
+            <p class="profile-diary-recommendation__next-step"><strong>Далі:</strong> {{ recommendation.nextStep }}</p>
+            {% if recommendation.needsMoreData and recommendation.clarifyingQuestion %}
+                <p class="profile-diary-recommendation__question"><strong>Потрібне уточнення:</strong> {{ recommendation.clarifyingQuestion }}</p>
+            {% endif %}
+            <button type="button"
+                    class="profile-diary-recommendation__toggle"
+                    data-recommendation-toggle
+                    aria-expanded="false">Детальніше</button>
+            <div class="profile-diary-recommendation__details"
+                 data-recommendation-details
+                 hidden>
+                <p>{{ recommendation.details }}</p>
+            </div>
+        </section>
+    {% else %}
+        <section class="am-panel profile-diary-recommendation profile-diary-recommendation--empty">
+            <div class="profile-diary-recommendation__eyebrow"><span>AI-порада</span></div>
+            <h2 class="profile-diary-recommendation__title">Підказка з’явиться після першої дії</h2>
+            <p class="profile-diary-recommendation__summary">Додайте запис у timeline, і тут з’явиться коротка рекомендація по подіях у цьому щоденнику.</p>
+        </section>
+    {% endif %}
+</div>

@@ -31,6 +31,10 @@
                 </li>
                 <li>
                     <a class="dropdown-item text-success no-decoration"
+                       href="{% url 'news:news-list' %}">Новини</a>
+                </li>
+                <li>
+                    <a class="dropdown-item text-success no-decoration"
                        href="{% url 'events:event-list' %}">Події</a>
                 </li>
                 <li>
@@ -88,11 +92,18 @@
         </div>
     </div>
     <div class="mobile-bottom-nav__item">
-        <a class="mobile-bottom-nav__control"
-           href="{% url 'news:news-list' %}"
-           {% if request.resolver_match.namespace == 'news' %}aria-current="page"{% endif %}>
-            <span class="mobile-bottom-nav__icon" aria-hidden="true"><i class="icon-book"></i></span>
-            <span class="mobile-bottom-nav__label">Новини</span>
+        <a class="mobile-bottom-nav__control" href="{{ forum_sso_url }}">
+            <span class="mobile-bottom-nav__icon" aria-hidden="true">
+                <svg width="24"
+                     height="24"
+                     viewBox="0 0 24 24"
+                     fill="none"
+                     xmlns="http://www.w3.org/2000/svg">
+                    <path d="M7.5 17.5L4 20V15.25C2.75 14.2 2 12.7 2 11C2 7.7 5.35 5 9.5 5C13.65 5 17 7.7 17 11C17 14.3 13.65 17 9.5 17C8.8 17 8.15 16.9 7.5 16.75V17.5Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+                    <path d="M16.25 8.25C19.55 8.65 22 10.85 22 13.5C22 15.05 21.15 16.45 19.75 17.4V21L16.65 18.85C15.95 19.05 15.2 19.15 14.45 19.15C12.55 19.15 10.85 18.5 9.7 17.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </span>
+            <span class="mobile-bottom-nav__label">Спільнота</span>
         </a>
     </div>
     <div class="mobile-bottom-nav__item">
@@ -235,4 +246,4 @@
         </div>
     </div>
 </footer>
-<div class="footer-copyright text-center text-white py-3 d-none d-sm-block">© 2016 - 2025 AgroMega.In.Ua</div>
+<div class="footer-copyright text-center text-white py-3 d-none d-sm-block">© 2016 - 2026 AgroMega.In.Ua</div>

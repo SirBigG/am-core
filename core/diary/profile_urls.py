@@ -6,6 +6,7 @@ from core.diary.views import (
     AddDiaryView,
     DiaryDeleteView,
     DiaryItemDeleteView,
+    DiaryRecommendationView,
     DiaryRestoreView,
     PlantArchiveView,
     PlantDeleteView,
@@ -80,6 +81,11 @@ urlpatterns = [
         "profile/diary/<int:pk>/quick-watering/",
         login_required(QuickWateringView.as_view()),
         name="profile-diary-quick-watering",
+    ),
+    path(
+        "profile/diary/<int:pk>/recommendation/",
+        login_required(DiaryRecommendationView.as_view()),
+        name="profile-diary-recommendation",
     ),
     path(
         "profile/diary/<int:diary_pk>/plant/<int:plant_pk>/move/",

@@ -1,7 +1,11 @@
+import json
+import tempfile
 from datetime import timedelta
 from datetime import timezone as dt_timezone
+from unittest.mock import patch
 
-from django.test import TestCase
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import date_format
@@ -287,7 +291,9 @@ class DiaryOrderingTests(TestCase):
         self.client.force_login(user)
         response = self.client.get(reverse("pro_auth:profile-diary-list"))
 
-        self.assertContains(response, "+ Додати іншу дію")
+        self.assertContains(response, 'data-diary-action-preset="watering"')
+        self.assertContains(response, 'data-diary-action-preset="harvest"')
+        self.assertContains(response, 'aria-label="Відкрити інші дії"')
         self.assertContains(response, f'id="diaryCardActionModal{diary.pk}"')
         self.assertContains(response, f'name="_form_prefix" value="diary-{diary.pk}"')
         self.assertContains(
@@ -324,6 +330,126 @@ class DiaryOrderingTests(TestCase):
         item = DiaryItem.objects.get(diary=diary, action_type="note")
         self.assertEqual(item.description, "Підживлення після огляду")
         self.assertTrue(item.apply_to_all)
+
+    def test_htmx_diary_item_create_returns_refresh_event_without_redirect(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="mint", value="М’ята")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Moroccan")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {
+                "action_type": "note",
+                "apply_to_all": "on",
+                "description": "Новий листок",
+                "date": "2026-07-12",
+            },
+            headers={"hx-request": "true"},
+        )
+
+        self.assertEqual(response.status_code, 204)
+        trigger = json.loads(response["HX-Trigger"])["diaryActionSaved"]
+        self.assertEqual(trigger["refreshUrl"], diary.get_profile_absolute_url())
+        self.assertTrue(DiaryItem.objects.filter(diary=diary, description="Новий листок").exists())
+
+    def test_htmx_diary_item_create_accepts_multipart_photo(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="rosemary", value="Розмарин")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Tuscan Blue")
+        diary.plants.add(plant)
+        image = SimpleUploadedFile(
+            "rosemary.gif",
+            b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;",
+            content_type="image/gif",
+        )
+
+        self.client.force_login(user)
+        with tempfile.TemporaryDirectory() as media_root, override_settings(MEDIA_ROOT=media_root):
+            response = self.client.post(
+                reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+                {
+                    "action_type": "photo",
+                    "apply_to_all": "on",
+                    "description": "Фото після поливу",
+                    "date": "2026-07-12",
+                    "image": image,
+                },
+                headers={"hx-request": "true"},
+            )
+            item = DiaryItem.objects.get(diary=diary, description="Фото після поливу")
+            self.assertTrue(item.image.name.endswith("rosemary.gif"))
+
+        self.assertEqual(response.status_code, 204)
+
+    def test_htmx_diary_item_create_enforces_csrf(self):
+        user = UserFactory()
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        csrf_client = Client(enforce_csrf_checks=True)
+        csrf_client.force_login(user)
+
+        response = csrf_client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {"action_type": "note", "apply_to_all": "on", "date": "2026-07-12"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(DiaryItem.objects.filter(diary=diary).exists())
+
+    def test_invalid_htmx_diary_item_create_returns_bound_modal_fragment(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="sage", value="Шавлія")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Common")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {
+                "action_type": "note",
+                "description": "Зберегти введений текст",
+                "date": "2026-07-12",
+            },
+            headers={"hx-request": "true"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Зберегти введений текст")
+        self.assertContains(response, "Оберіть хоча б одну рослину")
+        self.assertContains(response, "data-diary-item-form-container")
+        self.assertFalse(DiaryItem.objects.filter(diary=diary).exists())
+
+    def test_diary_item_create_rejects_archived_diary(self):
+        user = UserFactory()
+        diary = Diary.objects.create(user=user, title="Archived", description="desc", is_archived=True)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {"action_type": "note", "apply_to_all": "on", "date": "2026-07-12"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(DiaryItem.objects.filter(diary=diary).exists())
+
+    def test_htmx_diary_item_create_rejects_archived_diary(self):
+        user = UserFactory()
+        diary = Diary.objects.create(user=user, title="Archived", description="desc", is_archived=True)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": diary.pk}),
+            {"action_type": "note", "apply_to_all": "on", "date": "2026-07-12"},
+            headers={"hx-request": "true"},
+        )
+
+        self.assertEqual(response.status_code, 404)
+        self.assertFalse(DiaryItem.objects.filter(diary=diary).exists())
 
     def test_profile_diary_list_splits_active_and_archived_diaries(self):
         user = UserFactory()
@@ -429,6 +555,44 @@ class DiaryOrderingTests(TestCase):
         item = DiaryItem.objects.get(diary=diary, action_type="watering")
         self.assertFalse(item.apply_to_all)
         self.assertEqual(list(item.plants.all()), [second_plant])
+
+    def test_htmx_quick_watering_returns_refresh_event_without_redirect(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="thyme", value="Чебрець")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Common")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "1", "next": diary.get_profile_absolute_url()},
+            headers={"hx-request": "true"},
+        )
+
+        self.assertEqual(response.status_code, 204)
+        trigger = json.loads(response["HX-Trigger"])["diaryActionSaved"]
+        self.assertEqual(trigger["refreshUrl"], diary.get_profile_absolute_url())
+        self.assertEqual(DiaryItem.objects.filter(diary=diary, action_type="watering").count(), 1)
+
+    def test_htmx_quick_watering_missing_selection_does_not_write(self):
+        user = UserFactory()
+        category = Category.objects.create(slug="oregano", value="Орегано")
+        diary = Diary.objects.create(user=user, title="Diary", description="desc")
+        plant = Plant.objects.create(user=user, category=category, variety="Greek")
+        diary.plants.add(plant)
+
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("pro_auth:profile-diary-quick-watering", kwargs={"pk": diary.pk}),
+            {"apply_to_all": "0"},
+            headers={"hx-request": "true"},
+        )
+
+        self.assertEqual(response.status_code, 204)
+        trigger = json.loads(response["HX-Trigger"])
+        self.assertIn("diaryActionError", trigger)
+        self.assertFalse(DiaryItem.objects.filter(diary=diary, action_type="watering").exists())
 
     def test_quick_watering_redirects_to_safe_next_url(self):
         user = UserFactory()
@@ -1367,6 +1531,12 @@ class DiaryItemFormPlantTargetTests(TestCase):
         self.assertNotIn("plants", form.initial)
         self.assertEqual(list(form.fields["plants"].queryset), [self.active_plant, self.second_active_plant])
 
+    def test_date_uses_native_compatible_date_input(self):
+        form = DiaryItemForm(diary=self.diary)
+
+        self.assertEqual(form.fields["date"].widget.input_type, "date")
+        self.assertEqual(form.fields["date"].widget.format, "%Y-%m-%d")
+
     def test_apply_to_all_false_requires_explicit_plant_selection(self):
         form = DiaryItemForm(
             diary=self.diary,
@@ -1781,13 +1951,17 @@ class PlantLifecycleActionTests(TestCase):
         self.assertContains(response, 'name="_form_prefix"')
         self.assertContains(response, f'value="plant-{self.growing_plant.pk}"')
 
-    def test_detail_renders_quick_watering_panel(self):
+    def test_detail_renders_dated_icon_actions(self):
         response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
 
         self.assertContains(response, "Швидкі дії")
-        self.assertContains(response, f'data-quick-water-open="quickWateringModal{self.diary.pk}"')
-        self.assertContains(response, f'id="quickWateringModal{self.diary.pk}"')
-        self.assertContains(response, f'name="next" value="{self.diary.get_profile_absolute_url()}"')
+        self.assertContains(response, 'data-diary-action-preset="watering"')
+        self.assertContains(response, 'data-diary-action-preset="fertilizer"')
+        self.assertContains(response, 'data-diary-action-preset="harvest"')
+        self.assertContains(response, 'data-diary-action-preset="photo"')
+        self.assertContains(response, 'data-diary-action-preset="note"')
+        self.assertContains(response, 'aria-label="Відкрити інші дії"')
+        self.assertContains(response, "data-date-shortcuts")
 
     def test_detail_without_active_plants_renders_status_banner(self):
         self.growing_plant.status = "completed"
@@ -1918,9 +2092,30 @@ class DiaryItemTimelineRenderingTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "data-diary-item-modal-open")
+        self.assertContains(response, 'data-diary-focus-key="hero-add-action"')
+        self.assertContains(response, 'data-diary-focus-key="quick-panel-more-actions"')
         self.assertContains(response, 'id="diaryItemAddModal"')
         self.assertContains(response, reverse("pro_auth:profile-diary-item-add", kwargs={"diary_id": self.diary.pk}))
         self.assertContains(response, "Оберіть швидку дію")
+
+    def test_detail_uses_local_profile_vendor_assets(self):
+        response = self.client.get(reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}))
+
+        self.assertContains(response, "/static/posts/j-profile.css")
+        self.assertContains(response, "/static/posts/j-profile.js")
+        self.assertNotContains(response, "cdn.jsdelivr.net/npm/flatpickr")
+        self.assertNotContains(response, "cdn.jsdelivr.net/npm/bootstrap")
+
+    def test_detail_workspace_fragment_excludes_complete_page(self):
+        response = self.client.get(
+            reverse("pro_auth:profile-diary-detail", kwargs={"pk": self.diary.pk}),
+            {"fragment": "workspace"},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="profileDiaryDetailContent"')
+        self.assertNotContains(response, "<!DOCTYPE html>")
+        self.assertNotContains(response, "profile-sidebar-nav")
 
 
 class DiaryItemDeleteLifecycleTests(TestCase):
@@ -2572,7 +2767,7 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         self.client.force_login(self.user)
         self.category = Category.objects.create(slug="basil", value="Базилік")
 
-    def test_detail_context_contains_recommendation_for_latest_action(self):
+    def test_lazy_endpoint_contains_recommendation_for_latest_action(self):
         diary = Diary.objects.create(
             user=self.user,
             title="Cherry",
@@ -2594,10 +2789,9 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         )
         latest_item.plants.set([plant])
 
-        response = self.client.get(diary.get_profile_absolute_url())
+        response = self.client.get(reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}))
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context["diary_items"][0], latest_item)
         self.assertEqual(response.context["recommendation"]["severity"], "high")
         self.assertEqual(response.context["recommendation"]["status"], "warning")
         self.assertEqual(response.context["recommendation"]["actionType"], "pest")
@@ -2606,7 +2800,37 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         self.assertContains(response, "фото листя зверху і знизу")
         self.assertEqual(response.context["recommendation_target_label"], plant.display_name)
 
-    def test_detail_uses_cached_recommendation_for_latest_action(self):
+    def test_detail_renders_lazy_recommendation_placeholder(self):
+        diary = Diary.objects.create(user=self.user, title="Beds", description="desc")
+
+        response = self.client.get(diary.get_profile_absolute_url())
+
+        self.assertContains(
+            response,
+            reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}),
+        )
+        self.assertContains(response, 'hx-trigger="load"')
+        self.assertContains(response, "Готуємо рекомендацію")
+
+    def test_lazy_recommendation_requires_owned_diary(self):
+        other_user = UserFactory(email="other-recommendation@example.com")
+        diary = Diary.objects.create(user=other_user, title="Private", description="desc")
+
+        response = self.client.get(reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}))
+
+        self.assertEqual(response.status_code, 404)
+
+    @patch("core.diary.views.PlantRecommendationService.generate")
+    def test_detail_page_does_not_generate_recommendation_synchronously(self, generate):
+        diary = Diary.objects.create(user=self.user, title="Beds", description="desc")
+        DiaryItem.objects.create(diary=diary, action_type="note", description="Observation")
+
+        response = self.client.get(diary.get_profile_absolute_url())
+
+        self.assertEqual(response.status_code, 200)
+        generate.assert_not_called()
+
+    def test_lazy_endpoint_uses_cached_recommendation_for_latest_action(self):
         diary = Diary.objects.create(
             user=self.user,
             title="Cherry",
@@ -2637,11 +2861,11 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         }
         session.save()
 
-        response = self.client.get(diary.get_profile_absolute_url())
+        response = self.client.get(reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}))
 
         self.assertEqual(response.context["recommendation"]["title"], "Cached title")
 
-    def test_detail_recommendation_target_for_multiple_plants(self):
+    def test_lazy_recommendation_target_for_multiple_plants(self):
         diary = Diary.objects.create(user=self.user, title="Beds", description="desc")
         first_plant = Plant.objects.create(user=self.user, category=self.category, variety="Genovese")
         second_plant = Plant.objects.create(user=self.user, category=self.category, variety="Thai")
@@ -2654,7 +2878,7 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         )
         latest_item.plants.set([first_plant, second_plant])
 
-        response = self.client.get(diary.get_profile_absolute_url())
+        response = self.client.get(reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -2662,7 +2886,7 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
             f"{first_plant.display_name}, {second_plant.display_name}",
         )
 
-    def test_detail_recommendation_target_for_apply_to_all(self):
+    def test_lazy_recommendation_target_for_apply_to_all(self):
         diary = Diary.objects.create(user=self.user, title="Beds", description="desc")
         first_plant = Plant.objects.create(user=self.user, category=self.category, variety="Genovese")
         second_plant = Plant.objects.create(user=self.user, category=self.category, variety="Thai")
@@ -2675,12 +2899,12 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         )
         latest_item.plants.set([first_plant, second_plant])
 
-        response = self.client.get(diary.get_profile_absolute_url())
+        response = self.client.get(reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}))
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["recommendation_target_label"], "усіх активних рослин")
 
-    def test_detail_recommendation_target_respects_selected_plant_filter(self):
+    def test_lazy_recommendation_target_respects_selected_plant_filter(self):
         diary = Diary.objects.create(user=self.user, title="Beds", description="desc")
         first_plant = Plant.objects.create(user=self.user, category=self.category, variety="Genovese")
         second_plant = Plant.objects.create(user=self.user, category=self.category, variety="Thai")
@@ -2693,7 +2917,10 @@ class ProfileDiaryDetailRecommendationTests(TestCase):
         )
         latest_item.plants.set([first_plant, second_plant])
 
-        response = self.client.get(diary.get_profile_absolute_url(), {"plant": first_plant.pk})
+        response = self.client.get(
+            reverse("pro_auth:profile-diary-recommendation", kwargs={"pk": diary.pk}),
+            {"plant": first_plant.pk},
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["recommendation_target_label"], first_plant.display_name)

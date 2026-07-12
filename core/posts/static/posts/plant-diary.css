@@ -433,7 +433,10 @@
     position:absolute;
     left:50%;
     bottom:0;
-    width:min(100%,31rem);
+    width:auto;
+    max-width:min(100%,31rem);
+    max-height:100%;
+    height:auto;
     transform:translateX(-50%);
     display:block;
     filter:drop-shadow(0 22px 40px rgba(20,34,35,.12));
@@ -821,7 +824,7 @@
         max-width:34rem;
         margin:0 auto;
     }
-    .plant-diary-problem-visual__image{display:block;width:min(100%,22rem);bottom:0}
+    .plant-diary-problem-visual__image{display:block;width:auto;max-width:min(100%,22rem);max-height:100%;bottom:0}
     .plant-diary-problem-visual__bubble{
         max-width:11.4rem;
         padding:.8rem .9rem;

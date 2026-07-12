@@ -1939,6 +1939,27 @@
     gap: 0.7rem;
 }
 
+.profile-diary-action-icon {
+    width: 48px;
+    min-width: 48px;
+    height: 48px;
+    padding: 0;
+    font-size: 1.2rem;
+}
+
+.profile-diary-recommendation--loading {
+    min-height: 180px;
+    background: linear-gradient(110deg, #f4f8f3 30%, #ffffff 50%, #f4f8f3 70%);
+    background-size: 220% 100%;
+    animation: profile-diary-recommendation-loading 1.4s ease infinite;
+}
+
+@keyframes profile-diary-recommendation-loading {
+    to {
+        background-position-x: -220%;
+    }
+}
+
 .profile-diary-detail-layout {
     grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.75fr);
     gap: 1rem;
@@ -2406,12 +2427,23 @@
     }
 
     .profile-diary-card-quick-actions {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: nowrap;
+        gap: 0.25rem;
     }
 
     .profile-diary-card-quick-actions .btn {
-        width: 100%;
+        flex: 0 0 40px;
+        width: 40px;
+        min-width: 40px;
+        max-width: 40px;
+        height: 40px;
+        min-height: 40px;
+        max-height: 40px;
+        padding: 0 !important;
+        border-radius: 12px;
+        aspect-ratio: 1;
     }
 
     .profile-diary-detail-topbar {
@@ -2437,12 +2469,15 @@
     }
 
     .profile-diary-quick-panel__actions {
-        flex-direction: column;
-        align-items: stretch;
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 0.4rem;
     }
 
     .profile-diary-quick-panel__actions .btn {
-        width: 100%;
+        width: 48px;
+        min-width: 48px;
     }
 
     .profile-diary-filters {
@@ -2618,15 +2653,22 @@
         order: 1;
     }
 
-    .profile-confirm-actions,
-    .profile-diary-item-modal__actions {
+    .profile-confirm-actions {
         flex-direction: column;
         align-items: stretch;
     }
 
+    .profile-diary-item-modal__actions {
+        flex-direction: row;
+        align-items: stretch;
+        flex-wrap: nowrap;
+    }
+
     .profile-confirm-actions .btn,
     .profile-diary-item-modal__actions .btn {
-        width: 100%;
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
         min-height: 48px;
     }
 }

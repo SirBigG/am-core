@@ -4,6 +4,9 @@
     <form class="profile-confirm-dialog profile-quick-action-dialog"
           method="post"
           action="{% url 'pro_auth:profile-diary-quick-watering' pk=diary.id %}"
+          hx-post="{% url 'pro_auth:profile-diary-quick-watering' pk=diary.id %}"
+          hx-swap="none"
+          hx-disabled-elt="find button[type='submit']"
           role="dialog"
           aria-modal="true"
           aria-labelledby="quickWateringTitle{{ diary.id }}">
@@ -21,10 +24,7 @@
                 <span>Підлити всі активні рослини</span>
             </label>
             <label class="profile-quick-action-option">
-                <input type="radio"
-                       name="apply_to_all"
-                       value="0"
-                       data-quick-water-selected>
+                <input type="radio" name="apply_to_all" value="0" data-quick-water-selected>
                 <span>Обрати рослини</span>
             </label>
         </div>
@@ -41,6 +41,7 @@
                     class="btn profile-confirm-cancel"
                     data-quick-water-cancel>Відмінити</button>
             <button type="submit"
+                    aria-label="Зберегти полив"
                     class="btn am-btn am-btn--primary profile-confirm-submit">Зберегти</button>
         </div>
     </form>

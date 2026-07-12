@@ -1,16 +1,9 @@
 {% extends "base.html" %}
 {% load post_extras static %}
 {% block scripts %}
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css"
-          rel="stylesheet"
-          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl"
-          crossorigin="anonymous">
-    <link rel="stylesheet"
-          href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="{% static 'posts/j-profile.css' %}?v=20260712">
     <script src="{% static "admin/js/vendor/jquery/jquery.min.js" %}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/uk.js"></script>
+    <script src="{% static 'posts/j-profile.js' %}?v=20260712"></script>
     <script src="{% static "posts/j-index.js" %}"></script>
     <link rel="stylesheet" href="{% static 'posts/list.css' %}">
 {% endblock scripts %}
@@ -67,6 +60,11 @@
                     </div>
                 {% endblock profile_sidebar %}
                 <div class="col-lg-8 col-12 profile-content-col">
+                    <div class="profile-async-status"
+                         data-profile-async-status
+                         role="status"
+                         aria-live="polite"
+                         aria-atomic="true"></div>
                     {% block profile_content %}
                     {% endblock profile_content %}
                 </div>
@@ -98,7 +96,7 @@
                         dateFormat: "Y-m-d",
                         allowInput: true,
                         clickOpens: true,
-                        disableMobile: true,
+                        disableMobile: false,
                         monthSelectorType: "static",
                         locale: "uk",
                         prevArrow: "‹",

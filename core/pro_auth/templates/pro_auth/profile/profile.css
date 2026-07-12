@@ -521,8 +521,8 @@
 }
 
 .profile-diary-item-meta-row {
-    grid-template-columns: minmax(0, 30fr) minmax(0, 70fr);
-    align-items: end;
+    grid-template-columns: minmax(0, 1fr);
+    align-items: stretch;
 }
 
 .profile-diary-item-meta-row > .profile-form-group {
@@ -1441,4 +1441,154 @@ span.flatpickr-weekday {
     .profile-advert-card__media {
         max-width: 160px;
     }
+}
+
+.profile-date-shortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.profile-date-control-row {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.profile-date-control-row .profile-form-field {
+    flex: 0 1 12rem;
+}
+
+.profile-date-control-row .profile-date-shortcuts {
+    flex-wrap: nowrap;
+    margin-top: 0;
+}
+
+.profile-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.profile-plant-mode {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+}
+
+.profile-plant-mode .btn.is-active {
+    border-color: #2b9b50;
+    color: #176f37;
+    background: #eef9f0;
+}
+
+[data-plant-targets][hidden] {
+    display: none !important;
+}
+
+[data-plant-target-section][hidden] {
+    display: none !important;
+}
+
+.profile-image-preview {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.profile-image-preview[hidden] {
+    display: none !important;
+}
+
+.profile-image-preview img {
+    width: 88px;
+    height: 88px;
+    border-radius: 14px;
+    object-fit: contain;
+    background: #f3f7f3;
+    transition: transform 160ms ease;
+}
+
+@media (max-width: 767px) {
+    .profile-date-control-row {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .profile-date-control-row .profile-form-field {
+        flex-basis: auto;
+    }
+
+    .profile-plant-mode {
+        flex-wrap: nowrap;
+    }
+
+    .profile-plant-mode .btn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+        padding-inline: 0.65rem;
+    }
+
+    .profile-diary-item-modal__actions {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 0.65rem;
+    }
+
+    .profile-diary-item-modal__actions .btn,
+    .profile-diary-item-modal__actions .am-btn {
+        flex: 1 1 0;
+        width: auto;
+        min-width: 0;
+    }
+}
+
+.profile-date-shortcuts .btn {
+    min-height: 44px;
+    padding-inline: 0.9rem;
+}
+
+.profile-async-status {
+    position: fixed;
+    z-index: 1200;
+    right: 1rem;
+    bottom: 1rem;
+    max-width: min(28rem, calc(100vw - 2rem));
+    padding: 0.8rem 1rem;
+    border-radius: 14px;
+    color: #fff;
+    background: #19713c;
+    box-shadow: 0 12px 32px rgba(18, 61, 35, 0.25);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(0.75rem);
+    transition: opacity 160ms ease, transform 160ms ease;
+}
+
+.profile-async-status.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.profile-async-status.is-error {
+    background: #a62727;
+}
+
+.profile-diary-item-form.htmx-request,
+.profile-quick-action-dialog.htmx-request {
+    cursor: progress;
+}
+
+.profile-diary-item-form.htmx-request button[type="submit"],
+.profile-quick-action-dialog.htmx-request button[type="submit"] {
+    opacity: 0.7;
 }
