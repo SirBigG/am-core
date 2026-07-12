@@ -334,8 +334,15 @@ class SiteMapTests(TestCase):
     def test_return_context(self):
         response = client.get("/sitemap.xml")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context["urls"]), 3)
+        self.assertEqual(len(response.context["urls"]), 4)
         self.assertTemplateUsed(response, "sitemap_index.xml")
+
+    @override_settings(FORUM_BASE_URL="https://agromega.in.ua/community/")
+    def test_index_includes_normalized_forum_owned_sitemap(self):
+        response = client.get("/sitemap.xml")
+
+        self.assertContains(response, "<loc>https://agromega.in.ua/community/sitemap.xml</loc>", html=False)
+        self.assertNotContains(response, "/community//sitemap.xml", html=False)
 
     @override_settings(HOST="https://agromega.in.ua/")
     def test_index_normalizes_host_and_renders_available_lastmod(self):

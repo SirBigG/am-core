@@ -257,6 +257,7 @@ class SitemapIndexView(TemplateView):
                 "lastmod": latest_advert.updated if latest_advert else None,
             },
             {"loc": f"{base_url}/sitemap-news.xml"},
+            {"loc": f"{settings.FORUM_BASE_URL.rstrip('/')}/sitemap.xml"},
         ]
         return context
 
