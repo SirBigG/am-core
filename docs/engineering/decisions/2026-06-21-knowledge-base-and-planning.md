@@ -1,7 +1,7 @@
 # Decision: Knowledge Base And Planning Workflow
 
 - Date: 2026-06-21
-- Status: Accepted
+- Status: Superseded by `2026-07-17-local-agent-plans.md`
 - Owners: Project team
 
 ## Context

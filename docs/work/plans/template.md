@@ -1,3 +1,8 @@
+# Historical Plan Template
+
+Do not create new plans in this tracked directory. Copy the outline below into a
+dated file under the gitignored `var/agents-work/plans/` workspace instead.
+
 # Plan: Title
 
 - Date: YYYY-MM-DD

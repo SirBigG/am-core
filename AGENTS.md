@@ -80,7 +80,7 @@ Keep forum dependency work isolated in the sibling project at `../forum_instance
 
 ## Documentation Layout
 
-Use `docs/engineering/` for technical plans, investigations, architecture notes, upgrade reports, and implementation records.
+Use `docs/engineering/` for durable investigations, architecture notes, upgrade reports, implementation records, and decisions.
 
 Use `docs/business/` for future product, domain, operations, content, and non-code business documentation.
 
@@ -89,13 +89,13 @@ This repository now treats `docs/` as the durable knowledge base for people and 
 - `docs/README.md` for the knowledge-base workflow.
 - `docs/business/README.md` and relevant notes under `docs/business/domains/` for domain context.
 - `docs/engineering/decisions/` for accepted or proposed decisions that affect the change.
-- `docs/work/` for the planning and result artifact workflow.
+- `var/agents-work/plans/README.md` for the local planning workflow when that gitignored workspace exists.
 
-Planning is required before implementation when a change affects product behavior, domain rules, architecture, dependencies, data, security, or a workflow spanning multiple apps/services. Use `docs/work/plans/template.md` and create a dated plan under `docs/work/plans/` unless an equivalent plan already exists.
+Planning is required before implementation when a change affects product behavior, domain rules, architecture, dependencies, data, security, or a workflow spanning multiple apps/services. Create a dated local plan under `var/agents-work/plans/` unless an equivalent plan already exists. Local plans are gitignored, non-authoritative, and must not be committed.
 
 Small mechanical fixes do not need a full plan. Examples: typo fixes, formatting-only docs edits, small test expectation corrections, or comments that do not change behavior.
 
-Write result artifacts under `docs/work/results/` when the work needs a durable execution summary, verification record, audit output, or follow-up list.
+Put task requirements in the owning task tracker and implementation or verification summaries in the pull request. Promote lasting knowledge into the relevant durable business or engineering docs. Existing files under `docs/work/` are historical records, not the destination for new plans.
 
 ### Content Operations Workspace
 
@@ -103,21 +103,22 @@ Editorial research, article refreshes, bulk content generation, API publication 
 
 - Store content plans, research notes, evidence packets, before/after snapshots, API audit logs, rollback data, review bundles, and execution summaries under the gitignored `content_refresh_runs/` directory.
 - Store one-off content scripts under the corresponding run directory instead of the repository root. Keep them locally after the run when they may help reproduce, audit, or analyze the work.
-- Do not add content-only plans or result artifacts to `docs/work/` unless the work also changes product behavior, domain rules, architecture, security, data schema, or a reusable code workflow.
-- Reusable application code, management commands, tests, migrations, and template/API changes still belong in the tracked codebase and follow the normal `docs/work/` planning rules when applicable.
+- Do not add content-only plans or result artifacts to tracked documentation.
+- Reusable application code, management commands, tests, migrations, and template/API changes still belong in the tracked codebase and follow the local planning rules when applicable.
 - Before content work, read the local `content_refresh_runs/README.md` when it exists. That file is intentionally local and may contain the current operational directory convention without secrets.
 - Never store API tokens, passwords, cookies, or other credentials in `content_refresh_runs/`; load them from the approved environment file at runtime.
 
 Update the durable knowledge base in the same change when implementation reveals new business rules, domain language, workflows, lifecycle states, constraints, or decisions.
 
-When adding new investigation output, prefer a dated document under a topic folder, for example:
+When adding durable investigation output, prefer a dated document under a topic folder, for example:
 
-- `docs/work/plans/YYYY-MM-DD-topic.md`
-- `docs/work/results/YYYY-MM-DD-topic.md`
 - `docs/engineering/decisions/YYYY-MM-DD-topic.md`
 - `docs/engineering/package-upgrades/YYYY-MM-DD-topic.md`
 - `docs/engineering/security/YYYY-MM-DD-topic.md`
 - `docs/business/domains/YYYY-MM-DD-topic.md`
+
+Delete local plans and supporting analysis when work completes or is abandoned,
+after promoting any lasting knowledge into durable docs or decisions.
 
 ## Working Rules
 

@@ -1,6 +1,10 @@
-# Results
+# Historical Results
 
-Use this folder for after-work artifacts:
+This folder preserves after-work artifacts committed before implementation and
+verification summaries moved to pull requests by default. Do not add routine
+task results here.
+
+Historical contents include:
 
 - Implementation summaries.
 - Investigation findings.
@@ -9,6 +13,9 @@ Use this folder for after-work artifacts:
 - Migration or rollout results.
 - Follow-up lists created after implementation.
 
-Results should be concise and evidence-based. Include commands, dates, scope, and residual risks when relevant.
+New durable investigation or operational material belongs in the relevant
+`docs/business/` or `docs/engineering/` topic folder. Generated or task-local
+evidence belongs in an appropriate gitignored workspace.
 
-If a result contains knowledge that should guide future work, also update the durable docs under `docs/business/` or `docs/engineering/`.
+See `docs/engineering/decisions/2026-07-17-local-agent-plans.md` for the current
+workflow and lifecycle.

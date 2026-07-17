@@ -1,31 +1,25 @@
 # Work Artifacts
 
-This folder collects planning and result artifacts produced during delivery work.
+This folder preserves planning and result artifacts created before new plans
+moved to a local gitignored workspace.
 
-Use this area for documents that explain how a specific task was planned, executed, verified, or summarized. Keep durable business knowledge, engineering decisions, architecture notes, and domain references in the main `docs/business/` and `docs/engineering/` folders.
+Do not add new plans here. Create unfinished plans under
+`var/agents-work/plans/`, summarize implementation and verification in the pull
+request, and keep durable business knowledge, engineering decisions,
+architecture notes, and domain references in `docs/business/` and
+`docs/engineering/`.
 
 ## Structure
 
-- `plans/` - implementation plans, upgrade plans, migration plans, and other before-work planning documents.
-- `results/` - implementation results, investigation outputs, verification summaries, audit outputs, and other after-work records.
+- `plans/` - historical implementation plans from the previous tracked workflow.
+- `results/` - historical implementation results and investigation outputs from the previous tracked workflow.
 
 ## Working Rule
 
-Plans and results may be referenced from durable docs, but they should not replace durable docs.
+Historical plans and results may be referenced from durable docs, but they are
+not current-state authority and must not replace durable docs.
 
 When a work artifact discovers lasting knowledge, update the relevant domain note, decision record, dependency note, security note, or testing note.
 
-## Naming
-
-Use dated filenames:
-
-```text
-YYYY-MM-DD-short-topic.md
-```
-
-For related plan/result pairs, reuse the same short topic:
-
-```text
-plans/2026-06-21-company-profile-cleanup.md
-results/2026-06-21-company-profile-cleanup.md
-```
+See `docs/engineering/decisions/2026-07-17-local-agent-plans.md` for the current
+workflow and lifecycle.
