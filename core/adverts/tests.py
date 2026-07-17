@@ -206,6 +206,16 @@ class TestAdvertFormView(TestCase):
         self.assertNotContains(response, 'class="advert-detail__thumb js-smartPhoto"')
         self.assertNotContains(response, 'target="_blank" rel="noopener"')
 
+    def test_detail_increments_view_count(self):
+        advert = Advert.objects.create(title="test", description="test", price=100, contact="test", views=3)
+
+        response = self.client.get(advert.get_absolute_url())
+
+        advert.refresh_from_db()
+        self.assertEqual(response.status_code, HTTPStatus.OK)
+        self.assertEqual(advert.views, 4)
+        self.assertEqual(response.context["object"].views, 4)
+
     def test_photo_urls_keep_legacy_main_image_before_extra_photos(self):
         advert = Advert.objects.create(
             title="test",

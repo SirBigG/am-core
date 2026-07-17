@@ -1,5 +1,3 @@
-{% load classifier_extras %}
-{% get_root_categories_links as categories_links %}
 <div id="bottom-mobile-menu"
      class="navbar bg-light fixed-bottom d-lg-none mt-3 border-top border-success mobile-bottom-nav">
     <div class="mobile-bottom-nav__item">
@@ -20,7 +18,7 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                {% for category in categories_links %}
+                {% for category in root_category_links %}
                     <li>
                         <a class="dropdown-item text-success no-decoration"
                            href="{{ category.url }}">{{ category.title }}</a>
@@ -223,7 +221,7 @@
                     <li class="mb-1">
                         <a class="no-decoration text-success" href="{% url 'categories' %}">Всі категорії</a>
                     </li>
-                    {% for category in categories_links %}
+                    {% for category in root_category_links %}
                         <li class="mb-1">
                             <a class="no-decoration text-success" href="{{ category.url }}">{{ category.title }}</a>
                         </li>

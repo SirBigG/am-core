@@ -11,6 +11,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.core.files import File
 from django.db import models
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import get_language
@@ -42,7 +43,13 @@ class PostQuerySet(models.QuerySet):
     def select_objects(self):
         return (
             self.select_related("country")
-            .prefetch_related("photo")
+            .prefetch_related(
+                Prefetch(
+                    "photo",
+                    queryset=Photo.objects.order_by("pk"),
+                    to_attr="prefetched_photos",
+                )
+            )
             .select_related("rubric")
             .select_related("rubric__parent")
             .select_related("rubric__meta")
@@ -148,6 +155,20 @@ class Post(models.Model):
         )
         self.save()
         return self.absolute_url
+
+    @property
+    def primary_photo(self):
+        prefetched_photos = getattr(self, "prefetched_photos", None)
+        if prefetched_photos is not None:
+            return prefetched_photos[0] if prefetched_photos else None
+        return self.photo.order_by("pk").first()
+
+    @property
+    def public_photo_count(self):
+        prefetched_photos = getattr(self, "prefetched_photos", None)
+        if prefetched_photos is not None:
+            return len(prefetched_photos)
+        return self.photo.count()
 
 
 class CategoryAttributeGroup(models.Model):

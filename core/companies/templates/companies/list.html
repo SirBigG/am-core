@@ -15,14 +15,14 @@
         {% for company in companies %}
             <article class="site-list-card{% if not company.logo %} site-list-card--text-only{% endif %}">
                 {% if company.logo %}
-                    <a class="site-list-card__media"
+                    <a class="site-list-card__media site-list-card__media--logo"
                        href="{{ company.get_absolute_url }}"
                        aria-label="{{ company.name }}">
                         <img src="{{ company.logo.url }}"
                              alt="{{ company.name }} logo"
                              width="350"
                              height="260"
-                             class="site-list-card__image">
+                             class="site-list-card__image site-list-card__image--logo">
                     </a>
                 {% endif %}
                 <div class="site-list-card__body">

@@ -54,6 +54,8 @@ Batch 12 upgraded the main Docker runtime to Python 3.14.5 and tightened `pyproj
 
 Batch 13 cleaned up local tooling after the uv migration. The stale Poetry pre-commit hook and stale in-repo `release-forum` Makefile target were removed, and `make check-deps` now wraps the uv lock/sync checks. Dependency checks and pre-commit config validation passed.
 
+Pre-commit explicitly creates Python hook environments with Python 3.14. This keeps hook execution aligned with the application runtime and allows Black and pyupgrade to target Python 3.14 without producing syntax that a Python 3.13 hook environment cannot parse.
+
 Known warnings that remain useful upgrade signals:
 
 - `django-ckeditor` warns that bundled CKEditor 4 has unfixed security issues.

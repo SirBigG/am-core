@@ -1,0 +1,23 @@
+{% load static %}
+<script src="{% static 'posts/htmx.min.js' %}?v=2.0.10" defer></script>
+<section id="random-post-recommendations"
+         class="site-content-section site-random-posts"
+         aria-live="polite"
+         aria-busy="true"
+         hx-get="{{ recommendations_url }}"
+         hx-trigger="load"
+         hx-swap="outerHTML">
+    <div class="site-random-posts__header">
+        <h2 class="site-content-section__title">Цікавинки на додачу</h2>
+        <span class="site-random-posts__loading">Завантажуємо…</span>
+    </div>
+    <div class="site-random-posts__grid" aria-hidden="true">
+        <span class="site-random-posts__skeleton"></span>
+        <span class="site-random-posts__skeleton"></span>
+        <span class="site-random-posts__skeleton"></span>
+        <span class="site-random-posts__skeleton"></span>
+    </div>
+    <noscript>
+        <p class="site-random-posts__empty">Увімкніть JavaScript, щоб побачити випадкові публікації.</p>
+    </noscript>
+</section>

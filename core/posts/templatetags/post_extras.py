@@ -1,9 +1,11 @@
 import json
-from urllib.parse import urlparse
+from urllib.parse import urlencode, urlparse
 
 from django import template
 from django.conf import settings
+from django.core.cache import cache
 from django.core.files.storage import storages
+from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
 
@@ -11,12 +13,21 @@ from core.adverts.models import Advert
 from core.classifier.models import Category
 from core.posts.models import Post
 from core.utils.images import imgproxy_url as build_image_url
+from core.utils.rotating import get_rotating_ids, order_by_id_list, rotation_bucket
 
 register = template.Library()
 
 
 def _json_ld(data):
     return mark_safe(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+
+
+def _category_ancestors(category):
+    ancestors = getattr(category, "_public_ancestors", None)
+    if ancestors is None:
+        ancestors = list(category.get_ancestors(include_self=True))
+        category._public_ancestors = ancestors
+    return ancestors
 
 
 @register.simple_tag
@@ -58,8 +69,10 @@ def site_structured_data():
 @register.simple_tag
 def breadcrumb_structured_data(category, current_title=None):
     entries = [{"name": "Головна", "item": public_url("/")}]
-    for ancestor in category.get_ancestors(include_self=True)[1:]:
-        entries.append({"name": ancestor.value, "item": public_url(ancestor.get_absolute_url())})
+    for ancestor in _category_ancestors(category)[1:]:
+        entries.append(
+            {"name": ancestor.value, "item": public_url(ancestor.absolute_url or ancestor.get_absolute_url())}
+        )
     if current_title:
         entries.append({"name": current_title, "item": None})
     items = []
@@ -202,7 +215,7 @@ def main_menu():
 @register.inclusion_tag("posts/second_menu.html")
 def second_menu(parent_slug, current_slug=None):
     return {
-        "menu_items": Category.objects.get(slug=parent_slug).get_children().values("slug", "value", "absolute_url"),
+        "menu_items": Category.objects.filter(parent__slug=parent_slug).values("slug", "value", "absolute_url"),
         "slug": current_slug,
     }
 
@@ -211,7 +224,10 @@ def second_menu(parent_slug, current_slug=None):
 def breadcrumbs(category, post_title=None):
     """Breadcrumbs block."""
     return {
-        "items": category.get_ancestors(include_self=True).values("value", "absolute_url")[1:],
+        "items": [
+            {"value": ancestor.value, "absolute_url": ancestor.absolute_url}
+            for ancestor in _category_ancestors(category)[1:]
+        ],
         "post_title": post_title,
     }
 
@@ -247,29 +263,52 @@ def random_adverts():
 
 
 @register.inclusion_tag("posts/relative_posts.html")
-def relative_posts(category_id):
-    context = {
-        "posts": Post.objects.filter(rubric_id=category_id, status=True)
-        .values("id", "title", "absolute_url", "photo__image")
-        .order_by("?")[:4]
-    }
-    for post in context["posts"]:
-        if post["photo__image"]:
-            post["photo__image"] = imgproxy_url(storages["default"].url(post["photo__image"]), 200, 150)
-    return context
+def relative_posts(category_id, current_post_id=None):
+    posts = _rotating_post_cards(
+        Post.objects.filter(rubric_id=category_id, status=True),
+        f"relative:{category_id}",
+        5,
+    )
+    return {"posts": [post for post in posts if post["id"] != current_post_id][:4]}
 
 
-@register.inclusion_tag("posts/random_posts.html")
-def random_posts():
-    context = {
-        "posts": Post.objects.filter(status=True)
-        .values("id", "title", "absolute_url", "photo__image")
-        .order_by("?")[:4]
-    }
-    for post in context["posts"]:
-        if post["photo__image"]:
-            post["photo__image"] = imgproxy_url(storages["default"].url(post["photo__image"]), 200, 150)
-    return context
+@register.inclusion_tag("posts/random_posts_loader.html")
+def random_posts(current_post_id=None):
+    params = {"current": current_post_id} if current_post_id else {}
+    url = reverse("random-post-recommendations")
+    if params:
+        url = f"{url}?{urlencode(params)}"
+    return {"recommendations_url": url}
+
+
+def _rotating_post_cards(queryset, scope, limit):
+    ids = get_rotating_ids(queryset, scope, limit)
+    cache_key = f"public_post_cards_v2:{scope}:{limit}:{rotation_bucket()}:{','.join(map(str, ids))}"
+    cards = cache.get(cache_key)
+    if cards is None:
+        posts = order_by_id_list(Post.objects.select_objects(), ids)
+        cards = [
+            {
+                "id": post.id,
+                "title": post.title,
+                "absolute_url": post.absolute_url,
+                "photo__image": post.primary_photo.image.name if post.primary_photo else "",
+            }
+            for post in posts
+        ]
+        cache.set(cache_key, cards, 3660)
+
+    rendered_cards = []
+    for card in cards:
+        rendered_card = dict(card)
+        if rendered_card["photo__image"]:
+            rendered_card["photo__image"] = imgproxy_url(
+                storages["default"].url(rendered_card["photo__image"]),
+                200,
+                150,
+            )
+        rendered_cards.append(rendered_card)
+    return rendered_cards
 
 
 @register.simple_tag

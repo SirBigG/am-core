@@ -12,6 +12,7 @@ from core.posts.views import (
     PostList,
     PostListView,
     PostSearchView,
+    random_post_recommendations,
 )
 
 
@@ -29,6 +30,7 @@ urlpatterns = [
     path("search/", PostSearchView.as_view(), name="post-search-list"),
     path("publication/create/", PostFormView.as_view(), name="post-add"),
     path("post-autocomplete/", PostAutocomplete.as_view(), name="post-autocomplete"),
+    path("recommendations/random/", random_post_recommendations, name="random-post-recommendations"),
     path("gallery/<int:post_id>/", GalleryView.as_view(), name="gallery"),
     path("<str:parent>/", ParentRubricView.as_view(), name="parent-category-index"),
     path("<str:parent>/<str:child>/", PostListView.as_view(), name="posts-list-view"),

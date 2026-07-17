@@ -4,7 +4,9 @@ from tempfile import NamedTemporaryFile
 from django.contrib import admin
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
+from django.db import connection
 from django.test import TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 from openpyxl import Workbook
 
@@ -188,6 +190,22 @@ class RegistryPublicViewTests(TestCase):
         self.assertTemplateUsed(response, "registry/varieties.html")
         self.assertEqual(response.context["category"], self.child)
         self.assertEqual(response.context["posts"][0][0], "С")
+
+    def test_registry_variety_list_does_not_write_during_get(self):
+        Variety.objects.create(title="Сорт А", slug="sort-a", category=self.child)
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(
+                reverse("registry:index-parent", kwargs={"root_slug": self.root.slug, "child_slug": self.child.slug})
+            )
+
+        write_queries = [
+            query["sql"]
+            for query in queries
+            if query["sql"].lstrip().upper().startswith(("UPDATE ", "INSERT ", "DELETE "))
+        ]
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(write_queries, [])
 
     def test_registry_variety_list_returns_404_for_unknown_child(self):
         response = self.client.get(

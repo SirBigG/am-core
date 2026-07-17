@@ -1,4 +1,6 @@
 exclude: ^core/posts/static/posts/(fontawesome/|.*\.(css|js|svg)$)
+default_language_version:
+  python: python3.14
 
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -18,7 +20,7 @@ repos:
         args: [ "--maxkb=1024" ]
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.4.2
+    rev: v2.4.3
     hooks:
       - id: codespell
         args: [
@@ -42,7 +44,7 @@ repos:
         args: [ "--target-version", "6.0" ]
 
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.15.20
+    rev: v0.15.22
     hooks:
       - id: ruff
 
@@ -64,7 +66,7 @@ repos:
         args: [ "-c", ".bandit.yaml" ,"--severity-level", "high", "-r", "." ]
 
   - repo: https://github.com/Riverside-Healthcare/djLint
-    rev: v1.39.4
+    rev: v1.40.8
     hooks:
       - id: djlint-reformat-django
       - id: djlint-django

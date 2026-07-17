@@ -1,8 +1,11 @@
+from django.core.cache import cache
+from django.db import connection
 from django.test import Client, TestCase
+from django.test.utils import CaptureQueriesContext
 from django.urls import reverse
 
 from core.classifier.models import Category
-from core.utils.tests.factories import LocationFactory
+from core.utils.tests.factories import CategoryFactory, LocationFactory
 
 client = Client()
 
@@ -57,3 +60,20 @@ class DiaryPlantCategoryAutocompleteTests(TestCase):
         self.assertEqual(response.json()["results"][0]["id"], str(self.basil.pk))
         self.assertEqual(response.json()["results"][0]["text"], str(self.basil))
         self.assertIn("selected_text", response.json()["results"][0])
+
+
+class CategoriesIndexTests(TestCase):
+    def test_category_tree_is_loaded_without_per_node_queries(self):
+        for root_index in range(3):
+            root = CategoryFactory(value=f"Root {root_index}")
+            for child_index in range(3):
+                child = CategoryFactory(parent=root, value=f"Child {root_index}-{child_index}")
+                CategoryFactory(parent=child, value=f"Leaf {root_index}-{child_index}")
+        cache.clear()
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(reverse("categories"))
+
+        category_queries = [query["sql"] for query in queries if 'FROM "classifier_category"' in query["sql"]]
+        self.assertEqual(response.status_code, 200)
+        self.assertLessEqual(len(category_queries), 2)

@@ -171,8 +171,8 @@
             {% render_comments object request %}
         </section>
         {% products_for_post object.id %}
-        {% relative_posts category.id %}
+        {% relative_posts category.id object.id %}
         {% post_adverts %}
-        {% random_posts %}
+        {% random_posts object.id %}
     </article>
 {% endblock content %}

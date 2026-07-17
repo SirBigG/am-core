@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import date, datetime, timedelta
 from itertools import groupby
+from urllib.parse import urlencode
 
 from dal import autocomplete
 from django.conf import settings
@@ -9,7 +10,10 @@ from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.cache import cache
 from django.db.models import F
 from django.http import FileResponse, Http404
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
+from django.views.decorators.cache import never_cache
+from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 
 from core.adverts.models import Advert
@@ -17,8 +21,48 @@ from core.classifier.models import Category
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
 from core.posts.models import Photo, Post, SearchStatistic
+from core.posts.recommendations import get_random_recommendations
 from core.posts.templatetags.post_extras import full_url
 from core.registry.models import Variety
+from core.utils.rotating import get_rotating_ids, order_by_id_list
+
+
+def _bounded_positive_ids(value, limit=20):
+    ids = []
+    for raw_id in (value or "").split(","):
+        try:
+            post_id = int(raw_id)
+        except TypeError, ValueError:
+            continue
+        if post_id > 0 and post_id not in ids:
+            ids.append(post_id)
+        if len(ids) == limit:
+            break
+    return ids
+
+
+@require_GET
+@never_cache
+def random_post_recommendations(request):
+    current_ids = _bounded_positive_ids(request.GET.get("current"), limit=1)
+    current_post_id = current_ids[0] if current_ids else None
+    excluded_ids = _bounded_positive_ids(request.GET.get("exclude"))
+    posts = get_random_recommendations(
+        current_post_id=current_post_id,
+        exclude_ids=excluded_ids,
+    )
+    refresh_params = {"exclude": ",".join(str(post.pk) for post in posts)}
+    if current_post_id:
+        refresh_params["current"] = current_post_id
+    refresh_url = f"{reverse('random-post-recommendations')}?{urlencode(refresh_params)}"
+    return render(
+        request,
+        "posts/random_posts.html",
+        {
+            "posts": posts,
+            "refresh_url": refresh_url,
+        },
+    )
 
 
 def service_worker(request):
@@ -44,12 +88,16 @@ class IndexView(TemplateView):
             Event.objects.select_related("location").filter(status=1, start__gte=date.today()).order_by("start")[:4]
         )
         context["object_list"] = Post.objects.select_objects().active().order_by("-publish_date")[:8]
-        context["random_posts"] = Post.objects.select_objects().active().order_by("?")[:8]
+        active_posts = Post.objects.active()
+        random_post_ids = get_rotating_ids(active_posts, "homepage", 8)
+        context["random_posts"] = order_by_id_list(Post.objects.select_objects(), random_post_ids)
         context["random_adverts"] = []
         if settings.ENABLE_INTERNAL_ADVERTS:
-            context["random_adverts"] = Advert.objects.filter(
-                updated__gte=datetime.now() - timedelta(days=14)
-            ).order_by("?")[:8]
+            recent_adverts = Advert.objects.filter(updated__gte=datetime.now() - timedelta(days=14)).prefetch_related(
+                "photos"
+            )
+            random_advert_ids = get_rotating_ids(recent_adverts, "homepage", 8)
+            context["random_adverts"] = order_by_id_list(recent_adverts, random_advert_ids)
         return context
 
 
@@ -171,18 +219,21 @@ class PostDetail(DetailView):
     model = Post
     template_name = "posts/detail.html"
 
+    def get_queryset(self):
+        return Post.objects.select_objects().select_related("publisher", "meta")
+
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""
         context = super().get_context_data(**kwargs)
         try:
-            context["main_photo_object"] = context["object"].photo.first()
+            context["main_photo_object"] = context["object"].primary_photo
             if context["main_photo_object"]:
                 context["main_photo_thumbnail"] = context["main_photo_object"].image.url
                 context["main_photo_full_url"] = full_url(context["main_photo_thumbnail"])
         except Exception as e:
             logging.error(e)
             context["main_photo_object"] = None
-        context["photo_count"] = context["object"].photo.count()
+        context["photo_count"] = context["object"].public_photo_count
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
         context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()

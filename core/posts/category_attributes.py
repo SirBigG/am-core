@@ -1,6 +1,7 @@
 from decimal import Decimal, InvalidOperation
 
 from django import forms
+from django.db.models import Prefetch
 
 from core.posts.models import (
     CategoryAttributeChoice,
@@ -39,7 +40,13 @@ def get_category_schema_fields(category_id):
         return CategoryAttributeField.objects.none()
     return (
         CategoryAttributeField.objects.select_related("group")
-        .prefetch_related("choices")
+        .prefetch_related(
+            Prefetch(
+                "choices",
+                queryset=CategoryAttributeChoice.objects.filter(is_active=True, is_public=True),
+                to_attr="public_choices",
+            )
+        )
         .filter(category_id=category_id, is_active=True)
         .order_by("group__sort_order", "sort_order", "label")
     )
@@ -272,6 +279,10 @@ def _choice_for_value(field, value):
 
 
 def _choice_label(field, value):
+    public_choices = getattr(field, "public_choices", None)
+    if public_choices is not None:
+        choice = next((choice for choice in public_choices if choice.value == value), None)
+        return choice.label if choice else ""
     choice = field.choices.filter(value=value, is_active=True, is_public=True).first()
     return choice.label if choice else ""
 

@@ -35,8 +35,6 @@ class VarietyListView(TemplateView):
         category = VarietyCategory.objects.select_related("meta").filter(slug=self.kwargs["child_slug"]).first()
         if category is None:
             raise Http404
-        for i in Variety.objects.filter(category_id=category.id):
-            i.save()
         posts = list(
             Variety.objects.filter(category_id=category.id).values(
                 "title", "publication__absolute_url", "original_country__short_slug"

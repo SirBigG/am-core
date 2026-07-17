@@ -84,7 +84,7 @@ class ContentSecurityPolicyPublicPageTests(TestCase):
         self.assert_report_only_csp(response)
 
     @override_settings(API_HOST="https://api.example.com")
-    @patch("core.news.views.requests.get")
+    @patch("core.news.client.requests.get")
     def test_news_list_page_has_report_only_csp_for_external_image_template(self, mocked_get):
         mocked_get.return_value.status_code = 200
         mocked_get.return_value.json.return_value = {
@@ -171,7 +171,7 @@ class ContentSecurityPolicyAuthenticatedPageTests(TestCase):
             defaults={"domain": "localhost:8000", "name": "localhost"},
         )
 
-        response = self.client.get("/admin/login/", {"next": "/admin/"}, HTTP_HOST="localhost:8000")
+        response = self.client.get("/admin/login/", {"next": "/admin/"}, headers={"host": "localhost:8000"})
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "admin/login.html")

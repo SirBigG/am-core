@@ -1,23 +1,39 @@
 {% load post_extras %}
-{% if posts %}
-    <section class="site-content-section site-random-posts">
+<section id="random-post-recommendations"
+         class="site-content-section site-random-posts"
+         aria-live="polite">
+    <div class="site-random-posts__header">
         <h2 class="site-content-section__title">Цікавинки на додачу</h2>
+        <button type="button"
+                class="site-random-posts__refresh"
+                aria-label="Показати інші випадкові публікації"
+                hx-get="{{ refresh_url }}"
+                hx-target="#random-post-recommendations"
+                hx-swap="outerHTML"
+                hx-disabled-elt="this">
+            <span aria-hidden="true">↻</span>
+            Інші варіанти
+        </button>
+    </div>
+    {% if posts %}
         <div class="site-random-posts__grid">
             {% for item in posts %}
                 <article class="site-random-posts__item">
                     <a href="{{ item.absolute_url }}" class="site-random-posts__link">
-                        {% if item.photo__image %}
-                            <img src="{{ item.photo__image }}"
+                        {% with primary_photo=item.primary_photo %}
+                            <img src="{% thumbnail primary_photo 200 150 %}"
                                  loading="lazy"
                                  class="site-random-posts__image"
                                  width="200"
                                  height="150"
                                  alt="Фото {{ item.title }}">
-                        {% endif %}
+                        {% endwith %}
                         <p class="site-random-posts__title">{{ item.title }}</p>
                     </a>
                 </article>
             {% endfor %}
         </div>
-    </section>
-{% endif %}
+    {% else %}
+        <p class="site-random-posts__empty">Зараз немає інших публікацій для показу.</p>
+    {% endif %}
+</section>

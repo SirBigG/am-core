@@ -1261,6 +1261,66 @@ span.flatpickr-weekday {
     border-bottom-color: #e4ece5 !important;
 }
 
+.site-random-posts__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+.site-random-posts__refresh {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0.45rem 0.8rem;
+    gap: 0.4rem;
+    color: #148543;
+    font-size: 0.88rem;
+    font-weight: 800;
+    line-height: 1.2;
+    background: #f3fbf3;
+    border: 1px solid #d4e8d6;
+    border-radius: 999px;
+}
+
+.site-random-posts__refresh:hover,
+.site-random-posts__refresh:focus {
+    color: #0b8043;
+    background: #e8f6e9;
+    border-color: #bcdcc2;
+}
+
+.site-random-posts__refresh:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.site-random-posts__loading,
+.site-random-posts__empty {
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.site-random-posts__empty {
+    margin: 0;
+}
+
+.site-random-posts__skeleton {
+    display: block;
+    min-height: 190px;
+    background: linear-gradient(110deg, #eef4ef 25%, #f8fbf8 45%, #eef4ef 65%);
+    background-size: 200% 100%;
+    border-radius: 12px;
+    animation: site-random-posts-loading 1.2s linear infinite;
+}
+
+@keyframes site-random-posts-loading {
+    to {
+        background-position-x: -200%;
+    }
+}
+
 .site-random-posts__grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1302,6 +1362,12 @@ span.flatpickr-weekday {
     font-weight: 750;
     line-height: 1.3;
     overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .site-random-posts__skeleton {
+        animation: none;
+    }
 }
 
 .site-table-scroll {
@@ -1352,6 +1418,39 @@ span.flatpickr-weekday {
     height: 260px;
     min-height: 0;
     object-fit: cover;
+}
+
+.site-list-card__media.site-list-card__media--logo {
+    display: grid;
+    min-height: 260px;
+    padding: 1.25rem;
+    place-items: center;
+    background: #f8faf8;
+}
+
+.site-list-card__image.site-list-card__image--logo {
+    height: 220px;
+    min-height: 0;
+    object-fit: contain;
+}
+
+.company-logo-frame {
+    display: grid;
+    min-height: 100px;
+    padding: 0.5rem;
+    place-items: center;
+    background: #f8faf8;
+    border: 1px solid #e1e8e2;
+    border-radius: 14px;
+}
+
+.company-logo-frame__image {
+    display: block;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 84px;
+    object-fit: contain;
 }
 
 .site-list-card__body {
@@ -2030,6 +2129,16 @@ span.flatpickr-weekday {
         min-height: 190px;
         aspect-ratio: 16 / 10;
         height: auto;
+    }
+
+    .site-list-card__media.site-list-card__media--logo {
+        min-height: 210px;
+    }
+
+    .site-list-card__image.site-list-card__image--logo {
+        height: 170px;
+        min-height: 0;
+        aspect-ratio: auto;
     }
 
     .site-list-card__actions,

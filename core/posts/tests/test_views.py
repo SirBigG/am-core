@@ -2,7 +2,10 @@ import json
 import re
 
 from django.core.cache import cache
+from django.db import connection
 from django.test import Client, RequestFactory, TestCase, override_settings
+from django.test.utils import CaptureQueriesContext
+from django.urls import reverse
 
 from core.posts.category_attributes import rebuild_post_attribute_values
 from core.posts.models import CategoryAttributeFieldType, SearchStatistic
@@ -18,6 +21,82 @@ from core.utils.tests.factories import (
 client = Client()
 
 request = RequestFactory()
+
+
+class RandomPostRecommendationTests(TestCase):
+    def setUp(self):
+        cache.clear()
+        self.posts = []
+        for index in range(10):
+            root = CategoryFactory(value=f"Root {index}")
+            rubric = CategoryFactory(parent=root, value=f"Rubric {index}")
+            post = PostFactory(rubric=rubric, title=f"Recommendation {index}")
+            PhotoFactory(post=post)
+            self.posts.append(post)
+        self.url = reverse("random-post-recommendations")
+
+    def test_fragment_returns_four_unique_imaged_posts_from_different_trees(self):
+        no_photo = PostFactory(title="No photo")
+        inactive = PostFactory(title="Inactive", status=False)
+        PhotoFactory(post=inactive)
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(
+                self.url,
+                {"current": self.posts[0].pk},
+                headers={"hx-request": "true"},
+            )
+
+        recommendations = response.context["posts"]
+        recommendation_ids = [post.pk for post in recommendations]
+        tree_ids = [post.rubric.tree_id for post in recommendations]
+        sql = " ".join(query["sql"] for query in queries)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "posts/random_posts.html")
+        self.assertEqual(len(recommendations), 4)
+        self.assertEqual(len(set(recommendation_ids)), 4)
+        self.assertEqual(len(set(tree_ids)), 4)
+        self.assertNotIn(self.posts[0].pk, recommendation_ids)
+        self.assertNotIn(no_photo.pk, recommendation_ids)
+        self.assertNotIn(inactive.pk, recommendation_ids)
+        self.assertNotIn("RANDOM()", sql.upper())
+        self.assertIn("no-store", response.headers["Cache-Control"])
+
+    def test_refresh_excludes_the_currently_visible_recommendations(self):
+        first_response = self.client.get(
+            self.url,
+            {"current": self.posts[0].pk},
+            headers={"hx-request": "true"},
+        )
+        first_ids = {post.pk for post in first_response.context["posts"]}
+
+        second_response = self.client.get(
+            first_response.context["refresh_url"],
+            headers={"hx-request": "true"},
+        )
+        second_ids = {post.pk for post in second_response.context["posts"]}
+
+        self.assertEqual(len(second_ids), 4)
+        self.assertTrue(first_ids.isdisjoint(second_ids))
+        self.assertNotIn(self.posts[0].pk, second_ids)
+        self.assertContains(second_response, 'hx-swap="outerHTML"', html=False)
+
+    def test_exclusion_parser_is_bounded_and_ignores_invalid_values(self):
+        excluded = [post.pk for post in self.posts[1:5]]
+
+        response = self.client.get(
+            self.url,
+            {
+                "current": f"invalid,{self.posts[0].pk}",
+                "exclude": f"invalid,-1,{','.join(str(post_id) for post_id in excluded)}",
+            },
+            headers={"hx-request": "true"},
+        )
+        recommendation_ids = {post.pk for post in response.context["posts"]}
+
+        self.assertNotIn(self.posts[0].pk, recommendation_ids)
+        self.assertTrue(recommendation_ids.isdisjoint(excluded))
 
 
 class MainPageTest(TestCase):
@@ -139,6 +218,18 @@ class PostListTests(TestCase):
         self.assertEqual(len(response.context["object_list"]), 3)
         self.assertEqual(response.context["category"], self.post.rubric)
 
+    def test_child_list_prefetches_primary_photos_without_n_plus_one_queries(self):
+        posts = [self.post, *PostFactory.create_batch(5, rubric=self.category)]
+        for post in posts:
+            PhotoFactory(post=post)
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(f"/{self.parent.slug}/{self.category.slug}/list/")
+
+        photo_queries = [query["sql"] for query in queries if 'FROM "photo"' in query["sql"]]
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(photo_queries), 1)
+
     def test_child_list_404(self):
         response = client.get("/%s/unknown/" % self.parent.slug)
         self.assertEqual(response.status_code, 404)
@@ -230,6 +321,25 @@ class PostDetailTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, "/gallery/add/")
         self.assertNotContains(response, "Додати фото до публікації")
+
+    def test_detail_loads_random_recommendations_asynchronously(self):
+        response = self.client.get(self.post.get_absolute_url())
+
+        recommendations_url = reverse("random-post-recommendations")
+        self.assertContains(response, f'hx-get="{recommendations_url}?current={self.post.pk}"', html=False)
+        self.assertContains(response, 'hx-trigger="load"', html=False)
+        self.assertContains(response, "posts/htmx.min.js", html=False)
+
+    def test_detail_prefetches_photos_once(self):
+        PhotoFactory.create_batch(3, post=self.post)
+        self.client.get(self.post.get_absolute_url())
+
+        with CaptureQueriesContext(connection) as queries:
+            response = self.client.get(self.post.get_absolute_url())
+
+        photo_queries = [query["sql"] for query in queries if 'FROM "photo"' in query["sql"]]
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(photo_queries), 1)
 
     def test_detail_renders_sources_as_rich_text(self):
         self.post.sources = "<p><strong>Джерело:</strong> довідник садівника</p>"

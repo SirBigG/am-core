@@ -1,6 +1,5 @@
 {% load cache %}
-{% load post_extras classifier_extras %}
-{% get_root_categories_links as categories_links %}
+{% load post_extras %}
 <header class="navbar navbar-expand-lg site-header">
     <div class="container">
         <a class="navbar-brand site-header__brand" href="{% url 'index' %}">Agro Mega</a>
@@ -23,7 +22,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        {% for category in categories_links %}
+                        {% for category in root_category_links %}
                             <li>
                                 <a class="dropdown-item site-header__dropdown-link"
                                    href="{{ category.url }}">{{ category.title }}</a>

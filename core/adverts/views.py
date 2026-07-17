@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.conf import settings
+from django.db.models import F
 from django.http.response import Http404, HttpResponseGone, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -114,8 +115,8 @@ class AdvertDetailView(DetailView):
     def get_object(self, queryset=None):
         obj = super().get_object(queryset)
         # increment views count
+        Advert.objects.filter(pk=obj.pk).update(views=F("views") + 1)
         obj.views += 1
-        obj.save(update_fields=["views"])
         return obj
 
 

@@ -69,6 +69,24 @@ class CompanyPublicViewTests(TestCase):
         self.assertTemplateUsed(response, "companies/list.html")
         self.assertEqual(list(response.context["companies"]), [self.company])
 
+    def test_company_list_uses_uncropped_logo_style(self):
+        self.company.logo = "companies/company-logo.png"
+        self.company.save(update_fields=["logo"])
+
+        response = self.client.get(reverse("companies:list"))
+
+        self.assertContains(response, "site-list-card__media--logo")
+        self.assertContains(response, "site-list-card__image--logo")
+
+    def test_company_detail_uses_uncropped_logo_style(self):
+        self.company.logo = "companies/company-logo.png"
+        self.company.save(update_fields=["logo"])
+
+        response = self.client.get(self.company.get_absolute_url())
+
+        self.assertContains(response, "company-logo-frame")
+        self.assertContains(response, "company-logo-frame__image")
+
     def test_company_detail_renders_products(self):
         product = Product.objects.create(
             company=self.company,

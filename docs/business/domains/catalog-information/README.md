@@ -24,6 +24,7 @@ Catalog information is the main knowledge area of the product. It contains struc
 - Integration post creation derives the publisher from the credential and never trusts a publisher supplied in the request body.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.
+- The global “Цікавинки на додачу” discovery block includes only active posts with images, prefers different broad category trees, excludes the page's current post, and avoids immediately repeating the four visible items when a visitor requests another set.
 - Registry spreadsheet refreshes should preserve existing variety records and update them in place by variety title plus registry category.
 - Active registry rows clear exclusion metadata when an existing variety is present in the active sheet.
 - Excluded registry rows mark matching varieties as excluded and store the registry end date/year.

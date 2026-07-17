@@ -3,6 +3,8 @@ import re
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import requests
+from django.core.cache import cache
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
@@ -18,7 +20,10 @@ class NewsResponse:
 
 @override_settings(API_HOST="https://api.example.com")
 class NewsListViewTests(TestCase):
-    @patch("core.news.views.requests.get")
+    def setUp(self):
+        cache.clear()
+
+    @patch("core.news.client.requests.get")
     def test_renders_news_list_from_api(self, mocked_get):
         mocked_get.return_value = NewsResponse(
             payload={
@@ -43,9 +48,9 @@ class NewsListViewTests(TestCase):
         self.assertTemplateUsed(response, "news/list.html")
         self.assertEqual(len(response.context["object_list"]), 1)
         self.assertTrue(response.context["page_obj"]["has_next"])
-        mocked_get.assert_called_once_with("https://api.example.com/news")
+        mocked_get.assert_called_once_with("https://api.example.com/news", timeout=(1.5, 3.0))
 
-    @patch("core.news.views.requests.get")
+    @patch("core.news.client.requests.get")
     def test_renders_empty_list_when_api_fails(self, mocked_get):
         mocked_get.return_value = NewsResponse(status_code=500)
 
@@ -54,10 +59,30 @@ class NewsListViewTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context["object_list"], [])
 
+    @patch("core.news.client.requests.get")
+    def test_reuses_cached_successful_response(self, mocked_get):
+        mocked_get.return_value = NewsResponse(payload={"items": [], "previous": None, "next": None})
+
+        self.client.get(reverse("news:news-list"))
+        self.client.get(reverse("news:news-list"))
+
+        mocked_get.assert_called_once()
+
+    @patch("core.news.client.requests.get", side_effect=requests.Timeout)
+    def test_renders_empty_list_when_api_times_out(self, mocked_get):
+        response = self.client.get(reverse("news:news-list"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["object_list"], [])
+        mocked_get.assert_called_once()
+
 
 @override_settings(API_HOST="https://api.example.com", HOST="https://example.com")
 class NewsDetailViewTests(TestCase):
-    @patch("core.news.views.requests.get")
+    def setUp(self):
+        cache.clear()
+
+    @patch("core.news.client.requests.get")
     def test_renders_news_detail_from_api(self, mocked_get):
         mocked_get.return_value = NewsResponse(
             payload={
@@ -84,9 +109,9 @@ class NewsDetailViewTests(TestCase):
         news_article = next(data for data in structured_data if data.get("@type") == "NewsArticle")
         self.assertEqual(news_article["headline"], "Market update")
         self.assertEqual(news_article["datePublished"], "2026-05-12")
-        mocked_get.assert_called_once_with("https://api.example.com/news/12")
+        mocked_get.assert_called_once_with("https://api.example.com/news/12", timeout=(1.5, 3.0))
 
-    @patch("core.news.views.requests.get")
+    @patch("core.news.client.requests.get")
     def test_returns_404_when_api_returns_not_found(self, mocked_get):
         mocked_get.return_value = SimpleNamespace(status_code=404)
 

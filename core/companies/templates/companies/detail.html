@@ -12,11 +12,13 @@
 {% endblock page_title %}
 {% block page_title_right %}
     {% if company.logo %}
-        <img src="{{ company.logo.url }}"
-             alt="{{ company.name }} logo"
-             class="img-fluid"
-             height="100"
-             width="150" />
+        <div class="company-logo-frame">
+            <img src="{{ company.logo.url }}"
+                 alt="{{ company.name }} logo"
+                 class="company-logo-frame__image"
+                 height="100"
+                 width="150" />
+        </div>
     {% endif %}
 {% endblock page_title_right %}
 {% block content %}

@@ -150,6 +150,7 @@ TEMPLATES = [
                 "social_django.context_processors.login_redirect",
                 "core.pro_auth.context_processors.forum",
                 "core.utils.context_processors.feature_flags",
+                "core.utils.context_processors.public_navigation",
             ],
         },
     },
@@ -394,6 +395,9 @@ CKEDITOR_CONFIGS = {
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
 
 API_HOST = os.getenv("API_HOST")
+NEWS_API_CONNECT_TIMEOUT = float(os.getenv("NEWS_API_CONNECT_TIMEOUT", "1.5"))
+NEWS_API_READ_TIMEOUT = float(os.getenv("NEWS_API_READ_TIMEOUT", "3"))
+NEWS_API_CACHE_TTL = int(os.getenv("NEWS_API_CACHE_TTL", "300"))
 
 # SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
