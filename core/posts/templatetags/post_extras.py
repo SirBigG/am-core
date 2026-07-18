@@ -8,6 +8,7 @@ from django.core.files.storage import storages
 from django.urls import reverse
 from django.utils.html import strip_tags
 from django.utils.safestring import mark_safe
+from lxml import etree, html
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
@@ -19,7 +20,72 @@ register = template.Library()
 
 
 def _json_ld(data):
-    return mark_safe(json.dumps(data, ensure_ascii=False, separators=(",", ":")))
+    payload = json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+    payload = payload.translate(
+        {
+            ord("<"): r"\u003C",
+            ord(">"): r"\u003E",
+            ord("&"): r"\u0026",
+        }
+    )
+    return mark_safe(payload)
+
+
+def _has_css_class(element, class_name):
+    return class_name in (element.get("class") or "").split()
+
+
+def _visible_text(element):
+    return " ".join(element.text_content().split())
+
+
+def _faq_entities(article_html):
+    if not article_html:
+        return []
+
+    try:
+        wrapper = html.fragment_fromstring(str(article_html), create_parent="div")
+    except etree.ParserError, TypeError, ValueError:
+        return []
+
+    blocks = wrapper.xpath(".//*[contains(concat(' ', normalize-space(@class), ' '), ' article-faq-item ')]")
+    entities = []
+    question_tags = {"p", "h1", "h2", "h3", "h4", "h5", "h6"}
+
+    for block in blocks:
+        has_faq_ancestor = any(_has_css_class(ancestor, "article-faq-item") for ancestor in block.iterancestors())
+        has_faq_descendant = bool(
+            block.xpath(".//*[contains(concat(' ', normalize-space(@class), ' '), ' article-faq-item ')]")
+        )
+        if has_faq_ancestor or has_faq_descendant:
+            continue
+
+        children = [child for child in block if isinstance(child.tag, str)]
+        if len(children) < 2 or children[0].tag.lower() not in question_tags:
+            continue
+
+        question = _visible_text(children[0])
+        answer = " ".join(filter(None, (_visible_text(child) for child in children[1:])))
+        if not question or not answer:
+            continue
+
+        entities.append(
+            {
+                "@type": "Question",
+                "name": question,
+                "acceptedAnswer": {"@type": "Answer", "text": answer},
+            }
+        )
+
+    return entities
+
+
+@register.simple_tag
+def faq_structured_data(article_html):
+    entities = _faq_entities(article_html)
+    if not entities:
+        return ""
+    return _json_ld({"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": entities})
 
 
 def _category_ancestors(category):

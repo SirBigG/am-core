@@ -350,6 +350,37 @@ class PostDetailTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "<strong>Джерело:</strong>", html=False)
 
+    def test_detail_renders_faq_structured_data_for_visible_faq_blocks(self):
+        self.post.text = """
+            <p>Article introduction.</p>
+            <div class="article-faq-item">
+                <p>Чи є це питанням?</p>
+                <p>Так, це видима відповідь.</p>
+            </div>
+        """
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        payloads = re.findall(rb'<script type="application/ld\+json">(.*?)</script>', response.content)
+        structured_data = [json.loads(payload) for payload in payloads]
+        faq_data = next(data for data in structured_data if data.get("@type") == "FAQPage")
+        self.assertEqual(faq_data["mainEntity"][0]["name"], "Чи є це питанням?")
+        self.assertEqual(
+            faq_data["mainEntity"][0]["acceptedAnswer"]["text"],
+            "Так, це видима відповідь.",
+        )
+
+    def test_detail_omits_faq_structured_data_without_complete_faq_blocks(self):
+        self.post.text = '<div class="article-faq-item"><p>Question without an answer?</p></div>'
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        payloads = re.findall(rb'<script type="application/ld\+json">(.*?)</script>', response.content)
+        structured_data = [json.loads(payload) for payload in payloads]
+        self.assertNotIn("FAQPage", {data.get("@type") for data in structured_data})
+
     def test_detail_prefers_post_meta_description(self):
         self.post.meta_description = "Purpose-written search description."
         self.post.text = "<p>Article text that should not become the description.</p>"

@@ -23,6 +23,8 @@
 {% block extra_meta %}
     <script type="application/ld+json">{% breadcrumb_structured_data category object.title %}</script>
     <script type="application/ld+json">{% article_structured_data object category main_photo_full_url publisher_name %}</script>
+    {% faq_structured_data object.text as faq_json_ld %}
+    {% if faq_json_ld %}<script type="application/ld+json">{{ faq_json_ld }}</script>{% endif %}
     <meta content=" {% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
           property="og:title">
     <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
