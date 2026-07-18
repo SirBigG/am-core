@@ -76,13 +76,15 @@
                                     data-bs-toggle="dropdown"
                                     data-bs-display="static"
                                     aria-expanded="false"
-                                    aria-haspopup="true">
+                                    aria-haspopup="true"
+                                    aria-label="Відкрити меню профілю">
                                 {% if request.user.avatar %}
-                                    <img src="{{ request.user.avatar.url }}"
+                                    <img src="{% imgproxy_url request.user.avatar.url 80 80 'fill' %}"
                                          alt=""
                                          class="rounded-circle"
                                          width="40"
-                                         height="40">
+                                         height="40"
+                                         decoding="async">
                                 {% else %}
                                     <svg width="40"
                                          height="40"

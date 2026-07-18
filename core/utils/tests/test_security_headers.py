@@ -28,6 +28,7 @@ class SecurityHeaderTests(SimpleTestCase):
         self.assertIn("default-src 'self'", policy)
         self.assertIn("script-src 'self' 'unsafe-inline'", policy)
         self.assertIn("style-src 'self' 'unsafe-inline'", policy)
+        self.assertIn("manifest-src 'self'", policy)
         self.assertIn("object-src 'none'", policy)
         self.assertIn("base-uri 'self'", policy)
         self.assertNotIn("report-uri", policy)
@@ -45,6 +46,7 @@ class SecurityHeaderTests(SimpleTestCase):
             self.assertIn("https://static.example.com", policy["script-src"])
             self.assertIn("https://static.example.com", policy["style-src"])
             self.assertIn("https://static.example.com", policy["font-src"])
+            self.assertIn("https://static.example.com", policy["manifest-src"])
         finally:
             importlib.reload(project_settings)
 

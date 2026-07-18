@@ -432,6 +432,7 @@ SECURE_CSP_REPORT_ONLY = {
     "style-src": ("'self'", "'unsafe-inline'") + CSP_STATIC_ORIGINS + CSP_STYLE_SRC_ORIGINS,
     "img-src": ("'self'", "data:", "https:", "http:"),
     "font-src": ("'self'", "data:") + CSP_STATIC_ORIGINS + CSP_FONT_SRC_ORIGINS,
+    "manifest-src": ("'self'",) + CSP_STATIC_ORIGINS,
     "connect-src": ("'self'",),
     "frame-src": ("'self'",) + CSP_FRAME_SRC_ORIGINS,
     "object-src": ("'none'",),

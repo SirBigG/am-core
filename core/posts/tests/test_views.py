@@ -16,6 +16,7 @@ from core.utils.tests.factories import (
     CategoryFactory,
     PhotoFactory,
     PostFactory,
+    UserFactory,
 )
 
 client = Client()
@@ -62,6 +63,8 @@ class RandomPostRecommendationTests(TestCase):
         self.assertNotIn(inactive.pk, recommendation_ids)
         self.assertNotIn("RANDOM()", sql.upper())
         self.assertIn("no-store", response.headers["Cache-Control"])
+        self.assertContains(response, "Інші варіанти")
+        self.assertNotContains(response, 'aria-label="Показати інші випадкові публікації"', html=False)
 
     def test_refresh_excludes_the_currently_visible_recommendations(self):
         first_response = self.client.get(
@@ -329,6 +332,21 @@ class PostDetailTests(TestCase):
         self.assertContains(response, f'hx-get="{recommendations_url}?current={self.post.pk}"', html=False)
         self.assertContains(response, 'hx-trigger="load"', html=False)
         self.assertContains(response, "posts/htmx.min.js", html=False)
+
+    def test_detail_defers_javascript_without_loading_fontawesome(self):
+        response = self.client.get(self.post.get_absolute_url())
+
+        self.assertContains(response, 'src="/static/posts/j-detail.js" defer', html=False)
+        self.assertNotContains(response, "posts/fontawesome/css/all.min.css", html=False)
+
+    def test_authenticated_detail_omits_unused_fontawesome_and_names_profile_menu(self):
+        self.client.force_login(UserFactory())
+
+        response = self.client.get(self.post.get_absolute_url())
+
+        self.assertNotContains(response, "posts/fontawesome/css/all.min.css", html=False)
+        self.assertContains(response, 'aria-label="Відкрити меню профілю"', html=False)
+        self.assertContains(response, 'class="site-footer__heading text-uppercase h5"', html=False)
 
     def test_detail_prefetches_photos_once(self):
         PhotoFactory.create_batch(3, post=self.post)

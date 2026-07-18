@@ -44,7 +44,8 @@
     <link rel="icon"
           sizes="192x192"
           href="{% static_push 'android-chrome-192x192.png' %}">
-    <link rel="stylesheet" href="{% static 'posts/fontawesome/css/all.css' %}">
+    {% block fontawesome %}
+    {% endblock fontawesome %}
     {# For extra meta tags#}
     {% block extra_meta %}
         <meta content="Агропортал України" property="og:title">

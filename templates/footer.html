@@ -1,3 +1,4 @@
+{% load post_extras %}
 <div id="bottom-mobile-menu"
      class="navbar bg-light fixed-bottom d-lg-none mt-3 border-top border-success mobile-bottom-nav">
     <div class="mobile-bottom-nav__item">
@@ -130,11 +131,12 @@
                     aria-label="Відкрити меню профілю">
                 <span class="mobile-bottom-nav__icon">
                     {% if request.user.avatar %}
-                        <img src="{{ request.user.avatar.url }}"
+                        <img src="{% imgproxy_url request.user.avatar.url 80 80 'fill' %}"
                              alt=""
                              class="rounded-circle"
                              width="40"
-                             height="40">
+                             height="40"
+                             decoding="async">
                     {% else %}
                         <svg width="40"
                              height="40"
@@ -157,80 +159,84 @@
     </div>
 </div>
 <div class="wrapper flex-grow-1"></div>
-<footer class="page-footer bg-light d-none d-lg-block border-top border-success">
+<footer class="page-footer site-footer bg-light d-none d-lg-block border-top border-success">
     <div class="container mt-4 mb-4">
         <div class="row">
             <div class="col-3 mx-auto">
-                <p class="font-weight-bold text-uppercase text-success h5">Про нас</p>
+                <p class="site-footer__heading text-uppercase h5">Про нас</p>
                 <ul class="list-unstyled">
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'about/' %}"
-                           class="no-decoration text-success">Про нас</a>
+                           class="site-footer__link no-decoration">Про нас</a>
                     </li>
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'privacy_policy/' %}"
-                           class="no-decoration text-success">Політика
+                           class="site-footer__link no-decoration">Політика
                         конфіденційності</a>
                     </li>
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'cookies_policy/' %}"
-                           class="no-decoration text-success">Політика cookies</a>
+                           class="site-footer__link no-decoration">Політика cookies</a>
                     </li>
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'terms/' %}"
-                           class="no-decoration text-success">Умови користування</a>
+                           class="site-footer__link no-decoration">Умови користування</a>
                     </li>
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'publication_rules/' %}"
-                           class="no-decoration text-success">Правила публікацій</a>
+                           class="site-footer__link no-decoration">Правила публікацій</a>
                     </li>
                     <li class="mb-1">
                         <a href="{% url 'django.contrib.flatpages.views.flatpage' 'adverts_rules/' %}"
-                           class="no-decoration text-success">Правила оголошень</a>
+                           class="site-footer__link no-decoration">Правила оголошень</a>
                     </li>
                     <li class="mb-1">
                         <button type="button" class="cookie-settings-link" data-cookie-settings-open>Налаштування cookies</button>
                     </li>
                     <li class="mb-1">
-                        <a href="{% url 'feedback-form' %}" class="no-decoration text-success">Зворотній зв'язок</a>
+                        <a href="{% url 'feedback-form' %}"
+                           class="site-footer__link no-decoration">Зворотній зв'язок</a>
                     </li>
                 </ul>
             </div>
             {#            <hr class="clearfix w-100 d-md-none">#}
             <div class="col-3 mx-auto">
-                <p class="font-weight-bold text-uppercase text-success h5">Почитати</p>
+                <p class="site-footer__heading text-uppercase h5">Почитати</p>
                 <ul class="list-unstyled">
                     <li class="mb-1">
-                        <a class="no-decoration text-success" href="{% url 'news:news-list' %}">Новини</a>
+                        <a class="site-footer__link no-decoration"
+                           href="{% url 'news:news-list' %}">Новини</a>
                     </li>
                     <li class="mb-1">
-                        <a class="no-decoration text-success" href="{% url 'adverts:list' %}">Оголошення</a>
+                        <a class="site-footer__link no-decoration"
+                           href="{% url 'adverts:list' %}">Оголошення</a>
                     </li>
                     <li class="mb-1">
-                        <a class="no-decoration text-success"
+                        <a class="site-footer__link no-decoration"
                            href="{% url 'events:event-list' %}">Події</a>
                     </li>
                     <li class="mb-1">
-                        <a class="no-decoration text-success" href="{% url 'companies:list' %}">Компанії</a>
+                        <a class="site-footer__link no-decoration"
+                           href="{% url 'companies:list' %}">Компанії</a>
                     </li>
                 </ul>
             </div>
             <div class="col-3 mx-auto">
-                <p class="font-weight-bold text-uppercase text-success h5">Категорії</p>
+                <p class="site-footer__heading text-uppercase h5">Категорії</p>
                 <ul class="list-unstyled">
                     <li class="mb-1">
-                        <a class="no-decoration text-success" href="{% url 'categories' %}">Всі категорії</a>
+                        <a class="site-footer__link no-decoration" href="{% url 'categories' %}">Всі категорії</a>
                     </li>
                     {% for category in root_category_links %}
                         <li class="mb-1">
-                            <a class="no-decoration text-success" href="{{ category.url }}">{{ category.title }}</a>
+                            <a class="site-footer__link no-decoration" href="{{ category.url }}">{{ category.title }}</a>
                         </li>
                     {% endfor %}
                 </ul>
             </div>
             {#            <hr class="clearfix w-100 d-md-none">#}
             <div class="col-3 mx-auto">
-                <p class="font-weight-bold text-uppercase text-success h5">Соцмережі</p>
+                <p class="site-footer__heading text-uppercase h5">Соцмережі</p>
                 <ul class="list-unstyled">
                     <li>
                         <a href="https://www.facebook.com/agromega.in.ua/"

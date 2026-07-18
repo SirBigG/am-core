@@ -56,14 +56,17 @@
             {% endif %}
             {% if oauth %}
                 {% block oauth %}
-                    <a class="mx-1 my-0 h4 github-color"
-                       href="{% url 'social:begin' 'github' %}?next={{ request.path }}"><i class="fa fa-github-square"></i></a>
-                    <a class="mx-1 my-0 h4 facebook-color"
-                       href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}"><i class="fa fa-facebook-square"></i></a>
-                    <a class="mx-1 my-0 h4 twitter-color"
-                       href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}"><i class="fa fa-twitter-square"></i></a>
-                    <a class="mx-1 my-0 h4 google-color"
-                       href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}"><i class="fa fa-google-plus-square"></i></a>
+                    <span class="comment-oauth-links"
+                          aria-label="Увійти через соціальну мережу">
+                        <a class="comment-oauth-link github-color"
+                           href="{% url 'social:begin' 'github' %}?next={{ request.path }}">GitHub</a>
+                        <a class="comment-oauth-link facebook-color"
+                           href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Facebook</a>
+                        <a class="comment-oauth-link twitter-color"
+                           href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Twitter</a>
+                        <a class="comment-oauth-link google-color"
+                           href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Google</a>
+                    </span>
                 {% endblock oauth %}
             {% endif %}
         </div>
