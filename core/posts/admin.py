@@ -234,7 +234,7 @@ class PostAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = [
-            ("Main data", {"fields": ("title", "text", "rubric", "country", "sources")}),
+            ("Main data", {"fields": ("title", "page_h1", "text", "rubric", "country", "sources")}),
             (None, {"fields": ("tags",)}),
         ]
         fieldsets.extend(self.get_category_attribute_fieldsets(request, obj))

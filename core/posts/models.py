@@ -62,7 +62,18 @@ class PostQuerySet(models.QuerySet):
 class Post(models.Model):
     """Posts model."""
 
-    title = models.CharField(max_length=500, verbose_name=_("post title"))
+    title = models.CharField(
+        max_length=500,
+        verbose_name=_("Назва у списках"),
+        help_text=_("Коротка назва для списків, карток, breadcrumbs, пошуку та slug."),
+    )
+    page_h1 = models.CharField(
+        max_length=500,
+        blank=True,
+        null=True,
+        verbose_name=_("H1 на сторінці публікації"),
+        help_text=_("Якщо поле заповнене, саме цей текст буде H1 на сторінці публікації."),
+    )
     text = RichTextField(verbose_name=_("post text"))
     slug = models.CharField(max_length=250, unique=True, verbose_name=_("transliteration value"))
     work_status = models.IntegerField(

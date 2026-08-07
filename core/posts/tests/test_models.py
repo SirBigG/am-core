@@ -25,6 +25,19 @@ class PostTests(TestCase):
         post = PostFactory(title="Тест автоідентифікатор", slug=None)
         self.assertEqual(post.slug, "test-avtoidentyfikator")
 
+    def test_title_and_page_h1_are_independent(self):
+        post = PostFactory(title="Назва у списках", page_h1="H1 сторінки")
+
+        post.title = "Оновлена назва у списках"
+        post.save()
+        post.refresh_from_db()
+        self.assertEqual(post.page_h1, "H1 сторінки")
+
+        post.page_h1 = "Оновлений H1 сторінки"
+        post.save()
+        post.refresh_from_db()
+        self.assertEqual(post.title, "Оновлена назва у списках")
+
 
 class PhotoTests(TestCase):
 

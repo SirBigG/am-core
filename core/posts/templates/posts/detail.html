@@ -47,11 +47,7 @@
     {% second_menu view.kwargs.parent category.slug %}
 {% endblock second_menu %}
 {% block page_title %}
-    {% if object.meta and object.meta.h1 %}
-        {{ object.meta.h1 }}
-    {% else %}
-        {{ object.title }}
-    {% endif %}
+    {% if object.page_h1 %}{{ object.page_h1 }}{% else %}{{ object.title }}{% endif %}
     {% if object.country %}
         <img alt="{{ object.country.value }}"
              src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"
@@ -77,11 +73,7 @@
             {% endif %}
             <div class="site-article-hero__breadcrumbs">{% breadcrumbs category object.title %}</div>
             <h1 class="site-article-hero__title">
-                {% if object.meta and object.meta.h1 %}
-                    {{ object.meta.h1 }}
-                {% else %}
-                    {{ object.title }}
-                {% endif %}
+                {% if object.page_h1 %}{{ object.page_h1 }}{% else %}{{ object.title }}{% endif %}
                 {% if object.country %}
                     <img alt="{{ object.country.value }}"
                          src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"
