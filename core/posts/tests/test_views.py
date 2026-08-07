@@ -7,6 +7,7 @@ from core.utils.tests.factories import (
     CategoryAttributeFieldFactory,
     CategoryAttributeGroupFactory,
     CategoryFactory,
+    MetaDataFactory,
     PhotoFactory,
     PostFactory,
 )
@@ -179,6 +180,28 @@ class PostDetailTests(TestCase):
         self.assertTemplateUsed(response, "posts/detail.html")
         self.assertIn("object", response.context)
         self.assertEqual(len(response.context["menu_items"]), 1)
+
+    def test_detail_uses_page_h1_for_article_heading(self):
+        self.post.page_h1 = "Повний H1 сторінки публікації"
+        self.post.meta = MetaDataFactory(h1="Старий metadata H1")
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Повний H1 сторінки публікації")
+        self.assertNotContains(response, "Старий metadata H1")
+
+    def test_detail_ignores_metadata_h1_and_falls_back_to_title(self):
+        self.post.title = "Назва у списках"
+        self.post.meta = MetaDataFactory(h1="Metadata H1")
+        self.post.save()
+
+        response = client.get(self.post.get_absolute_url())
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Назва у списках")
+        self.assertNotContains(response, "Metadata H1")
 
     def test_detail_does_not_show_add_photo_link(self):
         PhotoFactory(post=self.post)
