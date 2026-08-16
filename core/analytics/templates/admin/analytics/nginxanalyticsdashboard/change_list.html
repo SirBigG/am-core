@@ -1,0 +1,108 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+{% block extrastyle %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'posts/nginx-analytics.css' %}">
+{% endblock extrastyle %}
+{% block bodyclass %}{{ block.super }} app-analytics model-nginxanalyticsdashboard change-list{% endblock bodyclass %}
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">{% translate "Home" %}</a>
+        › {{ title }}
+    </div>
+{% endblock breadcrumbs %}
+{% block content %}
+    <div id="content-main" class="nginx-analytics">
+        <form method="get" class="module nginx-analytics__filters">
+            <label>
+                Start
+                <input type="date" name="start" value="{{ filters.start|date:'Y-m-d' }}">
+            </label>
+            <label>
+                End
+                <input type="date" name="end" value="{{ filters.end|date:'Y-m-d' }}">
+            </label>
+            <label>
+                Status
+                <select name="status">
+                    {% for value, label in status_choices %}
+                        <option value="{{ value }}"
+                                {% if filters.status == value %} selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </label>
+            <button type="submit">Apply</button>
+        </form>
+        {% if report_error %}
+            <p class="errornote">{{ report_error }}</p>
+        {% elif report %}
+            <div class="nginx-analytics__summary">
+                <div><strong>{{ report.access.total_requests }}</strong><span>requests</span></div>
+                <div><strong>{{ report.access.response_bytes|filesizeformat }}</strong><span>response data</span></div>
+                <div><strong>{{ report.errors.total }}</strong><span>NGINX errors</span></div>
+                <div><strong>{{ report.files_scanned }}</strong><span>files / {{ report.bytes_scanned|filesizeformat }}</span></div>
+            </div>
+            <p class="help">Scanned {{ report.lines_scanned }} lines / {{ report.decompressed_bytes|filesizeformat }} decompressed in {{ report.scan_seconds }}s. Malformed access lines: {{ report.access.malformed }}; malformed error lines: {{ report.errors.malformed }}; oversized lines: {{ report.oversized_lines }}; skipped high-cardinality values: {{ report.cardinality_limited }}.{% if report.truncated %} The configured {{ report.truncation_reason }} was reached; results are partial.{% endif %}</p>
+            <h2>Traffic</h2>
+            <div class="nginx-analytics__grid">
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Requests by day" rows=report.access.by_day %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Status classes" rows=report.access.status_classes %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Status codes" rows=report.access.statuses %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Methods" rows=report.access.methods %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Duration bands" rows=report.access.duration_bands %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Top paths" rows=report.access.paths %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Top referrers" rows=report.access.referrers %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="User agents" rows=report.access.user_agents %}
+            </div>
+            <section class="module">
+                <h2>Slowest paths</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Path</th>
+                            <th>Average</th>
+                            <th>Requests</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for path, average, count in report.access.slow_paths %}
+                            <tr>
+                                <td>{{ path }}</td>
+                                <td>{{ average }}s</td>
+                                <td>{{ count }}</td>
+                            </tr>
+                            {% empty %}<tr><td colspan="3">No access-log data in this range.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <h2>Errors</h2>
+            <div class="nginx-analytics__grid">
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Errors by day" rows=report.errors.by_day %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Severity" rows=report.errors.severities %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Category" rows=report.errors.categories %}
+                {% include "admin/analytics/nginxanalyticsdashboard/_counter.html" with title="Repeated messages" rows=report.errors.messages %}
+            </div>
+            <section class="module">
+                <h2>Recent sanitized errors</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Severity</th>
+                            <th>Message</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in report.errors.recent %}
+                            <tr>
+                                <td>{{ item.time|date:'Y-m-d H:i:s' }}</td>
+                                <td>{{ item.severity }}</td>
+                                <td>{{ item.message }}</td>
+                            </tr>
+                            {% empty %}<tr><td colspan="3">No error-log data in this range.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endif %}
+    </div>
+{% endblock content %}

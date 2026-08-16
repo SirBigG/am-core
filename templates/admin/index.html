@@ -14,6 +14,22 @@
 {% block content %}
     {% admin_dashboard_metrics as dashboard %}
     <div id="content-main" class="app-list">
+        {% if perms.analytics.view_nginx_analytics %}
+            <section class="admin-dashboard-summary"
+                     aria-labelledby="nginx-analytics-title">
+                <div class="admin-dashboard-summary__header">
+                    <h2 id="nginx-analytics-title">Operations</h2>
+                </div>
+                <div class="admin-dashboard-metrics">
+                    <a class="admin-dashboard-metric"
+                       href="{% url 'admin:analytics_nginxanalyticsdashboard_changelist' %}">
+                        <span class="admin-dashboard-metric__label">NGINX analytics</span>
+                        <strong class="admin-dashboard-metric__value">Logs</strong>
+                        <span class="admin-dashboard-metric__description">Private traffic and error report</span>
+                    </a>
+                </div>
+            </section>
+        {% endif %}
         {% if dashboard.cards %}
             <section class="admin-dashboard-summary"
                      aria-labelledby="admin-dashboard-summary-title">

@@ -1,0 +1,17 @@
+<section class="module nginx-analytics__counter">
+    <h2>{{ title }}</h2>
+    <table>
+        <tbody>
+            {% for label, count in rows %}
+                <tr>
+                    <th>{{ label }}</th>
+                    <td>{{ count }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>No data</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>

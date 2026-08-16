@@ -17,6 +17,7 @@ module.exports = {
     list: "./src/scss/list.scss",
     form: "./src/scss/form.scss",
     gallery: "./src/scss/gallery.scss",
+    "nginx-analytics": "./src/scss/nginx-analytics.scss",
     "j-index": "./src/js/index.js",
     "j-detail": "./src/js/detail.js",
     "j-gallery": "./src/js/gallery.js",

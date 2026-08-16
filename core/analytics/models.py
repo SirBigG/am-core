@@ -24,3 +24,14 @@ class Price(models.Model):
 
     def __str__(self):
         return f"{self.product} {self.price} {self.date}"
+
+
+class NginxAnalyticsDashboard(models.Model):
+    """Permission anchor for the file-backed admin report; no table exists."""
+
+    class Meta:
+        managed = False
+        default_permissions = ()
+        permissions = (("view_nginx_analytics", "Can view private NGINX analytics"),)
+        verbose_name = "NGINX analytics"
+        verbose_name_plural = "NGINX analytics"

@@ -144,6 +144,10 @@ forum-test:
 django-shell:
     {{manage}} shell --settings={{settings}}
 
+# Dump the Compose PostgreSQL database and upload it privately to DigitalOcean Spaces.
+backup-db-to-s3:
+    ./bin/backup-db-to-s3.sh
+
 # Open a Django shell with dev settings.
 dev-shell:
     {{manage}} shell --settings={{dev_settings}}
