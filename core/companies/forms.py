@@ -28,11 +28,24 @@ class ParserMapFormMixin(forms.ModelForm):
         required=False,
         widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
     )
+    parser_link_xpath = forms.CharField(
+        label=_("Product link XPath"),
+        help_text=_("Optional XPath selector for the canonical product URL."),
+        required=False,
+        widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
+    )
+    parser_snapshot_complete = forms.BooleanField(
+        label=_("Complete product snapshot"),
+        help_text=_("Enable only when this source URL returns the complete product catalog."),
+        required=False,
+    )
 
     parser_map_fields = {
         "parser_item_xpath": "item",
         "parser_name_xpath": "name",
         "parser_price_xpath": "price",
+        "parser_link_xpath": "link",
+        "parser_snapshot_complete": "snapshot_complete",
     }
 
     def __init__(self, *args, **kwargs):

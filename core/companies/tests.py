@@ -419,6 +419,8 @@ class CompanyAdminParserSafetyTests(TestCase):
         self.assertNotIn("parser_map", form.fields)
         self.assertEqual(form.fields["parser_name_xpath"].initial, "//article/h2/text()")
         self.assertEqual(form.fields["parser_price_xpath"].initial, "//article/span/text()")
+        self.assertEqual(form.fields["parser_link_xpath"].initial, "//article/a/@href")
+        self.assertFalse(form.fields["parser_snapshot_complete"].initial)
         self.assertEqual(form.fields["parser_name_xpath"].widget.attrs["rows"], 3)
 
     def test_link_form_saves_structured_parser_map_and_preserves_extra_keys(self):
@@ -436,6 +438,8 @@ class CompanyAdminParserSafetyTests(TestCase):
             "active": "on",
             "parser_name_xpath": "//article/h2/text()",
             "parser_price_xpath": "//article/span/text()",
+            "parser_link_xpath": "//article/a/@href",
+            "parser_snapshot_complete": "on",
         }
 
         form = LinkForm(data=data, instance=self.source)
@@ -448,6 +452,7 @@ class CompanyAdminParserSafetyTests(TestCase):
                 "link": "//article/a/@href",
                 "name": "//article/h2/text()",
                 "price": "//article/span/text()",
+                "snapshot_complete": True,
             },
         )
 
