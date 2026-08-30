@@ -411,6 +411,8 @@ class CompanyAdminParserSafetyTests(TestCase):
         self.source.parser_map = {
             "name": "//article/h2/text()",
             "price": "//article/span/text()",
+            "min_price": "//article/span[1]/text()",
+            "max_price": "//article/span[last()]/text()",
             "link": "//article/a/@href",
         }
 
@@ -419,6 +421,8 @@ class CompanyAdminParserSafetyTests(TestCase):
         self.assertNotIn("parser_map", form.fields)
         self.assertEqual(form.fields["parser_name_xpath"].initial, "//article/h2/text()")
         self.assertEqual(form.fields["parser_price_xpath"].initial, "//article/span/text()")
+        self.assertEqual(form.fields["parser_min_price_xpath"].initial, "//article/span[1]/text()")
+        self.assertEqual(form.fields["parser_max_price_xpath"].initial, "//article/span[last()]/text()")
         self.assertEqual(form.fields["parser_link_xpath"].initial, "//article/a/@href")
         self.assertFalse(form.fields["parser_snapshot_complete"].initial)
         self.assertEqual(form.fields["parser_name_xpath"].widget.attrs["rows"], 3)
@@ -438,6 +442,8 @@ class CompanyAdminParserSafetyTests(TestCase):
             "active": "on",
             "parser_name_xpath": "//article/h2/text()",
             "parser_price_xpath": "//article/span/text()",
+            "parser_min_price_xpath": "//article/span[1]/text()",
+            "parser_max_price_xpath": "//article/span[last()]/text()",
             "parser_link_xpath": "//article/a/@href",
             "parser_snapshot_complete": "on",
         }
@@ -452,6 +458,8 @@ class CompanyAdminParserSafetyTests(TestCase):
                 "link": "//article/a/@href",
                 "name": "//article/h2/text()",
                 "price": "//article/span/text()",
+                "min_price": "//article/span[1]/text()",
+                "max_price": "//article/span[last()]/text()",
                 "snapshot_complete": True,
             },
         )

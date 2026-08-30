@@ -28,6 +28,18 @@ class ParserMapFormMixin(forms.ModelForm):
         required=False,
         widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
     )
+    parser_min_price_xpath = forms.CharField(
+        label=_("Product minimum price XPath"),
+        help_text=_("Optional XPath selector for the lowest product or variation price."),
+        required=False,
+        widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
+    )
+    parser_max_price_xpath = forms.CharField(
+        label=_("Product maximum price XPath"),
+        help_text=_("Optional XPath selector for the highest product or variation price."),
+        required=False,
+        widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
+    )
     parser_link_xpath = forms.CharField(
         label=_("Product link XPath"),
         help_text=_("Optional XPath selector for the canonical product URL."),
@@ -44,6 +56,8 @@ class ParserMapFormMixin(forms.ModelForm):
         "parser_item_xpath": "item",
         "parser_name_xpath": "name",
         "parser_price_xpath": "price",
+        "parser_min_price_xpath": "min_price",
+        "parser_max_price_xpath": "max_price",
         "parser_link_xpath": "link",
         "parser_snapshot_complete": "snapshot_complete",
     }
