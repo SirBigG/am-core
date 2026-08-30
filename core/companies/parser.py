@@ -14,6 +14,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
 PARSER_CONFIG_KEYS = {"item", "snapshot_complete"}
+SOURCE_REQUEST_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (compatible; AgroMegaParser/1.0; +https://agromega.in.ua/)",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    "Accept-Language": "uk-UA,uk;q=0.9,en;q=0.7",
+}
 
 
 def extract_price(value):
@@ -123,7 +128,7 @@ def get_content_from_url(url):
     Returns:
     The content of the webpage as a string.
     """
-    response = requests.get(url, timeout=20)
+    response = requests.get(url, headers=SOURCE_REQUEST_HEADERS, timeout=20)
     if response.status_code != 200:
         raise ValueError(f"Failed to fetch content from {url}. Status code: {response.status_code}")
     return response.content.decode("utf-8")

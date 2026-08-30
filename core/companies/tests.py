@@ -16,7 +16,7 @@ from core.companies.admin import LinkAdmin
 from core.companies.forms import CompanyForm, LinkForm
 from core.companies.management.commands.run_local_parser_worker import ParserWorkerClient
 from core.companies.models import Company, CompanyType, Link, Product
-from core.companies.parser import create_firefox_driver, extract_price, parse_data_from_content
+from core.companies.parser import create_firefox_driver, extract_price, get_content_from_url, parse_data_from_content
 from core.utils.tests.factories import CategoryFactory, LocationFactory, PostFactory, UserFactory
 
 
@@ -36,6 +36,17 @@ class CompanyParserDriverTests(SimpleTestCase):
 
 
 class CompanyParserExtractionTests(SimpleTestCase):
+    @patch("core.companies.parser.requests.get")
+    def test_static_fetch_uses_source_friendly_request_headers(self, get):
+        get.return_value.status_code = 200
+        get.return_value.content = b"<html></html>"
+
+        get_content_from_url("https://shop.example/products")
+
+        headers = get.call_args.kwargs["headers"]
+        self.assertIn("AgroMegaParser", headers["User-Agent"])
+        self.assertTrue(headers["Accept-Language"].startswith("uk-UA"))
+
     def test_item_scoped_xpath_keeps_products_aligned_when_optional_price_is_missing(self):
         products = parse_data_from_content(
             (
