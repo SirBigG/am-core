@@ -163,6 +163,8 @@ class Product(models.Model):
     max_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     min_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     price_updated_at = models.DateTimeField(blank=True, null=True)
+    last_seen_at = models.DateTimeField(blank=True, null=True, db_index=True)
+    consecutive_missing_count = models.PositiveIntegerField(default=0)
     currency = models.CharField(choices=CurrencyChoices, default=CurrencyChoices.UAH, blank=True, null=True)
     auction_price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     auction_currency = models.CharField(choices=CurrencyChoices, default=CurrencyChoices.UAH, blank=True, null=True)
@@ -333,6 +335,9 @@ class ParserSourceAttempt(models.Model):
     crawl_status = models.PositiveIntegerField(blank=True, null=True)
     product_count = models.PositiveIntegerField(default=0)
     error = models.TextField(blank=True)
+    snapshot_complete = models.BooleanField(default=False)
+    parser_config_version = models.CharField(max_length=64, blank=True)
+    parser_config = models.JSONField(blank=True, null=True)
     created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -355,6 +360,7 @@ class ProductPriceHistory(models.Model):
     currency = models.CharField(choices=CurrencyChoices, default=CurrencyChoices.UAH, blank=True, null=True)
     observed_at = models.DateTimeField()
     raw_price = models.CharField(max_length=255, blank=True)
+    raw_data = models.JSONField(blank=True, null=True)
     worker_name = models.CharField(max_length=100, blank=True)
     created = models.DateTimeField(auto_now_add=True)
 
@@ -362,6 +368,10 @@ class ProductPriceHistory(models.Model):
         verbose_name = "Product price history"
         verbose_name_plural = "Product price history"
         ordering = ["-observed_at", "-created"]
+        indexes = [
+            models.Index(fields=["product", "-observed_at"], name="companies_price_product_obs"),
+            models.Index(fields=["source_link", "-observed_at"], name="companies_price_source_obs"),
+        ]
 
     def __str__(self):
         return f"{self.product} {self.price} {self.currency} {self.observed_at}"

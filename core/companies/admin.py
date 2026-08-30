@@ -37,7 +37,18 @@ class NullPostFilter(admin.SimpleListFilter):
 class ProductAdmin(admin.ModelAdmin):
     form = ProductForm
     autocomplete_fields = ["post"]
-    list_display = ("name", "post", "price", "price_updated_at", "description", "auction_price", "currency", "active")
+    list_display = (
+        "name",
+        "post",
+        "price",
+        "price_updated_at",
+        "last_seen_at",
+        "consecutive_missing_count",
+        "description",
+        "auction_price",
+        "currency",
+        "active",
+    )
     list_filter = (NullPostFilter, "active", "company", "source_link")
     list_editable = ("post", "auction_price", "price", "currency", "active")
     search_fields = ("name", "description", "post__title", "source_product_key", "link")
@@ -134,12 +145,21 @@ class ProductPriceHistoryAdmin(admin.ModelAdmin):
     )
     list_filter = ("currency", "source_link", "worker_name")
     search_fields = ("product__name", "source_link__url", "raw_price")
-    readonly_fields = ("created",)
+    readonly_fields = ("raw_data", "created")
 
 
 @admin.register(ParserSourceAttempt)
 class ParserSourceAttemptAdmin(admin.ModelAdmin):
-    list_display = ("source_link", "worker_name", "status", "crawl_status", "product_count", "created")
+    list_display = (
+        "source_link",
+        "worker_name",
+        "status",
+        "crawl_status",
+        "product_count",
+        "snapshot_complete",
+        "parser_config_version",
+        "created",
+    )
     list_filter = ("status", "worker_name", "source_link")
     search_fields = ("source_link__url", "worker_name", "error")
-    readonly_fields = ("created",)
+    readonly_fields = ("parser_config", "created")

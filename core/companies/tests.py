@@ -2,8 +2,9 @@ import os
 from datetime import timedelta
 from decimal import Decimal
 from io import StringIO
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
+import requests
 from django.contrib import admin
 from django.core.management import call_command
 from django.template import Context, Template
@@ -13,8 +14,9 @@ from django.utils import timezone
 
 from core.companies.admin import LinkAdmin
 from core.companies.forms import CompanyForm, LinkForm
+from core.companies.management.commands.run_local_parser_worker import ParserWorkerClient
 from core.companies.models import Company, CompanyType, Link, Product
-from core.companies.parser import create_firefox_driver
+from core.companies.parser import create_firefox_driver, extract_price, parse_data_from_content
 from core.utils.tests.factories import CategoryFactory, LocationFactory, PostFactory, UserFactory
 
 
@@ -31,6 +33,81 @@ class CompanyParserDriverTests(SimpleTestCase):
         service_class.assert_called_once_with(executable_path="/custom/geckodriver")
         self.assertEqual(firefox_class.call_args.kwargs["service"], service)
         self.assertEqual(driver, firefox_class.return_value)
+
+
+class CompanyParserExtractionTests(SimpleTestCase):
+    def test_item_scoped_xpath_keeps_products_aligned_when_optional_price_is_missing(self):
+        products = parse_data_from_content(
+            (
+                "<section>"
+                "<article><h2>Golden apple</h2><span>42,50 грн</span></article>"
+                "<article><h2>Gala apple</h2></article>"
+                "</section>"
+            ),
+            {"item": "//article", "name": ".//h2/text()", "price": ".//span/text()"},
+        )
+
+        self.assertEqual(
+            products,
+            [
+                {"name": "Golden apple", "price": 42.5},
+                {"name": "Gala apple", "price": None},
+            ],
+        )
+
+    def test_legacy_xpath_rejects_misaligned_nonempty_field_lists(self):
+        with self.assertRaisesRegex(ValueError, "result count mismatch"):
+            parse_data_from_content(
+                "<article><h2>A</h2><span>10</span></article><article><h2>B</h2></article>",
+                {"name": "//h2/text()", "price": "//span/text()"},
+            )
+
+    def test_price_parser_supports_spaces_and_decimal_comma(self):
+        self.assertEqual(extract_price("1 234,56 грн"), 1234.56)
+
+
+class ParserWorkerClientTests(SimpleTestCase):
+    def test_result_submission_retries_transport_failure_with_same_payload(self):
+        client = ParserWorkerClient("https://agromega.example", "token", timeout=10, submit_retries=1)
+        response = requests.Response()
+        response.status_code = 200
+        response._content = b'{"count": 1}'
+        response.url = "https://agromega.example/api/parser/sources/10/results/"
+        client.session.post = Mock(side_effect=[requests.ConnectionError("response lost"), response])
+
+        result = client.submit_results(
+            10,
+            "00000000-0000-0000-0000-000000000001",
+            [{"name": "Golden apple"}],
+            snapshot_complete=True,
+        )
+
+        self.assertEqual(result, {"count": 1})
+        self.assertEqual(client.session.post.call_count, 2)
+        first_payload = client.session.post.call_args_list[0].kwargs["json"]
+        second_payload = client.session.post.call_args_list[1].kwargs["json"]
+        self.assertEqual(first_payload, second_payload)
+
+    def test_failure_submission_retries_transport_failure_with_same_payload(self):
+        client = ParserWorkerClient("https://agromega.example", "token", timeout=10, submit_retries=1)
+        response = requests.Response()
+        response.status_code = 200
+        response._content = b'{"status": "recorded", "replayed": true}'
+        response.url = "https://agromega.example/api/parser/sources/10/failure/"
+        client.session.post = Mock(side_effect=[requests.ConnectionError("response lost"), response])
+
+        result = client.submit_failure(
+            10,
+            "00000000-0000-0000-0000-000000000001",
+            "Remote timeout",
+            status=503,
+        )
+
+        self.assertTrue(result["replayed"])
+        self.assertEqual(client.session.post.call_count, 2)
+        first_payload = client.session.post.call_args_list[0].kwargs["json"]
+        second_payload = client.session.post.call_args_list[1].kwargs["json"]
+        self.assertEqual(first_payload, second_payload)
 
 
 class CompanyPublicViewTests(TestCase):
@@ -523,3 +600,34 @@ class LocalParserWorkerCommandTests(SimpleTestCase):
         client.submit_results.assert_called_once()
         client.submit_failure.assert_not_called()
         self.assertIn("Could not confirm result submission", stderr.getvalue())
+
+    @patch("core.companies.management.commands.run_local_parser_worker.get_content_from_url")
+    @patch("core.companies.management.commands.run_local_parser_worker.ParserWorkerClient")
+    def test_worker_records_server_rejected_result_as_failure(self, client_class, get_content_from_url):
+        client = client_class.return_value
+        client.list_sources.return_value = [
+            {
+                "id": 13,
+                "url": "https://shop.example.com/apples",
+                "source_type": "static",
+                "parser_map": {
+                    "name": "//article/h2/text()",
+                    "price": "//article/span/text()",
+                    "snapshot_complete": True,
+                },
+            }
+        ]
+        client.lease.return_value = {"lease_token": "00000000-0000-0000-0000-000000000004"}
+        rejection_response = requests.Response()
+        rejection_response.status_code = 400
+        rejection_response._content = b'{"snapshot_complete":["A complete snapshot cannot be empty."]}'
+        rejection_response.url = "https://agromega.example/api/parser/sources/13/results/"
+        client.submit_results.side_effect = requests.HTTPError(response=rejection_response)
+        get_content_from_url.return_value = "<html><body>No products</body></html>"
+        stderr = StringIO()
+
+        call_command("run_local_parser_worker", "--token", "token-value", stderr=stderr)
+
+        client.submit_failure.assert_called_once()
+        self.assertEqual(client.submit_failure.call_args.kwargs["status"], 400)
+        self.assertIn("Recorded rejected result", stderr.getvalue())

@@ -1,6 +1,7 @@
 import os
 import re
 from concurrent.futures import ThreadPoolExecutor
+from decimal import Decimal, InvalidOperation
 from time import sleep
 
 import requests
@@ -12,10 +13,85 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
+PARSER_CONFIG_KEYS = {"item", "snapshot_complete"}
 
-def extract_price(s):
-    match = re.search(r"\d+\.?\d*", s)
-    return float(match.group()) if match else None
+
+def extract_price(value):
+    """Return a backward-compatible float normalized from common shop price
+    text."""
+    if value is None:
+        return None
+    compact = re.sub(r"[\s\u00a0\u202f]", "", str(value))
+    match = re.search(r"[-+]?\d[\d.,]*", compact)
+    if not match:
+        return None
+    number = match.group()
+    if "," in number and "." in number:
+        decimal_separator = "," if number.rfind(",") > number.rfind(".") else "."
+        thousands_separator = "." if decimal_separator == "," else ","
+        number = number.replace(thousands_separator, "").replace(decimal_separator, ".")
+    elif "," in number:
+        number = number.replace(",", ".")
+    try:
+        return float(Decimal(number))
+    except InvalidOperation:
+        return None
+
+
+def _xpath_value(value):
+    if hasattr(value, "text_content"):
+        value = value.text_content()
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="replace")
+    if isinstance(value, str):
+        return " ".join(value.split())
+    return value
+
+
+def _relative_xpath(xpath):
+    if xpath.startswith("//"):
+        return f".{xpath}"
+    return xpath
+
+
+def _parse_item_nodes(tree, data_xpaths, item_xpath):
+    parsed = []
+    for item_node in tree.xpath(item_xpath):
+        product = {}
+        for key, xpath in data_xpaths.items():
+            if key in PARSER_CONFIG_KEYS:
+                continue
+            values = item_node.xpath(_relative_xpath(xpath))
+            value = _xpath_value(values[0]) if values else None
+            product[key] = extract_price(value) if key in {"price", "min_price", "max_price"} else value
+        parsed.append(product)
+    return parsed
+
+
+def _parse_legacy_lists(tree, data_xpaths):
+    """Preserve legacy global XPath configs without silently misaligning
+    rows."""
+    extracted = {}
+    for key, xpath in data_xpaths.items():
+        if key in PARSER_CONFIG_KEYS:
+            continue
+        values = [_xpath_value(value) for value in tree.xpath(xpath)]
+        if key in {"price", "min_price", "max_price"}:
+            values = [extract_price(value) for value in values]
+        extracted[key] = values
+
+    name_count = len(extracted.get("name", []))
+    if not name_count:
+        return []
+    for key, values in extracted.items():
+        if values and len(values) != name_count:
+            raise ValueError(
+                f"Parser XPath result count mismatch: name returned {name_count}, {key} returned {len(values)}. "
+                "Configure an item XPath with relative field selectors to avoid incorrect product pairing."
+            )
+    return [
+        {key: values[index] if values else None for key, values in extracted.items()} for index in range(name_count)
+    ]
 
 
 def parse_data_from_content(html_content, data_xpaths):
@@ -29,25 +105,13 @@ def parse_data_from_content(html_content, data_xpaths):
     Returns:
     A dictionary with the same keys as data_xpaths, but the values are lists of extracted data.
     """
-
     # Parse the HTML
     tree = html.fromstring(html_content)
 
-    # Extract data based on XPaths
-    extracted_data = {}
-    for key, xpath in data_xpaths.items():
-        elements = tree.xpath(xpath)
-        # Store all found elements' texts (or attributes) in a list
-        extracted_data[key] = [element for element in elements] if elements else []
-        if key == "price":
-            extracted_data[key] = [extract_price(element) for element in extracted_data[key]]
-    # make list of objects with the same keys as data_xpaths
-    extracted_data = [dict(zip(extracted_data, t)) for t in zip(*extracted_data.values())]
-    for data in extracted_data:
-        for key, value in data.items():
-            if key == "name":
-                data[key] = value
-    return extracted_data
+    item_xpath = data_xpaths.get("item")
+    if item_xpath:
+        return _parse_item_nodes(tree, data_xpaths, item_xpath)
+    return _parse_legacy_lists(tree, data_xpaths)
 
 
 def get_content_from_url(url):

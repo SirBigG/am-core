@@ -327,6 +327,247 @@ class ParserWorkerAPITests(APITestCase):
         self.assertEqual(product.price_updated_at, price_updated_at)
         self.assertEqual(ProductPriceHistory.objects.filter(product=product).count(), 1)
 
+    def test_older_observation_is_kept_in_history_without_replacing_current_price(self):
+        current_time = timezone.now() - timedelta(hours=1)
+        product = Product.objects.create(
+            company=self.company,
+            category=self.category,
+            source_link=self.source,
+            source_product_key="https://shop.example.com/apples/golden",
+            name="Golden apple",
+            link="https://shop.example.com/apples/golden",
+            price=Decimal("45.00"),
+            price_updated_at=current_time,
+        )
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "products": [
+                    {
+                        "name": "Golden apple",
+                        "product_url": product.link,
+                        "price": "40.00",
+                        "observed_at": (current_time - timedelta(days=1)).isoformat(),
+                    }
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        product.refresh_from_db()
+        self.assertEqual(product.price, Decimal("45.00"))
+        self.assertEqual(product.price_updated_at, current_time)
+        self.assertTrue(ProductPriceHistory.objects.filter(product=product, price=Decimal("40.00")).exists())
+
+    @override_settings(PARSER_MAX_FUTURE_OBSERVATION_MINUTES=5)
+    def test_future_observation_is_rejected_without_consuming_lease(self):
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "products": [
+                    {
+                        "name": "Golden apple",
+                        "price": "42.50",
+                        "observed_at": (timezone.now() + timedelta(minutes=6)).isoformat(),
+                    }
+                ],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.source.refresh_from_db()
+        self.assertIsNotNone(self.source.lease_token)
+        self.assertFalse(Product.objects.exists())
+
+    @override_settings(PARSER_MAX_PRODUCTS_PER_RESULT=1)
+    def test_result_rejects_oversized_product_batch(self):
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "products": [{"name": "Golden apple"}, {"name": "Gala apple"}],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("products", response.data)
+        self.assertFalse(Product.objects.exists())
+
+    @override_settings(PARSER_MAX_RAW_PRODUCT_BYTES=10)
+    def test_result_rejects_oversized_raw_product_data(self):
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "products": [{"name": "Golden apple", "raw": {"html": "too much diagnostic data"}}],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Product.objects.exists())
+
+    def test_result_stores_raw_observation_and_parser_config_snapshot(self):
+        Link.objects.filter(pk=self.source.pk).update(
+            parser_config_version="apples-v2",
+            parser_map={"item": "//article", "name": ".//h2/text()", "price": ".//span/text()"},
+        )
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "worker_name": "spoofed-worker",
+                "parser_config_version": "worker-apples-v2",
+                "parser_config": {
+                    "item": "//article",
+                    "name": ".//h2/text()",
+                    "price": ".//span/text()",
+                },
+                "products": [{"name": "Golden apple", "price": "42.50", "raw": {"price": "42,50 грн"}}],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(ProductPriceHistory.objects.get().raw_data, {"price": "42,50 грн"})
+        attempt = ParserSourceAttempt.objects.get()
+        self.assertEqual(attempt.worker_name, "laptop-a")
+        self.assertEqual(attempt.parser_config_version, "worker-apples-v2")
+        self.assertEqual(attempt.parser_config["item"], "//article")
+
+    @override_settings(PARSER_MISSING_DEACTIVATION_THRESHOLD=2)
+    def test_only_complete_snapshots_age_missing_products_and_reappearance_reactivates(self):
+        product = Product.objects.create(
+            company=self.company,
+            category=self.category,
+            source_link=self.source,
+            source_product_key="golden apple",
+            name="Golden apple",
+        )
+
+        for complete in (False, True, True):
+            lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+            response = self.client.post(
+                f"/api/parser/sources/{self.source.id}/results/",
+                {
+                    "lease_token": lease_response.data["lease_token"],
+                    "snapshot_complete": complete,
+                    "products": [{"name": "Gala apple"}],
+                },
+                format="json",
+            )
+            self.assertEqual(response.status_code, 200)
+            Link.objects.filter(pk=self.source.pk).update(last_crawled=None)
+
+        product.refresh_from_db()
+        self.assertFalse(product.active)
+        self.assertEqual(product.consecutive_missing_count, 2)
+
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "products": [{"name": "Golden apple"}],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        product.refresh_from_db()
+        self.assertTrue(product.active)
+        self.assertEqual(product.consecutive_missing_count, 0)
+
+    def test_empty_complete_snapshot_is_rejected_without_aging_products_or_consuming_lease(self):
+        product = Product.objects.create(
+            company=self.company,
+            category=self.category,
+            source_link=self.source,
+            source_product_key="golden apple",
+            name="Golden apple",
+        )
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "snapshot_complete": True,
+                "products": [],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        product.refresh_from_db()
+        self.source.refresh_from_db()
+        self.assertTrue(product.active)
+        self.assertEqual(product.consecutive_missing_count, 0)
+        self.assertIsNotNone(self.source.lease_token)
+        self.assertFalse(ParserSourceAttempt.objects.exists())
+
+    @override_settings(PARSER_MIN_COMPLETE_SNAPSHOT_RATIO=0.5)
+    def test_sharply_reduced_complete_snapshot_is_rejected(self):
+        Product.objects.bulk_create(
+            [
+                Product(
+                    company=self.company,
+                    category=self.category,
+                    source_link=self.source,
+                    source_product_key=f"apple-{index}",
+                    name=f"Apple {index}",
+                )
+                for index in range(10)
+            ]
+        )
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/results/",
+            {
+                "lease_token": lease_response.data["lease_token"],
+                "snapshot_complete": True,
+                "products": [{"name": f"Apple {index}"} for index in range(4)],
+            },
+            format="json",
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("at least 5", str(response.data["snapshot_complete"]))
+        self.assertEqual(Product.objects.filter(active=True).count(), 10)
+        self.assertFalse(ParserSourceAttempt.objects.exists())
+
+    def test_successful_result_retry_is_idempotent_by_lease_token(self):
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+        payload = {
+            "lease_token": lease_response.data["lease_token"],
+            "products": [{"name": "Golden apple", "price": "42.50"}],
+        }
+
+        first_response = self.client.post(f"/api/parser/sources/{self.source.id}/results/", payload, format="json")
+        replay_response = self.client.post(f"/api/parser/sources/{self.source.id}/results/", payload, format="json")
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(replay_response.status_code, 200)
+        self.assertTrue(replay_response.data["replayed"])
+        self.assertEqual(Product.objects.count(), 1)
+        self.assertEqual(ProductPriceHistory.objects.count(), 1)
+
     def test_result_submission_rejects_invalid_lease(self):
         response = self.client.post(
             f"/api/parser/sources/{self.source.id}/results/",
@@ -363,3 +604,20 @@ class ParserWorkerAPITests(APITestCase):
         self.assertEqual(attempt.status, ParserSourceAttempt.STATUS_FAILURE)
         self.assertEqual(attempt.worker_name, "laptop-a")
         self.assertEqual(attempt.error, "Remote shop timed out")
+        self.assertEqual(attempt.parser_config, {"name": "//h1"})
+
+    def test_failure_submission_retry_is_idempotent_by_lease_token(self):
+        lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})
+        payload = {
+            "lease_token": lease_response.data["lease_token"],
+            "status": 503,
+            "error": "Remote shop timed out",
+        }
+
+        first_response = self.client.post(f"/api/parser/sources/{self.source.id}/failure/", payload, format="json")
+        replay_response = self.client.post(f"/api/parser/sources/{self.source.id}/failure/", payload, format="json")
+
+        self.assertEqual(first_response.status_code, 200)
+        self.assertEqual(replay_response.status_code, 200)
+        self.assertTrue(replay_response.data["replayed"])
+        self.assertEqual(ParserSourceAttempt.objects.filter(status=ParserSourceAttempt.STATUS_FAILURE).count(), 1)

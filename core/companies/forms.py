@@ -10,6 +10,12 @@ from .models import Company, Link, Product
 
 
 class ParserMapFormMixin(forms.ModelForm):
+    parser_item_xpath = forms.CharField(
+        label=_("Product item XPath"),
+        help_text=_("Optional container XPath. Field selectors are evaluated relative to every product item."),
+        required=False,
+        widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
+    )
     parser_name_xpath = forms.CharField(
         label=_("Product name XPath"),
         help_text=_("XPath selector for parsed product names."),
@@ -24,6 +30,7 @@ class ParserMapFormMixin(forms.ModelForm):
     )
 
     parser_map_fields = {
+        "parser_item_xpath": "item",
         "parser_name_xpath": "name",
         "parser_price_xpath": "price",
     }

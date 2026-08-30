@@ -15,9 +15,10 @@ from core.companies.parser import (
 
 
 class ParserWorkerClient:
-    def __init__(self, base_url, token, timeout):
+    def __init__(self, base_url, token, timeout, submit_retries=2):
         self.base_url = base_url.rstrip("/") + "/"
         self.timeout = timeout
+        self.submit_retries = max(0, submit_retries)
         self.session = requests.Session()
         self.session.headers.update({"Authorization": f"Token {token}"})
 
@@ -40,23 +41,68 @@ class ParserWorkerClient:
         response.raise_for_status()
         return response.json()
 
-    def submit_results(self, source_id, lease_token, products):
-        response = self.session.post(
-            self.url(f"api/parser/sources/{source_id}/results/"),
-            json={"lease_token": lease_token, "products": products},
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        return response.json()
+    def submit_results(
+        self,
+        source_id,
+        lease_token,
+        products,
+        snapshot_complete=False,
+        parser_config_version="",
+        parser_config=None,
+    ):
+        for attempt in range(self.submit_retries + 1):
+            try:
+                response = self.session.post(
+                    self.url(f"api/parser/sources/{source_id}/results/"),
+                    json={
+                        "lease_token": lease_token,
+                        "products": products,
+                        "snapshot_complete": snapshot_complete,
+                        "parser_config_version": parser_config_version,
+                        "parser_config": parser_config or {},
+                    },
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                return response.json()
+            except requests.HTTPError:
+                if response.status_code < 500 or attempt >= self.submit_retries:
+                    raise
+            except requests.RequestException:
+                if attempt >= self.submit_retries:
+                    raise
 
-    def submit_failure(self, source_id, lease_token, error, status=None):
-        response = self.session.post(
-            self.url(f"api/parser/sources/{source_id}/failure/"),
-            json={"lease_token": lease_token, "status": status, "error": str(error)[:2000]},
-            timeout=self.timeout,
-        )
-        response.raise_for_status()
-        return response.json()
+    def submit_failure(
+        self,
+        source_id,
+        lease_token,
+        error,
+        status=None,
+        parser_config_version="",
+        parser_config=None,
+    ):
+        payload = {
+            "lease_token": lease_token,
+            "status": status,
+            "error": str(error)[:2000],
+            "parser_config_version": parser_config_version,
+            "parser_config": parser_config or {},
+        }
+        for attempt in range(self.submit_retries + 1):
+            try:
+                response = self.session.post(
+                    self.url(f"api/parser/sources/{source_id}/failure/"),
+                    json=payload,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                return response.json()
+            except requests.HTTPError:
+                if response.status_code < 500 or attempt >= self.submit_retries:
+                    raise
+            except requests.RequestException:
+                if attempt >= self.submit_retries:
+                    raise
 
     def url(self, path):
         return urljoin(self.base_url, path)
@@ -73,13 +119,23 @@ class Command(BaseCommand):
         parser.add_argument("--limit", type=int, default=int(os.getenv("PARSER_WORKER_LIMIT", "5")))
         parser.add_argument("--lease-minutes", type=int, default=int(os.getenv("PARSER_WORKER_LEASE_MINUTES", "30")))
         parser.add_argument("--timeout", type=int, default=int(os.getenv("PARSER_WORKER_TIMEOUT", "30")))
+        parser.add_argument(
+            "--submit-retries",
+            type=int,
+            default=int(os.getenv("PARSER_WORKER_SUBMIT_RETRIES", "2")),
+        )
         parser.add_argument("--dry-run", action="store_true")
 
     def handle(self, *args, **options):
         if not options["token"]:
             raise CommandError("Provide --token or PARSER_WORKER_TOKEN.")
 
-        client = ParserWorkerClient(options["base_url"], options["token"], options["timeout"])
+        client = ParserWorkerClient(
+            options["base_url"],
+            options["token"],
+            options["timeout"],
+            options["submit_retries"],
+        )
         sources = client.list_sources(
             category=options["category"],
             experiment=options["experiment"],
@@ -103,12 +159,54 @@ class Command(BaseCommand):
                 try:
                     products, browser_driver = self.parse_source(source, browser_driver)
                 except Exception as exc:
-                    client.submit_failure(source["id"], lease["lease_token"], exc)
-                    self.stderr.write(f"Recorded failure for source {source['id']}: {exc}")
+                    try:
+                        client.submit_failure(
+                            source["id"],
+                            lease["lease_token"],
+                            exc,
+                            parser_config_version=source.get("parser_config_version") or "",
+                            parser_config=source.get("parser_map") or {},
+                        )
+                        self.stderr.write(f"Recorded failure for source {source['id']}: {exc}")
+                    except Exception as submit_exc:
+                        self.stderr.write(
+                            f"Could not confirm failure submission for source {source['id']}: {submit_exc}"
+                        )
                     continue
 
                 try:
-                    client.submit_results(source["id"], lease["lease_token"], products)
+                    client.submit_results(
+                        source["id"],
+                        lease["lease_token"],
+                        products,
+                        snapshot_complete=bool((source.get("parser_map") or {}).get("snapshot_complete", False)),
+                        parser_config_version=source.get("parser_config_version") or "",
+                        parser_config=source.get("parser_map") or {},
+                    )
+                except requests.HTTPError as exc:
+                    response = exc.response
+                    if response is not None and response.status_code == 400:
+                        rejection = f"Result rejected by server: {response.text[:1500]}"
+                        try:
+                            client.submit_failure(
+                                source["id"],
+                                lease["lease_token"],
+                                rejection,
+                                status=response.status_code,
+                                parser_config_version=source.get("parser_config_version") or "",
+                                parser_config=source.get("parser_map") or {},
+                            )
+                            self.stderr.write(f"Recorded rejected result for source {source['id']}.")
+                        except Exception as submit_exc:
+                            self.stderr.write(
+                                f"Could not confirm failure submission for source {source['id']}: {submit_exc}"
+                            )
+                        continue
+                    self.stderr.write(
+                        "Could not confirm result submission for source "
+                        f"{source['id']}; not recording parser failure because the server may have saved it: {exc}"
+                    )
+                    continue
                 except Exception as exc:
                     self.stderr.write(
                         "Could not confirm result submission for source "

@@ -114,6 +114,17 @@ class ParserSourceResultsView(ParserWorkerAPIView):
             serializer.is_valid(raise_exception=True)
             worker_name = self.worker_name(request, serializer)
             if not source.has_valid_lease(serializer.validated_data["lease_token"], worker_name):
+                completed_attempt = ParserSourceAttempt.objects.filter(
+                    source_link=source,
+                    worker_name=worker_name,
+                    lease_token=serializer.validated_data["lease_token"],
+                    status=ParserSourceAttempt.STATUS_SUCCESS,
+                ).first()
+                if completed_attempt:
+                    return Response(
+                        {"count": completed_attempt.product_count, "replayed": True},
+                        status=status.HTTP_200_OK,
+                    )
                 return Response({"detail": "Invalid or expired lease."}, status=status.HTTP_409_CONFLICT)
             products = serializer.save()
         return Response({"count": len(products)}, status=status.HTTP_200_OK)
@@ -127,6 +138,17 @@ class ParserSourceFailureView(ParserWorkerAPIView):
             serializer.is_valid(raise_exception=True)
             worker_name = self.worker_name(request, serializer)
             if not source.has_valid_lease(serializer.validated_data["lease_token"], worker_name):
+                completed_attempt = ParserSourceAttempt.objects.filter(
+                    source_link=source,
+                    worker_name=worker_name,
+                    lease_token=serializer.validated_data["lease_token"],
+                    status=ParserSourceAttempt.STATUS_FAILURE,
+                ).first()
+                if completed_attempt:
+                    return Response(
+                        {"status": "recorded", "replayed": True},
+                        status=status.HTTP_200_OK,
+                    )
                 return Response({"detail": "Invalid or expired lease."}, status=status.HTTP_409_CONFLICT)
 
             now = timezone.now()
@@ -153,5 +175,11 @@ class ParserSourceFailureView(ParserWorkerAPIView):
                 status=ParserSourceAttempt.STATUS_FAILURE,
                 crawl_status=source.last_crawl_status,
                 error=source.last_error,
+                parser_config_version=serializer.validated_data.get(
+                    "parser_config_version", source.parser_config_version
+                ),
+                parser_config=serializer.validated_data.get(
+                    "parser_config", source.parser_map or source.company.parser_map or {}
+                ),
             )
         return Response({"status": "recorded"}, status=status.HTTP_200_OK)

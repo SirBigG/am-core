@@ -27,6 +27,14 @@ Companies and shops represents organizations shown in AgroMega, including compan
 - Product prices have freshness semantics. Listing, category, search, and related-product blocks should only present prices as current when the latest accepted price observation is within the configured freshness window, currently 30 days.
 - Product and company detail pages may keep showing the product after the price becomes stale, but stale prices should not be presented as current.
 - Parsed product prices should keep observation history so admins can audit when a worker saw a price and from which parser source.
+- Parser ingestion is category-agnostic. Apples may be used as the first operational dataset, but shared company, source, product, price, geography, and API rules must work for every existing site and category without category-specific branches in the core models.
+- Parser workers may run on any trusted machine that can reach the authenticated API and the source websites. The server remains authoritative for source leases, accepted results, current public state, and audit history.
+- Existing parser configurations and worker payloads remain supported. Item-scoped XPath extraction is opt-in and should be preferred for new or repaired sources because it keeps optional fields attached to the correct product container.
+- A price observation is always retained when valid, but an older observation must not replace a newer current price. Observations too far in the future are rejected.
+- Product absence affects public availability only when a worker explicitly marks a successful result as a complete source snapshot. Partial or legacy results do not age missing products. A product is deactivated only after the configured number of consecutive complete-snapshot misses and is reactivated when seen again.
+- Empty complete snapshots and snapshots below the configured safe ratio of the source's active catalog are rejected before product state changes. This protects public availability when a shop changes its HTML or a parser selector stops matching.
+- Successful result submission is idempotent for the source lease token so a worker can safely retry after losing the HTTP response.
+- Failure submission is also idempotent for the source lease token so a worker can retry an uncertain failure receipt without duplicating audit attempts.
 
 ## States And Lifecycle
 
@@ -48,6 +56,7 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Who owns and edits company data?
 - Is there a verification process?
 - What public wording should be used for stale parsed prices beyond the first simple "needs update" message?
+- Which parser sources can truthfully claim complete snapshots, especially when a shop uses pagination or infinite scrolling?
 - Are shops separate entities from companies, or a type of company profile?
 - Which fields are required for a public company or shop listing?
 - Who is the final legal owner/contact for privacy and company data complaints?

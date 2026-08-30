@@ -75,7 +75,7 @@ class ProfileDashboardTests(TestCase):
         self.assertContains(response, "Створити оголошення")
         self.assertContains(response, "Мої щоденники")
         self.assertContains(response, "Мої рослини")
-        self.assertContains(response, "Перейти на форум через ваш AgroMega акаунт")
+        self.assertContains(response, "Перейти до спільноти через ваш AgroMega акаунт")
 
 
 # class PersonalIndexViewTests(TestCase):
@@ -98,7 +98,7 @@ class IsAuthenticateTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_no_authenticate(self):
-        response = self.client.get("/is-authenticate/", HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        response = self.client.get("/is-authenticate/", headers={"x-requested-with": "XMLHttpRequest"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("is_authenticate"), 0)
 
@@ -107,7 +107,7 @@ class IsAuthenticateTests(TestCase):
         user.set_password("12345")
         user.save()
         self.client.login(username=user.email, password="12345")
-        response = self.client.get("/is-authenticate/", HTTP_X_REQUESTED_WITH="XMLHttpRequest")
+        response = self.client.get("/is-authenticate/", headers={"x-requested-with": "XMLHttpRequest"})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json().get("is_authenticate"), 1)
 
