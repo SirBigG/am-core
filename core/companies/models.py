@@ -317,6 +317,7 @@ class Link(models.Model):
     class Meta:
         permissions = [
             ("use_parser_worker_api", "Can use parser worker API"),
+            ("run_parser_source_on_demand", "Can run parser sources on demand"),
         ]
 
 

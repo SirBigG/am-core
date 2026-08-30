@@ -2,6 +2,8 @@
 
 Trusted parser workers can run outside the AgroMega web host. They communicate only through the token-authenticated `/api/parser/` contract; public pages never depend on a worker being online.
 
+`parser_studio/` is the separately installed local desktop control surface in the parent `am-dev` workspace. It uses the same API contract and never connects directly to the Django database.
+
 ## Ownership And Compatibility
 
 - `am-core` owns parser source configuration, leases, accepted product state, price history, and parser-attempt audit records.
@@ -13,6 +15,22 @@ Trusted parser workers can run outside the AgroMega web host. They communicate o
 ## Worker Credential
 
 Create a dedicated active service user per machine, grant only `companies.use_parser_worker_api`, and create a DRF token. Keep the token outside git and pass it through `PARSER_WORKER_TOKEN` or `--token`. Revoking the token or permission stops that machine without affecting other workers.
+
+Parser Studio stores tokens through the operating-system keyring. Grant `companies.run_parser_source_on_demand` only to trusted interactive operators who may run a source before its normal crawl interval. This permission does not bypass an active lease or an inactive source.
+
+## Control And Catalog API
+
+The scheduled worker contract remains backward compatible: `GET /api/parser/sources/` returns only due sources by default. Interactive tools may use:
+
+- `GET /api/parser/sources/?scope=all` for the bounded source catalog;
+- `GET /api/parser/sources/<id>/` for source configuration and runtime state;
+- `GET /api/parser/companies/` and `GET /api/parser/categories/` for filter metadata;
+- `GET /api/parser/attempts/?source=<id>` for run audit history;
+- `GET /api/parser/products/?source=<id>` for accepted products;
+- `GET /api/parser/price-history/?source=<id>` for observations;
+- `POST /api/parser/sources/<id>/lease/` with `force=true` for authorized on-demand execution.
+
+Catalog, product, attempt, and history endpoints are read-only and bounded. The server remains authoritative for every lease and accepted state transition.
 
 ## Parser Map
 

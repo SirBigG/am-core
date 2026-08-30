@@ -82,6 +82,39 @@ class ParserWorkerAPITests(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data[0]["parser_map"], {"name": "//link/h2", "price": "//strong"})
 
+    def test_source_catalog_scope_all_includes_not_due_and_inactive_sources(self):
+        Link.objects.filter(pk=self.source.pk).update(last_crawled=timezone.now())
+        inactive_source = Link.objects.create(
+            url="https://shop.example.com/inactive",
+            company=self.company,
+            category=self.category,
+            active=False,
+        )
+
+        response = self.client.get("/api/parser/sources/?scope=all&limit=100")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual({item["id"] for item in response.data}, {self.source.id, inactive_source.id})
+
+    def test_source_detail_returns_runtime_and_parser_configuration(self):
+        response = self.client.get(f"/api/parser/sources/{self.source.id}/")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["id"], self.source.id)
+        self.assertEqual(response.data["company_name"], self.company.name)
+        self.assertEqual(response.data["parser_map"], {"name": "//h1"})
+        self.assertIn("is_due", response.data)
+        self.assertIn("lease_active", response.data)
+
+    def test_company_and_category_catalogs_are_paginated(self):
+        company_response = self.client.get("/api/parser/companies/")
+        category_response = self.client.get("/api/parser/categories/")
+
+        self.assertEqual(company_response.status_code, 200)
+        self.assertEqual(category_response.status_code, 200)
+        self.assertEqual(company_response.data["results"][0]["source_count"], 1)
+        self.assertEqual(category_response.data["results"][0]["id"], self.category.id)
+
     def test_source_list_returns_only_sources_due_for_crawl(self):
         Link.objects.filter(pk=self.source.pk).update(last_crawled=timezone.now(), crawl_interval_minutes=1440)
 
@@ -159,6 +192,8 @@ class ParserWorkerAPITests(APITestCase):
         self.assertEqual(response.data["detail"], "Source is not due for crawling.")
         self.source.refresh_from_db()
         self.assertIsNone(self.source.lease_token)
+        self.source.refresh_from_db()
+        self.assertIsNone(self.source.lease_token)
 
     def test_lease_rejects_source_crawled_less_than_one_day_ago(self):
         Link.objects.filter(pk=self.source.pk).update(
@@ -170,8 +205,30 @@ class ParserWorkerAPITests(APITestCase):
 
         self.assertEqual(response.status_code, 409)
         self.assertEqual(response.data["detail"], "Source is not due for crawling.")
+
+    def test_force_lease_requires_on_demand_permission_and_can_run_not_due_source(self):
+        Link.objects.filter(pk=self.source.pk).update(last_crawled=timezone.now())
+
+        forbidden_response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/lease/",
+            {"duration_minutes": 15, "force": True},
+        )
+
+        self.assertEqual(forbidden_response.status_code, 403)
+        permission = Permission.objects.get(
+            content_type=ContentType.objects.get_for_model(Link),
+            codename="run_parser_source_on_demand",
+        )
+        self.worker_user.user_permissions.add(permission)
+
+        response = self.client.post(
+            f"/api/parser/sources/{self.source.id}/lease/",
+            {"duration_minutes": 15, "force": True},
+        )
+
+        self.assertEqual(response.status_code, 200)
         self.source.refresh_from_db()
-        self.assertIsNone(self.source.lease_token)
+        self.assertEqual(self.source.leased_by, "laptop-a")
 
     def test_lease_rejects_source_deactivated_after_listing(self):
         Link.objects.filter(pk=self.source.pk).update(active=False)
@@ -280,6 +337,40 @@ class ParserWorkerAPITests(APITestCase):
             ).count(),
             2,
         )
+
+    def test_attempt_product_and_price_history_catalogs_filter_by_source(self):
+        product = Product.objects.create(
+            company=self.company,
+            category=self.category,
+            source_link=self.source,
+            source_product_key="golden",
+            name="Golden apple",
+            price=Decimal("42.50"),
+        )
+        ProductPriceHistory.objects.create(
+            product=product,
+            source_link=self.source,
+            price=Decimal("42.50"),
+            observed_at=timezone.now(),
+            worker_name="laptop-a",
+        )
+        ParserSourceAttempt.objects.create(
+            source_link=self.source,
+            worker_name="laptop-a",
+            status=ParserSourceAttempt.STATUS_SUCCESS,
+            product_count=1,
+        )
+
+        attempts = self.client.get(f"/api/parser/attempts/?source={self.source.id}")
+        products = self.client.get(f"/api/parser/products/?source={self.source.id}")
+        prices = self.client.get(f"/api/parser/price-history/?source={self.source.id}")
+
+        self.assertEqual(attempts.status_code, 200)
+        self.assertEqual(products.status_code, 200)
+        self.assertEqual(prices.status_code, 200)
+        self.assertEqual(attempts.data["results"][0]["product_count"], 1)
+        self.assertEqual(products.data["results"][0]["name"], "Golden apple")
+        self.assertEqual(prices.data["results"][0]["price"], "42.50")
 
     def test_result_submission_without_price_preserves_previous_price(self):
         lease_response = self.client.post(f"/api/parser/sources/{self.source.id}/lease/", {"duration_minutes": 15})

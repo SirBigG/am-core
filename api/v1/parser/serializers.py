@@ -7,7 +7,8 @@ from django.db.models import F
 from django.utils import timezone
 from rest_framework import serializers
 
-from core.companies.models import CurrencyChoices, Link, ParserSourceAttempt, Product, ProductPriceHistory
+from core.classifier.models import Category
+from core.companies.models import Company, CurrencyChoices, Link, ParserSourceAttempt, Product, ProductPriceHistory
 
 
 class ParserSourceSerializer(serializers.ModelSerializer):
@@ -16,9 +17,17 @@ class ParserSourceSerializer(serializers.ModelSerializer):
     category_id = serializers.IntegerField(read_only=True)
     category_slug = serializers.CharField(source="category.slug", read_only=True)
     parser_map = serializers.SerializerMethodField()
+    is_due = serializers.SerializerMethodField()
+    lease_active = serializers.SerializerMethodField()
 
     def get_parser_map(self, source):
         return source.parser_map or source.company.parser_map or {}
+
+    def get_is_due(self, source):
+        return source.is_due()
+
+    def get_lease_active(self, source):
+        return source.is_lease_active()
 
     class Meta:
         model = Link
@@ -40,6 +49,11 @@ class ParserSourceSerializer(serializers.ModelSerializer):
             "last_success_at",
             "last_error_at",
             "last_product_count",
+            "active",
+            "leased_by",
+            "leased_until",
+            "is_due",
+            "lease_active",
         )
 
 
@@ -47,16 +61,125 @@ class ParserSourceQuerySerializer(serializers.Serializer):
     category = serializers.CharField(required=False, allow_blank=True)
     experiment = serializers.CharField(required=False, allow_blank=True)
     limit = serializers.IntegerField(min_value=1, max_value=100, default=20)
+    scope = serializers.ChoiceField(choices=("due", "all"), default="due")
+    company = serializers.IntegerField(min_value=1, required=False)
+    active = serializers.BooleanField(required=False)
 
 
 class LeaseSerializer(serializers.Serializer):
     worker_name = serializers.CharField(max_length=100, required=False)
     duration_minutes = serializers.IntegerField(min_value=1, max_value=240, default=30)
+    force = serializers.BooleanField(default=False)
 
 
 class LeaseResponseSerializer(serializers.Serializer):
     lease_token = serializers.UUIDField()
     leased_until = serializers.DateTimeField()
+
+
+class ParserCompanySerializer(serializers.ModelSerializer):
+    location_name = serializers.CharField(source="location.value", read_only=True)
+    country_name = serializers.CharField(source="location.country.value", read_only=True)
+    region_name = serializers.CharField(source="location.region.value", read_only=True)
+    source_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Company
+        fields = (
+            "id",
+            "name",
+            "slug",
+            "type",
+            "website",
+            "active",
+            "location_name",
+            "country_name",
+            "region_name",
+            "latitude",
+            "longitude",
+            "source_count",
+        )
+
+
+class ParserCategorySerializer(serializers.ModelSerializer):
+    parent_id = serializers.IntegerField(read_only=True)
+    source_count = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Category
+        fields = ("id", "slug", "value", "parent_id", "is_active", "source_count")
+
+
+class ParserSourceAttemptSerializer(serializers.ModelSerializer):
+    source_url = serializers.CharField(source="source_link.url", read_only=True)
+
+    class Meta:
+        model = ParserSourceAttempt
+        fields = (
+            "id",
+            "source_link_id",
+            "source_url",
+            "worker_name",
+            "lease_token",
+            "status",
+            "crawl_status",
+            "product_count",
+            "error",
+            "snapshot_complete",
+            "parser_config_version",
+            "parser_config",
+            "created",
+        )
+
+
+class ParserProductSerializer(serializers.ModelSerializer):
+    company_name = serializers.CharField(source="company.name", read_only=True)
+    category_slug = serializers.CharField(source="category.slug", read_only=True)
+
+    class Meta:
+        model = Product
+        fields = (
+            "id",
+            "source_link_id",
+            "source_product_key",
+            "company_id",
+            "company_name",
+            "category_id",
+            "category_slug",
+            "name",
+            "description",
+            "link",
+            "active",
+            "price",
+            "min_price",
+            "max_price",
+            "currency",
+            "price_updated_at",
+            "last_seen_at",
+            "consecutive_missing_count",
+            "created",
+        )
+
+
+class ParserPriceHistorySerializer(serializers.ModelSerializer):
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
+    class Meta:
+        model = ProductPriceHistory
+        fields = (
+            "id",
+            "product_id",
+            "product_name",
+            "source_link_id",
+            "price",
+            "min_price",
+            "max_price",
+            "currency",
+            "observed_at",
+            "raw_price",
+            "worker_name",
+            "created",
+        )
 
 
 class ParsedProductSerializer(serializers.Serializer):
