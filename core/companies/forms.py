@@ -51,6 +51,19 @@ class ParserMapFormMixin(forms.ModelForm):
         help_text=_("Enable only when this source URL returns the complete product catalog."),
         required=False,
     )
+    parser_next_page_xpath = forms.CharField(
+        label=_("Next page XPath"),
+        help_text=_("Optional absolute XPath returning the next page href."),
+        required=False,
+        widget=Textarea(attrs={"cols": 100, "rows": 3, "style": "font-family: monospace; width: 90%;"}),
+    )
+    parser_max_pages = forms.IntegerField(
+        label=_("Maximum pages"),
+        help_text=_("Safety limit for pagination, between 1 and 50."),
+        required=False,
+        min_value=1,
+        max_value=50,
+    )
 
     parser_map_fields = {
         "parser_item_xpath": "item",
@@ -60,6 +73,8 @@ class ParserMapFormMixin(forms.ModelForm):
         "parser_max_price_xpath": "max_price",
         "parser_link_xpath": "link",
         "parser_snapshot_complete": "snapshot_complete",
+        "parser_next_page_xpath": "next_page",
+        "parser_max_pages": "max_pages",
     }
 
     def __init__(self, *args, **kwargs):

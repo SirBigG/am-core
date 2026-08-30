@@ -9,6 +9,7 @@ from django.utils import timezone
 from core.companies.parser import (
     create_firefox_driver,
     get_content_from_url,
+    get_next_page_url,
     parse_data_from_content,
     parse_link_with_js,
 )
@@ -238,8 +239,28 @@ class Command(BaseCommand):
             )
             _link, raw_products = parse_link_with_js(browser_driver, link)
         else:
-            content = get_content_from_url(source["url"])
-            raw_products = parse_data_from_content(content, parser_map)
+            raw_products = []
+            current_url = source["url"]
+            visited = set()
+            default_max_pages = 10 if parser_map.get("next_page") else 1
+            try:
+                max_pages = int(parser_map.get("max_pages") or default_max_pages)
+            except (TypeError, ValueError) as exc:
+                raise ValueError("Parser max_pages must be an integer.") from exc
+            if not 1 <= max_pages <= 50:
+                raise ValueError("Parser max_pages must be between 1 and 50.")
+            for page_number in range(max_pages):
+                if current_url in visited:
+                    raise ValueError(f"Pagination loop detected at {current_url}")
+                visited.add(current_url)
+                content = get_content_from_url(current_url)
+                raw_products.extend(parse_data_from_content(content, parser_map))
+                following_url = get_next_page_url(content, current_url, parser_map)
+                if not following_url:
+                    break
+                if page_number + 1 == max_pages:
+                    raise ValueError(f"Pagination exceeded configured max_pages={max_pages}.")
+                current_url = following_url
 
         return [
             self.normalize_product(product, source["url"]) for product in raw_products if product.get("name")

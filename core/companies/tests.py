@@ -14,6 +14,7 @@ from django.utils import timezone
 
 from core.companies.admin import LinkAdmin
 from core.companies.forms import CompanyForm, LinkForm
+from core.companies.management.commands.run_local_parser_worker import Command as LocalParserWorkerCommand
 from core.companies.management.commands.run_local_parser_worker import ParserWorkerClient
 from core.companies.models import Company, CompanyType, Link, Product
 from core.companies.parser import create_firefox_driver, extract_price, get_content_from_url, parse_data_from_content
@@ -414,6 +415,8 @@ class CompanyAdminParserSafetyTests(TestCase):
             "min_price": "//article/span[1]/text()",
             "max_price": "//article/span[last()]/text()",
             "link": "//article/a/@href",
+            "max_pages": 3,
+            "next_page": "//a[@rel='next']/@href",
         }
 
         form = LinkForm(instance=self.source)
@@ -425,6 +428,8 @@ class CompanyAdminParserSafetyTests(TestCase):
         self.assertEqual(form.fields["parser_max_price_xpath"].initial, "//article/span[last()]/text()")
         self.assertEqual(form.fields["parser_link_xpath"].initial, "//article/a/@href")
         self.assertFalse(form.fields["parser_snapshot_complete"].initial)
+        self.assertEqual(form.fields["parser_next_page_xpath"].initial, "//a[@rel='next']/@href")
+        self.assertEqual(form.fields["parser_max_pages"].initial, 3)
         self.assertEqual(form.fields["parser_name_xpath"].widget.attrs["rows"], 3)
 
     def test_link_form_saves_structured_parser_map_and_preserves_extra_keys(self):
@@ -446,6 +451,8 @@ class CompanyAdminParserSafetyTests(TestCase):
             "parser_max_price_xpath": "//article/span[last()]/text()",
             "parser_link_xpath": "//article/a/@href",
             "parser_snapshot_complete": "on",
+            "parser_next_page_xpath": "//a[@rel='next']/@href",
+            "parser_max_pages": "3",
         }
 
         form = LinkForm(data=data, instance=self.source)
@@ -461,6 +468,8 @@ class CompanyAdminParserSafetyTests(TestCase):
                 "min_price": "//article/span[1]/text()",
                 "max_price": "//article/span[last()]/text()",
                 "snapshot_complete": True,
+                "next_page": "//a[@rel='next']/@href",
+                "max_pages": 3,
             },
         )
 
@@ -535,6 +544,33 @@ class CompanyAdminParserSafetyTests(TestCase):
 
 
 class LocalParserWorkerCommandTests(SimpleTestCase):
+    @patch("core.companies.management.commands.run_local_parser_worker.get_content_from_url")
+    def test_static_source_follows_configured_pagination(self, get_content):
+        get_content.side_effect = [
+            '<article><h2>Golden</h2></article><a rel="next" href="/apples/page/2">Next</a>',
+            "<article><h2>Gala</h2></article>",
+        ]
+        source = {
+            "id": 10,
+            "url": "https://shop.example.com/apples",
+            "source_type": "static",
+            "parser_map": {
+                "item": "//article",
+                "name": ".//h2/text()",
+                "next_page": "//a[@rel='next']/@href",
+                "max_pages": 3,
+            },
+        }
+
+        products, driver = LocalParserWorkerCommand().parse_source(source)
+
+        self.assertIsNone(driver)
+        self.assertEqual([product["name"] for product in products], ["Golden", "Gala"])
+        self.assertEqual(
+            [call.args[0] for call in get_content.call_args_list],
+            ["https://shop.example.com/apples", "https://shop.example.com/apples/page/2"],
+        )
+
     @patch("core.companies.management.commands.run_local_parser_worker.get_content_from_url")
     @patch("core.companies.management.commands.run_local_parser_worker.ParserWorkerClient")
     def test_worker_leases_static_source_and_submits_results(self, client_class, get_content_from_url):

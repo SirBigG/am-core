@@ -42,11 +42,15 @@ Preferred item-scoped configuration:
   "name": ".//h2/text()",
   "price": ".//*[contains(@class, 'price')]/text()",
   "link": ".//a/@href",
+  "next_page": "//a[contains(@class, 'next')]/@href",
+  "max_pages": 10,
   "snapshot_complete": true
 }
 ```
 
 `item` is the product container XPath. Other selectors are evaluated relative to each container. `snapshot_complete` should be `true` only when the worker result covers every offer represented by the source, including all required pages or scrolling.
+
+`next_page` is an optional absolute XPath that returns the next page URL. Both Parser Studio and the bundled CLI worker follow it until it disappears. `max_pages` is a required operational safety bound when pagination is configured; it must be between 1 and 50, and reaching the bound while another page still exists fails the run rather than accepting an incomplete snapshot.
 
 Legacy maps without `item` still evaluate global field lists. If non-empty field lists return different counts, the worker stops and records a failure instead of risking incorrect product/price pairing.
 

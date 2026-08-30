@@ -3,6 +3,7 @@ import re
 from concurrent.futures import ThreadPoolExecutor
 from decimal import Decimal, InvalidOperation
 from time import sleep
+from urllib.parse import urljoin
 
 import requests
 from django.utils import timezone
@@ -13,7 +14,7 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-PARSER_CONFIG_KEYS = {"item", "snapshot_complete"}
+PARSER_CONFIG_KEYS = {"item", "max_pages", "next_page", "snapshot_complete"}
 SOURCE_REQUEST_HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; AgroMegaParser/1.0; +https://agromega.in.ua/)",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
@@ -117,6 +118,16 @@ def parse_data_from_content(html_content, data_xpaths):
     if item_xpath:
         return _parse_item_nodes(tree, data_xpaths, item_xpath)
     return _parse_legacy_lists(tree, data_xpaths)
+
+
+def get_next_page_url(html_content, current_url, data_xpaths):
+    """Return the next catalog page URL configured by an XPath."""
+    xpath = data_xpaths.get("next_page")
+    if not xpath:
+        return None
+    values = html.fromstring(html_content).xpath(xpath)
+    value = _xpath_value(values[0]) if values else None
+    return urljoin(current_url, value) if value else None
 
 
 def get_content_from_url(url):
