@@ -5,6 +5,12 @@ from oauth2_provider.oauth2_validators import OAuth2Validator
 
 
 class ForumOIDCValidator(OAuth2Validator):
+    oidc_claim_scope = {
+        **OAuth2Validator.oidc_claim_scope,
+        "is_staff": "profile",
+        "is_superuser": "profile",
+    }
+
     def get_additional_claims(self):
         return {
             "email": lambda request: request.user.email or "",
