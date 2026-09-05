@@ -319,8 +319,8 @@ class PostDetailTests(TestCase):
         self.assertIn("object", response.context)
         self.assertEqual(len(response.context["menu_items"]), 1)
 
-    def test_detail_uses_page_h1_for_article_heading(self):
-        self.post.page_h1 = "Повний H1 сторінки публікації"
+    def test_detail_uses_meta_title_for_article_heading(self):
+        self.post.meta_title = "Повний H1 сторінки публікації"
         self.post.meta = MetaDataFactory(h1="Старий metadata H1")
         self.post.save()
 
@@ -359,7 +359,7 @@ class PostDetailTests(TestCase):
     def test_detail_defers_javascript_without_loading_fontawesome(self):
         response = self.client.get(self.post.get_absolute_url())
 
-        self.assertContains(response, 'src="/static/posts/j-detail.js" defer', html=False)
+        self.assertRegex(response.content.decode(), r'<script src="/static/posts/j-detail\.js(?:\?[^"]*)?"\s+defer>')
         self.assertNotContains(response, "posts/fontawesome/css/all.min.css", html=False)
 
     def test_authenticated_detail_omits_unused_fontawesome_and_names_profile_menu(self):

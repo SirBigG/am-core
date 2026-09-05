@@ -45,6 +45,7 @@ class AdminPostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = "__all__"
+        widgets = {"meta_description": forms.Textarea(attrs={"rows": 3, "cols": 70})}
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -234,13 +235,19 @@ class PostAdmin(admin.ModelAdmin):
 
     def get_fieldsets(self, request, obj=None):
         fieldsets = [
-            ("Main data", {"fields": ("title", "page_h1", "text", "rubric", "country", "sources")}),
+            ("Main data", {"fields": ("title", "text", "rubric", "country", "sources")}),
             (None, {"fields": ("tags",)}),
         ]
         fieldsets.extend(self.get_category_attribute_fieldsets(request, obj))
         fieldsets.extend(
             [
-                ("Metadata", {"fields": ("meta", "meta_description")}),
+                (
+                    "Метадані публікації",
+                    {
+                        "fields": ("meta_title", "meta_description"),
+                        "description": "Необов’язкові поля. Мета-заголовок використовується також як H1. Порожні поля автоматично використовують канонічну назву та уривок тексту.",
+                    },
+                ),
                 (
                     "Stored category attributes",
                     {

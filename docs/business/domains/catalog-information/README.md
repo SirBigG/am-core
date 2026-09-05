@@ -71,3 +71,18 @@ and analytics consent. Existing usefulness feedback remains visible to editors
 in admin; its historical anonymous deduplication is not a unique-voter count.
 See the [implementation and verification note](../../../engineering/testing/2026-09-05-publication-actions.md)
 for the exact identity relation and existing limitations.
+
+## Publication metadata
+
+The canonical `title` names the cultivar, breed or other catalog entity and stays
+in cards, breadcrumbs, matching and Agromarket. Optional direct `meta_title`
+replaces the former `page_h1` and supplies both page title and H1, as well as social
+and Article metadata. Optional `meta_description` supplies all description tags.
+Empty fields independently fall back to the canonical title or a short plain-text
+article excerpt. Editors configure these fields in “Метадані публікації”.
+
+The content API reads and writes both fields and returns `resolved_metadata` for
+integrations. Existing ownership and staff-update permissions remain unchanged.
+Legacy related metadata is retained only as a migration archive and never used as
+a fallback after an editor clears a direct field. See the
+[API and migration contract](../../../engineering/api/publication-metadata.md).

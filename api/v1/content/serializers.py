@@ -1,6 +1,7 @@
 from rest_framework import serializers
 
 from core.classifier.models import Category, Country
+from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post
 
 
@@ -52,6 +53,7 @@ class ContentPostSerializer(serializers.ModelSerializer):
     photos = PostPhotoSerializer(source="photo", many=True, read_only=True)
     tags = serializers.SlugRelatedField(many=True, read_only=True, slug_field="name")
     url = serializers.CharField(source="absolute_url", read_only=True)
+    resolved_metadata = serializers.SerializerMethodField()
 
     class Meta:
         model = Post
@@ -72,6 +74,8 @@ class ContentPostSerializer(serializers.ModelSerializer):
             "rubric",
             "country",
             "meta_description",
+            "meta_title",
+            "resolved_metadata",
             "url",
             "tags",
             "category_attributes",
@@ -88,3 +92,6 @@ class ContentPostSerializer(serializers.ModelSerializer):
         data["rubric"] = PostCategorySerializer(instance.rubric).data
         data["country"] = PostCountrySerializer(instance.country).data if instance.country else None
         return data
+
+    def get_resolved_metadata(self, instance):
+        return resolve_publication_metadata(instance)

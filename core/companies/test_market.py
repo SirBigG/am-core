@@ -193,7 +193,7 @@ class MarketTests(TestCase):
         for title in ("Мікадо (Mikado)", "Гала", '<script>"Довга назва"</script>'):
             with self.subTest(title=title):
                 self.post.title = title
-                self.post.page_h1 = "SEO heading must not supply the market name"
+                self.post.meta_title = "SEO heading must not supply the market name"
                 with self.assertNumQueries(1):
                     context = publication_market_context(self.post)
                 self.assertTrue(context["can_show"])
@@ -203,7 +203,7 @@ class MarketTests(TestCase):
                 html = render_to_string("companies/publication_market_link.html", context)
                 self.assertIn(context["market_url"], html)
                 self.assertNotIn("<script>", html)
-                self.assertNotIn(self.post.page_h1, html)
+                self.assertNotIn(self.post.meta_title, html)
                 self.assertNotIn("nofollow", html)
                 self.assertNotIn("target=", html)
 

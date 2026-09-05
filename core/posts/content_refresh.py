@@ -16,6 +16,7 @@ CHECKSUM_FIELDS = (
     "rubric",
     "country",
     "meta_description",
+    "meta_title",
     "category_attributes",
 )
 

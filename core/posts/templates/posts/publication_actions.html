@@ -2,7 +2,7 @@
 <section class="publication-actions"
          data-publication-actions
          data-post-id="{{ object.pk }}"
-         data-title="{{ object.title }}"
+         data-title="{{ publication_metadata.title }}"
          data-vote-url="{% url 'api-post-useful' %}"
          data-vote-success="{% translate 'Дякуємо за відгук!' %}"
          data-vote-error="{% translate 'Не вдалося зберегти голос. Спробуйте ще раз.' %}"

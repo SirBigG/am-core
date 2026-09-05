@@ -21,9 +21,10 @@ from core.classifier.models import Category
 from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
+from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.recommendations import get_random_recommendations
-from core.posts.templatetags.post_extras import full_url
+from core.posts.templatetags.post_extras import default_og_image, full_url
 from core.registry.models import Variety
 from core.utils.rotating import get_rotating_ids, order_by_id_list
 
@@ -221,7 +222,7 @@ class PostDetail(DetailView):
     template_name = "posts/detail.html"
 
     def get_queryset(self):
-        return Post.objects.select_objects().select_related("publisher", "meta")
+        return Post.objects.select_objects().select_related("publisher")
 
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""
@@ -237,6 +238,9 @@ class PostDetail(DetailView):
         context["photo_count"] = context["object"].public_photo_count
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
+        context["publication_metadata"] = resolve_publication_metadata(context["object"])
+        context["publication_image_url"] = context.get("main_photo_full_url") or default_og_image()
+        context["publication_canonical_url"] = full_url(context["object"].get_absolute_url())
         context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
         context["publication_market"] = publication_market_context(
             context["object"], context["registry_variety_exists"]

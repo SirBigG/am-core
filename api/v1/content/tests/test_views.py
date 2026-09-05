@@ -177,3 +177,91 @@ class ContentPostTests(ContentApiTestCase):
         self.assertEqual(patch_response.status_code, 403)
         post.refresh_from_db()
         self.assertNotEqual(post.title, "Not allowed")
+
+    def test_creates_optional_metadata_and_returns_resolved_values(self):
+        self.authenticate()
+        for fields in ({}, {"meta_title": "Заголовок сторінки", "meta_description": "Опис сторінки"}):
+            response = self.client.post(
+                "/api/content/posts/",
+                {
+                    "title": "Канонічна назва",
+                    "text": "<p>Текст статті.</p>",
+                    "rubric": self.rubric.pk,
+                    **fields,
+                },
+                format="json",
+            )
+            self.assertEqual(response.status_code, 201, response.data)
+            self.assertEqual(
+                response.data["resolved_metadata"],
+                {
+                    "title": fields.get("meta_title", "Канонічна назва"),
+                    "description": fields.get("meta_description", "Текст статті."),
+                },
+            )
+            post = Post.objects.get(pk=response.data["id"])
+            self.assertIsNone(post.meta_id)
+            self.assertEqual(post.title, "Канонічна назва")
+
+    def test_staff_updates_and_clears_metadata_without_changing_identity(self):
+        post = PostFactory(rubric=self.rubric, title="Гала", meta_description="Existing", meta_title="Existing title")
+        original_url = post.get_absolute_url()
+        original_slug, original_publisher = post.slug, post.publisher_id
+        self.user.is_staff = True
+        self.user.save(update_fields=["is_staff"])
+        self.authenticate()
+        response = self.client.patch(
+            f"/api/content/posts/{post.pk}/", {"meta_title": "Гала: характеристики"}, format="json"
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(response.data["meta_description"], "Existing")
+        self.assertEqual(response.data["resolved_metadata"]["title"], "Гала: характеристики")
+        for clear in ("", None, "   "):
+            response = self.client.patch(
+                f"/api/content/posts/{post.pk}/",
+                {
+                    "meta_title": clear,
+                    "meta_description": clear,
+                },
+                format="json",
+            )
+            self.assertEqual(response.status_code, 200, response.data)
+            self.assertEqual(response.data["resolved_metadata"], {"title": "Гала", "description": post.text})
+        post.refresh_from_db()
+        self.assertEqual(
+            (post.title, post.slug, post.get_absolute_url(), post.publisher_id),
+            ("Гала", original_slug, original_url, original_publisher),
+        )
+        detail = self.client.get(f"/api/content/posts/{post.pk}/")
+        listing = self.client.get("/api/content/posts/")
+        self.assertEqual(detail.data["resolved_metadata"], listing.data["results"][0]["resolved_metadata"])
+
+    def test_metadata_length_validation_and_staff_requirement(self):
+        post = PostFactory(rubric=self.rubric)
+        self.authenticate()
+        response = self.client.patch(f"/api/content/posts/{post.pk}/", {"meta_title": "Unauthorized"}, format="json")
+        self.assertEqual(response.status_code, 403)
+        self.user.is_staff = True
+        self.user.save(update_fields=["is_staff"])
+        response = self.client.patch(
+            f"/api/content/posts/{post.pk}/",
+            {
+                "meta_title": "x" * 501,
+                "meta_description": "x" * 501,
+            },
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(set(response.data), {"meta_title", "meta_description"})
+        post.refresh_from_db()
+        self.assertIsNone(post.meta_title)
+
+    def test_options_describes_optional_metadata_for_integrations(self):
+        self.authenticate()
+        response = self.client.options("/api/content/posts/")
+        self.assertEqual(response.status_code, 200)
+        fields = response.data["actions"]["POST"]
+        for field in ("meta_title", "meta_description"):
+            self.assertFalse(fields[field]["required"])
+            self.assertEqual(fields[field]["max_length"], 500)
+        self.assertTrue(fields["resolved_metadata"]["read_only"])

@@ -103,3 +103,13 @@ class ContentRefreshInventoryTests(TestCase):
             parsed = parse_review(Path(path))
 
         self.assertEqual(parsed[1]["title"], "Тексель | Texel")
+
+
+class MetadataChecksumTests(TestCase):
+    def test_metadata_edits_change_snapshot_checksum(self):
+        original = post(1)
+        for field in ("meta_title", "meta_description"):
+            self.assertNotEqual(mutable_checksum(original), mutable_checksum({**original, field: "SEO edit"}))
+        self.assertEqual(
+            mutable_checksum(original), mutable_checksum({**original, "resolved_metadata": {"title": "preview"}})
+        )

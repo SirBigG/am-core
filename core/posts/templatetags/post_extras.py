@@ -12,6 +12,7 @@ from lxml import etree, html
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
+from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Post
 from core.utils.images import imgproxy_url as build_image_url
 from core.utils.rotating import get_rotating_ids, order_by_id_list, rotation_bucket
@@ -177,12 +178,12 @@ def collection_structured_data(context, title, objects):
 
 @register.simple_tag
 def article_structured_data(post, category, image_url="", author_name=""):
-    description = strip_tags(getattr(post, "meta_description", "") or str(post.text))
+    metadata = resolve_publication_metadata(post)
     data = {
         "@context": "https://schema.org",
         "@type": "Article",
-        "headline": post.meta.title if post.meta else f"{post.title} | {category.value}",
-        "description": description,
+        "headline": metadata["title"],
+        "description": metadata["description"],
         "datePublished": post.publish_date.isoformat(),
         "dateModified": post.update_date.isoformat(),
         "mainEntityOfPage": public_url(post.get_absolute_url()),

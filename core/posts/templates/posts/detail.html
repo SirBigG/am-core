@@ -1,21 +1,10 @@
 {% extends "base.html" %}
 {% load cache post_extras comment_tags static companies_extras registry_extras i18n %}
-{% block title %}
-    {% if object.meta %}
-        {{ object.meta.title }}
-    {% else %}
-        {{ object.title }} | {{ category.value }}
-    {% endif %}
-{% endblock title %}
-{% block meta_description %}
-    {% if object.meta_description %}
-        {{ object.meta_description }}
-    {% elif object.meta %}
-        {{ object.meta.description }}
-    {% else %}
-        {{ object.text|striptags|truncatechars:160 }}
-    {% endif %}
-{% endblock meta_description %}
+{% block title %}{{ publication_metadata.title }}{% endblock title %}
+{% block meta_description %}{{ publication_metadata.description }}{% endblock meta_description %}
+{% block canonical %}
+    <link rel="canonical" href="{{ publication_canonical_url }}">
+{% endblock canonical %}
 {% block scripts %}
     <script src="{% static "posts/j-detail.js" %}?v=20260905-publication-actions-2"
             defer></script>
@@ -24,32 +13,31 @@
 {% endblock scripts %}
 {% block extra_meta %}
     <script type="application/ld+json">{% breadcrumb_structured_data category object.title %}</script>
-    <script type="application/ld+json">{% article_structured_data object category main_photo_full_url publisher_name %}</script>
+    <script type="application/ld+json">{% article_structured_data object category publication_image_url publisher_name %}</script>
     {% faq_structured_data object.text as faq_json_ld %}
     {% if faq_json_ld %}<script type="application/ld+json">{{ faq_json_ld }}</script>{% endif %}
-    <meta content=" {% if object.meta %}{{ object.meta.title }} {% else %}{{ object.title }} | {{ category.value }}{% endif %}"
-          property="og:title">
-    <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
+    <meta content="{{ publication_metadata.title }}" property="og:title">
+    <meta content="{{ publication_metadata.description }}"
           property="og:description">
-    <meta content="{{ main_photo_full_url }}" property="og:image">
-    <meta content="{% full_url object.get_absolute_url %}" property="og:url">
+    <meta content="{{ publication_image_url }}" property="og:image">
+    <meta content="{{ publication_canonical_url }}" property="og:url">
     <meta content="article" property="og:type">
     <meta content="AgroMega.in.ua" property="og:site_name">
-    <meta content="{{ object.title }}" property="twitter:title">
-    <meta content=" {% if object.meta_description %}{{ object.meta_description }} {% else %}{{ object.text|striptags|truncatechars:160 }}{% endif %}"
-          property="twitter:description">
-    <meta content="{{ main_photo_full_url }}" property="twitter:image">
-    <meta content="{{ object.title }}" property="twitter:image:alt">
-    <meta content="summary_large_image" property="twitter:card">
-    <meta content="@AgroMega.in.ua" property="twitter:site">
-    <meta content="@AgroMegaTeam" property="twitter:creator">
-    <link href="{{ main_photo_full_url }}" rel="image_src" />
+    <meta content="{{ publication_metadata.title }}" name="twitter:title">
+    <meta content="{{ publication_metadata.description }}"
+          name="twitter:description">
+    <meta content="{{ publication_image_url }}" name="twitter:image">
+    <meta content="{{ object.title }}" name="twitter:image:alt">
+    <meta content="summary_large_image" name="twitter:card">
+    <meta content="@AgroMega.in.ua" name="twitter:site">
+    <meta content="@AgroMegaTeam" name="twitter:creator">
+    <link href="{{ publication_image_url }}" rel="image_src" />
 {% endblock extra_meta %}
 {% block second_menu %}
     {% second_menu view.kwargs.parent category.slug %}
 {% endblock second_menu %}
 {% block page_title %}
-    {% if object.page_h1 %}{{ object.page_h1 }}{% else %}{{ object.title }}{% endif %}
+    {{ publication_metadata.title }}
     {% if object.country %}
         <img alt="{{ object.country.value }}"
              src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"
@@ -75,7 +63,7 @@
             {% endif %}
             <div class="site-article-hero__breadcrumbs">{% breadcrumbs category object.title %}</div>
             <h1 class="site-article-hero__title">
-                {% if object.page_h1 %}{{ object.page_h1 }}{% else %}{{ object.title }}{% endif %}
+                {{ publication_metadata.title }}
                 {% if object.country %}
                     <img alt="{{ object.country.value }}"
                          src="{% static 'posts/flags/'|add:object.country.short_slug|add:'.svg' %}"

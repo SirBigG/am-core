@@ -64,15 +64,19 @@ class Post(models.Model):
 
     title = models.CharField(
         max_length=500,
-        verbose_name=_("Назва у списках"),
-        help_text=_("Коротка назва для списків, карток, breadcrumbs, пошуку та slug."),
+        verbose_name=_("Канонічна назва"),
+        help_text=_(
+            "Назва сорту, породи чи іншої сутності для списків, карток, breadcrumbs та Агромаркету. Також заголовок сторінки за замовчуванням."
+        ),
     )
-    page_h1 = models.CharField(
+    meta_title = models.CharField(
         max_length=500,
         blank=True,
         null=True,
-        verbose_name=_("H1 на сторінці публікації"),
-        help_text=_("Якщо поле заповнене, саме цей текст буде H1 на сторінці публікації."),
+        verbose_name=_("Мета-заголовок"),
+        help_text=_(
+            "Необов’язково. Заголовок у вкладці браузера, H1, соціальних мережах і структурованих даних. Якщо порожньо — канонічна назва."
+        ),
     )
     text = RichTextField(verbose_name=_("post text"))
     slug = models.CharField(max_length=250, unique=True, verbose_name=_("transliteration value"))
@@ -93,14 +97,24 @@ class Post(models.Model):
 
     rubric = models.ForeignKey(Category, on_delete=models.CASCADE, verbose_name=_("post category"))
 
-    meta_description = models.CharField(max_length=250, blank=True, null=True, verbose_name=_("meta description"))
-
-    meta = models.OneToOneField(
-        MetaData,
-        on_delete=models.CASCADE,
+    meta_description = models.CharField(
+        max_length=500,
         blank=True,
         null=True,
-        verbose_name=_("post meta data"),
+        verbose_name=_("Мета-опис"),
+        help_text=_(
+            "Необов’язково. Опис для пошуку, соціальних мереж і структурованих даних. Якщо порожньо — короткий уривок тексту без HTML."
+        ),
+    )
+
+    # Migration archive only; public rendering and editing use the direct fields.
+    meta = models.OneToOneField(
+        MetaData,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        editable=False,
+        verbose_name=_("Архів пов’язаних метаданих"),
         related_name="post-meta-data+",
     )
 
