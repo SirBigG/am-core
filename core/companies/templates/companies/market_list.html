@@ -1,42 +1,44 @@
 {% extends "companies/market_base.html" %}
 {% block market_content %}
-    {% if categories %}
-        <section class="site-content-section">
-            <h2 class="site-content-section__title">Категорії</h2>
-            <nav class="site-alpha-nav" aria-label="Категорії товарів">
-                <a class="site-segmented-control__item{% if not category %} is-active{% endif %}"
-                   href="{% url 'market:list' %}">Усі категорії</a>
+    <form method="get"
+          action="{% url 'market:list' %}"
+          class="site-content-section site-filter-grid">
+        <label class="site-form-label">
+            Категорія
+            <select name="category" class="form-select">
+                <option value="">Усі категорії</option>
                 {% for item in categories %}
-                    <a class="site-segmented-control__item{% if category.pk == item.pk %} is-active{% endif %}"
-                       href="{% url 'market:category' item.slug %}">{{ item.market_label }}</a>
+                    <option value="{{ item.slug }}"
+                            {% if category.pk == item.pk %} selected{% endif %}>{{ item.market_label }}</option>
                 {% endfor %}
-            </nav>
-        </section>
-    {% endif %}
-    <div class="site-card-list">
+            </select>
+        </label>
+        <label class="site-form-label">
+            Регіон компанії
+            <select name="region" class="form-select">
+                <option value="">Усі регіони</option>
+                {% for item in regions %}
+                    <option value="{{ item.pk }}"
+                            {% if selected_region == item.pk|stringformat:"s" %} selected{% endif %}>{{ item.value }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <button type="submit" class="btn btn-success align-self-end">Показати</button>
+        <a href="{% url 'market:list' %}" class="align-self-end">Скинути</a>
+    </form>
+    <div class="site-card-list site-market-grid">
         {% for variety in varieties %}
-            <article class="site-list-card{% if not variety.primary_photo %} site-list-card--text-only{% endif %}">
-                {% if variety.primary_photo %}
-                    <a class="site-list-card__media"
-                       href="{% url 'market:variety' variety.pk %}">
-                        <img src="{{ variety.primary_photo.image.url }}"
-                             alt="{{ variety.title }}"
-                             width="350"
-                             height="260"
-                             loading="lazy"
-                             class="site-list-card__image">
-                    </a>
-                {% endif %}
+            <article class="site-list-card site-list-card--text-only site-market-card">
                 <div class="site-list-card__body">
                     <p class="site-content-section__eyebrow">{{ variety.rubric.value }}</p>
                     <h2 class="site-list-card__title"><a class="site-list-card__title-link"
-   href="{% url 'market:variety' variety.pk %}">{{ variety.title }}</a></h2>
+   href="{% url 'market:variety' variety.pk %}{% if selected_region %}?region={{ selected_region|urlencode }}{% endif %}">{{ variety.title }}</a></h2>
                     {% for price in variety.market_prices %}
                         <p class="site-product-card__price">{{ price.min }}{% if price.max != price.min %} – {{ price.max }}{% endif %} {{ price.currency }}</p>
                     {% endfor %}
                     <p class="site-list-card__text">Пропозицій: {{ variety.market_offer_count }} · Компаній: {{ variety.market_seller_count }}</p>
                     <a class="site-list-card__link"
-                       href="{% url 'market:variety' variety.pk %}">Порівняти пропозиції</a>
+                       href="{% url 'market:variety' variety.pk %}{% if selected_region %}?region={{ selected_region|urlencode }}{% endif %}">Порівняти пропозиції</a>
                 </div>
             </article>
         {% empty %}

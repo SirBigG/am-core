@@ -165,8 +165,8 @@ class CompanyPublicViewTests(TestCase):
 
         response = self.client.get(reverse("companies:list"))
 
-        self.assertContains(response, "site-list-card__media--logo")
-        self.assertContains(response, "site-list-card__image--logo")
+        self.assertContains(response, "site-company-card__header")
+        self.assertContains(response, "site-company-card__logo")
 
     def test_company_detail_uses_uncropped_logo_style(self):
         self.company.logo = "companies/company-logo.png"

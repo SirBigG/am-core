@@ -54,7 +54,7 @@ class MarketTests(TestCase):
             [(p["min"], p["max"]) for p in variety.market_prices],
             [(Decimal(100), Decimal(200)), (Decimal(10), Decimal(10))],
         )
-        self.assertContains(response, reverse("market:category", args=[self.category.slug]))
+        self.assertContains(response, f'value="{self.category.slug}"')
         self.assertEqual(self.client.get(reverse("market:category", args=[self.category.slug])).status_code, 200)
         detail = self.client.get(reverse("market:variety", args=[self.post.pk]))
         self.assertContains(detail, "https://example.com/gala")
@@ -155,3 +155,32 @@ class MarketTests(TestCase):
             self.assertEqual(second.status_code, 200)
             self.assertContains(second, "noindex,follow")
             self.assertEqual(second.context["varieties"][0].pk, other.pk)
+
+    def test_region_filters_prices_counts_and_detail_offers(self):
+        other_company = Company.objects.create(
+            name="Other region shop", website="https://example.org", location=LocationFactory(), active=True
+        )
+        other = Product.objects.create(
+            name="Other region offer", company=other_company, category=self.category, post=self.post, price=250
+        )
+        region = str(self.company.location.region_id)
+        response = self.client.get(reverse("market:list"), {"region": region})
+        variety = response.context["varieties"][0]
+        self.assertEqual(variety.market_offer_count, 1)
+        self.assertEqual(variety.market_prices[0]["max"], Decimal(100))
+        self.assertContains(response, "noindex,follow")
+        self.assertContains(response, "?region=" + region)
+        self.assertNotContains(response, "site-list-card__image")
+        detail = self.client.get(reverse("market:variety", args=[self.post.pk]), {"region": region})
+        self.assertContains(detail, self.offer.name)
+        self.assertNotContains(detail, other.name)
+        self.assertEqual(self.client.get(reverse("market:list"), {"region": "missing-region"}).status_code, 404)
+
+    def test_category_select_redirect_preserves_region_and_resets_page(self):
+        region = str(self.company.location.region_id)
+        response = self.client.get(
+            reverse("market:list"), {"category": self.category.slug, "region": region, "page": 3}
+        )
+        self.assertRedirects(response, reverse("market:category", args=[self.category.slug]) + "?region=" + region)
+        cleared = self.client.get(reverse("market:list"), {"category": "", "region": ""})
+        self.assertRedirects(cleared, reverse("market:list"))

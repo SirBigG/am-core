@@ -1,6 +1,6 @@
 {% extends "companies/market_base.html" %}
 {% block market_content %}
-    <p><a href="{% url 'market:category' variety.rubric.slug %}">{{ variety.rubric.value }}</a> / {{ variety.title }}</p>
+    <p><a href="{% url 'market:category' variety.rubric.slug %}{% if selected_region %}?region={{ selected_region|urlencode }}{% endif %}">{{ variety.rubric.value }}</a> / {{ variety.title }}</p>
     <header class="site-content-section">
         <h2 class="site-content-section__title">Пропозиції компаній</h2>
     </header>

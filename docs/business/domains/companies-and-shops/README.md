@@ -184,3 +184,13 @@ pages have their own canonical URLs distinct from editorial catalog pages. The
 market sitemap includes only currently populated landing and variety pages and is
 linked from the sitemap index. Reuse of the catalog's structured characteristics
 does not depend on rebuilding its separate filter index for this release.
+
+
+Market cards use a compact two-column layout on wide screens and omit catalog
+photos. Category and company-region filters use selects. Category submissions
+redirect to the existing clean category URL, retaining the selected region and
+resetting pagination. Region filters use Region IDs, since slugs are not unique.
+The region describes the company's address, not its delivery coverage. Offer
+eligibility, price ranges and counts are all restricted to the selected region;
+variety links and pagination preserve it. Region query pages remain noindex and
+are not added to sitemaps. Catalog photos remain untouched in their original posts.

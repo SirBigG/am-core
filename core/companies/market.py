@@ -7,7 +7,7 @@ from django.db.models import Exists, F, OuterRef, Prefetch, Q
 from django.utils import timezone
 
 from core.classifier.models import Category
-from core.posts.models import Photo, Post
+from core.posts.models import Post
 
 from .models import Product
 
@@ -36,15 +36,17 @@ def market_categories():
     )
 
 
-def market_posts():
+def market_posts(region=""):
+    offers = market_offers()
+    if region:
+        offers = offers.filter(company__location__region_id=region)
     return (
         Post.objects.filter(status=True, rubric__is_active=True)
-        .annotate(has_offers=Exists(market_offers().filter(post_id=OuterRef("pk"))))
+        .annotate(has_offers=Exists(offers.filter(post_id=OuterRef("pk"))))
         .filter(has_offers=True)
         .select_related("rubric")
         .prefetch_related(
-            Prefetch("photo", queryset=Photo.objects.order_by("pk"), to_attr="prefetched_photos"),
-            Prefetch("product_set", queryset=market_offers().order_by("company__name", "pk"), to_attr="market_offers"),
+            Prefetch("product_set", queryset=offers.order_by("company__name", "pk"), to_attr="market_offers"),
         )
         .order_by("title", "pk")
     )

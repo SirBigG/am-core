@@ -1,13 +1,24 @@
 from django.conf import settings
-from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.views.generic import DetailView, ListView, TemplateView
 
-from core.classifier.models import Category
+from core.classifier.models import Category, Region
 from core.posts.category_attributes import get_public_category_attribute_groups
 
-from .market import market_categories, market_posts, summarize_offers
+from .market import market_categories, market_offers, market_posts, summarize_offers
 from .models import MarketPage
+
+
+def selected_region(request):
+    value = request.GET.get("region", "")
+    if value:
+        if not value.isascii() or not value.isdecimal():
+            raise Http404("Unknown region")
+        get_object_or_404(Region, pk=value)
+    return value
 
 
 def category_navigation():
@@ -23,9 +34,25 @@ class MarketListView(ListView):
     context_object_name = "varieties"
     paginate_by = 24
 
+    def get(self, request, *args, **kwargs):
+        if "category" in request.GET:
+            slug = request.GET["category"]
+            if slug:
+                category = get_object_or_404(Category, slug=slug, is_active=True)
+                url = reverse("market:category", args=[category.slug])
+            else:
+                url = reverse("market:list")
+            query = request.GET.copy()
+            query.pop("category", None)
+            query.pop("page", None)
+            if not query.get("region"):
+                query.pop("region", None)
+            return redirect(url + ("?" + query.urlencode() if query else ""))
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         self.category = None
-        queryset = market_posts()
+        queryset = market_posts(selected_region(self.request))
         if "slug" in self.kwargs:
             self.category = get_object_or_404(Category, slug=self.kwargs["slug"], is_active=True)
             queryset = queryset.filter(rubric=self.category)
@@ -38,9 +65,21 @@ class MarketListView(ListView):
         heading = (page.heading if page else "") or (
             f"{label}: пропозиції продавців" if self.category else "Агромаркет"
         )
+        categories = category_navigation()
+        if self.category and self.category.pk not in {item.pk for item in categories}:
+            self.category.market_label = label
+            categories.append(self.category)
+        region_offers = market_offers()
+        if self.category:
+            region_offers = region_offers.filter(category=self.category)
         context.update(
+            regions=Region.objects.filter(
+                Q(pk__in=region_offers.values("company__location__region_id"))
+                | Q(pk=self.request.GET.get("region") or None)
+            ).order_by("value"),
+            selected_region=self.request.GET.get("region", ""),
             category=self.category,
-            categories=category_navigation(),
+            categories=categories,
             market_tab="products",
             market_heading=heading,
             market_title=(page.title if page else "") or f"{heading} — ціни та порівняння | AgroMega",
@@ -58,12 +97,13 @@ class MarketVarietyView(DetailView):
     context_object_name = "variety"
 
     def get_queryset(self):
-        return market_posts()
+        return market_posts(selected_region(self.request))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         variety = summarize_offers(self.object)
         context.update(
+            selected_region=self.request.GET.get("region", ""),
             market_tab="products",
             attributes=get_public_category_attribute_groups(variety),
             market_heading=f"{variety.title}: пропозиції продавців",
