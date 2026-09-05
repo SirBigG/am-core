@@ -804,7 +804,9 @@ class ProductMatchDictionaryTests(TestCase):
 
     def test_admin_rule_changes_take_effect_without_restart(self):
         model_admin = admin.site._registry[ProductMatchRule]
-        form_class = model_admin.get_form(RequestFactory().get("/"))
+        request = RequestFactory().get("/")
+        request.user = UserFactory(is_staff=True, is_superuser=True)
+        form_class = model_admin.get_form(request)
         self.assertEqual(assess_product_post(self.product)[0], self.post)
         form = form_class(data={"word": "  ОСОБЛИВИЙ  ", "purpose": "ignore", "active": True})
         self.assertTrue(form.is_valid(), form.errors)
@@ -849,3 +851,146 @@ class ProductMatchDictionaryTests(TestCase):
         self.assertEqual(assess_product_post(self.product)[0], self.post)
         self.product.name = "Особливий сорт + інший"
         self.assertIsNone(assess_product_post(self.product)[0])
+
+
+class ProductMatchingAdminControlsTests(TestCase):
+    def setUp(self):
+        from core.companies.admin import ProductAdmin
+        from core.companies.models import ProductMatchAlias
+
+        self.alias_model = ProductMatchAlias
+        self.category = CategoryFactory()
+        self.other_category = CategoryFactory()
+        self.post = PostFactory(rubric=self.category, title="Ренет Симиренко", status=True)
+        self.company = Company.objects.create(name="Test", website="https://example.com", location=LocationFactory())
+        self.product = Product.objects.create(
+            name="Apple Semerenko container", category=self.category, company=self.company, price="125.00"
+        )
+        self.user = UserFactory(is_staff=True, is_superuser=True)
+        self.model_admin = ProductAdmin(Product, admin.site)
+
+    def action(self, data=None):
+        request = RequestFactory().post("/", data or {})
+        request.user = self.user
+        with patch.object(self.model_admin, "message_user"):
+            return self.model_admin.reassess_matches(request, Product.objects.filter(pk=self.product.pk))
+
+    def test_alias_whole_phrase_activation_and_category(self):
+        alias = self.alias_model.objects.create(name="  SEMERENKO ", post=self.post)
+        self.assertEqual(alias.name, "semerenko")
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        self.product.name = "Apple xSemerenko"
+        self.assertIsNone(assess_product_post(self.product)[0])
+        self.product.name = "Apple Semerenko container"
+        self.product.category = self.other_category
+        self.assertIsNone(assess_product_post(self.product)[0])
+        self.product.category = self.category
+        alias.active = False
+        alias.save()
+        self.assertIsNone(assess_product_post(self.product)[0])
+        alias.active = True
+        alias.save()
+        self.post.status = False
+        self.post.save()
+        self.assertIsNone(assess_product_post(self.product)[0])
+
+    def test_alias_ambiguity_and_normalized_duplicates(self):
+        self.alias_model.objects.create(name="Semerenko", post=self.post)
+        with self.assertRaises(ValidationError):
+            self.alias_model(name="SEMERENKO", post=self.post).full_clean()
+        other = PostFactory(rubric=self.category, title="Інший сорт", status=True)
+        self.alias_model.objects.create(name="Semerenko", post=other)
+        self.assertIsNone(assess_product_post(self.product)[0])
+
+    def test_scoped_rules_and_global_uniqueness(self):
+        ProductMatchRule.objects.all().delete()
+        self.product.name = "Ренет товар"
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        ProductMatchRule.objects.create(word="ренет", category=self.other_category)
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        ProductMatchRule.objects.create(word="ренет", category=self.category)
+        self.assertIsNone(assess_product_post(self.product)[0])
+        with self.assertRaises(ValidationError):
+            ProductMatchRule(word="РЕНЕТ", category=self.category).full_clean()
+        ProductMatchRule.objects.create(word="ренет")
+        with self.assertRaises(ValidationError):
+            ProductMatchRule(word="РЕНЕТ").full_clean()
+
+    def test_preview_and_apply_audited_without_price_or_confirmation_changes(self):
+        from django.contrib.admin.models import LogEntry
+
+        self.alias_model.objects.create(name="Semerenko", post=self.post)
+        price_time = self.product.price_updated_at
+        response = self.action()
+        self.product.refresh_from_db()
+        self.assertIsNone(self.product.post_id)
+        self.assertEqual(response.context_data["rows"][0]["post_id"], self.post.pk)
+        # Render the real admin template as well as checking its projection.
+        self.assertIn("Застосувати зміни", response.render().content.decode())
+        self.assertIsNone(self.action({"apply_matching": "1", "preview_token": response.context_data["preview_token"]}))
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.post_id, self.post.pk)
+        self.assertEqual(self.product.match_status, Product.MatchStatus.REVIEW)
+        self.assertEqual(self.product.price_updated_at, price_time)
+        self.assertEqual(self.product.price, Decimal("125.00"))
+        self.assertEqual(LogEntry.objects.filter(user=self.user, object_id=str(self.product.pk)).count(), 1)
+
+    def test_changed_rules_and_forged_preview_do_not_apply(self):
+        alias = self.alias_model.objects.create(name="Semerenko", post=self.post)
+        token = self.action().context_data["preview_token"]
+        alias.active = False
+        alias.save()
+        self.assertIsNotNone(self.action({"apply_matching": "1", "preview_token": token}))
+        self.assertIsNotNone(self.action({"apply_matching": "1", "preview_token": "forged"}))
+        self.product.refresh_from_db()
+        self.assertIsNone(self.product.post_id)
+
+    def test_new_manual_confirmation_protects_against_stale_preview(self):
+        self.alias_model.objects.create(name="Semerenko", post=self.post)
+        token = self.action().context_data["preview_token"]
+        Product.objects.filter(pk=self.product.pk).update(match_status=Product.MatchStatus.CONFIRMED)
+        response = self.action({"apply_matching": "1", "preview_token": token})
+        self.assertTrue(response.context_data["rows"][0]["protected"])
+        self.product.refresh_from_db()
+        self.assertIsNone(self.product.post_id)
+        self.assertEqual(self.product.match_status, Product.MatchStatus.CONFIRMED)
+
+    def test_change_permission_required(self):
+        from django.core.exceptions import PermissionDenied
+
+        self.user.is_superuser = False
+        self.user.save()
+        with self.assertRaises(PermissionDenied):
+            self.action()
+
+    def test_admin_action_roundtrip(self):
+        self.alias_model.objects.create(name="Semerenko", post=self.post)
+        self.client.force_login(self.user)
+        url = reverse("admin:companies_product_changelist")
+        data = {"action": "reassess_matches", "_selected_action": str(self.product.pk)}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        data.update(apply_matching="1", preview_token=response.context_data["preview_token"])
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 302)
+        self.product.refresh_from_db()
+        self.assertEqual(self.product.post_id, self.post.pk)
+
+    def test_preview_is_bound_to_user_and_expires(self):
+        self.alias_model.objects.create(name="Semerenko", post=self.post)
+        token = self.action().context_data["preview_token"]
+        self.user = UserFactory(is_staff=True, is_superuser=True)
+        self.assertIsNotNone(self.action({"apply_matching": "1", "preview_token": token}))
+        with patch("django.core.signing.time.time", return_value=1000):
+            expired = self.action().context_data["preview_token"]
+        self.assertIsNotNone(self.action({"apply_matching": "1", "preview_token": expired}))
+        self.product.refresh_from_db()
+        self.assertIsNone(self.product.post_id)
+
+    def test_reassessment_can_clear_old_wrong_link(self):
+        Product.objects.filter(pk=self.product.pk).update(post=self.post, match_status=Product.MatchStatus.REVIEW)
+        token = self.action().context_data["preview_token"]
+        self.action({"apply_matching": "1", "preview_token": token})
+        self.product.refresh_from_db()
+        self.assertIsNone(self.product.post_id)
+        self.assertEqual(self.product.match_status, Product.MatchStatus.REVIEW)

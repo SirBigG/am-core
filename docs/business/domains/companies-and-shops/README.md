@@ -85,7 +85,7 @@ back to review and save.
 
 Automatic links are reassessed when the persisted name or category changes.
 Bundles, multi-graft plants, cultivar sports and partial matches need human review;
-this release does not implement an alias dictionary or an entity model for them.
+a separate entity model for bundles and cultivar sports is not implemented.
 Migration 0014 adds the queue fields only; it neither merges duplicate offers nor
 bulk replaces historical links. Deploy code and run migrations before using the
 new admin fields. Parser payloads remain compatible.
@@ -102,10 +102,10 @@ not an accuracy measurement or a production-catalog estimate.
 ### Admin-managed matching dictionary
 
 `Словник зіставлення товарів` in the companies admin owns the matching vocabulary.
-Each record stores one normalized unique word, its purpose (ignored scoring token
+Each record stores one normalized word unique within its scope, its purpose (ignored scoring token
 or bundle/multi-variety marker), and an active flag. Bundle markers optionally
 match word prefixes to cover endings; ignored tokens match whole words only.
-The dictionary currently applies to all categories. Administrators can add,
+A blank category applies globally; a selected category limits a rule to that exact category (not its descendants). Active global and category rules are combined; scoped rules do not override global rules. Administrators can add,
 edit, disable or delete rules using standard Django permissions and audit history.
 
 Active rules are read from the database on each matching assessment, with no
@@ -120,3 +120,30 @@ once to preserve existing behavior. The seed is historical initial data, not a
 runtime default: disabled or deleted entries are not recreated on application
 startup. Reversing only the seed migration leaves operator-owned rules intact.
 Deploy with migrations before serving requests using the new matcher.
+
+
+### Alternative cultivar names and reassessment
+
+Administrators maintain `Альтернативні назви сортів`: a normalized name, target
+catalog post and active flag. The target post supplies its category; only published
+posts in the product's exact category participate. An alias must occur as a whole
+phrase in the seller title, never as a substring or a partial-token guess. Longer
+phrases outrank shorter ones; tied candidate posts stay unlinked. Full canonical
+name equality retains priority. Alternative names represent spelling variants of
+the same cultivar, not a mapping between different cultivars such as Gala and Gala
+Mast. New alias entries are empty by default and require an operator's decision.
+
+The Products action `Перерахувати зіставлення — попередній перегляд` processes up
+to 200 selected products, including existing unconfirmed links. It displays current
+and proposed links, resulting status and explanation before any writes. Applying
+can replace or clear old unconfirmed links; it does not confirm algorithmic results.
+Confirmed manual links and confirmed absence remain protected. Only matching fields
+are written; prices, observations and price history are untouched. Each change is
+recorded in Django admin history under the applying operator.
+
+A signed preview is bound to the operator, expires after 15 minutes and is compared
+with a fresh assessment under product row locks before applying. If selected product
+state or the proposed outcome has changed, no changes are applied and an updated
+preview is shown. Application requires Product change permission. Migration 0017
+adds aliases and scopes without rewriting existing product links; existing rules
+remain global. No production deployment is part of this change.

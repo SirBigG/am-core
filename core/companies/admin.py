@@ -1,19 +1,41 @@
 from django.conf import settings
 from django.contrib import admin, messages
+from django.core import signing
+from django.core.exceptions import PermissionDenied
+from django.db import transaction
+from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .forms import CompanyForm, LinkForm, ProductForm
-from .models import Company, Link, ParserSourceAttempt, Product, ProductMatchRule, ProductPriceHistory
+from .matching_review import matching_preview
+from .models import (
+    Company,
+    Link,
+    ParserSourceAttempt,
+    Product,
+    ProductMatchAlias,
+    ProductMatchRule,
+    ProductPriceHistory,
+)
 from .parser import parse_many_links_with_same_browser
 
 
 @admin.register(ProductMatchRule)
 class ProductMatchRuleAdmin(admin.ModelAdmin):
-    list_display = ("word", "purpose", "prefix", "active")
-    list_filter = ("purpose", "active", "prefix")
+    list_display = ("word", "category", "purpose", "prefix", "active")
+    list_filter = ("category", "purpose", "active", "prefix")
     list_editable = ("active",)
     search_fields = ("word",)
+
+
+@admin.register(ProductMatchAlias)
+class ProductMatchAliasAdmin(admin.ModelAdmin):
+    list_display = ("name", "post", "active")
+    list_filter = ("post__rubric", "active")
+    autocomplete_fields = ("post",)
+    search_fields = ("name", "post__title")
+    list_editable = ("active",)
 
 
 class ProductInline(admin.TabularInline):
@@ -60,7 +82,7 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_filter = ("match_status", "category", NullPostFilter, "active", "company")
     readonly_fields = ("match_reason",)
-    actions = ["confirm_matches"]
+    actions = ["confirm_matches", "reassess_matches"]
     list_editable = ("post", "auction_price", "price", "currency", "active")
     search_fields = ("name", "description", "post__title", "source_product_key", "link")
 
@@ -72,6 +94,61 @@ class ProductAdmin(admin.ModelAdmin):
             product.save(update_fields=["match_status", "match_reason"])
             self.log_change(request, product, "Confirmed catalog matching decision")
         self.message_user(request, "Рішення підтверджені; наступні імпорти їх збережуть.")
+
+    @admin.action(description="Перерахувати зіставлення — попередній перегляд", permissions=["change"])
+    def reassess_matches(self, request, queryset):
+        if not self.has_change_permission(request):
+            raise PermissionDenied
+        if queryset.count() > 200:
+            self.message_user(request, "Виберіть не більше 200 товарів за один раз.", level=messages.WARNING)
+            return None
+        with transaction.atomic():
+            products = list(queryset.select_for_update(of=("self",)).select_related("post").order_by("pk"))
+            if any(not self.has_change_permission(request, product) for product in products):
+                raise PermissionDenied
+            rows = [matching_preview(product) for product in products]
+            payload = {"user": request.user.pk, "rows": rows}
+            if request.POST.get("apply_matching"):
+                try:
+                    approved = signing.loads(
+                        request.POST.get("preview_token", ""), salt="companies.matching-preview", max_age=900
+                    )
+                except signing.BadSignature:
+                    approved = None
+                if approved != payload:
+                    self.message_user(
+                        request,
+                        "Перегляд застарів або недійсний. Перевірте оновлений результат перед застосуванням.",
+                        level=messages.WARNING,
+                    )
+                else:
+                    changed = 0
+                    for product, row in zip(products, rows, strict=True):
+                        if not row["changed"]:
+                            continue
+                        # This is reassessment, not manual confirmation. Update only
+                        # matching fields; Product.save would confirm a changed post.
+                        Product.objects.filter(pk=product.pk).update(
+                            post_id=row["post_id"], match_status=row["status"], match_reason=row["reason"]
+                        )
+                        self.log_change(
+                            request,
+                            product,
+                            f"Перерахунок зіставлення: {row['old_post']} → {row['post']}. {row['reason']}",
+                        )
+                        changed += 1
+                    self.message_user(request, f"Оновлено зіставлень: {changed}. Підтверджені рішення збережено.")
+                    return None
+            context = {
+                **self.admin_site.each_context(request),
+                "title": "Перегляд зіставлень товарів",
+                "opts": self.model._meta,
+                "rows": rows,
+                "preview_token": signing.dumps(payload, salt="companies.matching-preview", compress=True),
+                "action_checkbox_name": admin.helpers.ACTION_CHECKBOX_NAME,
+                "has_changes": any(row["changed"] for row in rows),
+            }
+        return TemplateResponse(request, "admin/companies/matching_preview.html", context)
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)

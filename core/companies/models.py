@@ -46,7 +46,11 @@ def assess_product_post(product):
         return exact[0], "Єдиний повний збіг нормалізованої назви в категорії."
     if len(exact) > 1:
         return None, "Декілька публікацій з однаковою назвою: потрібна перевірка."
-    rules = list(ProductMatchRule.objects.filter(active=True).values_list("word", "purpose", "prefix"))
+    rules = list(
+        ProductMatchRule.objects.filter(
+            Q(category__isnull=True) | Q(category_id=product.category_id), active=True
+        ).values_list("word", "purpose", "prefix")
+    )
     name_tokens = set(name.split())
     bundle = any(
         any(token.startswith(word) if prefix else token == word for token in name_tokens)
@@ -64,10 +68,22 @@ def assess_product_post(product):
     # machine-invented synonyms. Score at post level so aliases do not tie.
     aliases = {post.pk: [part for part in re.split(r"[|()]", post.title) if tokens(part)] for post in candidates}
     frequency = Counter(token for post in candidates for token in set().union(*(tokens(a) for a in aliases[post.pk])))
+    explicit_aliases = {}
+    for post_id, alias in ProductMatchAlias.objects.filter(
+        active=True, post__rubric_id=product.category_id, post__status=True
+    ).values_list("post_id", "name"):
+        explicit_aliases.setdefault(post_id, []).append(alias)
     product_tokens = tokens(name)
     ranked = []
     for post in candidates:
-        best = 0
+        best = max(
+            (
+                90 + min(len(alias.split()), 8)
+                for alias in explicit_aliases.get(post.pk, [])
+                if f" {alias} " in f" {name} "
+            ),
+            default=0,
+        )
         for alias in aliases[post.pk]:
             normalized = normalize_product_post_match_text(alias)
             title_tokens = tokens(alias)
@@ -105,8 +121,15 @@ class ProductMatchRule(models.Model):
     word = models.CharField(
         "Слово",
         max_length=100,
-        unique=True,
         help_text="Одне слово, без пробілів і пунктуації. Регістр не має значення.",
+    )
+    category = models.ForeignKey(
+        "classifier.Category",
+        verbose_name="Категорія",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        help_text="Порожньо — для всіх категорій. Вибрана категорія — без підкатегорій.",
     )
     purpose = models.CharField("Призначення", max_length=16, choices=Purpose.choices, default=Purpose.IGNORE)
     prefix = models.BooleanField(
@@ -116,6 +139,14 @@ class ProductMatchRule(models.Model):
 
     class Meta:
         ordering = ("purpose", "word")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("word", "category"), condition=Q(category__isnull=False), name="unique_match_rule_word_category"
+            ),
+            models.UniqueConstraint(
+                fields=("word",), condition=Q(category__isnull=True), name="unique_global_match_rule_word"
+            ),
+        ]
         verbose_name = "Правило зіставлення товарів"
         verbose_name_plural = "Словник зіставлення товарів"
 
@@ -133,6 +164,33 @@ class ProductMatchRule(models.Model):
 
     def __str__(self):
         return self.word
+
+
+class ProductMatchAlias(models.Model):
+    name = models.CharField("Альтернативна назва", max_length=200)
+    post = models.ForeignKey(
+        Post, verbose_name="Сорт каталогу", on_delete=models.CASCADE, related_name="product_match_aliases"
+    )
+    active = models.BooleanField("Активна", default=True)
+
+    class Meta:
+        ordering = ("name",)
+        verbose_name = "Альтернативна назва сорту"
+        verbose_name_plural = "Альтернативні назви сортів"
+        constraints = [models.UniqueConstraint(fields=("name", "post"), name="unique_product_match_alias")]
+
+    def clean(self):
+        super().clean()
+        self.name = normalize_product_post_match_text(self.name)
+        if not self.name:
+            raise ValidationError({"name": "Вкажіть непорожню назву."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.name
 
 
 class CompanyType(models.IntegerChoices):

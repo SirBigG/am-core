@@ -1,0 +1,43 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <p>Перевірте запропоновані прив’язки. Підтверджені вручну рішення захищені. Ціни не змінюються.</p>
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="reassess_matches">
+        <input type="hidden" name="preview_token" value="{{ preview_token }}">
+        <table>
+            <thead>
+                <tr>
+                    <th>Товар</th>
+                    <th>Поточний сорт</th>
+                    <th>Запропонований сорт</th>
+                    <th>Статус</th>
+                    <th>Пояснення</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in rows %}
+                    <tr>
+                        <td>
+                            {{ row.name }}
+                            <input type="hidden" name="{{ action_checkbox_name }}" value="{{ row.id }}">
+                        </td>
+                        <td>{{ row.old_post }}</td>
+                        <td>{{ row.post }}</td>
+                        <td>
+                            {{ row.status_label }}
+                            {% if row.protected %}
+                                — захищено
+                            {% elif not row.changed %}
+                                — без змін
+                            {% endif %}
+                        </td>
+                        <td>{{ row.reason }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if has_changes %}<button type="submit" name="apply_matching" value="1">Застосувати зміни</button>{% endif %}
+        <a href="{% url 'admin:companies_product_changelist' %}">Скасувати</a>
+    </form>
+{% endblock content %}
