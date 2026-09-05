@@ -71,6 +71,25 @@ class CompanyParserExtractionTests(SimpleTestCase):
         )
         self.assertEqual(products[0]["name"], "Яблуня Айдаред")
 
+    def test_worker_merges_duplicates_but_rejects_conflicts(self):
+        source = {
+            "url": "https://shop.example",
+            "source_type": "static",
+            "parser_map": {"item": "//article", "name": ".//h2/text()", "price": ".//b/text()", "link": ".//a/@href"},
+        }
+        card = '<article><h2>Apple</h2><b>650</b><a href="/apple">Open</a></article>'
+        with patch(
+            "core.companies.management.commands.run_local_parser_worker.get_content_from_url", return_value=card * 2
+        ):
+            products, _ = LocalParserWorkerCommand().parse_source(source)
+        self.assertEqual(len(products), 1)
+        with patch(
+            "core.companies.management.commands.run_local_parser_worker.get_content_from_url",
+            return_value=card + card.replace("650", "700"),
+        ):
+            with self.assertRaisesRegex(ValueError, "Conflicting duplicate"):
+                LocalParserWorkerCommand().parse_source(source)
+
     def test_encoding_form_validation(self):
         for value in ("utf-8", "windows-1251", ""):
             form = LinkForm(data={"parser_encoding": value})

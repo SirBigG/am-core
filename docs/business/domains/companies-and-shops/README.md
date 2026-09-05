@@ -211,3 +211,22 @@ option: older workers treat unknown configuration keys as XPath selectors.
 After updating Studio, restart it and reload sources. Re-run affected sources
 to refresh incorrectly decoded product names; this change does not repair saved
 historical records automatically.
+
+### Source catalog pagination and repeated products
+
+Parser Studio loads the complete source catalog using `scope=all`, `limit=100`
+and an `after_id` cursor (starting at zero). Cursor requests are ordered by ID,
+so crawl times and priorities cannot shift sources between pages. Requests
+without the cursor retain the existing scheduling order and response list shape.
+The client reads until an empty page, and fails explicitly if IDs do not advance
+(e.g. an older server ignores the cursor). Deploy the backend before restarting
+the updated Studio. No schema migration is required.
+
+Both parsers collapse repeated normalized product records before submission,
+using the same identity as the API: product URL, or stripped case-insensitive name
+when the URL is absent. All fields must agree except the observation timestamp;
+differences, including differing prices, fail the run with the conflicting
+identity. First occurrence order is retained. Studio reports the number merged
+for both preview and import. The API still rejects duplicate identities from
+other clients. Snapshot checks and result-size limits apply to the unique result;
+deduplication does not bypass those safeguards.

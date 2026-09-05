@@ -40,6 +40,22 @@ class ParserWorkerAPITests(APITestCase):
         self.token = Token.objects.create(user=self.worker_user)
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
 
+    def test_source_cursor_loads_more_than_one_hundred_without_skipping(self):
+        for i in range(101):
+            Link.objects.create(url=f"https://shop.example/{i}", company=self.company, category=self.category)
+        first = self.client.get("/api/parser/sources/", {"scope": "all", "limit": 100, "after_id": 0})
+        self.assertEqual(first.status_code, 200)
+        self.assertEqual(len(first.data), 100)
+        cursor = first.data[-1]["id"]
+        Link.objects.filter(pk=first.data[0]["id"]).update(priority=999)
+        second = self.client.get("/api/parser/sources/", {"scope": "all", "limit": 100, "after_id": cursor})
+        self.assertEqual(second.status_code, 200)
+        self.assertEqual(len(second.data), 2)
+        ids = [row["id"] for row in first.data + second.data]
+        self.assertEqual(len(set(ids)), 102)
+        last = self.client.get("/api/parser/sources/", {"scope": "all", "after_id": ids[-1]})
+        self.assertEqual(last.data, [])
+
     def test_source_list_requires_parser_token(self):
         self.client.credentials()
 

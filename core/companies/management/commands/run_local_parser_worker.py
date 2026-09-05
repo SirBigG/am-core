@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from core.companies.parser import (
     create_firefox_driver,
+    deduplicate_products,
     get_content_from_url,
     get_next_page_url,
     parse_data_from_content,
@@ -266,9 +267,11 @@ class Command(BaseCommand):
                     raise ValueError(f"Pagination exceeded configured max_pages={max_pages}.")
                 current_url = following_url
 
-        return [
-            self.normalize_product(product, source["url"]) for product in raw_products if product.get("name")
-        ], browser_driver
+        products = [self.normalize_product(product, source["url"]) for product in raw_products if product.get("name")]
+        unique = deduplicate_products(products)
+        if len(unique) != len(products):
+            self.stdout.write(f"Merged {len(products) - len(unique)} identical product duplicates.")
+        return unique, browser_driver
 
     @staticmethod
     def normalize_product(product, source_url):

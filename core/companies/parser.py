@@ -22,6 +22,22 @@ SOURCE_REQUEST_HEADERS = {
 }
 
 
+def deduplicate_products(products):
+    """Collapse identical identities; conflicting records require operator
+    review."""
+    unique = {}
+    for product in products:
+        identity = product.get("product_url") or product["name"].strip().casefold()
+        if identity in unique:
+            previous = {k: v for k, v in unique[identity].items() if k != "observed_at"}
+            current = {k: v for k, v in product.items() if k != "observed_at"}
+            if previous != current:
+                raise ValueError(f"Conflicting duplicate product: {identity}. Check names, prices and selectors.")
+        else:
+            unique[identity] = product
+    return list(unique.values())
+
+
 def parse_document(content, parser_map):
     """Override decoding only for raw bytes; browser HTML is already
     Unicode."""

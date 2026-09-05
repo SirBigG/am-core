@@ -91,6 +91,8 @@ class ParserSourceListView(ListAPIView):
         experiment = query_params.get("experiment")
         if experiment:
             queryset = queryset.filter(experiment_label=experiment)
+        if query_params["scope"] == "all" and "after_id" in query_params:
+            return queryset.filter(id__gt=query_params["after_id"]).order_by("id")[: query_params["limit"]]
         return queryset.order_by("priority", "last_crawled", "id")[: query_params["limit"]]
 
     @staticmethod
