@@ -86,3 +86,20 @@ integrations. Existing ownership and staff-update permissions remain unchanged.
 Legacy related metadata is retained only as a migration archive and never used as
 a fallback after an editor clears a direct field. See the
 [API and migration contract](../../../engineering/api/publication-metadata.md).
+
+## Reading navigation
+
+Main-site publications build a table of contents in the browser from nonempty
+`h2` and `h3` elements inside the article body, starting at three headings.
+Comments, sources outside the body and related cards are excluded. Existing
+heading IDs are retained; missing IDs receive collision-free fragment targets.
+At widths of 1400px and above, the contents sit beside the unchanged text column.
+On narrower screens, a sticky disclosure sits above the text and closes after a
+section is selected; Escape closes it and returns focus to its summary.
+The current section is highlighted and transitions account for the category menu.
+
+Pages extending the main site's base template also offer “Нагору” after the
+reader scrolls two viewport heights. It clears the mobile bottom navigation and
+is hidden while cookie consent or a modal occupies the foreground. Scrolling
+respects reduced-motion preferences and can be interrupted by user input.
+These controls do not modify stored article HTML or community-app templates.

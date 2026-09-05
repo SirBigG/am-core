@@ -2449,3 +2449,76 @@ span.flatpickr-weekday {
     margin-top: auto;
     align-self: flex-start;
 }
+
+// Reading navigation shared by pages extending base.html.
+.back-to-top {
+    position: fixed;
+    right: max(16px, env(safe-area-inset-right));
+    bottom: 90px;
+    z-index: 1020;
+    width: 48px;
+    height: 48px;
+    display: grid;
+    place-items: center;
+    border: 1px solid #d7e8da;
+    border-radius: 50%;
+    background: #fff;
+    color: #0b8043;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, .16);
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+.back-to-top[hidden] { display: none; }
+.back-to-top:focus-visible, .publication-toc :focus-visible {
+    outline: 3px solid #2f7d45;
+    outline-offset: 3px;
+}
+.site-content-section.publication-reading-section { position: relative; overflow: visible; }
+.publication-toc {
+    position: sticky;
+    top: var(--reading-top, 16px);
+    z-index: 1000;
+    margin-bottom: 1rem;
+    color: #203829;
+    font-size: .875rem;
+    line-height: 1.45;
+
+    details {
+        border: 1px solid #d7e8da;
+        border-radius: 12px;
+        background: #f7fbf8;
+        box-shadow: 0 4px 12px rgba(15, 23, 42, .05);
+    }
+    summary { padding: .8rem; cursor: pointer; font-weight: 700; }
+    ul {
+        list-style: none;
+        padding: 0 .5rem .5rem;
+        margin: 0;
+        max-height: min(50vh, calc(100dvh - var(--reading-top, 16px) - 160px));
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+    a {
+        display: block;
+        padding: .65rem .5rem;
+        color: #294c33;
+        text-decoration: none;
+        overflow-wrap: anywhere;
+        border-radius: 6px;
+    }
+    a:hover, a[aria-current] { background: #dfede2; color: #075f32; }
+    a[aria-current] { font-weight: 700; }
+    &__subsection { padding-left: .9rem; }
+}
+@media (min-width: 1400px) {
+    .publication-toc {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: calc(100% + 16px);
+        width: 196px;
+        margin: 0;
+        details { position: sticky; top: var(--reading-top, 16px); }
+        ul { max-height: calc(100dvh - var(--reading-top, 16px) - 90px); }
+    }
+}

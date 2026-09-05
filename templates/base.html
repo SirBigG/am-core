@@ -15,7 +15,8 @@
             policyUrl: "{% url 'django.contrib.flatpages.views.flatpage' 'cookies_policy/' %}"
         };
     </script>
-    <link rel="stylesheet" href="{% static "posts/site.css" %}?v=f96a43e338bc">
+    <link rel="stylesheet"
+          href="{% static "posts/site.css" %}?v=20260905-reading-navigation-4">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -403,6 +404,14 @@
             });
     }
     </script>
+    <button type="button"
+            class="back-to-top"
+            data-back-to-top
+            hidden
+            aria-label="Повернутися на початок сторінки"
+            title="Нагору"><span aria-hidden="true">↑</span></button>
+    <script src="{% static 'posts/j-reading-navigation.js' %}?v=20260905-reading-navigation-4"
+            defer></script>
     {% block extra_footerscript %}
     {% endblock extra_footerscript %}
 </body>

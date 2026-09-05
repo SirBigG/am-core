@@ -18,6 +18,7 @@ module.exports = {
     form: "./src/scss/form.scss",
     gallery: "./src/scss/gallery.scss",
     "nginx-analytics": "./src/scss/nginx-analytics.scss",
+    "j-reading-navigation": "./src/js/reading-navigation.js",
     "j-index": "./src/js/index.js",
     "j-detail": "./src/js/detail.js",
     "j-gallery": "./src/js/gallery.js",
