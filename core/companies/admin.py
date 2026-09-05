@@ -4,8 +4,16 @@ from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from .forms import CompanyForm, LinkForm, ProductForm
-from .models import Company, Link, ParserSourceAttempt, Product, ProductPriceHistory
+from .models import Company, Link, ParserSourceAttempt, Product, ProductMatchRule, ProductPriceHistory
 from .parser import parse_many_links_with_same_browser
+
+
+@admin.register(ProductMatchRule)
+class ProductMatchRuleAdmin(admin.ModelAdmin):
+    list_display = ("word", "purpose", "prefix", "active")
+    list_filter = ("purpose", "active", "prefix")
+    list_editable = ("active",)
+    search_fields = ("word",)
 
 
 class ProductInline(admin.TabularInline):
@@ -40,6 +48,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "post",
+        "match_status",
         "price",
         "price_updated_at",
         "last_seen_at",
@@ -49,9 +58,20 @@ class ProductAdmin(admin.ModelAdmin):
         "currency",
         "active",
     )
-    list_filter = (NullPostFilter, "active", "company", "source_link")
+    list_filter = ("match_status", "category", NullPostFilter, "active", "company")
+    readonly_fields = ("match_reason",)
+    actions = ["confirm_matches"]
     list_editable = ("post", "auction_price", "price", "currency", "active")
     search_fields = ("name", "description", "post__title", "source_product_key", "link")
+
+    @admin.action(description="Підтвердити прив’язку або відсутність сорту для вибраних товарів")
+    def confirm_matches(self, request, queryset):
+        for product in queryset:
+            product.match_status = Product.MatchStatus.CONFIRMED
+            product.match_reason = "Адміністратор підтвердив прив’язку або відсутність сорту."
+            product.save(update_fields=["match_status", "match_reason"])
+            self.log_change(request, product, "Confirmed catalog matching decision")
+        self.message_user(request, "Рішення підтверджені; наступні імпорти їх збережуть.")
 
     def get_form(self, request, obj=None, change=False, **kwargs):
         form = super().get_form(request, obj, change, **kwargs)

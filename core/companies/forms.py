@@ -129,6 +129,7 @@ class ProductForm(forms.ModelForm):
             "price",
             "description",
             "post",
+            "match_status",
             "category",
             "link",
             "active",

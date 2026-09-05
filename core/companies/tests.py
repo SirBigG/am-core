@@ -6,6 +6,7 @@ from unittest.mock import Mock, patch
 
 import requests
 from django.contrib import admin
+from django.core.exceptions import ValidationError
 from django.core.management import call_command
 from django.template import Context, Template
 from django.test import RequestFactory, SimpleTestCase, TestCase, override_settings
@@ -16,7 +17,7 @@ from core.companies.admin import LinkAdmin
 from core.companies.forms import CompanyForm, LinkForm
 from core.companies.management.commands.run_local_parser_worker import Command as LocalParserWorkerCommand
 from core.companies.management.commands.run_local_parser_worker import ParserWorkerClient
-from core.companies.models import Company, CompanyType, Link, Product
+from core.companies.models import Company, CompanyType, Link, Product, ProductMatchRule, assess_product_post
 from core.companies.parser import create_firefox_driver, extract_price, get_content_from_url, parse_data_from_content
 from core.utils.tests.factories import CategoryFactory, LocationFactory, PostFactory, UserFactory
 
@@ -252,7 +253,7 @@ class CompanyPublicViewTests(TestCase):
         self.assertEqual(product.price, 12)
         self.assertGreater(product.price_updated_at, old_timestamp)
 
-    def test_product_save_links_post_when_post_title_is_inside_product_name(self):
+    def test_product_save_requires_review_for_partial_name(self):
         category = CategoryFactory(slug="apple-varieties", value="Сорти яблунь")
         post = PostFactory(
             rubric=category,
@@ -268,6 +269,8 @@ class CompanyPublicViewTests(TestCase):
         )
 
         self.assertEqual(product.post, post)
+        self.assertEqual(product.match_status, Product.MatchStatus.REVIEW)
+        self.assertIn(post.title, product.match_reason)
 
     def test_product_save_does_not_link_post_from_other_category(self):
         post = PostFactory(
@@ -299,7 +302,7 @@ class CompanyPublicViewTests(TestCase):
             source_product_key="red-chief",
             defaults={
                 "category": category,
-                "name": "Яблуня Ред Чіф контейнер",
+                "name": "Ред Чіф",
                 "price": "150.00",
             },
         )
@@ -312,7 +315,7 @@ class CompanyPublicViewTests(TestCase):
         product = Product.objects.create(
             company=self.company,
             category=category,
-            name="Саджанець яблуні Фуджі",
+            name="Фуджі",
             price="130.00",
         )
         post = PostFactory(
@@ -691,3 +694,158 @@ class LocalParserWorkerCommandTests(SimpleTestCase):
         client.submit_failure.assert_called_once()
         self.assertEqual(client.submit_failure.call_args.kwargs["status"], 400)
         self.assertIn("Recorded rejected result", stderr.getvalue())
+
+
+class ProductMatchReviewTests(TestCase):
+    def setUp(self):
+        self.company = Company.objects.create(
+            name="Match shop", website="https://example.com", location=LocationFactory()
+        )
+        self.category = CategoryFactory()
+
+    def product(self, name, **kwargs):
+        return Product.objects.create(company=self.company, category=self.category, name=name, **kwargs)
+
+    def test_substring_and_fulltext_do_not_create_wrong_link(self):
+        PostFactory(rubric=self.category, title="Мир", text="Яблуня Симиренко", status=True)
+        p = self.product("Яблуня Симиренко")
+        self.assertIsNone(p.post)
+        self.assertNotIn("Частковий", p.match_reason)
+
+    def test_ambiguous_exact_titles_require_review(self):
+        for _ in range(2):
+            PostFactory(rubric=self.category, title="Гала", status=True)
+        p = self.product("Гала")
+        self.assertIsNone(p.post)
+        self.assertIn("Декілька", p.match_reason)
+
+    def test_full_name_match_and_changed_identity(self):
+        post = PostFactory(rubric=self.category, title="Гала", status=True)
+        p = self.product("  ГАЛА  ")
+        self.assertEqual(p.post, post)
+        self.assertEqual(p.match_status, Product.MatchStatus.AUTO)
+        p.name = "Невідомий сорт"
+        p.save(update_fields=["name"])
+        p.refresh_from_db()
+        self.assertIsNone(p.post)
+        self.assertEqual(p.match_status, Product.MatchStatus.REVIEW)
+
+    def test_bundle_and_sport_only_offer_suggestions(self):
+        PostFactory(rubric=self.category, title="Гала", status=True)
+        PostFactory(rubric=self.category, title="Флоріна", status=True)
+        for name in ("Комплект Гала + Флоріна",):
+            p = self.product(name)
+            self.assertIsNone(p.post)
+            self.assertEqual(p.match_status, Product.MatchStatus.REVIEW)
+
+    def test_confirmed_absence_survives_ingestion_and_backfill(self):
+        p = self.product("Гала", match_status=Product.MatchStatus.CONFIRMED)
+        PostFactory(rubric=self.category, title="Гала", status=True)
+        Product.objects.update_or_create(pk=p.pk, defaults={"name": "Гала", "price": "123.00"})
+        call_command("link_product_posts", stdout=StringIO())
+        p.refresh_from_db()
+        self.assertIsNone(p.post)
+        self.assertEqual(p.match_status, Product.MatchStatus.CONFIRMED)
+
+    def test_manual_clear_and_manual_choice_survive_next_import(self):
+        post = PostFactory(rubric=self.category, title="Гала", status=True)
+        p = self.product("Гала")
+        p.post = None
+        p.save(update_fields=["post"])
+        p.refresh_from_db()
+        self.assertEqual(p.match_status, Product.MatchStatus.CONFIRMED)
+        p.save()
+        self.assertIsNone(p.post)
+        p.post = post
+        p.save(update_fields=["post"])
+        Product.objects.update_or_create(pk=p.pk, defaults={"name": "Гала нова назва", "price": "150.00"})
+        p.refresh_from_db()
+        self.assertEqual(p.post, post)
+        self.assertEqual(p.match_status, Product.MatchStatus.CONFIRMED)
+
+    def test_admin_filters_and_confirmation_action(self):
+        from core.companies.admin import ProductAdmin
+
+        model_admin = ProductAdmin(Product, admin.site)
+        self.assertIn("category", model_admin.list_filter)
+        self.assertNotIn("source_link", model_admin.list_filter)
+        p = self.product("Невідомий сорт")
+        with patch.object(model_admin, "log_change"), patch.object(model_admin, "message_user"):
+            model_admin.confirm_matches(RequestFactory().post("/"), Product.objects.filter(pk=p.pk))
+        p.refresh_from_db()
+        self.assertEqual(p.match_status, Product.MatchStatus.CONFIRMED)
+        self.assertIsNone(p.post)
+
+    def test_seller_title_missing_prefix_uses_distinctive_token(self):
+        PostFactory(rubric=self.category, title="Мир", status=True)
+        post = PostFactory(rubric=self.category, title="Ренет Симиренко", status=True)
+        p = self.product("Яблуня Симиренко дворічна контейнер 5 л")
+        self.assertEqual(p.post, post)
+        self.assertEqual(p.match_status, Product.MatchStatus.REVIEW)
+
+    def test_specific_cultivar_and_explicit_latin_alias(self):
+        PostFactory(rubric=self.category, title="Гала", status=True)
+        post = PostFactory(rubric=self.category, title="Гала Маст (Gala Mast)", status=True)
+        self.assertEqual(self.product("Саджанець яблуні Гала Маст 2 роки").post, post)
+        self.assertEqual(self.product("Apple Gala Mast container 5 l").post, post)
+
+    def test_shared_generic_word_does_not_select_wrong_red_variety(self):
+        PostFactory(rubric=self.category, title="Ред Топаз", status=True)
+        PostFactory(rubric=self.category, title="Рояль Ред Делішес", status=True)
+        self.assertIsNone(self.product("Яблуня Ред Чіф пізній сорт").post)
+
+
+class ProductMatchDictionaryTests(TestCase):
+    def setUp(self):
+        ProductMatchRule.objects.all().delete()
+        self.category = CategoryFactory()
+        self.product = Product(category=self.category, name="Особливий товар")
+        self.post = PostFactory(rubric=self.category, title="Особливий сорт", status=True)
+
+    def test_admin_rule_changes_take_effect_without_restart(self):
+        model_admin = admin.site._registry[ProductMatchRule]
+        form_class = model_admin.get_form(RequestFactory().get("/"))
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        form = form_class(data={"word": "  ОСОБЛИВИЙ  ", "purpose": "ignore", "active": True})
+        self.assertTrue(form.is_valid(), form.errors)
+        rule = form.save()
+        self.assertEqual(rule.word, "особливий")
+        self.assertIsNone(assess_product_post(self.product)[0])
+        rule.active = False
+        rule.save(update_fields=["active"])
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        rule.active = True
+        rule.word = "інше"
+        rule.save()
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        rule.delete()
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+
+    def test_dictionary_validation_and_normalized_uniqueness(self):
+        ProductMatchRule.objects.create(word="Унікальне")
+        for values in (
+            {"word": "УНІКАЛЬНЕ"},
+            {"word": "два слова"},
+            {"word": "---"},
+            {"word": "слово", "prefix": True},
+        ):
+            with self.subTest(values=values), self.assertRaises(ValidationError):
+                ProductMatchRule(**values).full_clean()
+
+    def test_bundle_rules_support_exact_and_prefix_and_deactivation(self):
+        self.product.name = "Пакування Особливий сорт"
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        rule = ProductMatchRule.objects.create(word="пакув", purpose=ProductMatchRule.Purpose.BUNDLE)
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        rule.prefix = True
+        rule.save()
+        self.assertIsNone(assess_product_post(self.product)[0])
+        rule.active = False
+        rule.save()
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+
+    def test_empty_dictionary_has_no_hidden_bundle_words(self):
+        self.product.name = "Комплект Особливий сорт"
+        self.assertEqual(assess_product_post(self.product)[0], self.post)
+        self.product.name = "Особливий сорт + інший"
+        self.assertIsNone(assess_product_post(self.product)[0])

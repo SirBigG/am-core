@@ -1,12 +1,14 @@
+import re
 import uuid
+from collections import Counter
 from datetime import timedelta
 from string import punctuation
 
 from django.conf import settings
-from django.contrib.postgres.search import SearchQuery, SearchRank
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import F, Q
+from django.db.models import Q
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import get_language
@@ -16,7 +18,6 @@ from core.classifier.models import Location
 from core.posts.models import Post
 
 DEFAULT_PARSER_CRAWL_INTERVAL_MINUTES = 24 * 60
-PRODUCT_POST_MATCH_MIN_TOKEN_LENGTH = 3
 
 
 def get_minimum_parser_crawl_interval_minutes():
@@ -33,62 +34,105 @@ def normalize_product_post_match_text(value):
     return " ".join(value.translate(translation_table).split())
 
 
-def match_product_post(product):
-    if not product.name or not product.category_id:
-        return None
-
-    normalized_name = normalize_product_post_match_text(product.name)
-    if not normalized_name:
-        return None
-
+def assess_product_post(product):
+    """Rank cultivar names in seller titles; never use article body
+    relevance."""
+    name = normalize_product_post_match_text(product.name)
+    if not name or not product.category_id:
+        return None, "Немає назви або категорії."
     candidates = list(Post.objects.filter(rubric_id=product.category_id, status=True).only("id", "title"))
-    best_post = None
-    best_score = 0
-    for post in candidates:
-        score = score_product_post_match(normalized_name, post.title)
-        if score > best_score:
-            best_post = post
-            best_score = score
-
-    if best_post and best_score >= 70:
-        return best_post
-
-    post = (
-        Post.objects.filter(rubric_id=product.category_id, status=True)
-        .annotate(rank=SearchRank(F("text_search"), SearchQuery(product.name, config="english")))
-        .filter(rank__gt=0.03)
-        .order_by("-rank")
-        .first()
+    exact = [post for post in candidates if normalize_product_post_match_text(post.title) == name]
+    if len(exact) == 1:
+        return exact[0], "Єдиний повний збіг нормалізованої назви в категорії."
+    if len(exact) > 1:
+        return None, "Декілька публікацій з однаковою назвою: потрібна перевірка."
+    rules = list(ProductMatchRule.objects.filter(active=True).values_list("word", "purpose", "prefix"))
+    name_tokens = set(name.split())
+    bundle = any(
+        any(token.startswith(word) if prefix else token == word for token in name_tokens)
+        for word, purpose, prefix in rules
+        if purpose == ProductMatchRule.Purpose.BUNDLE
     )
-    return post
+    ignored = {word for word, purpose, prefix in rules if purpose == ProductMatchRule.Purpose.IGNORE}
+    if "+" in (product.name or "") or bundle:
+        return None, "Комплект або кілька сортів: одна прив’язка не описує товар."
+
+    def tokens(text):
+        return set(normalize_product_post_match_text(text).split()) - ignored
+
+    # Parenthetical/pipe-separated names are explicit catalog aliases, not
+    # machine-invented synonyms. Score at post level so aliases do not tie.
+    aliases = {post.pk: [part for part in re.split(r"[|()]", post.title) if tokens(part)] for post in candidates}
+    frequency = Counter(token for post in candidates for token in set().union(*(tokens(a) for a in aliases[post.pk])))
+    product_tokens = tokens(name)
+    ranked = []
+    for post in candidates:
+        best = 0
+        for alias in aliases[post.pk]:
+            normalized = normalize_product_post_match_text(alias)
+            title_tokens = tokens(alias)
+            if not title_tokens:
+                continue
+            if f" {normalized} " in f" {name} ":
+                # Prefer a specific multiword cultivar over a contained base name.
+                score = 90 + min(len(title_tokens), 8)
+            else:
+                shared = title_tokens & product_tokens
+                coverage = len(shared) / len(title_tokens)
+                distinctive = {t for t in shared if len(t) >= 4 and frequency[t] == 1}
+                score = 70 + int(20 * coverage) if distinctive and coverage >= 0.5 else 0
+            best = max(best, score)
+        if best:
+            ranked.append((best, post))
+    ranked.sort(key=lambda pair: (-pair[0], pair[1].pk))
+    if not ranked:
+        return None, "Надійного збігу немає. Сорт може бути відсутній у каталозі."
+    score, post = ranked[0]
+    if len(ranked) > 1 and ranked[1][0] == score:
+        return None, ("Рівнозначні кандидати: " + "; ".join(p.title for value, p in ranked if value == score))[:1000]
+    return post, ("Автоматично за назвою в заголовку; перевірте сорт/варіант: " + post.title)[:1000]
 
 
-def score_product_post_match(normalized_product_name, post_title):
-    normalized_title = normalize_product_post_match_text(post_title)
-    if not normalized_title:
-        return 0
-    if normalized_product_name == normalized_title:
-        return 100
-    if normalized_title in normalized_product_name:
-        return 95
-    if (
-        len(normalized_product_name) >= PRODUCT_POST_MATCH_MIN_TOKEN_LENGTH
-        and normalized_product_name in normalized_title
-    ):
-        return 85
-
-    product_tokens = _match_tokens(normalized_product_name)
-    title_tokens = _match_tokens(normalized_title)
-    if not title_tokens:
-        return 0
-    matched_tokens = title_tokens & product_tokens
-    if matched_tokens == title_tokens and len(title_tokens) >= 2:
-        return 75
-    return int((len(matched_tokens) / len(title_tokens)) * 60)
+def match_product_post(product):
+    return assess_product_post(product)[0]
 
 
-def _match_tokens(value):
-    return {token for token in value.split() if len(token) >= PRODUCT_POST_MATCH_MIN_TOKEN_LENGTH}
+class ProductMatchRule(models.Model):
+    class Purpose(models.TextChoices):
+        IGNORE = "ignore", "Ігнорувати при зіставленні"
+        BUNDLE = "bundle", "Маркер комплекту / кількох сортів"
+
+    word = models.CharField(
+        "Слово",
+        max_length=100,
+        unique=True,
+        help_text="Одне слово, без пробілів і пунктуації. Регістр не має значення.",
+    )
+    purpose = models.CharField("Призначення", max_length=16, choices=Purpose.choices, default=Purpose.IGNORE)
+    prefix = models.BooleanField(
+        "Збіг за початком слова", default=False, help_text="Лише для маркерів комплектів: охоплює закінчення слова."
+    )
+    active = models.BooleanField("Активне", default=True)
+
+    class Meta:
+        ordering = ("purpose", "word")
+        verbose_name = "Правило зіставлення товарів"
+        verbose_name_plural = "Словник зіставлення товарів"
+
+    def clean(self):
+        super().clean()
+        self.word = normalize_product_post_match_text(self.word)
+        if len(self.word.split()) != 1:
+            raise ValidationError({"word": "Вкажіть одне непорожнє слово."})
+        if self.prefix and self.purpose != self.Purpose.BUNDLE:
+            raise ValidationError({"prefix": "Збіг за початком доступний лише для маркерів комплектів."})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.word
 
 
 class CompanyType(models.IntegerChoices):
@@ -150,6 +194,16 @@ class CurrencyChoices(models.TextChoices):
 
 
 class Product(models.Model):
+    class MatchStatus(models.TextChoices):
+        REVIEW = "review", "Потребує перевірки"
+        AUTO = "auto", "Повний збіг назви"
+        CONFIRMED = "confirmed", "Підтверджено адміністратором"
+
+    match_status = models.CharField(
+        max_length=16, choices=MatchStatus.choices, default=MatchStatus.REVIEW, db_index=True
+    )
+    match_reason = models.CharField(max_length=1000, blank=True, default="Попередній запис: зіставлення не перевірене.")
+
     name = models.CharField(max_length=200, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     company = models.ForeignKey(Company, related_name="products", on_delete=models.CASCADE)
@@ -180,12 +234,50 @@ class Product(models.Model):
         return self.price_updated_at >= fresh_after
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
+        if update_fields is not None and not update_fields:
+            return
         update_fields = self._refresh_price_timestamp(update_fields)
-        if not self.post_id:
-            self.post = match_product_post(self)
-            if self.post_id and update_fields is not None:
-                update_fields = set(update_fields)
-                update_fields.add("post")
+        original = None
+        if self.pk:
+            original = (
+                type(self).objects.filter(pk=self.pk).values("name", "category_id", "post_id", "match_status").first()
+            )
+        fields = None if update_fields is None else set(update_fields)
+        identity_changed = bool(
+            original
+            and any(
+                (fields is None or field in fields or f"{field}_id" in fields)
+                and getattr(self, f"{field}_id" if field == "category" else field)
+                != original[f"{field}_id" if field == "category" else field]
+                for field in ("name", "category")
+            )
+        )
+        post_changed = bool(
+            original
+            and (fields is None or "post" in fields or "post_id" in fields)
+            and self.post_id != original["post_id"]
+        )
+        if post_changed:
+            self.match_status = self.MatchStatus.CONFIRMED
+            self.match_reason = "Ручне рішення щодо прив’язки."
+        elif self.match_status != self.MatchStatus.CONFIRMED:
+            if identity_changed and (
+                original["match_status"] == self.MatchStatus.AUTO
+                or self.match_reason.startswith("Автоматично за назвою")
+            ):
+                self.post = None
+            if not self.post_id and (original is None or identity_changed or fields is None):
+                self.post, self.match_reason = assess_product_post(self)
+                self.match_status = (
+                    self.MatchStatus.AUTO
+                    if self.post_id
+                    and normalize_product_post_match_text(self.name)
+                    == normalize_product_post_match_text(self.post.title)
+                    else self.MatchStatus.REVIEW
+                )
+        if fields is not None:
+            fields.update({"post", "match_status", "match_reason"})
+            update_fields = fields
         super().save(
             force_insert=force_insert,
             force_update=force_update,

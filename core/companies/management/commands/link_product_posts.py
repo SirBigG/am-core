@@ -15,6 +15,7 @@ class Command(BaseCommand):
         queryset = (
             Product.objects.select_related("category")
             .filter(active=True, post__isnull=True)
+            .exclude(match_status=Product.MatchStatus.CONFIRMED)
             .exclude(name__isnull=True)
             .exclude(name="")
             .order_by("id")
@@ -34,7 +35,7 @@ class Command(BaseCommand):
             linked += 1
             self.stdout.write(f"{product.id}: {product.name} -> {post.title}")
             if not options["dry_run"]:
-                Product.objects.filter(pk=product.pk, post__isnull=True).update(post=post)
+                product.save()
 
         action = "Would link" if options["dry_run"] else "Linked"
         self.stdout.write(f"{action} {linked} of {inspected} inspected products.")

@@ -61,3 +61,62 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Are shops separate entities from companies, or a type of company profile?
 - Which fields are required for a public company or shop listing?
 - Who is the final legal owner/contact for privacy and company data complaints?
+
+## Product-to-catalog matching and review
+
+Matching is category-scoped and only considers published posts. A single full
+normalized name match can create an automatic link. Whole-phrase matches inside seller titles and unique distinctive-token matches
+may populate a link with review status. Explicit parenthetical/pipe-separated
+catalog aliases are considered; longer full phrases outrank base names, and tied
+candidates remain unlinked. Bundles remain unlinked. Arbitrary substrings and full-text article rank never
+create links. Name equality is a deterministic rule, not a claim of 100% semantic
+certainty. Missing catalog entries are normal and do not block product ingestion.
+
+Products carry a matching status and explanation. Existing records enter the
+review queue without losing their current links: historical manual decisions
+cannot be distinguished from automatic ones. Administrators filter Products by
+matching status and category; the source-link filter is removed from this page.
+They can choose a post or clear a wrong link, which confirms the decision, or use
+the confirmation action/status to approve an existing link or no link at all.
+Confirmed decisions survive imports and the backfill command, even when the
+catalog later gains a similarly named post. Django admin history records edits
+and confirmations. To retry an intentionally unlinked product, change its status
+back to review and save.
+
+Automatic links are reassessed when the persisted name or category changes.
+Bundles, multi-graft plants, cultivar sports and partial matches need human review;
+this release does not implement an alias dictionary or an entity model for them.
+Migration 0014 adds the queue fields only; it neither merges duplicate offers nor
+bulk replaces historical links. Deploy code and run migrations before using the
+new admin fields. Parser payloads remain compatible.
+
+Validation (2026-09-05): 77 companies/parser API tests and scoped pre-commit
+checks passed. Local migration applied; migration consistency check passed.
+The broader 535-test core/API run had 9 failures and 5 errors in other areas
+(canonical request rendering, host expectations, Silk query counts and news
+cache behavior); it is not a clean full-suite result. No production deployment
+or historical link rewrite was performed. A read-only evaluation of 80 BioСад
+preview rows against the local catalog proposed 27 links; this is coverage,
+not an accuracy measurement or a production-catalog estimate.
+
+### Admin-managed matching dictionary
+
+`Словник зіставлення товарів` in the companies admin owns the matching vocabulary.
+Each record stores one normalized unique word, its purpose (ignored scoring token
+or bundle/multi-variety marker), and an active flag. Bundle markers optionally
+match word prefixes to cover endings; ignored tokens match whole words only.
+The dictionary currently applies to all categories. Administrators can add,
+edit, disable or delete rules using standard Django permissions and audit history.
+
+Active rules are read from the database on each matching assessment, with no
+process cache or hardcoded fallback vocabulary. Changes affect subsequent
+assessments; they do not bulk rewrite existing product links or override confirmed
+manual decisions. Full-name equality retains priority over dictionary rules;
+ignored words only affect token scoring, not normalized full-name equality.
+The `+` delimiter remains a structural multi-item check in code.
+
+Migration 0015 creates the dictionary and 0016 seeds the previous vocabulary
+once to preserve existing behavior. The seed is historical initial data, not a
+runtime default: disabled or deleted entries are not recreated on application
+startup. Reversing only the seed migration leaves operator-owned rules intact.
+Deploy with migrations before serving requests using the new matcher.
