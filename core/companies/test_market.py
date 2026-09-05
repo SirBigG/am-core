@@ -184,3 +184,93 @@ class MarketTests(TestCase):
         self.assertRedirects(response, reverse("market:category", args=[self.category.slug]) + "?region=" + region)
         cleared = self.client.get(reverse("market:list"), {"category": "", "region": ""})
         self.assertRedirects(cleared, reverse("market:list"))
+
+    def test_publication_link_uses_catalog_identity_and_escapes_title(self):
+        from django.template.loader import render_to_string
+
+        from .market import publication_market_context
+
+        for title in ("Мікадо (Mikado)", "Гала", '<script>"Довга назва"</script>'):
+            with self.subTest(title=title):
+                self.post.title = title
+                self.post.page_h1 = "SEO heading must not supply the market name"
+                with self.assertNumQueries(1):
+                    context = publication_market_context(self.post)
+                self.assertTrue(context["can_show"])
+                self.assertTrue(context["replace_related_products"])
+                self.assertEqual(context["entity_name"], title)
+                self.assertEqual(context["market_url"], reverse("market:variety", args=[self.post.pk]))
+                html = render_to_string("companies/publication_market_link.html", context)
+                self.assertIn(context["market_url"], html)
+                self.assertNotIn("<script>", html)
+                self.assertNotIn(self.post.page_h1, html)
+                self.assertNotIn("nofollow", html)
+                self.assertNotIn("target=", html)
+
+    def test_publication_link_rechecks_offer_changes_without_cache(self):
+        from django.template.loader import render_to_string
+
+        from .market import publication_market_context
+
+        original = dict(
+            active=True, price=100, price_updated_at=timezone.now(), post_id=self.post.pk, category_id=self.category.pk
+        )
+        other = PostFactory(rubric=self.category)
+        for change in (
+            {"active": False},
+            {"price": 0},
+            {"price_updated_at": timezone.now() - timedelta(days=31)},
+            {"post_id": None},
+            {"post_id": other.pk},
+            {"category_id": CategoryFactory().pk},
+        ):
+            with self.subTest(change=change):
+                Product.objects.filter(pk=self.offer.pk).update(**(original | change))
+                context = publication_market_context(self.post, registry_variety_exists=True)
+                self.assertFalse(context["can_show"])
+                self.assertTrue(context["replace_related_products"])
+                self.assertEqual(render_to_string("companies/publication_market_link.html", context).strip(), "")
+        Product.objects.filter(pk=self.offer.pk).update(**original)
+        self.assertTrue(publication_market_context(self.post)["can_show"])
+        for model, pk, field in (
+            (Company, self.company.pk, "active"),
+            (Post, self.post.pk, "status"),
+            (Category, self.category.pk, "is_active"),
+        ):
+            model.objects.filter(pk=pk).update(**{field: False})
+            self.assertFalse(publication_market_context(self.post)["can_show"])
+            model.objects.filter(pk=pk).update(**{field: True})
+
+    def test_non_market_publication_keeps_legacy_related_products(self):
+        from .market import publication_market_context
+
+        Product.objects.filter(pk=self.offer.pk).update(category=CategoryFactory())
+        context = publication_market_context(self.post)
+        self.assertFalse(context["can_show"])
+        self.assertFalse(context["replace_related_products"])
+
+    def test_post_view_places_market_and_actions_once_before_comments(self):
+        from django.template import Context, Template
+        from django.test import RequestFactory
+
+        from core.posts.views import PostDetail
+
+        view = PostDetail()
+        view.request = RequestFactory().get(self.post.get_absolute_url())
+        view.object = self.post
+        view.kwargs = {}
+        context = view.get_context_data()
+        html = Template(
+            '{% include "companies/publication_market_link.html" with entity_name=publication_market.entity_name market_url=publication_market.market_url can_show=publication_market.can_show only %}{% include "posts/publication_actions.html" %}'
+        ).render(Context(context))
+        self.assertEqual(html.count("data-publication-actions"), 1)
+        self.assertEqual(html.count("data-market-link"), 1)
+        self.assertIn(reverse("api-post-useful"), html)
+        self.assertNotIn("Пов'язані товари", html)
+        self.assertLess(html.index("data-market-link"), html.index("data-publication-actions"))
+        response = self.client.get(self.post.get_absolute_url())
+        self.assertContains(response, "data-market-link", count=1)
+        self.assertContains(response, "data-publication-actions", count=1)
+        self.assertNotContains(response, "Пов'язані товари")
+        page = response.content.decode()
+        self.assertLess(page.index("data-publication-actions"), page.index(">Коментарі</h2>"))

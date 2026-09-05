@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load cache post_extras comment_tags static companies_extras registry_extras %}
+{% load cache post_extras comment_tags static companies_extras registry_extras i18n %}
 {% block title %}
     {% if object.meta %}
         {{ object.meta.title }}
@@ -17,8 +17,10 @@
     {% endif %}
 {% endblock meta_description %}
 {% block scripts %}
-    <script src="{% static "posts/j-detail.js" %}" defer></script>
-    <link rel="stylesheet" href="{% static "posts/detail.css" %}">
+    <script src="{% static "posts/j-detail.js" %}?v=20260905-publication-actions-2"
+            defer></script>
+    <link rel="stylesheet"
+          href="{% static "posts/detail.css" %}?v=20260905-publication-actions-3">
 {% endblock scripts %}
 {% block extra_meta %}
     <script type="application/ld+json">{% breadcrumb_structured_data category object.title %}</script>
@@ -137,34 +139,15 @@
                 <div class="site-detail-content post-wrapper site-article-sources">{{ object.sources|safe }}</div>
             </section>
         {% endif %}
-        <section class="site-content-section">
-            <p class="site-content-section__eyebrow">Поділитися</p>
-            <div class="site-share-actions">
-                <a class="h5 text-primary mb-0"
-                   tabindex="-1"
-                   target="Share-in-facebook"
-                   onclick="window.open(this.href, 'Share-in-facebook' , 'width=400, height=400'); return false;"
-                   href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url %}"
-                   aria-label="Опублікувати у фейсбук">
-                    <i class="icon-facebook"></i>
-                </a>
-            </div>
-        </section>
-        <section class="site-content-section">
-            <div class="post_id_value" id="{{ object.id }}"></div>
-            <div id="useful__wrapper">
-                <p class="site-content-section__title text-center">Публікація корисна?</p>
-                <div class="d-flex flex-row justify-content-center">
-                    <button class="btn btn-outline-success m-2" id="useful">Так</button>
-                    <button class="btn btn-outline-danger m-2" id="notuseful">Ні</button>
-                </div>
-            </div>
-        </section>
+        {% include "companies/publication_market_link.html" with entity_name=publication_market.entity_name market_url=publication_market.market_url can_show=publication_market.can_show post_id=publication_market.post_id entity_id=publication_market.entity_id only %}
+        {% include "posts/publication_actions.html" %}
         <section class="site-content-section">
             <h2 class="site-content-section__title">Коментарі</h2>
             {% render_comments object request %}
         </section>
-        {% products_for_post object.id %}
+        {% if not publication_market.replace_related_products %}
+            {% products_for_post object.id %}
+        {% endif %}
         {% relative_posts category.id object.id %}
         {% post_adverts %}
         {% random_posts object.id %}

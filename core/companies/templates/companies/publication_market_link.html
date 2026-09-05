@@ -1,0 +1,16 @@
+{% load i18n %}
+{% if can_show %}
+    <section class="site-content-section publication-market">
+        <div class="publication-market__text">
+            <h2 class="site-content-section__title h5">{% blocktranslate %}Пропозиції продавців: {{ entity_name }}{% endblocktranslate %}</h2>
+            <p>{% translate "Перегляньте ціни та пропозиції продавців в Агромаркеті." %}</p>
+        </div>
+        <a class="btn btn-success"
+           href="{{ market_url }}"
+           data-market-link
+           data-post-id="{{ post_id }}"
+           data-entity-id="{{ entity_id }}"
+           data-placement="after_content"
+           aria-label="{% blocktranslate %}Переглянути пропозиції → {{ entity_name }}{% endblocktranslate %}">{% translate "Переглянути пропозиції →" %}</a>
+    </section>
+{% endif %}

@@ -4,12 +4,37 @@ from datetime import timedelta
 
 from django.conf import settings
 from django.db.models import Exists, F, OuterRef, Prefetch, Q
+from django.urls import reverse
 from django.utils import timezone
 
 from core.classifier.models import Category
 from core.posts.models import Post
 
 from .models import Product
+
+
+def publication_market_context(post, registry_variety_exists=False):
+    """Post is the market identity; registry Variety has a separate primary
+    key.
+
+    Keep legacy related products only outside registry/market-linked identities.
+    Do not cache eligibility: price expiry and parser/admin changes apply on the
+    next render. Both checks use EXISTS, never materializing seller offers.
+    """
+    can_show = market_offers().filter(post_id=post.pk).exists()
+    replace_related_products = (
+        can_show
+        or registry_variety_exists
+        or Product.objects.filter(post_id=post.pk, category_id=post.rubric_id).exists()
+    )
+    return {
+        "entity_name": post.title,
+        "market_url": reverse("market:variety", args=[post.pk]),
+        "can_show": can_show,
+        "post_id": post.pk,
+        "entity_id": post.pk,
+        "replace_related_products": replace_related_products,
+    }
 
 
 def market_offers():

@@ -1,0 +1,43 @@
+{% load i18n post_extras %}
+<section class="publication-actions"
+         data-publication-actions
+         data-post-id="{{ object.pk }}"
+         data-title="{{ object.title }}"
+         data-vote-url="{% url 'api-post-useful' %}"
+         data-vote-success="{% translate 'Дякуємо за відгук!' %}"
+         data-vote-error="{% translate 'Не вдалося зберегти голос. Спробуйте ще раз.' %}"
+         data-vote-loading="{% translate 'Зберігаємо…' %}"
+         data-copy-success="{% translate 'Посилання скопійовано.' %}">
+    <div class="publication-actions__row">
+        <button type="button" class="btn btn-outline-secondary" data-share hidden>{% translate "Поділитися" %}</button>
+        <div class="publication-actions__row" data-vote-controls hidden>
+            <span>{% translate "Було корисно?" %}</span>
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-vote="true"
+                    aria-pressed="false">{% translate "Так" %}</button>
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-vote="false"
+                    aria-pressed="false">{% translate "Ні" %}</button>
+        </div>
+    </div>
+    <div data-share-fallback hidden>
+        <button type="button" class="btn btn-outline-secondary" data-copy>{% translate "Скопіювати посилання" %}</button>
+        <label data-manual-copy hidden>
+            {% translate "Скопіюйте посилання вручну:" %}
+            <input type="text" readonly class="form-control" data-share-url>
+        </label>
+    </div>
+    <span class="publication-actions__status"
+          role="status"
+          aria-live="polite"
+          data-share-status></span>
+    <span class="publication-actions__status"
+          role="status"
+          aria-live="polite"
+          data-vote-status></span>
+    <noscript>
+        <a href="https://www.facebook.com/sharer/sharer.php?u={% full_url object.get_absolute_url as share_url %}{{ share_url|urlencode }}">{% translate "Поділитися у Facebook" %}</a>
+    </noscript>
+</section>

@@ -59,3 +59,15 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Should registry variety descriptions from the state registry spreadsheet be stored in the current `Variety.description` field or in a separate structured reference-data model?
 - Should the registry model support all six applicant, owner, and maintainer columns available in current state registry files?
 - Should the registry import command run continuously with `--poll` under a supervisor, or only be invoked manually after an admin queues a refresh?
+
+## Publication footer actions
+
+Registry or explicitly market-linked catalog posts use a compact seller-offers
+link after sources and before sharing, usefulness feedback and comments. It is
+shown only when the shared market eligibility rules admit an offer. Labels use
+the catalog title, and no claim of stock availability is made. Other publications
+retain the legacy related-product behavior. Sharing remains independent of login
+and analytics consent. Existing usefulness feedback remains visible to editors
+in admin; its historical anonymous deduplication is not a unique-voter count.
+See the [implementation and verification note](../../../engineering/testing/2026-09-05-publication-actions.md)
+for the exact identity relation and existing limitations.

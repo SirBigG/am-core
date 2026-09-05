@@ -18,6 +18,7 @@ from django.views.generic import DetailView, ListView, RedirectView, TemplateVie
 
 from core.adverts.models import Advert
 from core.classifier.models import Category
+from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
 from core.posts.models import Photo, Post, SearchStatistic
@@ -237,6 +238,9 @@ class PostDetail(DetailView):
         context["category"] = context["object"].rubric
         context["publisher_name"] = context["object"].publisher.get_full_name()
         context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
+        context["publication_market"] = publication_market_context(
+            context["object"], context["registry_variety_exists"]
+        )
         context["category_attribute_groups"] = get_public_category_attribute_groups(context["object"])
         return context
 

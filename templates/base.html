@@ -183,6 +183,15 @@
             analytics: false,
             advertising: false
         };
+        let currentConsent = defaultConsent;
+
+        // Functional links never wait for analytics or require consent.
+        window.agromegaTrackEvent = function (name, parameters) {
+            const consent = readConsent() || currentConsent;
+            if (currentConsent.analytics && consent.analytics && config.analytics && config.analytics.enabled && typeof window.gtag === "function") {
+                window.gtag("event", name, parameters);
+            }
+        };
 
         function hasOptionalServices() {
             return Boolean((config.analytics && config.analytics.enabled) || (config.advertising && config.advertising.enabled));
@@ -254,6 +263,7 @@
         }
 
         function applyConsent(consent) {
+            currentConsent = consent;
             if (consent.analytics) {
                 enableAnalytics();
             }
