@@ -1,0 +1,52 @@
+{% extends "companies/market_base.html" %}
+{% block market_content %}
+    {% if categories %}
+        <section class="site-content-section">
+            <h2 class="site-content-section__title">Категорії</h2>
+            <nav class="site-alpha-nav" aria-label="Категорії товарів">
+                <a class="site-segmented-control__item{% if not category %} is-active{% endif %}"
+                   href="{% url 'market:list' %}">Усі категорії</a>
+                {% for item in categories %}
+                    <a class="site-segmented-control__item{% if category.pk == item.pk %} is-active{% endif %}"
+                       href="{% url 'market:category' item.slug %}">{{ item.market_label }}</a>
+                {% endfor %}
+            </nav>
+        </section>
+    {% endif %}
+    <div class="site-card-list">
+        {% for variety in varieties %}
+            <article class="site-list-card{% if not variety.primary_photo %} site-list-card--text-only{% endif %}">
+                {% if variety.primary_photo %}
+                    <a class="site-list-card__media"
+                       href="{% url 'market:variety' variety.pk %}">
+                        <img src="{{ variety.primary_photo.image.url }}"
+                             alt="{{ variety.title }}"
+                             width="350"
+                             height="260"
+                             loading="lazy"
+                             class="site-list-card__image">
+                    </a>
+                {% endif %}
+                <div class="site-list-card__body">
+                    <p class="site-content-section__eyebrow">{{ variety.rubric.value }}</p>
+                    <h2 class="site-list-card__title"><a class="site-list-card__title-link"
+   href="{% url 'market:variety' variety.pk %}">{{ variety.title }}</a></h2>
+                    {% for price in variety.market_prices %}
+                        <p class="site-product-card__price">{{ price.min }}{% if price.max != price.min %} – {{ price.max }}{% endif %} {{ price.currency }}</p>
+                    {% endfor %}
+                    <p class="site-list-card__text">Пропозицій: {{ variety.market_offer_count }} · Компаній: {{ variety.market_seller_count }}</p>
+                    <a class="site-list-card__link"
+                       href="{% url 'market:variety' variety.pk %}">Порівняти пропозиції</a>
+                </div>
+            </article>
+        {% empty %}
+            <section class="site-content-section">
+                <h2 class="site-content-section__title">Пропозиції ще збираються</h2>
+                <p class="site-content-section__text">Поки немає пропозицій. Тут з’являться сорти та ціни після оновлення пропозицій компаній.</p>
+                <div class="site-list-card__actions"><a class="site-list-card__link" href="{% url 'companies:list' %}">Переглянути компанії</a></div>
+            </section>
+        {% endfor %}
+    </div>
+    {% include "companies/market_pagination.html" %}
+    {% if market_text and page_obj.number == 1 %}<div class="site-content-section site-article-body">{{ market_text|linebreaks }}</div>{% endif %}
+{% endblock market_content %}

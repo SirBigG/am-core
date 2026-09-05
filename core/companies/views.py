@@ -3,6 +3,8 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
+from core.classifier.models import Category, Region
+
 from .forms import AdminParseForm
 from .models import Company, CompanyType, Product
 from .parser import get_content_from_url, parse_data_from_content
@@ -12,9 +14,29 @@ class CompanyListView(ListView):
     model = Company
     template_name = "companies/list.html"
     context_object_name = "companies"
+    paginate_by = 24
 
     def get_queryset(self):
-        return Company.objects.filter(active=True, type=CompanyType.SHOP)
+        queryset = Company.objects.filter(active=True, type=CompanyType.SHOP)
+        category = self.request.GET.get("category", "")
+        region = self.request.GET.get("region", "")
+        if category:
+            queryset = queryset.filter(products__category__slug=category, products__active=True)
+        if region:
+            queryset = queryset.filter(location__region__slug=region)
+        return queryset.distinct().order_by("name", "pk")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        shops = Company.objects.filter(active=True, type=CompanyType.SHOP)
+        context.update(
+            market_tab="companies",
+            company_categories=Category.objects.filter(product__company__in=shops, product__active=True, is_active=True)
+            .distinct()
+            .order_by("value"),
+            company_regions=Region.objects.filter(location__company__in=shops).distinct().order_by("value"),
+        )
+        return context
 
 
 class CompanyDetailView(DetailView):

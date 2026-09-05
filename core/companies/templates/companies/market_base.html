@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}{{ market_title }}{% endblock title %}
+{% block meta_description %}{{ market_description }}{% endblock meta_description %}
+{% block page_header %}
+{% endblock page_header %}
+{% block robots %}
+    <meta name="robots"
+          content="{% if market_noindex %}noindex,follow{% else %}index,follow{% endif %}">
+{% endblock robots %}
+{% block scripts %}
+    <script src="{% static 'posts/j-index.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'posts/list.css' %}">
+{% endblock scripts %}
+{% block content %}
+    <div class="site-catalog-shell">
+        <header class="site-catalog-hero">
+            <p class="site-catalog-hero__eyebrow">Агромаркет · Каталог пропозицій</p>
+            <h1 class="site-catalog-hero__title">{{ market_heading }}</h1>
+            <p class="site-catalog-hero__text">Сорти з каталогу AgroMega та пропозиції компаній. Оберіть категорію, щоб порівняти ціни.</p>
+            <ul class="site-catalog-stats" aria-label="Огляд пропозицій">
+                {% if variety %}
+                    <li class="site-catalog-stats__item">{{ variety.market_offer_count }} пропозицій</li>
+                    <li class="site-catalog-stats__item">{{ variety.market_seller_count }} компаній</li>
+                {% else %}
+                    <li class="site-catalog-stats__item">{{ paginator.count }} сортів із пропозиціями</li>
+                {% endif %}
+            </ul>
+            <small class="text-muted">Товари та ціни наведені для ознайомлення. Наявність, актуальну ціну та умови придбання уточнюйте безпосередньо на сайті компанії.</small>
+        </header>
+        {% include "companies/market_tabs.html" %}
+        {% block market_content %}
+        {% endblock market_content %}
+    </div>
+{% endblock content %}

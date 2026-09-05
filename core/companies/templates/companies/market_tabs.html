@@ -1,0 +1,8 @@
+<nav class="site-segmented-control" aria-label="Розділи Агромаркету">
+    <a class="site-segmented-control__item{% if market_tab == 'products' %} is-active{% endif %}"
+       href="{% url 'market:list' %}"
+       {% if market_tab == 'products' %} aria-current="page"{% endif %}>Товари</a>
+    <a class="site-segmented-control__item{% if market_tab == 'companies' %} is-active{% endif %}"
+       href="{% url 'companies:list' %}"
+       {% if market_tab == 'companies' %} aria-current="page"{% endif %}>Компанії</a>
+</nav>

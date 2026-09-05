@@ -147,3 +147,40 @@ state or the proposed outcome has changed, no changes are applied and an updated
 preview is shown. Application requires Product change permission. Migration 0017
 adds aliases and scopes without rewriting existing product links; existing rules
 remain global. No production deployment is part of this change.
+
+## Agromarket category MVP
+
+`/agromarket/` is the commercial catalog entry point. Its default Products tab
+lists catalog varieties, not seller titles. Category pages use
+`/agromarket/category/<catalog-slug>/`; offer comparisons use
+`/agromarket/variety/<post-id>/`. The Companies tab preserves `/companies/` and
+existing company detail URLs, with category and region filters. Main navigation
+now points to Agromarket.
+
+Catalog posts own variety identity, categories and published characteristics.
+Seller descriptions do not supply public variety filters. Category navigation is
+derived from categories with eligible offers; detailed characteristic filters are
+outside this first release. Unlinked products remain outside the market.
+
+Eligible offers require an active product and company, a published catalog post
+in an active category matching the product category, and a positive current price
+(or positive minimum price) observed within PRODUCT_PRICE_FRESH_DAYS. Historical
+and inactive offers remain stored but do not affect cards, counts or price ranges.
+Company counts are distinct; offer counts still include separate product records.
+Different currencies have separate ranges, with no implicit conversion. A price
+range describes seller offers and does not imply identical age, rootstock or packaging.
+Seller availability still requires confirmation on the seller's site.
+
+SEO landing records in the companies admin allow optional navigation labels,
+title, description, H1 and plain-text body for the root or a catalog category.
+Blank fields use generated defaults; category discovery does not require creating
+an SEO record. One blank-category record configures the root. Migration 0018 adds
+this configuration without altering catalog or product data. Category names can
+be shortened for commercial navigation (for example, Яблуні) using the label field.
+
+Empty landing pages and query variants are noindex; empty categories are absent
+from navigation. Variety offer pages without eligible offers return 404. Market
+pages have their own canonical URLs distinct from editorial catalog pages. The
+market sitemap includes only currently populated landing and variety pages and is
+linked from the sitemap index. Reuse of the catalog's structured characteristics
+does not depend on rebuilding its separate filter index for this release.

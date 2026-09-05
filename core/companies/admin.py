@@ -12,6 +12,7 @@ from .matching_review import matching_preview
 from .models import (
     Company,
     Link,
+    MarketPage,
     ParserSourceAttempt,
     Product,
     ProductMatchAlias,
@@ -260,3 +261,9 @@ class ParserSourceAttemptAdmin(admin.ModelAdmin):
     list_filter = ("status", "worker_name", "source_link")
     search_fields = ("source_link__url", "worker_name", "error")
     readonly_fields = ("parser_config", "created")
+
+
+@admin.register(MarketPage)
+class MarketPageAdmin(admin.ModelAdmin):
+    list_display = ("__str__", "label", "title", "heading")
+    search_fields = ("category__value", "title", "heading")

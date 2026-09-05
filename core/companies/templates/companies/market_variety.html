@@ -1,0 +1,40 @@
+{% extends "companies/market_base.html" %}
+{% block market_content %}
+    <p><a href="{% url 'market:category' variety.rubric.slug %}">{{ variety.rubric.value }}</a> / {{ variety.title }}</p>
+    <header class="site-content-section">
+        <h2 class="site-content-section__title">Пропозиції компаній</h2>
+    </header>
+    <div class="site-card-list">
+        {% for offer in variety.market_offers %}
+            <article class="site-list-card site-list-card--text-only">
+                <div class="site-list-card__body">
+                    <h3 class="site-list-card__title">{{ offer.name }}</h3>
+                    <p><a href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a> · {{ offer.company.location.value }}</p>
+                    <p class="site-product-card__price">{{ offer.market_price_min }}{% if offer.market_price_min != offer.market_price_max %} – {{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"Валюта не вказана" }}</p>
+                    <p>Ціну отримано {{ offer.price_updated_at|date:"d.m.Y" }}</p>
+                    {% if offer.link %}
+                        <a class="site-list-card__link"
+                           href="{{ offer.link }}"
+                           target="_blank"
+                           rel="nofollow noopener">До продавця</a>
+                    {% else %}
+                        <a class="site-list-card__link"
+                           href="{{ offer.company.get_absolute_url }}">Контакти компанії</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+    <section class="site-content-section">
+        <h2 class="site-content-section__title">Характеристики сорту</h2>
+        {% for group in attributes %}
+            <h3 class="site-product-card__price">{{ group.title }}</h3>
+            <dl>
+                {% for field in group.fields %}<dt>{{ field.label }}</dt><dd>{{ field.value }} {{ field.unit }}</dd>{% endfor %}
+            </dl>
+        {% empty %}
+            <p>Структуровані характеристики ще доповнюються.</p>
+        {% endfor %}
+        <a class="site-list-card__link" href="{{ variety.get_absolute_url }}">Повний опис сорту в каталозі AgroMega</a>
+    </section>
+{% endblock market_content %}

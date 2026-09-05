@@ -526,3 +526,29 @@ class ProductPriceHistory(models.Model):
 
     def __str__(self):
         return f"{self.product} {self.price} {self.currency} {self.observed_at}"
+
+
+class MarketPage(models.Model):
+    category = models.OneToOneField(
+        "classifier.Category",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Категорія",
+        help_text="Порожньо — головна сторінка Агромаркету.",
+    )
+    label = models.CharField("Назва в навігації", max_length=200, blank=True)
+    title = models.CharField("SEO title", max_length=250, blank=True)
+    description = models.CharField("Meta description", max_length=500, blank=True)
+    heading = models.CharField("H1", max_length=250, blank=True)
+    text = models.TextField("Текст сторінки", blank=True, help_text="Звичайний текст без HTML.")
+
+    class Meta:
+        verbose_name = "SEO-сторінка Агромаркету"
+        verbose_name_plural = "SEO-сторінки Агромаркету"
+        constraints = [
+            models.UniqueConstraint(models.Value(1), condition=Q(category__isnull=True), name="single_market_root_page")
+        ]
+
+    def __str__(self):
+        return str(self.category) if self.category_id else "Агромаркет — головна"
