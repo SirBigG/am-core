@@ -194,3 +194,20 @@ The region describes the company's address, not its delivery coverage. Offer
 eligibility, price ranges and counts are all restricted to the selected region;
 variety links and pagination preserve it. Region query pages remain noindex and
 are not added to sitemaps. Catalog photos remain untouched in their original posts.
+
+### Source encoding overrides
+
+The company/source parser form exposes optional **Page encoding**, stored as
+`parser_map.encoding` (for example `utf-8` or `windows-1251`). Unsupported
+encodings are rejected by the form. Clearing the field restores worker defaults:
+the backend decodes UTF-8, while Parser Studio lets lxml interpret the HTML bytes.
+An explicit override takes precedence over HTML charset declarations and applies
+to both product extraction and pagination. Already decoded browser HTML is not
+re-encoded. The parser API transports the option in the existing configuration;
+no database migration is needed.
+
+Update Parser Studio and any standalone backend workers before setting this
+option: older workers treat unknown configuration keys as XPath selectors.
+After updating Studio, restart it and reload sources. Re-run affected sources
+to refresh incorrectly decoded product names; this change does not repair saved
+historical records automatically.

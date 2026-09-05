@@ -253,7 +253,11 @@ class Command(BaseCommand):
                 if current_url in visited:
                     raise ValueError(f"Pagination loop detected at {current_url}")
                 visited.add(current_url)
-                content = get_content_from_url(current_url)
+                content = (
+                    get_content_from_url(current_url, encoding=parser_map["encoding"])
+                    if parser_map.get("encoding")
+                    else get_content_from_url(current_url)
+                )
                 raw_products.extend(parse_data_from_content(content, parser_map))
                 following_url = get_next_page_url(content, current_url, parser_map)
                 if not following_url:

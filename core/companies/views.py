@@ -59,10 +59,11 @@ def admin_parse_form_view(request, company_id: int):
             # get company
             company = Company.objects.get(id=company_id)
             objects = []
+            parser_map = form.cleaned_data.get("custom_parser_map") or company.parser_map or {}
             # process the form
             if form.cleaned_data.get("url"):
                 # parse from url
-                content = get_content_from_url(form.cleaned_data.get("url"))
+                content = get_content_from_url(form.cleaned_data.get("url"), encoding=parser_map.get("encoding"))
                 # parse content
                 objects = parse_data_from_content(
                     content, form.cleaned_data.get("custom_parser_map") or company.parser_map
@@ -70,7 +71,9 @@ def admin_parse_form_view(request, company_id: int):
             else:
                 # parse from file
                 for file in request.FILES.getlist("files"):
-                    content = file.read().decode("utf-8")
+                    content = file.read()
+                    if not parser_map.get("encoding"):
+                        content = content.decode("utf-8")
                     # parse content
                     objects.extend(
                         parse_data_from_content(

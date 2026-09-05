@@ -2,6 +2,7 @@ from dal import autocomplete
 from django import forms
 from django.forms import Textarea
 from django.utils.translation import gettext_lazy as _
+from lxml import html
 from mptt.forms import TreeNodeChoiceField
 
 from ..classifier.models import Category, Location
@@ -10,6 +11,22 @@ from .models import Company, Link, Product
 
 
 class ParserMapFormMixin(forms.ModelForm):
+    parser_encoding = forms.CharField(
+        label=_("Page encoding"),
+        help_text=_("Optional override, e.g. utf-8 or windows-1251. Leave blank to keep worker defaults."),
+        required=False,
+        max_length=64,
+    )
+
+    def clean_parser_encoding(self):
+        value = self.cleaned_data["parser_encoding"].strip().lower()
+        if value:
+            try:
+                html.HTMLParser(encoding=value)
+            except (LookupError, ValueError) as exc:
+                raise forms.ValidationError(_("Unsupported page encoding.")) from exc
+        return value
+
     parser_item_xpath = forms.CharField(
         label=_("Product item XPath"),
         help_text=_("Optional container XPath. Field selectors are evaluated relative to every product item."),
@@ -66,6 +83,7 @@ class ParserMapFormMixin(forms.ModelForm):
     )
 
     parser_map_fields = {
+        "parser_encoding": "encoding",
         "parser_item_xpath": "item",
         "parser_name_xpath": "name",
         "parser_price_xpath": "price",

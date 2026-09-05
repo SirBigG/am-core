@@ -14,12 +14,20 @@ from selenium.webdriver.firefox.service import Service as FirefoxService
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-PARSER_CONFIG_KEYS = {"item", "max_pages", "next_page", "snapshot_complete"}
+PARSER_CONFIG_KEYS = {"encoding", "item", "max_pages", "next_page", "snapshot_complete"}
 SOURCE_REQUEST_HEADERS = {
     "User-Agent": "Mozilla/5.0 (compatible; AgroMegaParser/1.0; +https://agromega.in.ua/)",
     "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "Accept-Language": "uk-UA,uk;q=0.9,en;q=0.7",
 }
+
+
+def parse_document(content, parser_map):
+    """Override decoding only for raw bytes; browser HTML is already
+    Unicode."""
+    encoding = parser_map.get("encoding")
+    parser = html.HTMLParser(encoding=encoding) if encoding else None
+    return html.fromstring(content, parser=parser if isinstance(content, bytes) else None)
 
 
 def extract_price(value):
@@ -112,7 +120,7 @@ def parse_data_from_content(html_content, data_xpaths):
     A dictionary with the same keys as data_xpaths, but the values are lists of extracted data.
     """
     # Parse the HTML
-    tree = html.fromstring(html_content)
+    tree = parse_document(html_content, data_xpaths)
 
     item_xpath = data_xpaths.get("item")
     if item_xpath:
@@ -125,24 +133,25 @@ def get_next_page_url(html_content, current_url, data_xpaths):
     xpath = data_xpaths.get("next_page")
     if not xpath:
         return None
-    values = html.fromstring(html_content).xpath(xpath)
+    values = parse_document(html_content, data_xpaths).xpath(xpath)
     value = _xpath_value(values[0]) if values else None
     return urljoin(current_url, value) if value else None
 
 
-def get_content_from_url(url):
+def get_content_from_url(url, encoding=None):
     """Fetches the content of a webpage given its URL.
 
     Parameters:
     - url: The URL of the webpage.
 
     Returns:
-    The content of the webpage as a string.
+    The content as UTF-8 text by default, or raw bytes when an encoding override
+    is supplied for the HTML parser.
     """
     response = requests.get(url, headers=SOURCE_REQUEST_HEADERS, timeout=20)
     if response.status_code != 200:
         raise ValueError(f"Failed to fetch content from {url}. Status code: {response.status_code}")
-    return response.content.decode("utf-8")
+    return response.content if encoding else response.content.decode("utf-8")
 
 
 # def parse_link_with_js(link):

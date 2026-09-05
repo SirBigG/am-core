@@ -39,6 +39,48 @@ class CompanyParserDriverTests(SimpleTestCase):
 
 class CompanyParserExtractionTests(SimpleTestCase):
     @patch("core.companies.parser.requests.get")
+    def test_encoding_override_fetch_extraction_and_pagination(self, get):
+        from core.companies.parser import get_next_page_url
+
+        for encoding in ("utf-8", "windows-1251"):
+            content = (
+                '<meta charset="iso-8859-1"><article><h2>Яблуня Айдаред</h2></article><a href="/next">Далі</a>'
+            ).encode(encoding)
+            get.return_value.status_code = 200
+            get.return_value.content = content
+            config = {
+                "encoding": encoding,
+                "item": "//article",
+                "name": ".//h2/text()",
+                "next_page": "//a[text()='Далі']/@href",
+            }
+            fetched = get_content_from_url("https://shop.example", encoding=encoding)
+            self.assertEqual(parse_data_from_content(fetched, config), [{"name": "Яблуня Айдаред"}])
+            self.assertEqual(get_next_page_url(fetched, "https://shop.example", config), "https://shop.example/next")
+
+    @patch("core.companies.parser.requests.get")
+    def test_worker_applies_encoding_override(self, get):
+        get.return_value.status_code = 200
+        get.return_value.content = "<article><h2>Яблуня Айдаред</h2></article>".encode("windows-1251")
+        products, _ = LocalParserWorkerCommand().parse_source(
+            {
+                "url": "https://shop.example",
+                "source_type": "static",
+                "parser_map": {"encoding": "windows-1251", "item": "//article", "name": ".//h2/text()"},
+            }
+        )
+        self.assertEqual(products[0]["name"], "Яблуня Айдаред")
+
+    def test_encoding_form_validation(self):
+        for value in ("utf-8", "windows-1251", ""):
+            form = LinkForm(data={"parser_encoding": value})
+            form.is_valid()
+            self.assertNotIn("parser_encoding", form.errors)
+        form = LinkForm(data={"parser_encoding": "invalid-encoding"})
+        form.is_valid()
+        self.assertIn("parser_encoding", form.errors)
+
+    @patch("core.companies.parser.requests.get")
     def test_static_fetch_uses_source_friendly_request_headers(self, get):
         get.return_value.status_code = 200
         get.return_value.content = b"<html></html>"
@@ -456,6 +498,7 @@ class CompanyAdminParserSafetyTests(TestCase):
             "parser_snapshot_complete": "on",
             "parser_next_page_xpath": "//a[@rel='next']/@href",
             "parser_max_pages": "3",
+            "parser_encoding": "UTF-8",
         }
 
         form = LinkForm(data=data, instance=self.source)
@@ -473,6 +516,7 @@ class CompanyAdminParserSafetyTests(TestCase):
                 "snapshot_complete": True,
                 "next_page": "//a[@rel='next']/@href",
                 "max_pages": 3,
+                "encoding": "utf-8",
             },
         )
 
