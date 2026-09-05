@@ -40,26 +40,27 @@
             <button type="submit" class="btn btn-success align-self-end">Показати</button>
             <a href="{% url 'companies:list' %}" class="align-self-end">Скинути</a>
         </form>
-        <div class="site-card-list">
+        <div class="site-card-list site-company-grid">
             {% for company in companies %}
-                <article class="site-list-card{% if not company.logo %} site-list-card--text-only{% endif %}">
-                    {% if company.logo %}
-                        <a class="site-list-card__media site-list-card__media--logo"
-                           href="{{ company.get_absolute_url }}"
-                           aria-label="{{ company.name }}">
-                            <img src="{{ company.logo.url }}"
-                                 alt="{{ company.name }} logo"
-                                 width="350"
-                                 height="260"
-                                 class="site-list-card__image site-list-card__image--logo">
-                        </a>
-                    {% endif %}
+                <article class="site-list-card site-list-card--text-only site-company-card">
                     <div class="site-list-card__body">
-                        <h2 class="site-list-card__title">
-                            <a class="site-list-card__title-link"
-                               href="{{ company.get_absolute_url }}">{{ company.name }}</a>
-                        </h2>
-                        <p class="site-list-card__text">{{ company.description|striptags|safe|truncatechars:200 }}</p>
+                        <header class="site-company-card__header">
+                            {% if company.logo %}
+                                <img src="{{ company.logo.url }}"
+                                     alt=""
+                                     width="56"
+                                     height="56"
+                                     loading="lazy"
+                                     class="site-company-card__logo">
+                            {% endif %}
+                            <h2 class="site-list-card__title">
+                                <a class="site-list-card__title-link"
+                                   href="{{ company.get_absolute_url }}">{{ company.name }}</a>
+                            </h2>
+                        </header>
+                        {% if company.description %}
+                            <p class="site-list-card__text">{{ company.description|striptags|truncatechars:160 }}</p>
+                        {% endif %}
                         <div class="site-list-card__actions">
                             <a class="site-list-card__link" href="{{ company.get_absolute_url }}">Докладніше</a>
                         </div>
