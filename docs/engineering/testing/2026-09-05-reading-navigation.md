@@ -23,3 +23,20 @@ Native smooth scrolling stalled in the test browser. The shared helper therefore
 uses a short requestAnimationFrame animation with immediate scroll steps. It
 respects reduced motion and cancels on keyboard, pointer, wheel or touch input.
 No database changes, dependency changes, or community-app template changes.
+
+## 2026-09-06 mobile disclosure regression
+
+Opening the original sticky disclosure changed document height and scroll
+anchoring: at 390 × 844, scrollY changed from 1266 to 1397.5. The reported full
+jump to the page top was not reproduced in the local browser.
+
+The mobile list now opens as an absolutely positioned panel beneath the summary,
+keeping the disclosure's layout height constant. Escape returns focus with
+`preventScroll`. Native details keyboard and disclosure semantics are retained.
+
+Verified on post 4081 after rebuilding and collecting static assets:
+- 390 × 844: open, close and Enter leave scrollY at 1266 and document height at 4095.
+- 320 × 740: open and Escape leave scrollY at 1019.5 and document height at 4525.
+- Selecting a section still closes the mobile list and places the heading below it.
+- 1440 × 900: the desktop side column keeps an in-flow list without horizontal overflow.
+- Production static build, JS syntax check and diff whitespace check passed.

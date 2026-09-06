@@ -53,7 +53,7 @@
             details.addEventListener('keydown', event => {
                 if (event.key === 'Escape' && !wide.matches) {
                     details.open = false;
-                    summary.focus();
+                    summary.focus({preventScroll: true});
                 }
             });
         }

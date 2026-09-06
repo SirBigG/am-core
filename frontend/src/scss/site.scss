@@ -2510,6 +2510,24 @@ span.flatpickr-weekday {
     a[aria-current] { font-weight: 700; }
     &__subsection { padding-left: .9rem; }
 }
+// Keep the sticky disclosure's footprint stable while its list opens.
+// Changing its height makes mobile scroll anchoring move the reading position.
+@media (max-width: 1399.98px) {
+    .publication-toc {
+        details { position: relative; }
+        ul {
+            position: absolute;
+            top: 100%;
+            left: -1px;
+            right: -1px;
+            background: #f7fbf8;
+            border: 1px solid #d7e8da;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 8px 12px rgba(15, 23, 42, .08);
+        }
+        details[open] { border-radius: 12px 12px 0 0; }
+    }
+}
 @media (min-width: 1400px) {
     .publication-toc {
         position: absolute;
