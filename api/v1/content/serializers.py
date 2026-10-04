@@ -1,6 +1,10 @@
+from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import transaction
 from rest_framework import serializers
 
 from core.classifier.models import Category, Country
+from core.posts.attribute_validation import validate_category_attributes
+from core.posts.category_attributes import rebuild_post_attribute_values
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post
 
@@ -86,6 +90,59 @@ class ContentPostSerializer(serializers.ModelSerializer):
             "title": {"required": True},
             "text": {"required": True},
         }
+
+    def validate(self, attrs):
+        category = attrs.get("rubric") or getattr(self.instance, "rubric", None)
+        if category and "category_attributes" in attrs:
+            try:
+                supplied = validate_category_attributes(category, attrs["category_attributes"])
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"category_attributes": exc.messages}) from exc
+            historical = dict(getattr(self.instance, "category_attributes", {}) or {})
+            historical.pop(str(category.pk), None)
+            historical.update(supplied)
+            attrs["category_attributes"] = historical
+        return attrs
+
+    @transaction.atomic
+    def create(self, validated_data):
+        category = Category.objects.select_for_update().get(pk=validated_data["rubric"].pk)
+        if "category_attributes" in validated_data:
+            try:
+                validated_data["category_attributes"] = validate_category_attributes(
+                    category, validated_data["category_attributes"]
+                )
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"category_attributes": exc.messages}) from exc
+        post = super().create(validated_data)
+        rebuild_post_attribute_values(post)
+        return post
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+        # Serialize editorial writes before replacing the JSON and derived rows.
+        instance = Post.objects.select_for_update().get(pk=instance.pk)
+        if "category_attributes" in validated_data or "rubric" in validated_data:
+            category = validated_data.get("rubric", instance.rubric)
+            Category.objects.select_for_update().get(pk=category.pk)
+        if "category_attributes" in validated_data:
+            category = validated_data.get("rubric", instance.rubric)
+            supplied = validated_data["category_attributes"].get(str(category.pk), {})
+            try:
+                validated = validate_category_attributes(category, {str(category.pk): supplied})
+                supplied = validated.get(str(category.pk), {})
+            except DjangoValidationError as exc:
+                raise serializers.ValidationError({"category_attributes": exc.messages}) from exc
+            historical = dict(instance.category_attributes or {})
+            historical.pop(str(category.pk), None)
+            if supplied:
+                historical[str(category.pk)] = supplied
+            validated_data["category_attributes"] = historical
+        changed = "category_attributes" in validated_data or "rubric" in validated_data
+        post = super().update(instance, validated_data)
+        if changed:
+            rebuild_post_attribute_values(post)
+        return post
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
