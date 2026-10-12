@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.cache import cache
 from django.db.models import F
-from django.http import FileResponse, Http404
+from django.http import FileResponse, Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.views.decorators.cache import never_cache
@@ -223,6 +223,14 @@ class PostDetail(DetailView):
 
     def get_queryset(self):
         return Post.objects.select_objects().select_related("publisher")
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        canonical_path = self.object.get_absolute_url()
+        if request.path != canonical_path:
+            return HttpResponsePermanentRedirect(canonical_path)
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""

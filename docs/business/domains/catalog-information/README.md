@@ -24,6 +24,10 @@ Catalog information is the main knowledge area of the product. It contains struc
 - Integration post creation derives the publisher from the credential and never trusts a publisher supplied in the request body.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.
+- Main-site post detail URLs use the post's current category and slug as the
+  canonical path. After deployment of canonical redirects, old category or slug
+  paths with the same post ID return HTTP 301 directly to that current path.
+  GET and HEAD use the same rule; query parameters are omitted from the redirect.
 - The global “Цікавинки на додачу” discovery block includes only active posts with images, prefers different broad category trees, excludes the page's current post, and avoids immediately repeating the four visible items when a visitor requests another set.
 - Registry spreadsheet refreshes should preserve existing variety records and update them in place by variety title plus registry category.
 - Active registry rows clear exclusion metadata when an existing variety is present in the active sheet.
