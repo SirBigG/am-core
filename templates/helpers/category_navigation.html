@@ -1,0 +1,21 @@
+{% for category in root_category_links %}
+    <li>
+        {% if category.children %}
+            <details class="category-navigation">
+                <summary class="dropdown-item category-navigation__toggle">{{ category.title }}</summary>
+                <ul class="category-navigation__children">
+                    <li>
+                        <a class="dropdown-item category-navigation__overview"
+                           href="{{ category.url }}">Усе в розділі «{{ category.title }}»</a>
+                    </li>
+                    {% for child in category.children %}
+                        <li><a class="dropdown-item" href="{{ child.url }}">{{ child.title }}</a></li>
+                    {% endfor %}
+                </ul>
+            </details>
+        {% else %}
+            <a class="dropdown-item site-header__dropdown-link"
+               href="{{ category.url }}">{{ category.title }}</a>
+        {% endif %}
+    </li>
+{% endfor %}

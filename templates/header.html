@@ -12,8 +12,9 @@
                        id="readNavbarDropdown"
                        role="button"
                        data-bs-toggle="dropdown"
+                       data-bs-auto-close="outside"
                        aria-expanded="false">Почитати</a>
-                    <ul class="dropdown-menu border border-success"
+                    <ul class="dropdown-menu border border-success category-navigation-menu"
                         aria-labelledby="readNavbarDropdown">
                         <li>
                             <a class="dropdown-item site-header__dropdown-link"
@@ -22,21 +23,7 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        {% for category in root_category_links %}
-                            <li>
-                                <a class="dropdown-item site-header__dropdown-link"
-                                   href="{{ category.url }}">{{ category.title }}</a>
-                            </li>
-                        {% endfor %}
-                        <li>
-                            <hr class="dropdown-divider">
-                        </li>
-                        <li>
-                            <a class="dropdown-item site-header__dropdown-link"
-                               href="{% url 'registry:index' %}">Державний реєстр
-                                сортів рослин,
-                            придатних для поширення в Україні</a>
-                        </li>
+                        {% include "helpers/category_navigation.html" %}
                     </ul>
                 </li>
                 <li class="nav-item">

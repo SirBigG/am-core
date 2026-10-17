@@ -2540,3 +2540,80 @@ span.flatpickr-weekday {
         ul { max-height: calc(100dvh - var(--reading-top, 16px) - 90px); }
     }
 }
+
+// Shared downward disclosures keep category navigation usable with touch and keyboard.
+.site-header .category-navigation-menu,
+.mobile-bottom-nav .category-navigation-menu {
+    width: min(360px, calc(100vw - 24px));
+    max-height: min(70vh, 560px);
+    max-height: min(70dvh, 560px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.category-navigation-menu .dropdown-item {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0.65rem 0.85rem;
+    color: #215c34;
+    border-radius: 12px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+.category-navigation__toggle {
+    justify-content: space-between;
+    gap: 0.75rem;
+    cursor: pointer;
+    list-style: none;
+    font-weight: 650;
+}
+
+.category-navigation__toggle::-webkit-details-marker {
+    display: none;
+}
+
+.category-navigation__toggle::after {
+    content: "";
+    flex: 0 0 8px;
+    width: 8px;
+    height: 8px;
+    margin-right: 4px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+}
+
+.category-navigation[open] > summary::after {
+    transform: rotate(225deg);
+}
+
+.category-navigation__children {
+    margin: 0.25rem 0.5rem 0.75rem 1rem;
+    padding: 0 0 0 0.5rem;
+    border-left: 2px solid #dbe7dd;
+    list-style: none;
+}
+
+.category-navigation__overview {
+    font-weight: 650;
+}
+
+.category-navigation-menu .dropdown-item:focus-visible {
+    outline: 2px solid #0b8043;
+    outline-offset: -2px;
+}
+
+.mobile-bottom-nav .category-navigation-anchor {
+    position: static;
+}
+
+#bottom-mobile-menu .category-navigation-menu {
+    top: auto;
+    right: auto;
+    bottom: 100%;
+    left: 12px;
+    margin-bottom: 8px;
+}

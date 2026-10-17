@@ -2,16 +2,18 @@
 <div id="bottom-mobile-menu"
      class="navbar bg-light fixed-bottom d-lg-none mt-3 border-top border-success mobile-bottom-nav">
     <div class="mobile-bottom-nav__item">
-        <div class="btn-group dropup">
-            <button class="btn btn-link mobile-bottom-nav__control{% if request.resolver_match.url_name == 'categories' or request.resolver_match.url_name == 'plant-diary' or request.resolver_match.namespace == 'events' or request.resolver_match.namespace == 'companies' or request.resolver_match.namespace == 'registry' %} is-active{% endif %}"
+        <div class="btn-group dropup category-navigation-anchor">
+            <button class="btn btn-link mobile-bottom-nav__control{% if request.resolver_match.url_name == 'categories' or request.resolver_match.url_name == 'plant-diary' or request.resolver_match.namespace == 'events' or request.resolver_match.namespace == 'companies' %} is-active{% endif %}"
                     data-bs-toggle="dropdown"
+                    data-bs-auto-close="outside"
+                    data-bs-display="static"
                     aria-haspopup="true"
                     aria-expanded="false"
                     aria-label="Відкрити меню розділів">
                 <span class="mobile-bottom-nav__icon" aria-hidden="true"><i class="icon-th-list"></i></span>
                 <span class="mobile-bottom-nav__label">Розділи</span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-start">
+            <ul class="dropdown-menu dropdown-menu-start category-navigation-menu">
                 <li>
                     <a class="dropdown-item text-success no-decoration"
                        href="{% url 'categories' %}">Всі категорії</a>
@@ -19,12 +21,7 @@
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                {% for category in root_category_links %}
-                    <li>
-                        <a class="dropdown-item text-success no-decoration"
-                           href="{{ category.url }}">{{ category.title }}</a>
-                    </li>
-                {% endfor %}
+                {% include "helpers/category_navigation.html" %}
                 <li>
                     <hr class="dropdown-divider">
                 </li>
@@ -43,10 +40,6 @@
                 <li>
                     <a class="dropdown-item text-success no-decoration"
                        href="{{ forum_sso_url }}">Спільнота</a>
-                </li>
-                <li>
-                    <a class="dropdown-item text-success no-decoration"
-                       href="{% url 'registry:index' %}">Державний реєстр сортів рослин</a>
                 </li>
                 <li>
                     <hr class="dropdown-divider">
