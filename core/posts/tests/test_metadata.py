@@ -123,7 +123,8 @@ class PublicationMetadataTests(TestCase):
     def test_canonical_uses_publication_url_even_on_an_alias_path(self):
         alias = self.url.replace(self.post.slug, "obsolete-slug")
         response = self.client.get(alias + "?utm_source=example")
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, self.url, status_code=301)
+        response = self.client.get(response.url)
         document = html.fromstring(response.content)
         expected = "https://agromega.in.ua" + self.url
         self.assertEqual(document.xpath('//link[@rel="canonical"]/@href'), [expected])

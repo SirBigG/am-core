@@ -9,4 +9,5 @@ exclude =
     .venv,
     __pycache__,
     migrations,
-    staticfiles
+    staticfiles,
+    content_refresh_runs

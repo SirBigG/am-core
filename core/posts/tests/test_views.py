@@ -513,10 +513,20 @@ class SiteMapTests(TestCase):
         child = CategoryFactory(parent=parent)
         PostFactory.create_batch(5, **{"rubric": child})
 
+    @override_settings(HOST="https://agromega.in.ua", FORUM_BASE_URL="https://agromega.in.ua/forum/")
     def test_return_context(self):
         response = client.get("/sitemap.xml")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context["urls"]), 4)
+        self.assertCountEqual(
+            [item["loc"] for item in response.context["urls"]],
+            [
+                "https://agromega.in.ua/sitemap-main.xml",
+                "https://agromega.in.ua/sitemap-adverts.xml",
+                "https://agromega.in.ua/sitemap-news.xml",
+                "https://agromega.in.ua/agromarket/sitemap.xml",
+                "https://agromega.in.ua/forum/sitemap.xml",
+            ],
+        )
         self.assertTemplateUsed(response, "sitemap_index.xml")
 
     @override_settings(FORUM_BASE_URL="https://agromega.in.ua/community/")

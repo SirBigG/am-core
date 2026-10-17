@@ -395,7 +395,11 @@ class CropHubTests(TestCase):
         )
         for response, destination in ((market, "/agromarket/"), (companies, "/companies/")):
             self.assertEqual(response.context["crop_hub_category"].pk, self.crop.pk)
-            self.assertContains(response, f'href="{destination}?hub=kartoplya" class="align-self-end">Скинути')
+            self.assertContains(
+                response,
+                f'<a href="{destination}?hub=kartoplya" class="align-self-end">Скинути</a>',
+                html=True,
+            )
             self.assertContains(response, 'href="/kartoplya/"')
         Product.objects.filter(pk=self.offer.pk).delete()
         empty = self.client.get("/agromarket/?hub=kartoplya")

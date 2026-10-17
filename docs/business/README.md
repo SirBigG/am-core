@@ -7,6 +7,9 @@ Keep technical implementation details in `docs/engineering/`.
 ## Current Topics
 
 - `domains/` - domain-driven notes for the business areas represented by the application.
+- [Category pages and widgets](guides/category-pages-and-widgets.md) - an editor
+  and agent guide to catalogs, Crop Hubs, Guide Hubs, configuration, visibility,
+  marketplace metrics and recovery.
 
 ## Domain Documentation Standard
 

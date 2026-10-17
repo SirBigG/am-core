@@ -2,6 +2,10 @@
 
 Deployment, access assignments and rollback: [Guide Hub rollout](guide-hub-rollout.md).
 
+Editorial workflow: [Managing category pages and widgets](../business/guides/category-pages-and-widgets.md).
+The later [hub management API](api/hub-management.md) extends this foundation
+with authenticated section/placement CRUD and presentation management.
+
 Guide Hub is a curated collection of references to existing `posts.Post` rows.
 Its data lives in `core.posts`; the shared taxonomy remains in `core.classifier`.
 
@@ -28,8 +32,9 @@ Its data lives in `core.posts`; the shared taxonomy remains in `core.classifier`
   `guide_hub`; this allows preparation and later presentation changes without
   deleting curation.
 
-New public routes and APIs are not implemented. Existing catalog and
-article-detail behavior stays in place.
+The foundation introduced no new public article routes. Existing article-detail
+behavior stays in place. Agent configuration endpoints were added later; see
+the API reference linked above.
 
 ## Django Admin management
 
@@ -42,8 +47,9 @@ The GuideSection admin supports category autocomplete, title/category search,
 visibility/presentation filters, and an ordered article-placement inline.
 Editors select existing posts with the built-in Django Admin autocomplete,
 which reuses `PostAdmin` title/text search and its request-scoped queryset.
-Placements are edited and deleted here; no standalone placement editor, nested
-inline package, drag-and-drop dependency or API is introduced.
+Placements are edited and deleted here; there is no standalone placement Admin,
+nested inline package or drag-and-drop dependency. Agents can also manage
+placements through the later content API.
 
 Sections and placements use their existing standard Django add/view/change/delete
 model permissions. Category permission or `change_own_post` alone does not grant

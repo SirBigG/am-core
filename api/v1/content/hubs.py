@@ -5,11 +5,12 @@ from django.core.exceptions import ValidationError as ModelValidationError
 from django.db import IntegrityError, transaction
 from django.utils.cache import add_never_cache_headers
 from rest_framework import serializers
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
 from rest_framework.permissions import DjangoModelPermissions, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
 
+from core.classifier.hub_permissions import require_hub_section_deletion
 from core.classifier.models import Category, CategoryHub, CategoryHubSection
 from core.posts.guide_admin_permissions import require_guide_placement_deletion
 from core.posts.models import GuideSection, GuideSectionArticle, Post
@@ -174,8 +175,7 @@ class HubViewSet(ReferenceViewSet):
     filter_field = "category"
 
     def perform_destroy(self, instance):
-        if instance.sections.exists() and not self.request.user.has_perm("classifier.delete_categoryhubsection"):
-            raise PermissionDenied("Deleting a populated hub also requires section delete permission.")
+        require_hub_section_deletion(self.request, instance.sections.all())
         super().perform_destroy(instance)
 
 

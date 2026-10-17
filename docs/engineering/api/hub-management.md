@@ -1,5 +1,8 @@
 # Hub and Guide Hub management API
 
+For editorial setup and widget behavior, see
+[Managing category pages, Crop Hubs and Guide Hubs](../../business/guides/category-pages-and-widgets.md).
+
 Implemented 2026-10-17 under the existing `/api/content/` namespace. These endpoints manage the same configuration records as Django admin. They do not copy categories, move publications, change article bodies, regenerate article/category URLs, or provision agent credentials.
 
 ## Authentication and permissions
@@ -63,6 +66,11 @@ curl --fail-with-body -X PATCH \
 ```
 
 Mutations are atomic. Configuration parents are locked before child edits; duplicate/conflicting relationships return 400 with no partial write. A populated hub cannot be deleted without `delete_categoryhubsection`. A populated GuideSection cannot be deleted without `delete_guidesectionarticle` and visibility of every referenced Post. Deleting a hub or guide section deletes only its configuration/placement rows, preserving categories and Posts.
+
+The Hub-section deletion policy is shared with Admin. Admin enforces it for
+single/bulk hub deletion, Category inlines and taxonomy cascades, including
+cross-branch category targets. See the
+[permission regression record](../security/2026-10-17-hub-deletion-permissions.md).
 
 Hub configuration changes immediately select a new aggregate cache snapshot. Guide section/placement saves and deletions update the affected hubs' database version timestamp, so those changes are reflected across worker caches on the next page read. Existing direct Guide Hub rendering remains uncached. Raw QuerySet bulk updates bypass save signals; ordinary source-content/offer expiry remains bounded by the existing maximum five-minute TTL.
 

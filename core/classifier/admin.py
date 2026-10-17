@@ -10,6 +10,7 @@ from django.utils.cache import add_never_cache_headers, patch_vary_headers
 from django.views.decorators.http import require_safe
 from mptt.admin import DraggableMPTTAdmin
 
+from core.classifier.hub_permissions import hub_sections_in_category_trees, require_hub_section_deletion
 from core.classifier.models import (
     Area,
     Category,
@@ -64,6 +65,13 @@ class CategoryHubInline(admin.StackedInline):
     autocomplete_fields = ("guide_category", "site")
     show_change_link = True
 
+    def has_delete_permission(self, request, obj=None):
+        return super().has_delete_permission(request, obj) and (
+            request.user.has_perm("classifier.delete_categoryhubsection")
+            or obj is None
+            or not CategoryHubSection.objects.filter(hub__category=obj).exists()
+        )
+
 
 class CategoryHubSectionFormSet(BaseInlineFormSet):
     def clean(self):
@@ -100,6 +108,10 @@ class CategoryHubAdmin(admin.ModelAdmin):
     autocomplete_fields = ("category", "guide_category", "site")
     readonly_fields = ("updated",)
     inlines = (CategoryHubSectionInline,)
+
+    def get_deleted_objects(self, objs, request):
+        require_hub_section_deletion(request, CategoryHubSection.objects.filter(hub__in=objs))
+        return super().get_deleted_objects(objs, request)
 
 
 @admin.register(Category)
@@ -182,6 +194,11 @@ class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
 
     def save_formset(self, request, form, formset, change):
         instances = formset.save(commit=False)
+        deleted_hubs = [obj for obj in formset.deleted_objects if isinstance(obj, CategoryHub)]
+        for hub in deleted_hubs:
+            if not self.admin_site.get_model_admin(CategoryHub).has_delete_permission(request, hub):
+                raise PermissionDenied
+        require_hub_section_deletion(request, CategoryHubSection.objects.filter(hub__in=deleted_hubs))
         deleted_sections = [obj for obj in formset.deleted_objects if isinstance(obj, GuideSection)]
         for section in deleted_sections:
             if not self.admin_site.get_model_admin(GuideSection).has_delete_permission(request, section):
@@ -198,6 +215,7 @@ class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
         formset.save_m2m()
 
     def get_deleted_objects(self, objs, request):
+        require_hub_section_deletion(request, hub_sections_in_category_trees(objs))
         require_guide_placement_deletion(self.admin_site, request, guide_placements_in_category_trees(objs))
         return super().get_deleted_objects(objs, request)
 

@@ -19,6 +19,11 @@ Good documentation here should answer three questions:
 
 ## How To Use This Knowledge Base
 
+For editorial setup of the new category pages, start with
+[Managing category pages, Crop Hubs and Guide Hubs](business/guides/category-pages-and-widgets.md).
+It covers Admin configuration, page widgets, guide curation, agent APIs and
+market-data interpretation.
+
 Before starting meaningful implementation work:
 
 1. Read `AGENTS.md`.

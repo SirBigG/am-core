@@ -48,6 +48,8 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 
 ## Implementation Map
 
+- Editorial instructions: [Managing category pages, Crop Hubs and Guide Hubs](../../guides/category-pages-and-widgets.md).
+
 - Guide Hub curation has a data foundation: categories can own ordered sections
   with ordered references to existing articles, including articles owned by
   other categories. The same article can appear in multiple sections without
@@ -64,7 +66,8 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 - Guide Hub editing requires explicit section and placement permissions in
   Django Admin. Article selection respects existing global or own-article
   permissions. Curation never changes article ownership, content or URLs;
-  integration APIs are not part of this workflow.
+  permission-scoped agent management is also available through the
+  [hub management API](../../../engineering/api/hub-management.md).
 - Authorized editors can preview saved, publicly eligible Guide Hub content from
   category and section admin. Unsaved edits and hidden content are excluded.
   Preview access requires category, section, placement and article visibility;

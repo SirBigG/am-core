@@ -1,5 +1,12 @@
 # Reusable category hubs
 
+Editor and agent workflow:
+[Managing category pages, Crop Hubs and Guide Hubs](../../business/guides/category-pages-and-widgets.md).
+
+Latest release verification and resolved deletion-permission issue:
+[Hub deletion permissions](../security/2026-10-17-hub-deletion-permissions.md)
+(646/646 tests on a fresh test database; full application lint passes).
+
 Date: 2026-10-17. Implemented locally; no production deployment or catalog migration performed.
 
 ## Ownership and configuration
