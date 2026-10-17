@@ -1,0 +1,75 @@
+{% extends "posts/parent_index.html" %}
+{% load post_extras %}
+{% block robots %}{% if is_guide_preview %}<meta name="robots" content="noindex,nofollow">{% else %}{{ block.super }}{% endif %}{% endblock robots %}
+{% block canonical %}{% if is_guide_preview %}<link rel="canonical" href="{{ guide_canonical_url }}">{% else %}{{ block.super }}{% endif %}{% endblock canonical %}
+{% block extra_meta %}{% if not is_guide_preview %}{{ block.super }}{% endif %}{% endblock extra_meta %}
+{% block meta_description %}{% if category.meta %}{{ category.meta.description }}{% else %}{{ category.value }}{% endif %}{% endblock meta_description %}
+{% block second_menu %}
+    {% include "posts/second_menu.html" with menu_items=guide_menu_items slug=category.slug %}
+{% endblock second_menu %}
+{% block content %}
+    <div class="site-catalog-shell">
+        {% if is_guide_preview %}
+            <aside class="site-content-section" aria-label="Попередній перегляд">
+                <p>Попередній перегляд збережених публічних матеріалів. Незбережені зміни не відображаються.</p>
+                <a href="{{ guide_admin_url }}">Повернутися до редагування категорії</a>
+            </aside>
+        {% endif %}
+        <header class="site-catalog-hero">
+            <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
+            <p class="site-catalog-hero__eyebrow">Практичний посібник</p>
+            <h1 class="site-catalog-hero__title">
+                {% if category.meta and category.meta.h1 %}
+                    {{ category.meta.h1 }}
+                {% else %}
+                    {{ category.value }}
+                {% endif %}
+            </h1>
+            {% if category.meta and category.meta.text %}
+                <div class="site-catalog-hero__text site-article-body">{{ category.meta.text|safe }}</div>
+            {% endif %}
+            <ul class="site-catalog-stats" aria-label="Огляд посібника">
+                <li class="site-catalog-stats__item">Розділів: {{ guide_sections|length }}</li>
+                <li class="site-catalog-stats__item">Матеріалів: {{ post_count }}</li>
+            </ul>
+        </header>
+        {% if guide_sections %}
+            <nav class="site-content-section" aria-label="Розділи посібника">
+                <h2 class="site-content-section__title">Зміст</h2>
+                <ul class="site-link-grid">
+                    {% for section in guide_sections %}
+                        <li class="site-link-grid__item">
+                            <a class="site-link-grid__link" href="#section-{{ section.pk }}">{{ section.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </nav>
+            {% for section in guide_sections %}
+                <section class="site-content-section"
+                         id="section-{{ section.pk }}"
+                         aria-labelledby="section-title-{{ section.pk }}">
+                    <h2 class="site-content-section__title"
+                        id="section-title-{{ section.pk }}">{{ section.title }}</h2>
+                    {% if section.description %}
+                        <p class="site-content-section__text">{{ section.description|linebreaksbr }}</p>
+                    {% endif %}
+                    <ol class="site-variety-list">
+                        {% for article in section.public_articles %}
+                            <li>
+                                {% if article.post.absolute_url %}
+                                    <a class="site-variety-row" href="{{ article.post.absolute_url }}">
+                                        <span class="site-variety-row__title">{{ article.post.title }}</span>
+                                    </a>
+                                {% else %}
+                                    <span class="site-variety-row site-variety-row--muted">{{ article.post.title }}</span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ol>
+                </section>
+            {% endfor %}
+        {% else %}
+            <p class="site-content-section">Матеріали посібника готуються до публікації.</p>
+        {% endif %}
+    </div>
+{% endblock content %}

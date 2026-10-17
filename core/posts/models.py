@@ -196,6 +196,51 @@ class Post(models.Model):
         return self.photo.count()
 
 
+class GuideSection(models.Model):
+    """An ordered editorial section, independent of article taxonomy
+    ownership."""
+
+    category = models.ForeignKey(
+        Category, on_delete=models.CASCADE, related_name="guide_sections", verbose_name=_("category")
+    )
+    title = models.CharField(max_length=250, verbose_name=_("title"))
+    description = models.TextField(blank=True, verbose_name=_("description"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("sort order"))
+    is_active = models.BooleanField(default=True, verbose_name=_("active"))
+
+    class Meta:
+        db_table = "guide_section"
+        ordering = ("sort_order", "pk")
+        verbose_name = _("Guide section")
+        verbose_name_plural = _("Guide sections")
+
+    def __str__(self):
+        return f"{self.category}: {self.title}"
+
+
+class GuideSectionArticle(models.Model):
+    """A placement references a Post without changing its content or
+    category."""
+
+    section = models.ForeignKey(
+        GuideSection, on_delete=models.CASCADE, related_name="articles", verbose_name=_("section")
+    )
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="guide_placements", verbose_name=_("post"))
+    sort_order = models.PositiveIntegerField(default=0, verbose_name=_("sort order"))
+
+    class Meta:
+        db_table = "guide_section_article"
+        ordering = ("sort_order", "pk")
+        verbose_name = _("Guide section article")
+        verbose_name_plural = _("Guide section articles")
+        constraints = [
+            models.UniqueConstraint(fields=("section", "post"), name="guide_section_article_unique_post"),
+        ]
+
+    def __str__(self):
+        return f"{self.section}: {self.post}"
+
+
 class CategoryAttributeGroup(models.Model):
     category = models.ForeignKey(
         Category,

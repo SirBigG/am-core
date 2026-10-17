@@ -48,6 +48,36 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 
 ## Implementation Map
 
+- Guide Hub curation has a data foundation: categories can own ordered sections
+  with ordered references to existing articles, including articles owned by
+  other categories. The same article can appear in multiple sections without
+  changing its ownership, content or canonical URL. Guide Hub categories render
+  on their existing category URLs. Editors manage sections from category admin
+  and ordered article references from each section's admin page. See the
+  [data contract](../../../engineering/guide-hub-foundation.md).
+- The public Guide Hub collection query excludes inactive sections, inactive
+  articles and any hub or article category below an inactive ancestor (including
+  the category itself). It omits sections with no eligible articles and preserves
+  editorial ordering and cross-category references. Empty guides show a preparation
+  message. Inactive guide categories and their descendants are unavailable through
+  guide category routes; existing article detail access behavior is unchanged.
+- Guide Hub editing requires explicit section and placement permissions in
+  Django Admin. Article selection respects existing global or own-article
+  permissions. Curation never changes article ownership, content or URLs;
+  integration APIs are not part of this workflow.
+- Authorized editors can preview saved, publicly eligible Guide Hub content from
+  category and section admin. Unsaved edits and hidden content are excluded.
+  Preview access requires category, section, placement and article visibility;
+  it is denied if a full preview would include an article outside the editor's
+  scope. Previews are noindex and uncached and do not change public presentation.
+- Deleting guide sections with placements also requires placement-delete permission and visibility
+  of the affected articles, including when deletion happens through category
+  forms or category subtrees. Section audit history requires global article
+  visibility because old log entries can reference removed articles.
+- Guide sitemap entries follow active category ancestry. Guide list aliases use
+  uncached temporary redirects so returning a category to catalog mode restores
+  its paginated list.
+
 - Django app: `core/posts`.
 - Token-authenticated integration endpoints: `/api/content/posts/` and `/api/content/posts/<id>/`.
 - Some variety-style public catalog URLs, such as `/cybulevi/sorty-cybuli/`, are rendered through post/category templates even when the content behaves like registry/catalog reference information.

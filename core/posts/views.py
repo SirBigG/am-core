@@ -8,19 +8,21 @@ from dal import autocomplete
 from django.conf import settings
 from django.contrib.postgres.search import SearchQuery, SearchRank
 from django.core.cache import cache
-from django.db.models import F
-from django.http import FileResponse, Http404, HttpResponsePermanentRedirect
+from django.db.models import F, Q
+from django.http import FileResponse, Http404, HttpResponsePermanentRedirect, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils.cache import add_never_cache_headers
 from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 
 from core.adverts.models import Advert
-from core.classifier.models import Category
+from core.classifier.models import Category, CategoryPresentationMode
 from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
+from core.posts.guide_hub import build_guide_hub_context, get_public_guide_categories, get_public_guide_sections
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.recommendations import get_random_recommendations
@@ -122,6 +124,13 @@ class ParentRubricView(TemplateView):
         return context
 
 
+def _validate_public_guide_category(category, parent_slug):
+    if category.parent is None or category.parent.slug != parent_slug:
+        raise Http404
+    if category.get_ancestors(include_self=True).filter(is_active=False).exists():
+        raise Http404
+
+
 class PostListView(TemplateView):
     template_name = "posts/list_order.html"
 
@@ -144,9 +153,18 @@ class PostListView(TemplateView):
         return posts
 
     def get_context_data(self, **kwargs):
-        category = Category.objects.select_related("meta").filter(slug=self.kwargs["child"]).first()
+        category = Category.objects.select_related("meta", "parent").filter(slug=self.kwargs["child"]).first()
         if category is None:
             raise Http404
+        if category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
+            _validate_public_guide_category(category, self.kwargs["parent"])
+            self.template_name = "posts/guide_hub.html"
+            sections = get_public_guide_sections(category.pk)
+            return {
+                "view": self,
+                "request": self.request,
+                **build_guide_hub_context(category, sections),
+            }
         posts_queryset = Post.objects.filter(rubric_id=category.id).active()
         posts_queryset = self._filter_posts(posts_queryset)
         attribute_filters = build_category_attribute_filters(category, posts_queryset, self.request.GET)
@@ -175,6 +193,17 @@ class PostList(ListView):
     paginate_by = 50
     template_name = "posts/list.html"
     ordering = "-publish_date"
+
+    def get(self, request, *args, **kwargs):
+        category = get_object_or_404(Category.objects.select_related("parent"), slug=self.kwargs["child"])
+        if category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
+            _validate_public_guide_category(category, self.kwargs["parent"])
+            response = HttpResponseRedirect(
+                reverse("posts-list-view", kwargs={"parent": category.parent.slug, "child": category.slug})
+            )
+            add_never_cache_headers(response)
+            return response
+        return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""
@@ -270,6 +299,10 @@ class SiteMap(TemplateView):
 
         context = super().get_context_data(**kwargs)
         base_url = settings.HOST.rstrip("/")
+        categories = Category.objects.filter(is_active=True).filter(
+            ~Q(presentation_mode=CategoryPresentationMode.GUIDE_HUB)
+            | Q(pk__in=get_public_guide_categories().values("pk"))
+        )
         urls = [
             {"loc": f"{base_url}/"},
             {"loc": f"{base_url}/events/"},
@@ -277,17 +310,12 @@ class SiteMap(TemplateView):
             {"loc": f"{base_url}/adverts/"},
         ]
         urls.extend(
-            [
-                {"loc": f"{base_url}/{slug}/"}
-                for slug in Category.objects.filter(level=1, is_active=True).values_list("slug", flat=True)
-            ]
+            [{"loc": f"{base_url}/{slug}/"} for slug in categories.filter(level=1).values_list("slug", flat=True)]
         )
         urls.extend(
             [
                 {"loc": f"{base_url}{absolute_url}"}
-                for absolute_url in Category.objects.filter(level=2, is_active=True).values_list(
-                    "absolute_url", flat=True
-                )
+                for absolute_url in categories.filter(level=2).values_list("absolute_url", flat=True)
             ]
         )
         urls.extend(

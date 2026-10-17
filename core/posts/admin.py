@@ -4,6 +4,7 @@ from ckeditor.widgets import CKEditorWidget
 from dal import autocomplete
 from django import forms
 from django.contrib import admin
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.utils.html import format_html
 from mptt.admin import TreeRelatedFieldListFilter
@@ -21,11 +22,14 @@ from .category_attributes import (
     rebuild_post_attribute_values,
     set_category_attributes_for_post,
 )
+from .guide_admin_permissions import require_guide_placement_deletion
 from .models import (
     CategoryAttributeChoice,
     CategoryAttributeField,
     CategoryAttributeFieldType,
     CategoryAttributeGroup,
+    GuideSection,
+    GuideSectionArticle,
     Photo,
     Post,
     PostAttributeValue,
@@ -333,6 +337,52 @@ class PostAdmin(admin.ModelAdmin):
     class Media:
         css = {"all": ("posts/admin/ckeditor-source.css",)}
         js = ("posts/admin/ckeditor-source.js",)
+
+
+class GuideSectionArticleInline(admin.TabularInline):
+    model = GuideSectionArticle
+    extra = 0
+    fields = ("post", "sort_order")
+    ordering = ("sort_order", "pk")
+    autocomplete_fields = ("post",)
+
+    def get_queryset(self, request):
+        visible_posts = self.admin_site.get_model_admin(Post).get_queryset(request)
+        return super().get_queryset(request).filter(post__in=visible_posts).select_related("post__rubric")
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if db_field.name == "post":
+            # Match autocomplete visibility during validation, including forged IDs.
+            kwargs["queryset"] = self.admin_site.get_model_admin(Post).get_queryset(request)
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+
+@admin.register(GuideSection)
+class GuideSectionAdmin(admin.ModelAdmin):
+    change_form_template = "admin/guide_hub_change_form.html"
+    list_display = ("title", "category", "sort_order", "is_active")
+    list_filter = ("is_active", "category__presentation_mode")
+    search_fields = ("title", "category__value", "category__slug")
+    list_select_related = ("category",)
+    ordering = ("sort_order", "pk")
+    autocomplete_fields = ("category",)
+    inlines = (GuideSectionArticleInline,)
+
+    def render_change_form(self, request, context, add=False, change=False, form_url="", obj=None):
+        category_admin = self.admin_site.get_model_admin(Category)
+        context["guide_preview_url"] = category_admin.get_guide_preview_url(request, obj.category) if obj else None
+        return super().render_change_form(request, context, add, change, form_url, obj)
+
+    def get_deleted_objects(self, objs, request):
+        require_guide_placement_deletion(self.admin_site, request, GuideSectionArticle.objects.filter(section__in=objs))
+        return super().get_deleted_objects(objs, request)
+
+    def history_view(self, request, object_id, extra_context=None):
+        # Historic placement labels can reference articles that have since been
+        # removed or reassigned; current placement visibility cannot protect logs.
+        if not self.admin_site.get_model_admin(Post).has_global_post_view_or_change_permission(request):
+            raise PermissionDenied("Full Guide Hub history requires global article visibility.")
+        return super().history_view(request, object_id, extra_context)
 
 
 class CategoryAttributeChoiceInline(admin.TabularInline):

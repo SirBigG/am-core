@@ -83,6 +83,11 @@ class Location(models.Model):
         return f"{self.value} ({str(self.region)} {str(self.area)})"
 
 
+class CategoryPresentationMode(models.TextChoices):
+    CATALOG = "catalog", _("catalog")
+    GUIDE_HUB = "guide_hub", _("guide hub")
+
+
 class Category(MPTTModel):
     """Model realize tree structure for categories."""
 
@@ -104,6 +109,13 @@ class Category(MPTTModel):
         verbose_name=_("diary species parent"),
     )
     is_active = models.BooleanField(default=True, verbose_name=_("for feel on off"))
+    presentation_mode = models.CharField(
+        max_length=20,
+        choices=CategoryPresentationMode,
+        default=CategoryPresentationMode.CATALOG,
+        verbose_name=_("presentation mode"),
+        help_text=_("Default presentation; future site configuration may override this value."),
+    )
 
     absolute_url = models.CharField(max_length=1000, blank=True, null=True, verbose_name=_("absolute url"))
 
@@ -155,7 +167,8 @@ class Category(MPTTModel):
 
 
 class CategoryAIProfile(models.Model):
-    """Private plant-care knowledge used as AI context for diary recommendations."""
+    """Private plant-care knowledge used as AI context for diary
+    recommendations."""
 
     STATUS_DRAFT = "draft"
     STATUS_READY = "ready"
@@ -187,7 +200,9 @@ class CategoryAIProfile(models.Model):
     recommendation_rules = models.TextField(
         blank=True,
         verbose_name=_("AI recommendation rules"),
-        help_text=_("Structured rules for risks, triggers, confidence, and recommendations used as private AI context."),
+        help_text=_(
+            "Structured rules for risks, triggers, confidence, and recommendations used as private AI context."
+        ),
     )
     sources = models.TextField(
         blank=True,
