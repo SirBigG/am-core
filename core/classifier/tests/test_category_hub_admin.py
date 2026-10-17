@@ -93,6 +93,16 @@ class CategoryHubAdminTests(TestCase):
             "_save": "Save",
         }
 
+    def test_admin_can_select_market_widget_category(self):
+        data = self.data()
+        data["market_category"] = self.other.pk
+        response = self.client.post(self.add_url, data)
+        self.assertEqual(response.status_code, 302)
+        hub = CategoryHub.objects.get(category=self.crop)
+        self.assertEqual(hub.market_category_id, self.other.pk)
+        response = self.client.get(reverse("admin:classifier_categoryhub_change", args=[hub.pk]))
+        self.assertContains(response, 'name="market_category"')
+
     def test_create_hub_and_inline_then_edit_public_configuration(self):
         original = list(Category.objects.values())
         response = self.client.post(self.add_url, self.data())

@@ -107,6 +107,24 @@ class HubApiTests(APITestCase):
         self.assertEqual(self.client.delete(f'/api/content/hubs/{hub["id"]}/').status_code, 204)
         self.assertEqual(Post.objects.values().get(pk=self.post.pk), self.original_post)
 
+    def test_market_widget_category_is_writable_nullable_and_permission_scoped(self):
+        hub = self.create("hubs", {"category": self.crop.pk, "market_category": self.catalog.pk})
+        url = f'/api/content/hubs/{hub["id"]}/'
+        self.assertEqual(hub["market_category"], self.catalog.pk)
+        self.assertEqual(self.client.get(url).data["market_category"], self.catalog.pk)
+        reader = self.staff("view_categoryhub")
+        self.authenticate(reader)
+        self.assertEqual(self.client.patch(url, {"market_category": self.guide.pk}, format="json").status_code, 403)
+        self.authenticate(self.user)
+        response = self.client.patch(url, {"market_category": self.guide.pk}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data["market_category"], self.guide.pk)
+        self.assertEqual(self.client.patch(url, {"market_category": 999999}, format="json").status_code, 400)
+        response = self.client.patch(url, {"market_category": None}, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertIsNone(response.data["market_category"])
+        self.assertEqual(Post.objects.values().get(pk=self.post.pk), self.original_post)
+
     def test_token_only_staff_and_action_specific_permissions(self):
         urls = [
             f"/api/content/{resource}/" for resource in ("hubs", "hub-sections", "guide-sections", "guide-placements")

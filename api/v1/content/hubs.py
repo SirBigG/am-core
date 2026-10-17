@@ -76,7 +76,18 @@ class HubSerializer(ValidatedReferenceSerializer):
 
     class Meta:
         model = CategoryHub
-        fields = ("id", "category", "is_active", "description", "guide_category", "site", "locale", "updated", "url")
+        fields = (
+            "id",
+            "category",
+            "is_active",
+            "description",
+            "guide_category",
+            "market_category",
+            "site",
+            "locale",
+            "updated",
+            "url",
+        )
         read_only_fields = ("updated",)
 
 

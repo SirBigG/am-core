@@ -49,6 +49,7 @@ def hub_config(slug, site=None, locale=None):
         "category_slug": slug,
         "description": hub.description,
         "guide_category_id": hub.guide_category_id,
+        "market_category_id": hub.market_category_id,
         "site_id": hub.site_id,
         "locale": hub.locale,
         "updated": hub.updated.isoformat(),
@@ -165,7 +166,8 @@ def _article(post):
 
 
 def _build_context(category, config):
-    from core.companies.market import crop_market_offers
+    from core.companies.market import crop_market_offers, market_offers, market_posts
+    from core.companies.models import Product
 
     now = timezone.now()
     hub_query = urlencode({"hub": category.slug})
@@ -194,7 +196,14 @@ def _build_context(category, config):
     if guides and not any(item["role"] == "growing" for item in sections):
         knowledge.append(metric(len(represented), "Практичні матеріали", "#growing-guides"))
     varieties = next((item["category"] for item in sections if item["role"] == "varieties"), None)
-    offers = crop_market_offers(category, config)
+    widget_configured = bool(config.get("market_category_id"))
+    market_category = public_categories().filter(pk=config["market_category_id"]).first() if widget_configured else None
+    if widget_configured:
+        # Mirror the ordinary category market exactly. Do not reclassify or
+        # dedupe products, or change matching/price policy for any market view.
+        offers = market_offers().filter(category_id=market_category.pk) if market_category else Product.objects.none()
+    else:
+        offers = crop_market_offers(category, config)
     totals = offers.aggregate(
         offers=Count("pk"),
         sellers=Count("company_id", distinct=True),
@@ -211,7 +220,9 @@ def _build_context(category, config):
         for post in featured_posts:
             item = _article(post)
             item["market_url"] = (
-                reverse("market:variety", args=[post.pk]) + "?" + hub_query if post.pk in market_post_ids else ""
+                reverse("market:variety", args=[post.pk]) + ("" if widget_configured else "?" + hub_query)
+                if post.pk in market_post_ids
+                else ""
             )
             featured.append(item)
             represented.add(post.pk)
@@ -221,19 +232,50 @@ def _build_context(category, config):
     for section in sections:
         additional = additional.exclude(subtree(section["category"]))
     additional = [_article(post) for post in additional.order_by("-publish_date", "pk")[:6]]
-    market_url = reverse("market:list") + "?" + hub_query
-    company_url = reverse("companies:list") + "?" + hub_query
+    if widget_configured:
+        market_url = reverse("market:category", args=[market_category.slug]) if market_category else ""
+        company_url = (
+            reverse("companies:list") + "?" + urlencode({"category": market_category.slug}) if market_category else ""
+        )
+    else:
+        market_url = reverse("market:list") + "?" + hub_query
+        company_url = reverse("companies:list") + "?" + hub_query
     market_stats = [
-        metric(totals["offers"], "Унікальні пропозиції продавців", market_url),
-        metric(totals["sellers"], "Продавці з перевіреними пропозиціями", company_url),
+        metric(totals["offers"], "Пропозиції" if widget_configured else "Унікальні пропозиції продавців", market_url),
+        metric(
+            totals["sellers"],
+            "Компанії з пропозиціями" if widget_configured else "Продавці з перевіреними пропозиціями",
+            company_url,
+        ),
         metric(totals["varieties"], "Сорти з пропозиціями", market_url),
     ]
+    market_widget = None
+    if market_category:
+        preview = market_posts(offers=offers).filter(rubric_id=market_category.pk)[:6]
+        market_widget = {
+            "category_id": market_category.pk,
+            "category_name": market_category.value,
+            "url": market_url,
+            "stats": market_stats,
+            "items": [
+                {
+                    "id": post.pk,
+                    "title": post.title,
+                    "url": reverse("market:variety", args=[post.pk]),
+                    "offer_count": len(post.market_offers),
+                    "seller_count": len({offer.company_id for offer in post.market_offers}),
+                }
+                for post in preview
+            ],
+            "updated_at": updated,
+        }
     groups = []
     if varieties:
         groups.append({"label": "Пропозиції сортів каталогу", "url": market_url})
-    description = (
-        config.get("description")
-        or f"{category.value}: сорти, практичні матеріали та перевірені пропозиції продавців AgroMega."
+    description = config.get("description") or (
+        f"{category.value}: сорти, практичні матеріали та пропозиції Агромаркету."
+        if widget_configured
+        else f"{category.value}: сорти, практичні матеріали та перевірені пропозиції продавців AgroMega."
     )
     navigation = [{key: value for key, value in item.items() if key != "category"} for item in sections]
     return {
@@ -246,6 +288,8 @@ def _build_context(category, config):
         "featured_varieties": featured,
         "additional_articles": additional,
         "more_articles_url": next((item["url"] for item in sections if item["role"] == "growing"), ""),
+        "market_widget_configured": widget_configured,
+        "market_widget": market_widget,
         "market_stats": market_stats,
         "market_groups": groups,
         "data_updated_at": updated,
@@ -289,7 +333,7 @@ def build_crop_hub_context(category, site=None, locale=None, config=None):
             sort_keys=True,
         ).encode()
     ).hexdigest()
-    key = f"crop-hub:v2:{category.pk}:{digest}"
+    key = f"crop-hub:v3:{category.pk}:{digest}"
     context = cache.get(key)
     if context is None:
         context = _build_context(category, config)

@@ -38,7 +38,7 @@ Existing `/api/content/categories/tree/`, post, country and attribute-schema end
 
 ## Writable contracts
 
-- **Hub:** `category` (required on create), `is_active` (defaults false), `description`, optional `guide_category`, `site`, and `locale`. `id`, `updated` and saved category `url` are read-only. One hub per category.
+- **Hub:** `category` (required on create), `is_active` (defaults false), `description`, optional `guide_category`, `market_category`, `site`, and `locale`. `id`, `updated` and saved category `url` are read-only. One hub per category.
 - **Hub section:** `hub`, `category`, `role`, `title`, `description`, `sort_order`, `is_active`. Roles: `varieties`, `diseases`, `pests`, `growing`, `additional`. Each primary role occurs at most once per hub; multiple `additional` rows may reference different categories. A category occurs at most once per hub. `url` is the referenced category's stored canonical URL.
 - **Guide section:** `category`, `title`, `description`, `sort_order`, `is_active`.
 - **Guide placement:** `section`, `post`, `sort_order`. Read-only `title` and `url` come from the existing Post. Each section/Post pair is unique.
@@ -88,3 +88,20 @@ Configure hubs on the main crop categories. Source catalogs and guide collection
 Final verification after correcting the landing level: **112/112 crop/admin/API/company tests pass**, including a main crop page backed by legacy sibling catalogs and guides, independent Guide Hub rendering, preservation of article URLs, strict market/seller scope and exclusion of unrelated root-crop records. Earlier broad verification ran 343 tests with two previously verified baseline failures (metadata alias redirect and sitemap group count). No production deployment, token provisioning or permission grant was performed.
 
 Scoped marketplace/company pages display the culture and link back to its landing page. Their category selectors exclude unrelated crop categories; reset links and empty-state seller links retain the selected hub. Browser QA confirmed these flows and the corrected landing at mobile width 390 without horizontal overflow.
+
+## Optional category market widget
+
+Hub `market_category` is a nullable existing Category ID, writable on create,
+PUT or PATCH under the existing hub permissions. For example, the body
+`{"market_category": 2504}` selects that exact category for this crop page's
+widget; discover the real ID first. `{"market_category": null}` restores the
+previous strict hub market block. No category is assigned by migration 0018.
+
+This field is independent of the knowledge `varieties` reference. It uses the
+ordinary Agromarket category query, raw product-row counts and ordinary category/
+detail URLs. It does not affect `market_offers`, matching, existing `?hub` routes,
+publication actions or seller directory filtering. Inactive source ancestry hides
+the configured widget. Standard hub save timestamps/configuration cache keys
+make source changes visible on the next read; offer data retains the bounded TTL.
+
+See [widget implementation and verification](../crop-hubs/2026-10-17-category-market-widget.md).

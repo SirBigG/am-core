@@ -1,0 +1,25 @@
+<section class="site-content-section crop-hub__market"
+         aria-labelledby="crop-market-title">
+    <p class="site-content-section__eyebrow">Агромаркет</p>
+    <h2 class="site-content-section__title" id="crop-market-title">{{ widget.category_name }}: пропозиції</h2>
+    <p>Пропозиції з вибраної категорії Агромаркету. Наявність, призначення товару та фасування уточнюйте у продавця.</p>
+    <ul class="crop-hub__grid crop-hub__metrics">
+        {% for metric in widget.stats %}
+            <li><a class="crop-hub__card" href="{{ metric.url }}"><strong class="crop-hub__number">{{ metric.value }}</strong><span>{{ metric.label }}</span></a></li>
+        {% endfor %}
+    </ul>
+    {% if widget.updated_at %}<p>Останнє спостереження ціни: <time datetime="{{ widget.updated_at|date:'c' }}">{{ widget.updated_at|date:'d.m.Y' }}</time></p>{% endif %}
+    {% if widget.items %}
+        <ul class="crop-hub__grid">
+            {% for item in widget.items %}
+                <li class="crop-hub__card">
+                    <a href="{{ item.url }}"><strong>{{ item.title }}</strong></a>
+                    <span>Пропозицій: {{ item.offer_count }} · Компаній: {{ item.seller_count }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>У цій категорії поки немає пропозицій за правилами Агромаркету.</p>
+    {% endif %}
+    <p><a href="{{ widget.url }}">Усі пропозиції категорії →</a></p>
+</section>

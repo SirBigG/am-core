@@ -39,7 +39,7 @@
             <nav class="crop-hub__actions" aria-label="Основні дії">
                 {% for action in primary_actions %}<a class="btn btn-success" href="{{ action.url }}">{{ action.label }}</a>{% endfor %}
                 {% if growing_guides %}<a class="btn btn-outline-success" href="#growing-guides">Як вирощувати</a>{% endif %}
-                <a class="btn btn-outline-success" href="{{ marketplace_links.offers }}">Переглянути пропозиції</a>
+                {% if marketplace_links.offers %}<a class="btn btn-outline-success" href="{{ marketplace_links.offers }}">Переглянути пропозиції</a>{% endif %}
             </nav>
         </header>
         {% if knowledge_stats %}
@@ -62,20 +62,26 @@
                 </ul>
             </nav>
         {% endif %}
-        <section class="site-content-section crop-hub__market"
-                 aria-labelledby="crop-market-title">
-            <p class="site-content-section__eyebrow">Спостереження AgroMega</p>
-            <h2 class="site-content-section__title" id="crop-market-title">Агромаркет</h2>
-            <p>Перевірені збіги назв сортів у свіжих пропозиціях AgroMega. Один продавець і сорт — одна пропозиція. Це огляд спостережуваних оголошень, а не всього ринку України.</p>
-            <ul class="crop-hub__grid crop-hub__metrics">
-                {% for metric in market_stats %}
-                    <li><a class="crop-hub__card" href="{{ metric.url }}"><strong class="crop-hub__number">{{ metric.value }}</strong><span>{{ metric.label }}</span></a></li>
-                {% endfor %}
-            </ul>
-            {% if data_updated_at %}<p>Останнє спостереження ціни: <time datetime="{{ data_updated_at|date:'c' }}">{{ data_updated_at|date:'d.m.Y' }}</time></p>{% else %}<p>Перевірених свіжих пропозицій поки немає.</p>{% endif %}
-            {% for group in market_groups %}<p><a href="{{ group.url }}">{{ group.label }} →</a></p>{% endfor %}
-            <p>Призначення товару та фасування уточнюйте у продавця. Засоби захисту та добрива не враховуються як сорти.</p>
-        </section>
+        {% if market_widget_configured %}
+            {% if market_widget %}
+                {% include "posts/includes/category_market_widget.html" with widget=market_widget only %}
+            {% endif %}
+        {% else %}
+            <section class="site-content-section crop-hub__market"
+                     aria-labelledby="crop-market-title">
+                <p class="site-content-section__eyebrow">Спостереження AgroMega</p>
+                <h2 class="site-content-section__title" id="crop-market-title">Агромаркет</h2>
+                <p>Перевірені збіги назв сортів у свіжих пропозиціях AgroMega. Один продавець і сорт — одна пропозиція. Це огляд спостережуваних оголошень, а не всього ринку України.</p>
+                <ul class="crop-hub__grid crop-hub__metrics">
+                    {% for metric in market_stats %}
+                        <li><a class="crop-hub__card" href="{{ metric.url }}"><strong class="crop-hub__number">{{ metric.value }}</strong><span>{{ metric.label }}</span></a></li>
+                    {% endfor %}
+                </ul>
+                {% if data_updated_at %}<p>Останнє спостереження ціни: <time datetime="{{ data_updated_at|date:'c' }}">{{ data_updated_at|date:'d.m.Y' }}</time></p>{% else %}<p>Перевірених свіжих пропозицій поки немає.</p>{% endif %}
+                {% for group in market_groups %}<p><a href="{{ group.url }}">{{ group.label }} →</a></p>{% endfor %}
+                <p>Призначення товару та фасування уточнюйте у продавця. Засоби захисту та добрива не враховуються як сорти.</p>
+            </section>
+        {% endif %}
         <section class="site-content-section" aria-labelledby="crop-prices-title">
             <h2 class="site-content-section__title" id="crop-prices-title">Ціни серед пропозицій AgroMega</h2>
             <p class="am-state">{{ price_summary.reason }}</p>

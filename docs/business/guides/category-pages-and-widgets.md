@@ -103,6 +103,37 @@ descendants define the crop's marketplace scope. A broad parent containing
 carrots, potato diseases or agricultural chemicals is unsuitable as the potato
 variety reference.
 
+## Optional Agromarket category widget on a crop page
+
+Open **Classifier → Category hubs** and select **Agromarket widget category**
+(`market_category`). The field is also available in the Category hub inline on
+Category forms and through the existing Hub management API. Select the exact
+category used by the ordinary Agromarket category page, then save the hub.
+
+This setting changes only the crop landing page. Its widget displays the selected
+category's offer, company and variety counts, latest price observation and up to
+six varieties ordered by title and ID. It uses the existing Agromarket selection;
+separate product/package records count separately. Child categories are not added.
+The knowledge `varieties` section and guide references remain independent.
+
+The widget and its main action link to the ordinary Agromarket category and
+variety pages without `hub=...`. The company link opens the ordinary company
+directory filtered by category; that directory retains its own existing rules.
+Existing market pages, matching rules and seller filters are unchanged.
+
+A blank field preserves the previous strict hub market block and scoped links.
+A configured source with inactive category ancestry hides the widget and its
+market action. Saving a different source selects a new cached context immediately;
+ordinary offer changes can take up to five minutes to appear. No verified per-kg
+price summary is enabled by selecting a category.
+
+Apply classifier migration **0018_categoryhub_market_category** before serving
+this code. It adds an optional reference, defaults to blank and does not select
+categories for existing hubs or modify articles/products. Configure the intended
+target category separately after rollout; IDs differ between environments.
+Clearing the field restores the existing strict block. Deleting its source sets
+only this reference to null and preserves the hub and its other references.
+
 ## Configure the growing sequence and standalone Guide Hubs
 
 1. Open the category that will own the guide collection. This may be the main
@@ -143,7 +174,7 @@ shown as an unlinked title in the standalone guide and omitted from the Crop Hub
 | Main actions | Configured variety/growing destinations, guide anchor when populated, and scoped market link | Source references and available guide content |
 | Knowledge metrics | Unique eligible articles in each configured category subtree | Targets and labels; numbers are calculated |
 | Knowledge navigation | Links to the configured public categories | Role, label, description, order and active state |
-| Agromarket metrics | Eligible seller/cultivar observations, distinct sellers, varieties with offers, and latest eligible observation date | Variety-category reference; source data quality |
+| Agromarket metrics | With a widget category: ordinary market offer rows, distinct companies, varieties and latest price observation. Otherwise: existing strict seller/cultivar observations | Optional Agromarket widget category; otherwise the variety reference |
 | Market groups | Currently the catalog-variety offer destination | No seed/food/fertilizer group inference |
 | Price summary | Currently an informative unavailable state | No manual price or automatic median is enabled |
 | Growing sequence | Ordered Guide sections and article placements from the selected source | Guide curation |

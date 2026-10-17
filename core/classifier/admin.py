@@ -61,8 +61,8 @@ class CategoryHubInline(admin.StackedInline):
     fk_name = "category"
     extra = 0
     max_num = 1
-    fields = ("is_active", "description", "guide_category", "site", "locale")
-    autocomplete_fields = ("guide_category", "site")
+    fields = ("is_active", "description", "guide_category", "market_category", "site", "locale")
+    autocomplete_fields = ("guide_category", "market_category", "site")
     show_change_link = True
 
     def has_delete_permission(self, request, obj=None):
@@ -105,7 +105,7 @@ class CategoryHubAdmin(admin.ModelAdmin):
     list_display = ("category", "is_active", "site", "locale", "updated")
     list_filter = ("is_active", "site", "locale")
     search_fields = ("category__value", "category__slug", "description")
-    autocomplete_fields = ("category", "guide_category", "site")
+    autocomplete_fields = ("category", "guide_category", "market_category", "site")
     readonly_fields = ("updated",)
     inlines = (CategoryHubSectionInline,)
 

@@ -282,6 +282,17 @@ class CategoryHub(models.Model):
         related_name="guide_source_for_hubs",
         help_text=_("Optional existing guide source. Blank uses guide sections on the hub category."),
     )
+    market_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="market_widget_hubs",
+        verbose_name=_("Agromarket widget category"),
+        help_text=_(
+            "Optional exact Agromarket category. Uses existing market selection on this page only. Blank preserves the existing hub market block."
+        ),
+    )
     site = models.ForeignKey(
         "sites.Site",
         on_delete=models.PROTECT,
