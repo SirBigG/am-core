@@ -1,0 +1,48 @@
+{% if price_overview %}
+    <p>Діапазон заявлених цін у поточних пропозиціях. Різні фасування та одиниці продажу враховані разом. Це не середня ціна і не ціна за кілограм.</p>
+    {% for group in price_overview %}
+        <div class="crop-hub__card">
+            <p class="site-product-card__price">{{ group.min }}{% if group.max != group.min %} – {{ group.max }}{% endif %} {{ group.currency }}</p>
+            <p>Пропозицій: {{ group.offer_count }} · Продавців: {{ group.seller_count }}</p>
+            <p>Оновлено <time datetime="{{ group.updated_at|date:'c' }}">{{ group.updated_at|date:'d.m.Y' }}</time></p>
+            {% if group.has_chart %}
+                <p>Історія спостережень за 30 днів · {{ group.currency }}</p>
+                <p>Верхня межа шкали: {{ group.chart_max }} {{ group.currency }}, нижня: 0.</p>
+                <svg viewBox="0 0 620 180"
+                     width="100%"
+                     role="img"
+                     aria-label="Денні діапазони зафіксованих цін, {{ group.currency }}. Точні значення в таблиці нижче.">
+                    <path d="M20 20V160H600" fill="none" stroke="currentColor" opacity="0.3" />
+                    {% for day in group.history %}
+                        <line x1="{{ day.x }}" x2="{{ day.x }}" y1="{{ day.y_min }}" y2="{{ day.y_max }}" stroke="currentColor" stroke-width="6"><title>{{ day.day|date:'d.m.Y' }}: {{ day.min }} – {{ day.max }} {{ group.currency }}</title></line>
+                        <circle cx="{{ day.x }}" cy="{{ day.y_min }}" r="3" fill="currentColor" />
+                        <circle cx="{{ day.x }}" cy="{{ day.y_max }}" r="3" fill="currentColor" />
+                    {% endfor %}
+                </svg>
+                <p>{{ group.start|date:'d.m.Y' }} — {{ group.end|date:'d.m.Y' }}</p>
+            {% else %}
+                <p>Недостатньо історії для графіка: потрібні спостереження щонайменше за два різні дні.</p>
+            {% endif %}
+            {% if group.history %}
+                <details>
+                    <summary>Історія цін у таблиці · {{ group.currency }}</summary>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Дата</th>
+                                <th scope="col">Мінімум</th>
+                                <th scope="col">Максимум</th>
+                                <th scope="col">Пропозицій</th>
+                            </tr>
+                        </thead>
+                        <tbody>{% for day in group.history %}<tr><td>{{ day.day|date:'d.m.Y' }}</td><td>{{ day.min }}</td><td>{{ day.max }}</td><td>{{ day.offer_count }}</td></tr>{% endfor %}</tbody>
+                    </table>
+                </details>
+            {% endif %}
+        </div>
+    {% endfor %}
+    <p>Графік показує лише збережені спостереження для товарів, що входять до поточної вибірки. Пропуски означають відсутність спостережень; зміна складу й фасування пропозицій також впливає на діапазон.</p>
+    <p><a href="{{ marketplace_links.offers }}">Переглянути пропозиції в Агромаркеті →</a></p>
+{% else %}
+    <p class="am-state">У вибраній категорії поки немає актуальних пропозицій із цінами.</p>
+{% endif %}

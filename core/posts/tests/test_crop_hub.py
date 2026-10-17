@@ -97,6 +97,12 @@ class CropHubTests(TestCase):
         rows = list(crop_market_offers(Category.objects.get(pk=self.crop.pk), hub_config(self.crop.slug)))
         self.assertEqual(len(rows), 2)
         self.assertEqual(next(row.price for row in rows if row.company_id == self.company.pk), 300)
+        group = result["price_overview"][0]
+        self.assertEqual(group["offer_count"], 2)
+        self.assertEqual((group["min"], group["max"]), (100, 300))
+        response = self.client.get("/kartoplya/")
+        self.assertContains(response, "Діапазон заявлених цін")
+        self.assertNotContains(response, "Недостатньо порівнюваних пропозицій")
 
     def test_untrusted_broad_and_wrong_category_associations_excluded(self):
         originals = {"match_status": "auto", "name": self.post.title, "category_id": self.varieties.pk}
@@ -182,7 +188,7 @@ class CropHubTests(TestCase):
         Product.objects.all().delete()
         response = self.client.get("/kartoplya/")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Недостатньо порівнюваних пропозицій")
+        self.assertContains(response, "поки немає актуальних пропозицій із цінами")
         self.assertContains(response, "<h1 ", count=1)
         self.assertContains(response, "BreadcrumbList")
         self.assertContains(response, 'rel="canonical"')

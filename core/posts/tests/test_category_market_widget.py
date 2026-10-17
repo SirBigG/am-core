@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal
 
 from django.core.cache import cache
 from django.db import connection
@@ -9,7 +10,7 @@ from django.utils import timezone
 
 from core.classifier.models import Category, CategoryHub, CategoryHubSection
 from core.companies.market import market_offers
-from core.companies.models import Company, Product
+from core.companies.models import Company, Product, ProductPriceHistory
 from core.posts.crop_hub import build_crop_hub_context, hub_config
 from core.posts.models import Post
 from core.utils.tests.factories import CategoryFactory, LocationFactory, PostFactory
@@ -83,6 +84,65 @@ class CategoryMarketWidgetTests(TestCase):
         self.assertEqual(self.client.get(widget["items"][0]["url"]).status_code, 200)
         self.assertEqual(Post.objects.values().get(pk=knowledge_post.pk), original)
 
+    def test_price_overview_separates_currencies_and_includes_ranges(self):
+        ranged = self.offer_for(self.post, "Ажур 25 кг", currency="USD")
+        Product.objects.filter(pk=ranged.pk).update(price=None, min_price=70, max_price=95)
+        self.offer_for(self.post, "Ажур упаковка", currency=None)
+        response = self.client.get(self.crop.get_absolute_url())
+        groups = {item["currency_code"]: item for item in response.context["price_overview"]}
+        self.assertEqual((groups["UAH"]["min"], groups["UAH"]["max"]), (40, 40))
+        self.assertEqual((groups["USD"]["min"], groups["USD"]["max"]), (70, 95))
+        self.assertEqual(groups[""]["currency"], "Валюта не вказана")
+        self.assertContains(response, "Недостатньо історії для графіка")
+        self.assertNotContains(response, "Недостатньо порівнюваних пропозицій")
+        block = response.content.decode().split('id="crop-prices-title"')[1].split("</section>")[0]
+        self.assertNotIn("Ажур", block)
+        self.assertNotIn("Seller", block)
+        self.assertFalse(response.context["price_summary"]["available"])
+
+    def test_price_overview_excludes_ineligible_and_unrelated_offers(self):
+        other_category = CategoryFactory(parent=self.root)
+        other_post = self.post_in(other_category, "Other cultivar")
+        self.offer_for(other_post, "Outside category")
+        stale = self.offer_for(self.post, "Stale")
+        Product.objects.filter(pk=stale.pk).update(price_updated_at=timezone.now() - timedelta(days=10000))
+        self.offer_for(self.post, "Inactive", active=False)
+        invalid = self.offer_for(self.post, "Zero price")
+        Product.objects.filter(pk=invalid.pk).update(price=0)
+        group = self.context()["price_overview"][0]
+        self.assertEqual(group["offer_count"], 1)
+        self.assertEqual(group["min"], Decimal("40"))
+
+    def test_history_groups_actual_observations_by_day_and_currency(self):
+        now = timezone.now()
+        for days, price in ((5, 25), (2, 35), (2, 45), (40, 900), (-2, 800)):
+            ProductPriceHistory.objects.create(
+                product=self.offer, observed_at=now - timedelta(days=days), price=price, currency="UAH"
+            )
+        ProductPriceHistory.objects.create(product=self.offer, observed_at=now, price=0, currency="UAH")
+        ProductPriceHistory.objects.create(product=self.offer, observed_at=now, price=999, currency="USD")
+        inactive = self.offer_for(self.post, "Inactive", active=False)
+        ProductPriceHistory.objects.create(product=inactive, observed_at=now, price=999, currency="UAH")
+        response = self.client.get(self.crop.get_absolute_url())
+        group = response.context["price_overview"][0]
+        self.assertTrue(group["has_chart"])
+        self.assertEqual([(row["min"], row["max"]) for row in group["history"]], [(25, 25), (35, 45)])
+        self.assertEqual([row["offer_count"] for row in group["history"]], [1, 1])
+        self.assertEqual(group["min"], 40)
+        self.assertContains(response, '<svg viewBox="0 0 620 180"')
+        self.assertContains(response, "Історія цін у таблиці")
+
+    def test_one_history_day_keeps_table_without_inventing_a_trend(self):
+        ProductPriceHistory.objects.create(
+            product=self.offer, observed_at=timezone.now(), min_price=20, max_price=60, currency="UAH"
+        )
+        response = self.client.get(self.crop.get_absolute_url())
+        group = response.context["price_overview"][0]
+        self.assertFalse(group["has_chart"])
+        self.assertEqual((group["history"][0]["min"], group["history"][0]["max"]), (20, 60))
+        self.assertContains(response, "Історія цін у таблиці")
+        self.assertNotContains(response, '<svg viewBox="0 0 620 180"')
+
     def test_exact_category_not_descendants_and_no_inferred_crop_scope(self):
         child = CategoryFactory(parent=self.market)
         other = self.post_in(child, "Child cultivar")
@@ -121,6 +181,7 @@ class CategoryMarketWidgetTests(TestCase):
             response = self.client.get(self.crop.get_absolute_url())
             self.assertEqual(response.status_code, 200)
             self.assertIsNone(response.context["market_widget"])
+            self.assertEqual(response.context["price_overview"], [])
             self.assertTrue(response.context["market_widget_configured"])
             self.assertNotContains(response, 'id="crop-market-title"')
             self.assertNotContains(response, "Переглянути пропозиції")
@@ -138,6 +199,7 @@ class CategoryMarketWidgetTests(TestCase):
             context = self.context()
         self.assertEqual(len(queries), before)
         self.assertEqual(len(context["market_widget"]["items"]), 6)
+        self.assertEqual(context["price_overview"][0]["offer_count"], 11)
         self.assertEqual(context["market_widget"]["stats"][2]["value"], 11)
 
     @override_settings(CROP_HUB_FRESH_DAYS=1, PRODUCT_PRICE_FRESH_DAYS=30, CROP_HUB_CACHE_TTL=0)
@@ -147,6 +209,8 @@ class CategoryMarketWidgetTests(TestCase):
         Product.objects.filter(pk=self.offer.pk).update(price_updated_at=timezone.now() - timedelta(days=31))
         response = self.client.get(self.crop.get_absolute_url())
         self.assertEqual(response.context["market_widget"]["items"], [])
+        self.assertEqual(response.context["price_overview"], [])
+        self.assertContains(response, "поки немає актуальних пропозицій із цінами")
         self.assertContains(response, "У цій категорії поки немає пропозицій")
 
     def test_deleting_source_preserves_hub_and_knowledge_references(self):

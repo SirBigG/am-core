@@ -84,8 +84,7 @@
         {% endif %}
         <section class="site-content-section" aria-labelledby="crop-prices-title">
             <h2 class="site-content-section__title" id="crop-prices-title">Ціни серед пропозицій AgroMega</h2>
-            <p class="am-state">{{ price_summary.reason }}</p>
-            <p>{{ price_summary.detail }}</p>
+            {% include "posts/includes/crop_price_overview.html" %}
         </section>
         <section class="site-content-section"
                  id="growing-guides"

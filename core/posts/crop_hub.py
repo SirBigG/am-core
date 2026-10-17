@@ -168,6 +168,7 @@ def _article(post):
 def _build_context(category, config):
     from core.companies.market import crop_market_offers, market_offers, market_posts
     from core.companies.models import Product
+    from core.posts.crop_prices import build_price_overview
 
     now = timezone.now()
     hub_query = urlencode({"hub": category.slug})
@@ -249,6 +250,7 @@ def _build_context(category, config):
         ),
         metric(totals["varieties"], "Сорти з пропозиціями", market_url),
     ]
+    price_overview = build_price_overview(offers, now)
     market_widget = None
     if market_category:
         preview = market_posts(offers=offers).filter(rubric_id=market_category.pk)[:6]
@@ -294,6 +296,7 @@ def _build_context(category, config):
         "market_groups": groups,
         "data_updated_at": updated,
         "marketplace_links": {"offers": market_url, "sellers": company_url},
+        "price_overview": price_overview,
         "price_summary": {
             "available": False,
             "reason": "Недостатньо порівнюваних пропозицій",
@@ -333,7 +336,7 @@ def build_crop_hub_context(category, site=None, locale=None, config=None):
             sort_keys=True,
         ).encode()
     ).hexdigest()
-    key = f"crop-hub:v3:{category.pk}:{digest}"
+    key = f"crop-hub:v5:{category.pk}:{digest}"
     context = cache.get(key)
     if context is None:
         context = _build_context(category, config)

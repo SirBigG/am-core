@@ -33,7 +33,23 @@ compatibility. An explicitly configured source with inactive ancestry hides the
 widget and action instead of switching to another source. Clearing/deleting the
 reference returns to the existing block. Changing the hub selects a new cache
 snapshot immediately; offer changes retain the existing maximum five-minute TTL.
-The cache key version is v3. The preview uses existing responsive crop-card CSS.
+The cache key version is v5. The preview uses existing responsive crop-card CSS.
+
+The separate price block aggregates the same eligible offer cohort into nominal
+min/max prices, offer/seller counts and latest timestamp per currency. Fixed prices
+take precedence over minimum/maximum fields, as on the existing market. Null and
+blank currency form one unknown group. There are no individual product cards.
+A filtered primary-key subquery preserves the legacy window-based deduplication
+before grouping. One aggregate query serves current ranges; a second groups valid
+`ProductPriceHistory` observations by local day/currency over 30 calendar days.
+Only products currently eligible contribute. Historical currency changes retain
+the recorded currency; charts cover currencies present in the current overview.
+Missing dates are not filled or interpolated. Two distinct dates are required for
+an inline responsive SVG chart; a details table exposes exact daily values and
+counts of distinct products. No new dependencies or assets are required.
+The normalized `price_summary` remains unavailable: package/unit/purpose evidence
+still does not support per-kg analytics or a comparable market price index.
+Previously the block unconditionally displayed the unavailable message.
 
 `core/companies` is byte-for-byte identical to the inspected base HEAD; the earlier
 market, matching, seller and market-test edits from this chat were removed.
@@ -61,6 +77,16 @@ category was assigned. No production write, category assignment, permission
 change, commit, push, merge or deployment is part of this implementation.
 
 ## Rollout and acceptance
+
+Price-overview follow-up verification: **107 tests pass** in Compose/PostgreSQL
+(`core.posts.tests.test_category_market_widget`, `core.posts.tests.test_crop_hub`,
+`core.companies`, with `settings.test_settings`). Tests cover currency separation,
+fixed/range prices, current cohort eligibility, legacy deduplication, all offers
+beyond the six-variety preview, historical day grouping and distinct counts,
+invalid/old/future history exclusion, single-day table without a chart, actual SVG
+rendering, empty/inactive sources and stable query count. Scoped flake8 and diff
+checks pass. Local inventory has zero currently eligible market offers, so these
+checks use disposable test fixtures; production prices/history remain unverified.
 
 Apply migration 0018 through the existing release process before serving workers.
 Then select `market_category` on the intended hub. On production potato, category

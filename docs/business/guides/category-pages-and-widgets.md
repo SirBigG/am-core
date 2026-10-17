@@ -176,7 +176,7 @@ shown as an unlinked title in the standalone guide and omitted from the Crop Hub
 | Knowledge navigation | Links to the configured public categories | Role, label, description, order and active state |
 | Agromarket metrics | With a widget category: ordinary market offer rows, distinct companies, varieties and latest price observation. Otherwise: existing strict seller/cultivar observations | Optional Agromarket widget category; otherwise the variety reference |
 | Market groups | Currently the catalog-variety offer destination | No seed/food/fertilizer group inference |
-| Price summary | Currently an informative unavailable state | No manual price or automatic median is enabled |
+| Prices among offers | Current nominal min/max, offer/seller counts, latest date per currency, and 30-day observation chart | Same scope as market metrics; no per-kg calculation or median |
 | Growing sequence | Ordered Guide sections and article placements from the selected source | Guide curation |
 | Featured varieties | Up to six eligible catalog articles ordered by title and ID, excluding articles already shown in the guide | Catalog membership; no popularity ranking or dedicated featured selector |
 | Additional articles | Up to six recent eligible articles from the landing subtree, excluding configured source subtrees and already displayed articles | Article/category content; no separate manual widget list |
@@ -238,6 +238,24 @@ The current schema has no verified package mass/unit or seed-versus-food product
 classification. Price analytics therefore remain unavailable even when offers
 exist. Configuration thresholds alone do not enable them. Seed, food, fertilizers
 and crop-protection products must not be mixed to produce a crop price.
+
+The price block shows a general overview without repeating individual varieties:
+current minimum/maximum declared prices, offer and distinct seller counts and latest
+observation, separately per currency (including an unknown-currency group). Prices
+retain seller package/unit conventions. They describe the range of listings, not
+comparable per-kg prices, a market average or a price index.
+
+A 30-day chart shows each recorded day's minimum/maximum from `ProductPriceHistory`
+for products currently eligible in that same category or legacy strict scope.
+Currencies are never converted or combined; history appears in its recorded
+currency when that currency has a current group. At least two distinct recorded
+days are needed for a chart. A single day can still be read in the accessible table.
+Missing days remain gaps; observations are not carried forward or interpolated.
+Several records for a product on a day contribute to its recorded range but only
+one product count. This is a history of observations for the current cohort, not a
+reconstruction of historical market membership. Changes in package/mix affect the
+range. Empty scope shows no-price state even if unrelated global offers exist.
+The existing normalized `price_summary` remains unavailable.
 
 ## Agent/API workflow
 
