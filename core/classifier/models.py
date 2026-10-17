@@ -1,6 +1,7 @@
 from io import BytesIO
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.files import File
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -243,3 +244,115 @@ class CategoryAIProfile(models.Model):
 
     def __str__(self):
         return self.title or f"{self.category} AI documentation"
+
+
+def _validate_hub_target(category_id, target_id, *, include_self=False):
+    """Explicit references may cross taxonomy branches without moving content.
+
+    Section navigation cannot point back to the hub or include it
+    through an ancestor catalog. Guide sources are direct collections
+    and may use self.
+    """
+    if include_self:
+        return
+    bounds = Category.objects.filter(pk=category_id).values("tree_id", "lft", "rght").first()
+    if (
+        bounds
+        and Category.objects.filter(
+            pk=target_id,
+            tree_id=bounds["tree_id"],
+            lft__lte=bounds["lft"],
+            rght__gte=bounds["rght"],
+        ).exists()
+    ):
+        raise ValidationError(_("Choose a section category other than this hub or its ancestors."))
+
+
+class CategoryHub(models.Model):
+    """Presentation configuration referencing the existing taxonomy."""
+
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="crop_hub")
+    is_active = models.BooleanField(default=False, verbose_name=_("active"))
+    description = models.TextField(blank=True, verbose_name=_("short introduction"))
+    guide_category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="guide_source_for_hubs",
+        help_text=_("Optional existing guide source. Blank uses guide sections on the hub category."),
+    )
+    site = models.ForeignKey(
+        "sites.Site",
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        help_text=_("Optional display restriction. Blank uses this hub on every site owning this database."),
+    )
+    locale = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text=_("Optional language code, for example uk. Blank uses this hub in every language."),
+    )
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("category hub")
+        verbose_name_plural = _("category hubs")
+        ordering = ("category__value",)
+
+    def __str__(self):
+        return str(self.category)
+
+    def clean(self):
+        super().clean()
+        self.locale = self.locale.strip().lower()
+        if self.locale and self.locale not in dict(settings.LANGUAGES):
+            raise ValidationError({"locale": _("Select a language enabled for this application.")})
+        if self.category_id and self.guide_category_id:
+            try:
+                _validate_hub_target(self.category_id, self.guide_category_id, include_self=True)
+            except ValidationError as exc:
+                raise ValidationError({"guide_category": exc.messages}) from exc
+
+
+class CategoryHubSection(models.Model):
+    class Role(models.TextChoices):
+        VARIETIES = "varieties", _("varieties")
+        DISEASES = "diseases", _("diseases")
+        PESTS = "pests", _("pests")
+        GROWING = "growing", _("growing and care")
+        ADDITIONAL = "additional", _("additional section")
+
+    hub = models.ForeignKey(CategoryHub, on_delete=models.CASCADE, related_name="sections")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="hub_sections")
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.ADDITIONAL)
+    title = models.CharField(max_length=250, blank=True, verbose_name=_("label override"))
+    description = models.TextField(blank=True)
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name = _("hub section")
+        verbose_name_plural = _("hub sections")
+        ordering = ("sort_order", "pk")
+        constraints = [
+            models.UniqueConstraint(fields=("hub", "category"), name="unique_hub_section_category"),
+            models.UniqueConstraint(
+                fields=("hub", "role"),
+                condition=~models.Q(role="additional"),
+                name="unique_hub_primary_role",
+            ),
+        ]
+
+    def __str__(self):
+        return self.title or str(self.category)
+
+    def clean(self):
+        super().clean()
+        hub = getattr(self, "hub", None)
+        if self.category_id and hub is not None and hub.category_id:
+            try:
+                _validate_hub_target(hub.category_id, self.category_id)
+            except ValidationError as exc:
+                raise ValidationError({"category": exc.messages}) from exc

@@ -35,3 +35,32 @@ a.list-link {
   display: inline-block;
   transition: .3s;
 }
+
+// Crop hubs share the catalog surfaces and use bounded, wrapping card grids.
+.crop-hub {
+  &__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+    gap: 1rem;
+    padding: 0;
+    list-style: none;
+  }
+  &__card {
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    height: 100%;
+    padding: 1.2rem;
+    border: 1px solid #d9e4d9;
+    border-radius: .8rem;
+    background: #fff;
+    overflow-wrap: anywhere;
+    color: inherit;
+    text-decoration: none;
+  }
+  a:focus-visible { outline: 3px solid #258341; outline-offset: 3px; }
+  &__number { font-size: 2rem; color: #236535; }
+  &__actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1rem; }
+  &__market { background: #f1f6ee; border-radius: 1rem; padding: 1.25rem; }
+  &__image { max-width: 100%; height: auto; border-radius: .8rem; margin-bottom: 1rem; }
+}

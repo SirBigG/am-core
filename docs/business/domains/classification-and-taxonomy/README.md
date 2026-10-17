@@ -19,6 +19,9 @@ Classification is the shared tree of categories used by other AgroMega core proj
 ## Business Rules
 
 - Categories are hierarchical.
+- A main crop category can own an admin-managed Category Hub. It connects existing variety, disease, pest and growing categories and a curated guide collection through explicit references, including across legacy taxonomy branches. The landing page does not require source articles or catalogs to be moved or copied.
+- Hub knowledge counts and market destinations derive from those category references. Market cultivar scope uses only the configured variety subtree; unrelated records under a broad legacy parent are excluded.
+- Staff agents with explicit model permissions can manage hub and Guide Hub configuration through the [content API](../../../engineering/api/hub-management.md). Taxonomy creation and reparenting remain separate admin operations.
 - The token-authenticated integration API exposes only active categories and preserves the complete hierarchy recursively.
 - Categories are shared infrastructure for other domains, not only a standalone content area.
 - Changes to the tree can affect multiple business apps.

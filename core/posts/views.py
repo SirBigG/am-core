@@ -22,6 +22,7 @@ from core.classifier.models import Category, CategoryPresentationMode
 from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
+from core.posts.crop_hub import build_crop_hub_context, crop_scope_for_post, hub_config
 from core.posts.guide_hub import build_guide_hub_context, get_public_guide_categories, get_public_guide_sections
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
@@ -109,7 +110,24 @@ class PlantDiaryLandingView(TemplateView):
     template_name = "plant_diary.html"
 
 
-class ParentRubricView(TemplateView):
+class CropHubCanonicalMixin:
+    def get(self, request, *args, **kwargs):
+        slug = kwargs.get("child") or kwargs.get("parent")
+        config = hub_config(slug)
+        if config is not None:
+            category = get_object_or_404(Category.objects.select_related("meta", "parent"), slug=slug)
+            if category.get_ancestors(include_self=True).filter(is_active=False).exists():
+                raise Http404
+            if kwargs.get("child") and (category.parent is None or category.parent.slug != kwargs["parent"]):
+                raise Http404
+            if category.absolute_url and request.path != category.absolute_url:
+                return HttpResponsePermanentRedirect(category.absolute_url)
+            self.crop_hub_category = category
+            self.crop_hub_config = config
+        return super().get(request, *args, **kwargs)
+
+
+class ParentRubricView(CropHubCanonicalMixin, TemplateView):
     """For base rubric text."""
 
     template_name = "posts/parent_index.html"
@@ -117,7 +135,14 @@ class ParentRubricView(TemplateView):
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""
         context = super().get_context_data(**kwargs)
-        context["category"] = get_object_or_404(Category, slug=self.kwargs["parent"])
+        context["category"] = getattr(self, "crop_hub_category", None) or get_object_or_404(
+            Category.objects.select_related("meta"), slug=self.kwargs["parent"]
+        )
+        category = context["category"]
+        if hasattr(self, "crop_hub_config"):
+            self.template_name = "posts/crop_hub.html"
+            context.update(build_crop_hub_context(category, config=self.crop_hub_config))
+            return context
         context["object_list"] = (
             Post.objects.select_objects().filter(rubric__parent_id=context["category"].pk).active()[:4]
         )
@@ -131,7 +156,7 @@ def _validate_public_guide_category(category, parent_slug):
         raise Http404
 
 
-class PostListView(TemplateView):
+class PostListView(CropHubCanonicalMixin, TemplateView):
     template_name = "posts/list_order.html"
 
     def _get_post_countries(self, rubric_id):
@@ -153,9 +178,19 @@ class PostListView(TemplateView):
         return posts
 
     def get_context_data(self, **kwargs):
-        category = Category.objects.select_related("meta", "parent").filter(slug=self.kwargs["child"]).first()
+        category = (
+            getattr(self, "crop_hub_category", None)
+            or Category.objects.select_related("meta", "parent").filter(slug=self.kwargs["child"]).first()
+        )
         if category is None:
             raise Http404
+        if hasattr(self, "crop_hub_config"):
+            self.template_name = "posts/crop_hub.html"
+            return {
+                "view": self,
+                "request": self.request,
+                **build_crop_hub_context(category, config=self.crop_hub_config),
+            }
         if category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
             _validate_public_guide_category(category, self.kwargs["parent"])
             self.template_name = "posts/guide_hub.html"
@@ -196,7 +231,7 @@ class PostList(ListView):
 
     def get(self, request, *args, **kwargs):
         category = get_object_or_404(Category.objects.select_related("parent"), slug=self.kwargs["child"])
-        if category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
+        if hub_config(category.slug) is not None or category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
             _validate_public_guide_category(category, self.kwargs["parent"])
             response = HttpResponseRedirect(
                 reverse("posts-list-view", kwargs={"parent": category.parent.slug, "child": category.slug})
@@ -280,7 +315,7 @@ class PostDetail(DetailView):
         context["publication_canonical_url"] = full_url(context["object"].get_absolute_url())
         context["registry_variety_exists"] = Variety.objects.filter(publication_id=context["object"].id).exists()
         context["publication_market"] = publication_market_context(
-            context["object"], context["registry_variety_exists"]
+            context["object"], context["registry_variety_exists"], crop_scope=crop_scope_for_post(context["object"])
         )
         context["category_attribute_groups"] = get_public_category_attribute_groups(context["object"])
         return context

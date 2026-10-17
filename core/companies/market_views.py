@@ -7,8 +7,16 @@ from django.views.generic import DetailView, ListView, TemplateView
 
 from core.classifier.models import Category, Region
 from core.posts.category_attributes import get_public_category_attribute_groups
+from core.posts.crop_hub import hub_market_categories
 
-from .market import market_categories, market_offers, market_posts, summarize_offers
+from .market import (
+    crop_market_offers,
+    market_categories,
+    market_offers,
+    market_posts,
+    requested_crop_hub,
+    summarize_offers,
+)
 from .models import MarketPage
 
 
@@ -52,7 +60,9 @@ class MarketListView(ListView):
 
     def get_queryset(self):
         self.category = None
-        queryset = market_posts(selected_region(self.request))
+        self.crop_hub = requested_crop_hub(self.request)
+        offers = crop_market_offers(*self.crop_hub) if self.crop_hub else None
+        queryset = market_posts(selected_region(self.request), offers=offers)
         if "slug" in self.kwargs:
             self.category = get_object_or_404(Category, slug=self.kwargs["slug"], is_active=True)
             queryset = queryset.filter(rubric=self.category)
@@ -66,10 +76,13 @@ class MarketListView(ListView):
             f"{label}: пропозиції продавців" if self.category else "Агромаркет"
         )
         categories = category_navigation()
+        if self.crop_hub:
+            allowed = set(hub_market_categories(*self.crop_hub).values_list("pk", flat=True))
+            categories = [item for item in categories if item.pk in allowed]
         if self.category and self.category.pk not in {item.pk for item in categories}:
             self.category.market_label = label
             categories.append(self.category)
-        region_offers = market_offers()
+        region_offers = crop_market_offers(*self.crop_hub) if self.crop_hub else market_offers()
         if self.category:
             region_offers = region_offers.filter(category=self.category)
         context.update(
@@ -78,6 +91,8 @@ class MarketListView(ListView):
                 | Q(pk=self.request.GET.get("region") or None)
             ).order_by("value"),
             selected_region=self.request.GET.get("region", ""),
+            selected_hub=self.request.GET.get("hub", ""),
+            crop_hub_category=self.crop_hub[0] if self.crop_hub else None,
             category=self.category,
             categories=categories,
             market_tab="products",
@@ -97,7 +112,10 @@ class MarketVarietyView(DetailView):
     context_object_name = "variety"
 
     def get_queryset(self):
-        return market_posts(selected_region(self.request))
+        crop_hub = requested_crop_hub(self.request)
+        self.crop_hub = crop_hub
+        offers = crop_market_offers(*crop_hub) if crop_hub else None
+        return market_posts(selected_region(self.request), offers=offers)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,6 +123,8 @@ class MarketVarietyView(DetailView):
         context.update(
             selected_region=self.request.GET.get("region", ""),
             market_tab="products",
+            selected_hub=self.request.GET.get("hub", ""),
+            crop_hub_category=self.crop_hub[0] if self.crop_hub else None,
             attributes=get_public_category_attribute_groups(variety),
             market_heading=f"{variety.title}: пропозиції продавців",
             market_title=f"{variety.title} — ціни та пропозиції | Агромаркет",

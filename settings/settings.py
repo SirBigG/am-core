@@ -460,3 +460,9 @@ SECURE_CSP_REPORT_ONLY = {
     "base-uri": ("'self'",),
     "form-action": ("'self'",) + CSP_FORM_ACTION_ORIGINS,
 }
+
+# Operational limits; hub categories and sections are configured in Django admin.
+CROP_HUB_CACHE_TTL = int(os.getenv("CROP_HUB_CACHE_TTL", "300"))
+CROP_HUB_FRESH_DAYS = int(os.getenv("CROP_HUB_FRESH_DAYS", "30"))
+CROP_HUB_PRICE_MIN_OFFERS = int(os.getenv("CROP_HUB_PRICE_MIN_OFFERS", "5"))
+CROP_HUB_PRICE_MIN_SELLERS = int(os.getenv("CROP_HUB_PRICE_MIN_SELLERS", "3"))

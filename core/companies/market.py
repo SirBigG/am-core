@@ -1,6 +1,7 @@
 """Catalog identity and fresh seller offers for the public market."""
 
 from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.db.models import Exists, F, OuterRef, Prefetch, Q
@@ -13,7 +14,7 @@ from core.posts.models import Post
 from .models import Product
 
 
-def publication_market_context(post, registry_variety_exists=False):
+def publication_market_context(post, registry_variety_exists=False, crop_scope=None):
     """Post is the market identity; registry Variety has a separate primary
     key.
 
@@ -21,7 +22,12 @@ def publication_market_context(post, registry_variety_exists=False):
     Do not cache eligibility: price expiry and parser/admin changes apply on the
     next render. Both checks use EXISTS, never materializing seller offers.
     """
-    can_show = market_offers().filter(post_id=post.pk).exists()
+    offers = market_offers()
+    market_url = reverse("market:variety", args=[post.pk])
+    if crop_scope is not None:
+        offers = crop_market_offers(*crop_scope)
+        market_url += "?" + urlencode({"hub": crop_scope[0].slug})
+    can_show = offers.filter(post_id=post.pk).exists()
     replace_related_products = (
         can_show
         or registry_variety_exists
@@ -29,7 +35,7 @@ def publication_market_context(post, registry_variety_exists=False):
     )
     return {
         "entity_name": post.title,
-        "market_url": reverse("market:variety", args=[post.pk]),
+        "market_url": market_url,
         "can_show": can_show,
         "post_id": post.pk,
         "entity_id": post.pk,
@@ -61,8 +67,9 @@ def market_categories():
     )
 
 
-def market_posts(region=""):
-    offers = market_offers()
+def market_posts(region="", offers=None):
+    if offers is None:
+        offers = market_offers()
     if region:
         offers = offers.filter(company__location__region_id=region)
     return (
@@ -93,3 +100,57 @@ def summarize_offers(post):
     post.market_offer_count = len(post.market_offers)
     post.market_seller_count = len({offer.company_id for offer in post.market_offers})
     return post
+
+
+def crop_market_offers(category, config):
+    """Conservative, reconciliable seller/cultivar observations for hubs.
+
+    A broad title mention and an unchecked legacy FK do not prove
+    product identity. With no product-purpose classification, accept
+    reviewed exact cultivar names only. Do not infer planting/food
+    purpose or package units. One latest observation per seller/cultivar
+    prevents duplicate domination.
+    """
+    from django.db.models import Window
+    from django.db.models.functions import Lower, RowNumber, Trim
+
+    from core.posts.crop_hub import hub_market_categories, public_posts
+
+    fresh_after = timezone.now() - timedelta(days=min(settings.CROP_HUB_FRESH_DAYS, settings.PRODUCT_PRICE_FRESH_DAYS))
+    return (
+        market_offers()
+        .filter(
+            category__in=hub_market_categories(category, config),
+            post__in=public_posts(),
+            match_status__in=[Product.MatchStatus.AUTO, Product.MatchStatus.CONFIRMED],
+            price_updated_at__gte=fresh_after,
+            price_updated_at__lte=timezone.now(),
+        )
+        .alias(normalized_name=Lower(Trim("name")), normalized_title=Lower(Trim("post__title")))
+        .filter(normalized_name=F("normalized_title"))
+        .annotate(
+            hub_row=Window(
+                expression=RowNumber(),
+                partition_by=[F("company_id"), F("post_id")],
+                order_by=[F("price_updated_at").desc(), F("pk").desc()],
+            )
+        )
+        .filter(hub_row=1)
+    )
+
+
+def requested_crop_hub(request):
+    """Validate a strict marketplace scope; never silently broaden an invalid
+    hub."""
+    from django.http import Http404
+
+    from core.posts.crop_hub import hub_config, public_categories
+
+    slug = request.GET.get("hub", "")
+    if not slug:
+        return None
+    config = hub_config(slug)
+    category = public_categories().filter(slug=slug).first()
+    if config is None or category is None:
+        raise Http404("Unknown crop hub")
+    return category, config

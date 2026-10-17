@@ -4,8 +4,10 @@ from django.shortcuts import redirect, render
 from django.views.generic import DetailView, ListView
 
 from core.classifier.models import Category, Region
+from core.posts.crop_hub import hub_market_categories
 
 from .forms import AdminParseForm
+from .market import crop_market_offers, requested_crop_hub
 from .models import Company, CompanyType, Product
 from .parser import get_content_from_url, parse_data_from_content
 
@@ -17,11 +19,21 @@ class CompanyListView(ListView):
     paginate_by = 24
 
     def get_queryset(self):
-        queryset = Company.objects.filter(active=True, type=CompanyType.SHOP)
+        crop_hub = requested_crop_hub(self.request)
+        self.crop_hub = crop_hub
+        if crop_hub:
+            queryset = Company.objects.filter(active=True, pk__in=crop_market_offers(*crop_hub).values("company_id"))
+        else:
+            queryset = Company.objects.filter(active=True, type=CompanyType.SHOP)
         category = self.request.GET.get("category", "")
         region = self.request.GET.get("region", "")
         if category:
-            queryset = queryset.filter(products__category__slug=category, products__active=True)
+            if crop_hub:
+                queryset = queryset.filter(
+                    pk__in=crop_market_offers(*crop_hub).filter(category__slug=category).values("company_id")
+                )
+            else:
+                queryset = queryset.filter(products__category__slug=category, products__active=True)
         if region:
             queryset = queryset.filter(location__region__slug=region)
         return queryset.distinct().order_by("name", "pk")
@@ -29,9 +41,16 @@ class CompanyListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         shops = Company.objects.filter(active=True, type=CompanyType.SHOP)
+        if self.crop_hub:
+            shops = Company.objects.filter(pk__in=crop_market_offers(*self.crop_hub).values("company_id"))
         context.update(
             market_tab="companies",
-            company_categories=Category.objects.filter(product__company__in=shops, product__active=True, is_active=True)
+            crop_hub_category=self.crop_hub[0] if self.crop_hub else None,
+            company_categories=(
+                hub_market_categories(*self.crop_hub)
+                if self.crop_hub
+                else Category.objects.filter(product__company__in=shops, product__active=True, is_active=True)
+            )
             .distinct()
             .order_by("value"),
             company_regions=Region.objects.filter(location__company__in=shops).distinct().order_by("value"),

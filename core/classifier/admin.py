@@ -1,7 +1,8 @@
 from functools import wraps
 
 from django.contrib import admin
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.forms.models import BaseInlineFormSet
 from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.template.response import TemplateResponse
 from django.urls import path, reverse
@@ -9,7 +10,16 @@ from django.utils.cache import add_never_cache_headers, patch_vary_headers
 from django.views.decorators.http import require_safe
 from mptt.admin import DraggableMPTTAdmin
 
-from core.classifier.models import Area, Category, CategoryAIProfile, Country, Location, Region
+from core.classifier.models import (
+    Area,
+    Category,
+    CategoryAIProfile,
+    CategoryHub,
+    CategoryHubSection,
+    Country,
+    Location,
+    Region,
+)
 from core.posts.guide_admin_permissions import guide_placements_in_category_trees, require_guide_placement_deletion
 from core.posts.guide_hub import build_guide_hub_context, get_public_guide_sections
 from core.posts.models import GuideSection, GuideSectionArticle, Post
@@ -45,13 +55,60 @@ class GuideSectionInline(admin.TabularInline):
         return super().has_delete_permission(request, obj) and request.user.has_perm("posts.delete_guidesectionarticle")
 
 
+class CategoryHubInline(admin.StackedInline):
+    model = CategoryHub
+    fk_name = "category"
+    extra = 0
+    max_num = 1
+    fields = ("is_active", "description", "guide_category", "site", "locale")
+    autocomplete_fields = ("guide_category", "site")
+    show_change_link = True
+
+
+class CategoryHubSectionFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+        if any(self.errors):
+            return
+        roles = set()
+        for form in self.forms:
+            data = form.cleaned_data
+            if not data or data.get("DELETE"):
+                continue
+            role = data.get("role")
+            if role == CategoryHubSection.Role.ADDITIONAL:
+                continue
+            if role in roles:
+                raise ValidationError("Each primary section role may appear only once in a hub.")
+            roles.add(role)
+
+
+class CategoryHubSectionInline(admin.TabularInline):
+    model = CategoryHubSection
+    formset = CategoryHubSectionFormSet
+    extra = 0
+    fields = ("role", "category", "title", "description", "sort_order", "is_active")
+    autocomplete_fields = ("category",)
+    ordering = ("sort_order", "pk")
+
+
+@admin.register(CategoryHub)
+class CategoryHubAdmin(admin.ModelAdmin):
+    list_display = ("category", "is_active", "site", "locale", "updated")
+    list_filter = ("is_active", "site", "locale")
+    search_fields = ("category__value", "category__slug", "description")
+    autocomplete_fields = ("category", "guide_category", "site")
+    readonly_fields = ("updated",)
+    inlines = (CategoryHubSectionInline,)
+
+
 @admin.register(Category)
 class CategoryAdmin(DraggableMPTTAdmin, admin.ModelAdmin):
     change_form_template = "admin/guide_hub_change_form.html"
     list_display = ("tree_actions", "indented_title", "slug", "is_active", "is_diary_species_parent")
     list_filter = ("is_active", "is_diary_species_parent", "is_for_user")
     search_fields = ["value", "slug"]
-    inlines = (CategoryAIProfileInline, GuideSectionInline)
+    inlines = (CategoryAIProfileInline, GuideSectionInline, CategoryHubInline)
 
     def has_guide_preview_permission(self, request, obj=None):
         section_admin = self.admin_site.get_model_admin(GuideSection)

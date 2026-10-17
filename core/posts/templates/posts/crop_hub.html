@@ -1,0 +1,118 @@
+{% extends "posts/parent_index.html" %}
+{% load post_extras static %}
+{% block scripts %}
+    <script async src="{% static 'posts/j-index.js' %}"></script>
+    <link rel="stylesheet"
+          href="{% static 'posts/list.css' %}?v=20261017-crop-hub-1">
+{% endblock scripts %}
+{% block canonical %}
+    <link rel="canonical" href="{% full_url category.absolute_url %}">
+{% endblock canonical %}
+{% block title %}{{ title }}{% endblock title %}
+{% block meta_description %}{{ description }}{% endblock meta_description %}
+{% block extra_meta %}
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:url" content="{% full_url category.absolute_url %}">
+    {% if category.image %}
+        <meta property="og:image" content="{% full_url category.image.url %}">
+    {% endif %}
+    <script type="application/ld+json">{% breadcrumb_structured_data category %}</script>
+    <script type="application/ld+json">{% collection_structured_data category.value object_list %}</script>
+{% endblock extra_meta %}
+{% block second_menu %}
+{% endblock second_menu %}
+{% block content %}
+    <div class="site-catalog-shell crop-hub">
+        <header class="site-catalog-hero">
+            <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
+            <p class="site-catalog-hero__eyebrow">Знання та Агромаркет</p>
+            <h1 class="site-catalog-hero__title">{% if category.meta.h1 %}{{ category.meta.h1 }}{% else %}{{ category.value }}{% endif %}</h1>
+            {% if category.image %}
+                <img class="crop-hub__image"
+                     src="{{ category.image.url }}"
+                     alt=""
+                     width="300"
+                     height="200">
+            {% endif %}
+            <p class="site-catalog-hero__text">{{ description }}</p>
+            <nav class="crop-hub__actions" aria-label="Основні дії">
+                {% for action in primary_actions %}<a class="btn btn-success" href="{{ action.url }}">{{ action.label }}</a>{% endfor %}
+                {% if growing_guides %}<a class="btn btn-outline-success" href="#growing-guides">Як вирощувати</a>{% endif %}
+                <a class="btn btn-outline-success" href="{{ marketplace_links.offers }}">Переглянути пропозиції</a>
+            </nav>
+        </header>
+        {% if knowledge_stats %}
+            <nav class="site-content-section" aria-label="Каталог знань">
+                <h2 class="site-content-section__title">Каталог знань</h2>
+                <ul class="crop-hub__grid crop-hub__metrics">
+                    {% for metric in knowledge_stats %}
+                        <li><a class="crop-hub__card" href="{{ metric.url }}"><strong class="crop-hub__number">{{ metric.value }}</strong><span>{{ metric.label }}</span></a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+        {% if knowledge_sections %}
+            <nav class="site-content-section" aria-label="Розділи культури">
+                <h2 class="site-content-section__title">Досліджуйте культуру</h2>
+                <ul class="crop-hub__grid">
+                    {% for section in knowledge_sections %}
+                        <li><a class="crop-hub__card" href="{{ section.url }}"><strong>{{ section.label }}</strong><span>{{ section.description }}</span></a></li>
+                    {% endfor %}
+                </ul>
+            </nav>
+        {% endif %}
+        <section class="site-content-section crop-hub__market"
+                 aria-labelledby="crop-market-title">
+            <p class="site-content-section__eyebrow">Спостереження AgroMega</p>
+            <h2 class="site-content-section__title" id="crop-market-title">Агромаркет</h2>
+            <p>Перевірені збіги назв сортів у свіжих пропозиціях AgroMega. Один продавець і сорт — одна пропозиція. Це огляд спостережуваних оголошень, а не всього ринку України.</p>
+            <ul class="crop-hub__grid crop-hub__metrics">
+                {% for metric in market_stats %}
+                    <li><a class="crop-hub__card" href="{{ metric.url }}"><strong class="crop-hub__number">{{ metric.value }}</strong><span>{{ metric.label }}</span></a></li>
+                {% endfor %}
+            </ul>
+            {% if data_updated_at %}<p>Останнє спостереження ціни: <time datetime="{{ data_updated_at|date:'c' }}">{{ data_updated_at|date:'d.m.Y' }}</time></p>{% else %}<p>Перевірених свіжих пропозицій поки немає.</p>{% endif %}
+            {% for group in market_groups %}<p><a href="{{ group.url }}">{{ group.label }} →</a></p>{% endfor %}
+            <p>Призначення товару та фасування уточнюйте у продавця. Засоби захисту та добрива не враховуються як сорти.</p>
+        </section>
+        <section class="site-content-section" aria-labelledby="crop-prices-title">
+            <h2 class="site-content-section__title" id="crop-prices-title">Ціни серед пропозицій AgroMega</h2>
+            <p class="am-state">{{ price_summary.reason }}</p>
+            <p>{{ price_summary.detail }}</p>
+        </section>
+        <section class="site-content-section"
+                 id="growing-guides"
+                 aria-labelledby="crop-guides-title">
+            <h2 class="site-content-section__title" id="crop-guides-title">Вирощування: крок за кроком</h2>
+            {% for section in growing_guides %}
+                <h3>{{ section.title }}</h3>
+                <ol class="site-variety-list">
+                    {% for article in section.articles %}<li><a class="site-variety-row" href="{{ article.url }}">{{ article.title }}</a></li>{% endfor %}
+                </ol>
+            {% empty %}
+                <p>Послідовність практичних матеріалів готується.</p>
+            {% endfor %}
+        </section>
+        {% if featured_varieties %}
+            <section class="site-content-section" aria-labelledby="crop-varieties-title">
+                <h2 class="site-content-section__title" id="crop-varieties-title">Сорти з каталогу</h2>
+                <p>Добірка за абеткою.</p>
+                <ul class="crop-hub__grid">
+                    {% for variety in featured_varieties %}
+                        <li class="crop-hub__card"><a href="{{ variety.url }}"><strong>{{ variety.title }}</strong></a>{% if variety.market_url %}<a href="{{ variety.market_url }}">Пропозиції сорту {{ variety.title }} →</a>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+        {% if additional_articles %}
+            <section class="site-content-section" aria-labelledby="crop-articles-title">
+                <h2 class="site-content-section__title" id="crop-articles-title">Ще корисні матеріали</h2>
+                <ul class="site-variety-list">
+                    {% for article in additional_articles %}<li><a class="site-variety-row" href="{{ article.url }}">{{ article.title }}</a></li>{% endfor %}
+                </ul>
+                {% if more_articles_url %}<a href="{{ more_articles_url }}">Більше матеріалів →</a>{% endif %}
+            </section>
+        {% endif %}
+    </div>
+{% endblock content %}

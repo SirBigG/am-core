@@ -7,6 +7,7 @@
 {% block title %}
     Компанії
 {% endblock title %}
+{% block robots %}{% if request.GET %}<meta name="robots" content="noindex,follow">{% else %}{{ block.super }}{% endif %}{% endblock robots %}
 {% block page_header %}
 {% endblock page_header %}
 {% block content %}
@@ -21,6 +22,7 @@
         </header>
         {% include "companies/market_tabs.html" %}
         <form method="get" class="site-content-section site-filter-grid">
+            {% if request.GET.hub %}<input type="hidden" name="hub" value="{{ request.GET.hub }}">{% endif %}
             <label class="site-form-label">
                 Категорія
                 <select name="category" class="form-select">
@@ -38,7 +40,8 @@
                 </select>
             </label>
             <button type="submit" class="btn btn-success align-self-end">Показати</button>
-            <a href="{% url 'companies:list' %}" class="align-self-end">Скинути</a>
+            <a href="{% url 'companies:list' %}{% if request.GET.hub %}?hub={{ request.GET.hub|urlencode }}{% endif %}"
+               class="align-self-end">Скинути</a>
         </form>
         <div class="site-card-list site-company-grid">
             {% for company in companies %}
