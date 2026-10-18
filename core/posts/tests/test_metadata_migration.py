@@ -13,8 +13,11 @@ class DirectMetadataMigrationTests(TransactionTestCase):
         category = CategoryFactory()
         user = UserFactory()
         executor = MigrationExecutor(connection)
+        leaves = executor.loader.graph.leaf_nodes()
         service_targets = [target for target in executor.loader.graph.leaf_nodes() if target[0] == "services"]
-        self.addCleanup(lambda: MigrationExecutor(connection).migrate(self.migrate_to))
+        # Restore dependent apps too; their schema may be unapplied when posts
+        # rolls back, including search source-invalidation triggers.
+        self.addCleanup(lambda: MigrationExecutor(connection).migrate(leaves))
         executor.migrate(self.migrate_from)
         old_apps = executor.loader.project_state(self.migrate_from + service_targets).apps
         OldPost = old_apps.get_model("posts", "Post")

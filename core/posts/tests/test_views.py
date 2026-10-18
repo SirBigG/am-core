@@ -493,7 +493,7 @@ class PostSearchTests(TestCase):
         response = self.client.get("/search/")
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "posts/search.html")
+        self.assertTemplateUsed(response, "search/results.html")
         self.assertEqual(SearchStatistic.objects.count(), 0)
         self.assertContains(response, '<meta name="robots" content="noindex,follow">', html=True)
 
@@ -501,7 +501,7 @@ class PostSearchTests(TestCase):
         response = self.client.get("/search/", {"q": "missing query"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "posts/search.html")
+        self.assertTemplateUsed(response, "search/results.html")
         self.assertEqual(SearchStatistic.objects.count(), 1)
         self.assertEqual(SearchStatistic.objects.get().search_phrase, "missing query")
 

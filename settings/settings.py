@@ -118,6 +118,7 @@ INSTALLED_APPS = [
     "core.companies",
     "core.registry",
     "core.analytics",
+    "core.search",
     # Third part packages
     # Translation plugin http://django-rosetta.readthedocs.org/en/latest/index.html
     "rosetta",
@@ -416,6 +417,9 @@ CKEDITOR_CONFIGS = {
 MEDIA_VERSION = os.getenv("MEDIA_VERSION")
 
 API_HOST = os.getenv("API_HOST")
+
+# Set to 0 before rolling out schema/backfill; also serves as a rollback switch.
+UNIFIED_SEARCH_ENABLED = os.getenv("UNIFIED_SEARCH_ENABLED", "1") == "1"
 NEWS_API_CONNECT_TIMEOUT = float(os.getenv("NEWS_API_CONNECT_TIMEOUT", "1.5"))
 NEWS_API_READ_TIMEOUT = float(os.getenv("NEWS_API_READ_TIMEOUT", "3"))
 NEWS_API_CACHE_TTL = int(os.getenv("NEWS_API_CACHE_TTL", "300"))

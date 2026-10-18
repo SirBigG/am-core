@@ -24,6 +24,7 @@ The current Django app layout suggests these initial domain candidates:
 - Catalog information - `core/posts`; see `catalog-information/`.
 - Authentication and identity - `core/pro_auth`.
 - Registries and reference data - `core/registry`.
+- Search and discovery - `core/search`; see `search/`.
 - Services and reviews - `core/services`.
 
 These are candidates, not final bounded contexts. As the project moves toward DDD, we should validate whether these areas share language, rules, data ownership, and workflows.

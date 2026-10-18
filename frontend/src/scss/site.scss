@@ -508,6 +508,81 @@ span.flatpickr-weekday {
     font-weight: 700;
 }
 
+.search-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: 1rem 0;
+}
+
+.search-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .6rem .85rem;
+    border: 1px solid #c8d7cb;
+    border-radius: 1.25rem;
+    color: #225333;
+    text-decoration: none;
+    background: #fff;
+}
+
+.search-filter--active {
+    background: #225333;
+    color: #fff;
+}
+
+.search-filter:focus-visible,
+.search-result a:focus-visible {
+    outline: 3px solid #ad6b00;
+    outline-offset: 3px;
+}
+
+.search-archive {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.search-results {
+    display: grid;
+    gap: 1rem;
+}
+
+.search-result {
+    background: #fff;
+    border: 1px solid #d7e1da;
+    border-radius: 1rem;
+    padding: clamp(1rem, 3vw, 1.5rem);
+    overflow-wrap: anywhere;
+}
+
+.search-result__type {
+    color: #48644f;
+    font-size: .85rem;
+}
+
+.search-result__title {
+    font-size: 1.2rem;
+    line-height: 1.5;
+    margin: .3rem 0 .6rem;
+}
+
+.search-result__title a { color: #225333; }
+.search-result__summary { margin-bottom: 0; }
+.search-result__market { margin: .8rem 0 .3rem; }
+.search-result__price { display: inline-block; margin-right: 1rem; }
+
+.search-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
 .site-search-empty {
     padding: 24px;
 }

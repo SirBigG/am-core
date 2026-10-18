@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+{% block scripts %}
+    <script src="{% static 'posts/j-index.js' %}" defer></script>
+    <link rel="stylesheet" href="{% static 'posts/list.css' %}">
+{% endblock scripts %}
+{% block title %}Пошук на сайті{% endblock title %}
+{% block page_title %}Пошук{% endblock page_title %}
+{% block content %}
+    <section class="site-form-panel site-search-panel"
+             aria-labelledby="siteSearchTitle">
+        <h2 class="site-form-panel__title" id="siteSearchTitle">Пошук на сайті</h2>
+        <p class="site-form-panel__lead">Матеріали, оголошення, Агромаркет, компанії та події.</p>
+        <form action="{% url 'post-search-list' %}" method="get" role="search">
+            <label class="site-form-label" for="siteSearchInput">Що шукаємо?</label>
+            <div class="site-search-form__row">
+                <div class="site-form-field site-search-form__field">
+                    <input class="form-control"
+                           id="siteSearchInput"
+                           name="q"
+                           type="search"
+                           value="{{ query }}"
+                           maxlength="255"
+                           placeholder="Наприклад: картопля, Гала, саджанці"
+                           enterkeyhint="search">
+                </div>
+                <button class="btn btn-success site-search-form__submit" type="submit">Шукати</button>
+            </div>
+            {% if selected_type %}<input type="hidden" name="type" value="{{ selected_type }}">{% endif %}
+            <label class="search-archive"><input type="checkbox"
+       name="archive"
+       value="1"
+       {% if archive %} checked{% endif %}> Минулі події замість майбутніх</label>
+        </form>
+    </section>
+    {% if query %}
+        <nav class="search-filters" aria-label="Тип ресурсу">
+            {% for filter in filters %}
+                <a href="{{ filter.url }}"
+                   class="search-filter{% if filter.active %} search-filter--active{% endif %}"
+                   {% if filter.active %}aria-current="page"{% endif %}>{{ filter.label }} <span>{{ filter.count }}</span></a>
+            {% endfor %}
+        </nav>
+        {% if not search_ready %}
+            <div class="site-form-panel" role="status">Пошук готується до роботи. Спробуйте трохи пізніше.</div>
+        {% elif object_list %}
+            <p class="search-total" role="status">Знайдено: {{ paginator.count }}</p>
+            <div class="search-results">
+                {% for result in object_list %}
+                    <article class="search-result">
+                        <span class="search-result__type">{{ result.get_resource_type_display }}</span>
+                        <h2 class="search-result__title"><a href="{{ result.canonical_url }}">{{ result.title }}</a></h2>
+                        {% if result.summary %}<p class="search-result__summary">{{ result.summary }}</p>{% endif %}
+                        {% if result.market %}
+                            <p class="search-result__market">Пропозицій: {{ result.market.market_offer_count }} · Продавців: {{ result.market.market_seller_count }}</p>
+                            {% for price in result.market.market_prices %}
+                                <span class="search-result__price">{{ price.min }}{% if price.max != price.min %}–{{ price.max }}{% endif %} {{ price.currency }}</span>
+                            {% endfor %}
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            {% if previous_url or next_url %}
+                <nav class="search-pagination" aria-label="Сторінки результатів">
+                    {% if previous_url %}<a class="btn btn-outline-success" href="{{ previous_url }}" rel="prev">Попередня</a>{% endif %}
+                    <span>Сторінка {{ page_obj.number }} з {{ paginator.num_pages }}</span>
+                    {% if next_url %}<a class="btn btn-outline-success" href="{{ next_url }}" rel="next">Наступна</a>{% endif %}
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="site-form-panel site-search-empty" role="status">
+                <h2 class="site-form-panel__title">Нічого не знайшли</h2>
+                <p>Спробуйте іншу назву, коротший запит або виберіть «Усе».</p>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endblock content %}

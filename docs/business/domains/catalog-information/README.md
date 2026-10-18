@@ -22,6 +22,10 @@ Catalog information is the main knowledge area of the product. It contains struc
 - Token-authenticated integrations can read the shared post catalog and create posts owned by the token user.
 - Integration updates require a token-authenticated staff user. Staff editors can update any post through the content API without changing its original publisher; non-staff tokens cannot use the post detail/update endpoint.
 - Integration post creation derives the publisher from the credential and never trusts a publisher supplied in the request body.
+- For categories with a public post-detail route, content API creation also
+  persists the canonical URL in the same transaction before returning `201`.
+  A new article can enter public search after index refresh without requiring
+  a prior page visit or a second editorial save.
 - Varieties, diseases, and similar catalog entities belong in this domain unless a more specific bounded context is created later.
 - Category assignment likely affects how users find catalog information.
 - Main-site post detail URLs use the post's current category and slug as the

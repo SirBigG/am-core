@@ -115,6 +115,12 @@ class ContentPostSerializer(serializers.ModelSerializer):
             except DjangoValidationError as exc:
                 raise serializers.ValidationError({"category_attributes": exc.messages}) from exc
         post = super().create(validated_data)
+        if category.parent_id:
+            # The first save assigns the PK; the existing Post.save URL logic
+            # can now persist a canonical route before the create transaction
+            # commits, without relying on a later GET or editorial update.
+            post.rubric = category
+            post.save(update_fields=["absolute_url"])
         rebuild_post_attribute_values(post)
         return post
 

@@ -32,7 +32,8 @@
                            id="siteSearchInput"
                            name="q"
                            type="search"
-                           value="{{ request.GET.q|default_if_none:'' }}"
+                           value="{{ search_query }}"
+                           maxlength="255"
                            placeholder="Наприклад: насіння, базилік, події"
                            autocomplete="off"
                            enterkeyhint="search" />
@@ -46,7 +47,7 @@
     </section>
     {% if object_list %}
         {% include "posts/helpers/object_list.html" %}
-    {% elif request.GET.q %}
+    {% elif search_query %}
         <div class="site-form-panel site-search-empty">
             <h2 class="site-form-panel__title">Нічого не знайшли</h2>
             <p class="site-form-panel__lead">

@@ -22,13 +22,14 @@ from core.classifier.models import Category, CategoryPresentationMode
 from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
 from core.posts.category_attributes import get_public_category_attribute_groups
-from core.posts.crop_hub import build_crop_hub_context, crop_scope_for_post, hub_config
+from core.posts.crop_hub import build_crop_hub_context, crop_scope_for_post, hub_config, public_posts
 from core.posts.guide_hub import build_guide_hub_context, get_public_guide_categories, get_public_guide_sections
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.recommendations import get_random_recommendations
 from core.posts.templatetags.post_extras import default_og_image, full_url
 from core.registry.models import Variety
+from core.search.inputs import clean_query
 from core.utils.rotating import get_rotating_ids, order_by_id_list
 
 
@@ -268,15 +269,21 @@ class PostSearchView(ListView):
     template_name = "posts/search.html"
 
     def get_queryset(self):
-        if self.request.GET.get("q", ""):
-            SearchStatistic.objects.create(**{"fingerprint": "fingerprint", "search_phrase": self.request.GET.get("q")})
+        self.query = clean_query(self.request.GET.get("q", ""))
+        if not self.query:
+            return Post.objects.none()
+        if not any(key in self.request.GET for key in ("page", "type", "archive")):
+            SearchStatistic.objects.create(fingerprint="", search_phrase=self.query)
         return (
-            Post.objects.select_objects()
-            .active()
-            .annotate(rank=SearchRank(F("text_search"), SearchQuery(self.request.GET.get("q", ""), config="english")))
+            public_posts()
+            .select_objects()
+            .annotate(rank=SearchRank(F("text_search"), SearchQuery(self.query, config="english")))
             .filter(rank__gt=0.01)
-            .order_by("-rank")
+            .order_by("-rank", "pk")
         )
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs) | {"search_query": self.query}
 
 
 class PostDetail(DetailView):

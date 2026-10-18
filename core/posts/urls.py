@@ -11,9 +11,9 @@ from core.posts.views import (
     PostFormView,
     PostList,
     PostListView,
-    PostSearchView,
     random_post_recommendations,
 )
+from core.search.views import UnifiedSearchView
 
 
 # TODO: Updated this hack contribute to library
@@ -27,7 +27,7 @@ def custom_slugify(self, tag, i=None):
 TagBase.slugify = custom_slugify
 
 urlpatterns = [
-    path("search/", PostSearchView.as_view(), name="post-search-list"),
+    path("search/", UnifiedSearchView.as_view(), name="post-search-list"),
     path("publication/create/", PostFormView.as_view(), name="post-add"),
     path("post-autocomplete/", PostAutocomplete.as_view(), name="post-autocomplete"),
     path("recommendations/random/", random_post_recommendations, name="random-post-recommendations"),
