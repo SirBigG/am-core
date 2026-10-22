@@ -56,17 +56,13 @@
             {% endif %}
             {% if oauth %}
                 {% block oauth %}
-                    <span class="comment-oauth-links"
-                          aria-label="Увійти через соціальну мережу">
-                        <a class="comment-oauth-link github-color"
-                           href="{% url 'social:begin' 'github' %}?next={{ request.path }}">GitHub</a>
-                        <a class="comment-oauth-link facebook-color"
-                           href="{% url 'social:begin' 'facebook' %}?next={{ request.path }}">Facebook</a>
-                        <a class="comment-oauth-link twitter-color"
-                           href="{% url 'social:begin' 'twitter' %}?next={{ request.path }}">Twitter</a>
-                        <a class="comment-oauth-link google-color"
-                           href="{% url 'social:begin' 'google-oauth2' %}?next={{ request.path }}">Google</a>
-                    </span>
+                    <div class="comment-oauth-links"
+                         aria-label="Увійти через соціальну мережу">
+                        {% include "pro_auth/social_login_form.html" with backend="github" label="GitHub" button_class="comment-oauth-link github-color" next=request.path %}
+                        {% include "pro_auth/social_login_form.html" with backend="facebook" label="Facebook" button_class="comment-oauth-link facebook-color" next=request.path %}
+                        {% include "pro_auth/social_login_form.html" with backend="twitter" label="Twitter" button_class="comment-oauth-link twitter-color" next=request.path %}
+                        {% include "pro_auth/social_login_form.html" with backend="google-oauth2" label="Google" button_class="comment-oauth-link google-color" next=request.path %}
+                    </div>
                 {% endblock oauth %}
             {% endif %}
         </div>

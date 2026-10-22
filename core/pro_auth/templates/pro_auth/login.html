@@ -162,16 +162,8 @@
                     <p class="auth-muted mb-0">Email і пароль для входу, або швидке продовження через соціальні мережі.</p>
                 </div>
                 <div class="social-auth-grid mb-4">
-                    <a class="btn btn-danger"
-                       href="{% url 'social:begin' 'google-oauth2' %}"
-                       rel="nofollow">
-                        <i class="icon-google"></i> Google
-                    </a>
-                    <a class="btn btn-primary"
-                       href="{% url 'social:begin' 'facebook' %}"
-                       rel="nofollow">
-                        <i class="icon-facebook"></i> Facebook
-                    </a>
+                    {% include "pro_auth/social_login_form.html" with backend="google-oauth2" label="Google" button_class="btn btn-danger w-100" icon_class="icon-google" next=request.GET.next %}
+                    {% include "pro_auth/social_login_form.html" with backend="facebook" label="Facebook" button_class="btn btn-primary w-100" icon_class="icon-facebook" next=request.GET.next %}
                 </div>
                 <div class="auth-divider">або через email</div>
                 <ul class="nav auth-tabs justify-content-center"
