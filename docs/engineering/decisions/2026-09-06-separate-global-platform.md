@@ -4,6 +4,8 @@
 - Status: Accepted (architecture direction; not deployed)
 - Owners: AgroMega team
 
+Update 2026-10-23: the current user direction supersedes the separate-application approach for the next stage: extend the existing AgroMega core with site/content-language boundaries while keeping only AgroMega active. The original decision below is retained as history. The replacement first-stage behavior contract is [accepted here](2026-10-23-core-sites-content-language-contract.md), including shared texts, language verification and scoped editorial roles; implementation and data migration remain explicitly unauthorized.
+
 ## Context
 
 AgroMega will test Spain before expanding internationally. Existing Ukrainian content, URLs and search history must be preserved. The user chose a separate application and database instead of migrating am-core to a multilingual content schema. No new domain is required for the pilot.
