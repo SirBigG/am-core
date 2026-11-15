@@ -19,6 +19,8 @@ module.exports = {
     gallery: "./src/scss/gallery.scss",
     "nginx-analytics": "./src/scss/nginx-analytics.scss",
     "j-reading-navigation": "./src/js/reading-navigation.js",
+    "j-market": "./src/js/market.js",
+    "j-potato-sections": "./src/js/potato-sections.js",
     "j-index": "./src/js/index.js",
     "j-detail": "./src/js/detail.js",
     "j-gallery": "./src/js/gallery.js",

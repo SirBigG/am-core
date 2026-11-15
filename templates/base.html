@@ -111,7 +111,7 @@
                 </div>
                 <div class="row justify-content-lg-center">
                     {% block base_content_block %}
-                        <div class="col-lg-8 col-12">
+                        <div class="{% block content_column_classes %}col-lg-8 col-12{% endblock content_column_classes %}">
                             {% block content %}
                             {% endblock content %}
                         </div>

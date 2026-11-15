@@ -1,40 +1,59 @@
 {% extends "companies/market_base.html" %}
 {% block market_content %}
-    <p><a href="{% url 'market:category' variety.rubric.slug %}{% if selected_region or selected_hub %}?{% if selected_region %}region={{ selected_region|urlencode }}&amp;{% endif %}{% if selected_hub %}hub={{ selected_hub|urlencode }}{% endif %}{% endif %}">{{ variety.rubric.value }}</a> / {{ variety.title }}</p>
-    <header class="site-content-section">
-        <h2 class="site-content-section__title">Пропозиції компаній</h2>
-    </header>
-    <div class="site-card-list">
-        {% for offer in variety.market_offers %}
-            <article class="site-list-card site-list-card--text-only">
-                <div class="site-list-card__body">
-                    <h3 class="site-list-card__title">{{ offer.name }}</h3>
-                    <p><a href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a> · {{ offer.company.location.value }}</p>
-                    <p class="site-product-card__price">{{ offer.market_price_min }}{% if offer.market_price_min != offer.market_price_max %} – {{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"Валюта не вказана" }}</p>
-                    <p>Ціну отримано {{ offer.price_updated_at|date:"d.m.Y" }}</p>
-                    {% if offer.link %}
-                        <a class="site-list-card__link"
-                           href="{{ offer.link }}"
-                           target="_blank"
-                           rel="nofollow noopener">До продавця</a>
-                    {% else %}
-                        <a class="site-list-card__link"
-                           href="{{ offer.company.get_absolute_url }}">Контакти компанії</a>
-                    {% endif %}
-                </div>
-            </article>
-        {% endfor %}
+    {% url 'market:category' variety.rubric.slug as back_url %}
+    {% querystring region=selected_region|default:None hub=selected_hub|default:None sort=None period=None as back_query %}
+    <div class="am-market__selection">
+        <a class="am-market__link" href="{{ back_url }}{{ back_query }}">← Усі сорти</a>
+        <a class="am-market__button" href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% else %}?category={{ variety.rubric.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
     </div>
-    <section class="site-content-section">
-        <h2 class="site-content-section__title">Характеристики сорту</h2>
+    <div class="am-market__layout">
+        <section class="am-market__panel" aria-labelledby="am-offers-title">
+            <h2 id="am-offers-title">Пропозиції продавців</h2>
+            <p class="am-market__muted">Пропозицій: {{ variety.market_offer_count }} · Продавців: {{ variety.market_seller_count }}</p>
+            <form method="get" class="am-market__controls">
+                {% if selected_hub %}<input type="hidden" name="hub" value="{{ selected_hub }}">{% endif %}
+                {% if selected_region %}<input type="hidden" name="region" value="{{ selected_region }}">{% endif %}
+                {% if period == 90 %}<input type="hidden" name="period" value="90">{% endif %}
+                <label>Сортувати
+                    <select class="form-select" name="sort">
+                        <option value="company">За назвою продавця</option>
+                        <option value="asc" {% if market_sort == "asc" %}selected{% endif %}>Від нижчої ціни</option>
+                        <option value="desc" {% if market_sort == "desc" %}selected{% endif %}>Від вищої ціни</option>
+                    </select>
+                </label>
+                <button type="submit" class="am-market__button">Застосувати</button>
+            </form>
+            <div class="am-market__rows">
+                {% for offer in variety.market_offers %}
+                    <article class="am-market__row am-market__row--offer">
+                        <div>
+                            <h3><a href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a></h3>
+                            <small>{{ offer.company.location.value }}</small>
+                        </div>
+                        <div class="am-market__rate">
+                            <strong>{{ offer.market_price_min }}{% if offer.market_price_min != offer.market_price_max %}–{{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"Валюта не вказана" }}</strong>
+                            <small>{{ offer.name }} · {{ offer.price_updated_at|date:"d.m.Y" }}</small>
+                        </div>
+                        {% if offer.link %}
+                            <a class="am-market__button" href="{{ offer.link }}" target="_blank" rel="nofollow noopener">Умови ↗</a>
+                        {% else %}
+                            <a class="am-market__button" href="{{ offer.company.get_absolute_url }}">Контакти →</a>
+                        {% endif %}
+                    </article>
+                {% endfor %}
+            </div>
+            <p class="am-market__note">Сортування групує ціни за валютою. Фасування, наявність і доставку уточнюйте у продавця.</p>
+        </section>
+        {% include "companies/market_history.html" %}
+    </div>
+    <section class="am-market__panel mt-3">
+        <h2>Характеристики сорту</h2>
         {% for group in attributes %}
-            <h3 class="site-product-card__price">{{ group.title }}</h3>
-            <dl>
-                {% for field in group.fields %}<dt>{{ field.label }}</dt><dd>{{ field.value }} {{ field.unit }}</dd>{% endfor %}
-            </dl>
+            <h3>{{ group.title }}</h3>
+            <dl>{% for field in group.fields %}<dt>{{ field.label }}</dt><dd>{{ field.value }} {{ field.unit }}</dd>{% endfor %}</dl>
         {% empty %}
-            <p>Структуровані характеристики ще доповнюються.</p>
+            <p class="am-market__muted">Структуровані характеристики ще доповнюються.</p>
         {% endfor %}
-        <a class="site-list-card__link" href="{{ variety.get_absolute_url }}">Повний опис сорту в каталозі AgroMega</a>
+        <a class="am-market__link" href="{{ variety.get_absolute_url }}">Повний опис сорту в каталозі AgroMega ↗</a>
     </section>
 {% endblock market_content %}

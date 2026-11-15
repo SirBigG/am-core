@@ -1,55 +1,72 @@
 {% extends "companies/market_base.html" %}
 {% block market_content %}
-    <form method="get"
-          action="{% url 'market:list' %}"
-          class="site-content-section site-filter-grid">
-        {% if selected_hub %}<input type="hidden" name="hub" value="{{ selected_hub }}">{% endif %}
-        <label class="site-form-label">
-            Категорія
-            <select name="category" class="form-select">
-                <option value="">Усі категорії</option>
-                {% for item in categories %}
-                    <option value="{{ item.slug }}"
-                            {% if category.pk == item.pk %} selected{% endif %}>{{ item.market_label }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <label class="site-form-label">
-            Регіон компанії
-            <select name="region" class="form-select">
-                <option value="">Усі регіони</option>
-                {% for item in regions %}
-                    <option value="{{ item.pk }}"
-                            {% if selected_region == item.pk|stringformat:"s" %} selected{% endif %}>{{ item.value }}</option>
-                {% endfor %}
-            </select>
-        </label>
-        <button type="submit" class="btn btn-success align-self-end">Показати</button>
-        <a href="{% url 'market:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}"
-           class="align-self-end">Скинути</a>
-    </form>
-    <div class="site-card-list site-market-grid">
-        {% for variety in varieties %}
-            <article class="site-list-card site-list-card--text-only site-market-card">
-                <div class="site-list-card__body">
-                    <p class="site-content-section__eyebrow">{{ variety.rubric.value }}</p>
-                    <h2 class="site-list-card__title"><a class="site-list-card__title-link" href="{% url 'market:variety' variety.pk %}{% if selected_region or selected_hub %}?{% if selected_region %}region={{ selected_region|urlencode }}&amp;{% endif %}{% if selected_hub %}hub={{ selected_hub|urlencode }}{% endif %}{% endif %}">{{ variety.title }}</a></h2>
-                    {% for price in variety.market_prices %}
-                        <p class="site-product-card__price">{{ price.min }}{% if price.max != price.min %} – {{ price.max }}{% endif %} {{ price.currency }}</p>
-                    {% endfor %}
-                    <p class="site-list-card__text">Пропозицій: {{ variety.market_offer_count }} · Компаній: {{ variety.market_seller_count }}</p>
-                    <a class="site-list-card__link" href="{% url 'market:variety' variety.pk %}{% if selected_region or selected_hub %}?{% if selected_region %}region={{ selected_region|urlencode }}&amp;{% endif %}{% if selected_hub %}hub={{ selected_hub|urlencode }}{% endif %}{% endif %}">Порівняти пропозиції</a>
-                </div>
-            </article>
-        {% empty %}
-            <section class="site-content-section">
-                <h2 class="site-content-section__title">Пропозиції ще збираються</h2>
-                <p class="site-content-section__text">Поки немає пропозицій. Тут з’являться сорти та ціни після оновлення пропозицій компаній.</p>
-                <div class="site-list-card__actions"><a class="site-list-card__link"
-   href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}">Переглянути компанії</a></div>
-            </section>
-        {% endfor %}
+    <div class="am-market__selection">
+        <div>
+            {% if category %}<p class="am-market__context">{{ category.value }}</p>{% endif %}
+            <h2>Усі сорти</h2>
+        </div>
+        <a class="am-market__button" href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% elif category %}?category={{ category.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
     </div>
-    {% include "companies/market_pagination.html" %}
-    {% if market_text and page_obj.number == 1 %}<div class="site-content-section site-article-body">{{ market_text|linebreaks }}</div>{% endif %}
+    <div class="am-market__layout">
+        <section class="am-market__panel" aria-labelledby="am-overview-title">
+            <h3 id="am-overview-title">Огляд цін за сортами</h3>
+            <p class="am-market__muted">Сортів із пропозиціями: {{ paginator.count }}</p>
+            <form method="get" class="am-market__controls">
+                {% if selected_hub %}<input type="hidden" name="hub" value="{{ selected_hub }}">{% endif %}
+                {% if selected_region %}<input type="hidden" name="region" value="{{ selected_region }}">{% endif %}
+                <label>Знайти сорт <input class="form-control" type="search" name="q" value="{{ market_search }}" placeholder="Назва сорту"></label>
+                <label>Сортувати
+                    <select class="form-select" name="sort">
+                        <option value="">За назвою</option>
+                        <option value="offers" {% if market_sort == "offers" %}selected{% endif %}>За кількістю пропозицій</option>
+                        <option value="price" {% if market_sort == "price" %}selected{% endif %}>За найнижчою ціною в грн</option>
+                    </select>
+                </label>
+                <button class="am-market__button" type="submit">Застосувати</button>
+                <a href="{% url 'market:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}" class="align-self-end">Скинути</a>
+            </form>
+            <div class="am-market__rows">
+                {% for variety in varieties %}
+                    {% url 'market:variety' variety.pk as variety_url %}
+                    {% querystring region=selected_region|default:None hub=selected_hub|default:None q=None sort=None page=None as selection_query %}
+                    <article class="am-market__row">
+                        <div>
+                            <h4><a href="{{ variety_url }}{{ selection_query }}">{{ variety.title }}</a></h4>
+                            {% if not category %}<small>{{ variety.rubric.value }}</small>{% endif %}
+                        </div>
+                        <div class="am-market__rate">
+                            {% for price in variety.market_prices %}
+                                <strong>{{ price.min }}{% if price.max != price.min %}–{{ price.max }}{% endif %} {{ price.currency }}</strong>
+                            {% endfor %}
+                        </div>
+                        <small>Пропозицій: {{ variety.market_offer_count }}<br>Продавців: {{ variety.market_seller_count }}</small>
+                        <a class="am-market__button" href="{{ variety_url }}{{ selection_query }}">Порівняти →</a>
+                    </article>
+                {% empty %}
+                    <p class="am-market__empty">За цими умовами пропозицій поки немає.
+                        <a href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}">Переглянути компанії</a>
+                    </p>
+                {% endfor %}
+            </div>
+            {% include "companies/market_pagination.html" %}
+        </section>
+        <aside class="am-market__panel" aria-labelledby="am-range-title">
+            <h3 id="am-range-title">{% if category.slug == "kartoplia-sorty" %}Ціни на картоплю{% else %}Діапазон цін{% endif %}</h3>
+            {% for group in market_ranges %}
+                <div class="am-market__range">
+                    <p class="am-market__muted">Останнє спостереження · {{ group.updated_at|date:"d.m.Y" }}</p>
+                    <div class="am-market__range-values">
+                        <div><small>Найнижча ціна</small><strong>{{ group.min }} {{ group.currency }}</strong></div>
+                        <div><small>Найвища ціна</small><strong>{{ group.max }} {{ group.currency }}</strong></div>
+                    </div>
+                    <div class="am-market__range-line" aria-hidden="true"></div>
+                    <p class="am-market__muted">Усі сорти вибраної категорії · Пропозицій: {{ group.offer_count }}</p>
+                </div>
+            {% empty %}
+                <p class="am-market__empty">{% if category %}Актуальних цін у цій вибірці поки немає.{% else %}Оберіть культуру, щоб побачити загальний діапазон її цін.{% endif %}</p>
+            {% endfor %}
+            {% if market_ranges %}<p class="am-market__note">Показано заявлені ціни з актуальних пропозицій. Фасування й умови продажу уточнюйте у продавців.</p>{% endif %}
+        </aside>
+    </div>
+    {% if market_text and page_obj.number == 1 %}<div class="am-market__panel site-article-body mt-3">{{ market_text|linebreaks }}</div>{% endif %}
 {% endblock market_content %}

@@ -5,6 +5,8 @@ $breadcrumb-bg: inherit !default;
 $breadcrumb-divider: quote(">") !default;
 
 @import "main";
+@import "potato-hero";
+@import "potato-sections";
 
 @import "~bootstrap/scss/mixins/pagination";
 @import "~bootstrap/scss/badge";
@@ -64,3 +66,5 @@ a.list-link {
   &__market { background: #f1f6ee; border-radius: 1rem; padding: 1.25rem; }
   &__image { max-width: 100%; height: auto; border-radius: .8rem; margin-bottom: 1rem; }
 }
+
+@import "market";

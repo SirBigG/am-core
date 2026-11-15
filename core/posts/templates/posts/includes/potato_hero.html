@@ -1,0 +1,24 @@
+{% load static %}
+<header class="potato-hero" aria-labelledby="potato-hero-title">
+    <div class="potato-hero__copy">
+        <p class="potato-hero__eyebrow">Довідник культури</p>
+        <h1 id="potato-hero-title">Картопля</h1>
+        <p class="potato-hero__description">Виберіть сорт, сплануйте вирощування та знайдіть, де купити насіннєву чи столову картоплю.</p>
+        <nav class="potato-hero__actions" aria-label="Основні дії">
+            <a class="potato-hero__button potato-hero__button--primary"
+               href="{% url 'posts-list-view' parent='kartoplya' child='kartoplia-sorty' %}">
+                Підібрати сорт <span aria-hidden="true">→</span>
+            </a>
+            <a class="potato-hero__button" href="{% url 'market:category' slug='kartoplia-sorty' %}">
+                Де купити <span aria-hidden="true">↗</span>
+            </a>
+        </nav>
+    </div>
+    <div class="potato-hero__media">
+        <img src="{% static 'posts/img/potato-hero.jpg' %}"
+             alt="Свіжовикопана картопля на ґрунті"
+             width="1300"
+             height="866"
+             fetchpriority="high">
+    </div>
+</header>
