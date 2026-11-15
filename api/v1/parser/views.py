@@ -1,15 +1,17 @@
-from django.db import transaction
+from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
+from django.db import IntegrityError, transaction
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import ListAPIView, RetrieveAPIView
+from rest_framework.exceptions import ValidationError
+from rest_framework.generics import ListAPIView, ListCreateAPIView, RetrieveUpdateAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api.v1.parser.authentication import ParserWorkerAuthentication
-from api.v1.parser.permissions import IsParserWorker
+from api.v1.parser.permissions import CanManageParserCatalog, IsParserWorker
 from api.v1.parser.serializers import (
     LeaseResponseSerializer,
     LeaseSerializer,
@@ -49,7 +51,14 @@ class ParserWorkerAccessMixin:
         return get_object_or_404(Link.objects.select_related("company", "category"), pk=pk)
 
     def get_locked_source(self, pk):
-        return get_object_or_404(Link.objects.select_for_update().select_related("company", "category"), pk=pk)
+        company_id = get_object_or_404(Link.objects.only("company_id"), pk=pk).company_id
+        get_object_or_404(Company.objects.select_for_update(), pk=company_id)
+        source = get_object_or_404(
+            Link.objects.select_for_update(of=("self",)).select_related("company", "category"), pk=pk
+        )
+        if source.company_id != company_id:
+            raise ParserCatalogConflict("Source ownership changed. Reload and retry.")
+        return source
 
     def worker_name(self, request, serializer=None):
         return (request.user.get_full_name() or request.user.email or f"user-{request.user.pk}")[:100]
@@ -59,10 +68,39 @@ class ParserWorkerAPIView(ParserWorkerAccessMixin, APIView):
     pass
 
 
-class ParserSourceListView(ListAPIView):
+class ParserCatalogWriteMixin:
+    def save_catalog(self, serializer):
+        creating = serializer.instance is None
+        try:
+            with transaction.atomic():
+                instance = serializer.save()
+                LogEntry.objects.log_actions(
+                    user_id=self.request.user.pk,
+                    queryset=[instance],
+                    action_flag=ADDITION if creating else CHANGE,
+                    change_message=(
+                        [{"added": {}}] if creating else [{"changed": {"fields": sorted(serializer.validated_data)}}]
+                    ),
+                )
+        except IntegrityError as exc:
+            raise ParserCatalogConflict("Catalog write conflict. Reload and retry with unique values.") from exc
+
+    def perform_create(self, serializer):
+        self.save_catalog(serializer)
+
+
+class ParserSourceListView(ParserCatalogWriteMixin, ListCreateAPIView):
     authentication_classes = [ParserWorkerAuthentication]
-    permission_classes = [IsParserWorker]
+    permission_classes = [CanManageParserCatalog]
+    catalog_model = "link"
     serializer_class = ParserSourceSerializer
+
+    def perform_create(self, serializer):
+        with transaction.atomic():
+            # Creation and reassignment join the same company lock protocol as leases.
+            company = get_object_or_404(Company.objects.select_for_update(), pk=serializer.validated_data["company"].pk)
+            serializer.validated_data["company"] = company
+            self.save_catalog(serializer)
 
     def get_queryset(self):
         now = timezone.now()
@@ -133,12 +171,46 @@ class ParserSourceLeaseView(ParserWorkerAPIView):
         return Response(LeaseResponseSerializer(source).data)
 
 
-class ParserSourceDetailView(ParserWorkerAccessMixin, RetrieveAPIView):
+class ParserSourceDetailView(ParserCatalogWriteMixin, ParserWorkerAccessMixin, RetrieveUpdateAPIView):
+    permission_classes = [CanManageParserCatalog]
+    catalog_model = "link"
     serializer_class = ParserSourceSerializer
     queryset = Link.objects.select_related("company", "category")
 
+    def update(self, request, *args, **kwargs):
+        initial = self.get_object()
+        candidate = self.get_serializer(initial, data=request.data, partial=kwargs.get("partial", False))
+        candidate.is_valid(raise_exception=True)
+        company_ids = {initial.company_id, candidate.validated_data.get("company", initial.company).pk}
+        with transaction.atomic():
+            # Lock both companies in ID order for reassignment, then the source.
+            list(Company.objects.filter(pk__in=company_ids).order_by("pk").select_for_update())
+            self.queryset = self.queryset.select_for_update(of=("self",))
+            locked = self.get_object()
+            if locked.company_id != initial.company_id:
+                raise ParserCatalogConflict("Source ownership changed. Reload and retry.")
+            return super().update(request, *args, **kwargs)
 
-class ParserCompanyListView(ParserWorkerAccessMixin, ListAPIView):
+    def perform_update(self, serializer):
+        source = serializer.instance
+        if source.is_lease_active():
+            raise ParserCatalogConflict("Source is currently leased. Retry after the run finishes.")
+        changes_identity = any(
+            field in serializer.validated_data and serializer.validated_data[field].pk != getattr(source, f"{field}_id")
+            for field in ("company", "category")
+        )
+        if changes_identity and (source.products.exists() or source.parser_attempts.exists()):
+            raise ValidationError("Create a new source to change company/category after ingestion or attempts.")
+        self.save_catalog(serializer)
+
+
+class ParserCatalogConflict(ValidationError):
+    status_code = status.HTTP_409_CONFLICT
+
+
+class ParserCompanyListView(ParserCatalogWriteMixin, ParserWorkerAccessMixin, ListCreateAPIView):
+    permission_classes = [CanManageParserCatalog]
+    catalog_model = "company"
     serializer_class = ParserCompanySerializer
     pagination_class = ParserCatalogPagination
 
@@ -148,6 +220,35 @@ class ParserCompanyListView(ParserWorkerAccessMixin, ListAPIView):
             .annotate(source_count=Count("links"))
             .order_by("name", "id")
         )
+
+
+class ParserCompanyDetailView(ParserCatalogWriteMixin, ParserWorkerAccessMixin, RetrieveUpdateAPIView):
+    permission_classes = [CanManageParserCatalog]
+    catalog_model = "company"
+    serializer_class = ParserCompanySerializer
+    queryset = Company.objects.select_related("location__country", "location__region").annotate(
+        source_count=Count("links")
+    )
+
+    def update(self, request, *args, **kwargs):
+        with transaction.atomic():
+            get_object_or_404(Company.objects.select_for_update(), pk=kwargs["pk"])
+            # All API lease/creation/reassignment paths lock the company first.
+            self.leased_sources = Link.objects.filter(
+                company_id=kwargs["pk"],
+                lease_token__isnull=False,
+                leased_until__gt=timezone.now(),
+            ).exists()
+            return super().update(request, *args, **kwargs)
+
+    def perform_update(self, serializer):
+        if (
+            "parser_map" in serializer.validated_data
+            and serializer.validated_data["parser_map"] != serializer.instance.parser_map
+            and self.leased_sources
+        ):
+            raise ParserCatalogConflict("Company has leased sources. Retry configuration edits after they finish.")
+        self.save_catalog(serializer)
 
 
 class ParserCategoryListView(ParserWorkerAccessMixin, ListAPIView):
@@ -237,6 +338,9 @@ class ParserSourceResultsView(ParserWorkerAPIView):
                         status=status.HTTP_200_OK,
                     )
                 return Response({"detail": "Invalid or expired lease."}, status=status.HTTP_409_CONFLICT)
+            submitted_map = serializer.validated_data.get("parser_config")
+            if submitted_map is not None and submitted_map != (source.parser_map or source.company.parser_map or {}):
+                raise ParserCatalogConflict("Parser configuration changed. Reload the source before running again.")
             products = serializer.save()
         return Response({"count": len(products)}, status=status.HTTP_200_OK)
 

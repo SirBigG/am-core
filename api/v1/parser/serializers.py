@@ -5,23 +5,73 @@ from math import ceil
 from django.conf import settings
 from django.db.models import F
 from django.utils import timezone
+from django.utils.translation import get_language
+from lxml import etree, html
 from rest_framework import serializers
+from transliterate import slugify
 
-from core.classifier.models import Category
+from core.classifier.models import Category, Location
 from core.companies.models import Company, CurrencyChoices, Link, ParserSourceAttempt, Product, ProductPriceHistory
 
 
-class ParserSourceSerializer(serializers.ModelSerializer):
-    company_id = serializers.IntegerField(read_only=True)
+class ParserConfigurationField(serializers.JSONField):
+    def to_internal_value(self, data):
+        value = super().to_internal_value(data)
+        if not isinstance(value, dict):
+            raise serializers.ValidationError("Parser configuration must be an object.")
+        try:
+            encoded = json.dumps(value, ensure_ascii=False).encode("utf-8")
+        except UnicodeError as exc:
+            raise serializers.ValidationError("Parser configuration contains invalid Unicode.") from exc
+        if len(encoded) > settings.PARSER_MAX_CONFIG_BYTES:
+            raise serializers.ValidationError("Parser configuration is too large.")
+        for key, selector in value.items():
+            if key == "snapshot_complete":
+                if not isinstance(selector, bool):
+                    raise serializers.ValidationError("snapshot_complete must be a boolean.")
+            elif key == "max_pages":
+                if type(selector) is not int or not 1 <= selector <= 50:
+                    raise serializers.ValidationError("max_pages must be an integer between 1 and 50.")
+            elif key == "encoding":
+                try:
+                    if not isinstance(selector, str) or not selector:
+                        raise ValueError
+                    html.HTMLParser(encoding=selector)
+                except (LookupError, ValueError) as exc:
+                    raise serializers.ValidationError("Unsupported page encoding.") from exc
+            else:
+                try:
+                    if not isinstance(selector, str) or not selector.strip():
+                        raise ValueError
+                    etree.XPath(selector)
+                except (ValueError, etree.XPathError) as exc:
+                    raise serializers.ValidationError(f"Invalid XPath for {key}.") from exc
+        return value
+
+
+class ParserCatalogSerializer(serializers.ModelSerializer):
+    def to_internal_value(self, data):
+        if isinstance(data, dict):
+            invalid = set(data) - {name for name, field in self.fields.items() if not field.read_only}
+            if invalid:
+                raise serializers.ValidationError({name: "Unknown or read-only field." for name in invalid})
+        return super().to_internal_value(data)
+
+
+class ParserSourceSerializer(ParserCatalogSerializer):
+    company_id = serializers.PrimaryKeyRelatedField(source="company", queryset=Company.objects.all())
     company_name = serializers.CharField(source="company.name", read_only=True)
-    category_id = serializers.IntegerField(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(source="category", queryset=Category.objects.all())
     category_slug = serializers.CharField(source="category.slug", read_only=True)
-    parser_map = serializers.SerializerMethodField()
+    parser_map = ParserConfigurationField(required=False, allow_null=True)
+    stored_parser_map = serializers.JSONField(source="parser_map", read_only=True)
     is_due = serializers.SerializerMethodField()
     lease_active = serializers.SerializerMethodField()
 
-    def get_parser_map(self, source):
-        return source.parser_map or source.company.parser_map or {}
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        data["parser_map"] = instance.parser_map or instance.company.parser_map or {}
+        return data
 
     def get_is_due(self, source):
         return source.is_due()
@@ -39,6 +89,7 @@ class ParserSourceSerializer(serializers.ModelSerializer):
             "category_id",
             "category_slug",
             "parser_map",
+            "stored_parser_map",
             "source_type",
             "experiment_label",
             "parser_config_version",
@@ -55,6 +106,16 @@ class ParserSourceSerializer(serializers.ModelSerializer):
             "is_due",
             "lease_active",
         )
+        read_only_fields = (
+            "last_crawled",
+            "last_crawl_status",
+            "last_success_at",
+            "last_error_at",
+            "last_product_count",
+            "leased_by",
+            "leased_until",
+        )
+        extra_kwargs = {"crawl_interval_minutes": {"min_value": 1}}
 
 
 class ParserSourceQuerySerializer(serializers.Serializer):
@@ -78,11 +139,25 @@ class LeaseResponseSerializer(serializers.Serializer):
     leased_until = serializers.DateTimeField()
 
 
-class ParserCompanySerializer(serializers.ModelSerializer):
+class ParserCompanySerializer(ParserCatalogSerializer):
+    location_id = serializers.PrimaryKeyRelatedField(source="location", queryset=Location.objects.all())
+    parser_map = ParserConfigurationField(required=False, allow_null=True)
     location_name = serializers.CharField(source="location.value", read_only=True)
     country_name = serializers.CharField(source="location.country.value", read_only=True)
     region_name = serializers.CharField(source="location.region.value", read_only=True)
-    source_count = serializers.IntegerField(read_only=True)
+    source_count = serializers.IntegerField(read_only=True, default=0)
+
+    def validate(self, attrs):
+        if not attrs.get("slug", self.instance.slug if self.instance else None):
+            name = attrs.get("name", self.instance.name if self.instance else "")
+            generated = slugify(name.lower(), get_language())
+            if not generated:
+                raise serializers.ValidationError({"slug": "Supply a non-empty unique slug for this company name."})
+            try:
+                attrs["slug"] = self.fields["slug"].run_validation(generated)
+            except serializers.ValidationError as exc:
+                raise serializers.ValidationError({"slug": exc.detail}) from exc
+        return attrs
 
     class Meta:
         model = Company
@@ -93,6 +168,9 @@ class ParserCompanySerializer(serializers.ModelSerializer):
             "type",
             "website",
             "active",
+            "description",
+            "location_id",
+            "parser_map",
             "location_name",
             "country_name",
             "region_name",

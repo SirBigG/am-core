@@ -30,7 +30,122 @@ The scheduled worker contract remains backward compatible: `GET /api/parser/sour
 - `GET /api/parser/price-history/?source=<id>` for observations;
 - `POST /api/parser/sources/<id>/lease/` with `force=true` for authorized on-demand execution.
 
-Catalog, product, attempt, and history endpoints are read-only and bounded. The server remains authoritative for every lease and accepted state transition.
+Catalog reads are bounded. Product, attempt and history endpoints remain read-only.
+The server remains authoritative for every lease and accepted state transition.
+
+## Company And Source Management API
+
+Trusted operators can maintain company profiles and parser configurations through
+the same token-authenticated API, without a Django admin session:
+
+| Resource | Collection | Detail | Methods |
+| --- | --- | --- | --- |
+| Companies/shops | `/api/parser/companies/` | `/api/parser/companies/<id>/` | GET/POST collection; GET/PUT/PATCH detail |
+| Parser sources | `/api/parser/sources/` | `/api/parser/sources/<id>/` | GET/POST collection; GET/PUT/PATCH detail |
+
+DELETE is unsupported (405). Use `active=false` to disable a record. These
+companies belong to `core.companies`; `/api/registry/add-company/` imports
+registration entities and does not maintain shop profiles.
+
+All requests require `Authorization: Token <token>` and
+`companies.use_parser_worker_api`. Additionally, POST requires
+`companies.add_company` or `companies.add_link`, respectively; PUT/PATCH requires
+`companies.change_company` or `companies.change_link`. Grant only the necessary
+permissions to dedicated operator accounts. Existing worker tokens do not gain
+write access. Permissions can be provisioned through the normal Django user/group
+administration workflow; API writes themselves require no admin session.
+
+Create a company with POST `/api/parser/companies/`:
+
+```json
+{
+  "name": "Example nursery",
+  "website": "https://shop.example.com/",
+  "location_id": 123,
+  "type": 1,
+  "description": "Fruit tree nursery",
+  "active": true,
+  "parser_map": {"name": "//h2/text()", "price": "//span[@class='price']/text()"}
+}
+```
+
+`name`, `website` and an existing `location_id` are required on creation (and
+full PUT). Other writable fields are `slug`, `latitude` and `longitude`. Types:
+1 shop, 2 service, 3 supermarket, 4 market. Slugs are generated when omitted;
+provide a unique explicit slug if the generated one is already taken. Location
+IDs can be found through `GET /api/locations/?loc=<prefix>`. Logo uploads are
+outside this API. Read projections include geography labels and source counts.
+
+Create a source with POST `/api/parser/sources/`:
+
+```json
+{
+  "company_id": 123,
+  "category_id": 456,
+  "url": "https://shop.example.com/fruit-trees/",
+  "source_type": "static",
+  "parser_map": {
+    "item": "//article",
+    "name": ".//h2/text()",
+    "price": ".//span[@class='price']/text()",
+    "link": ".//a/@href",
+    "snapshot_complete": false
+  },
+  "parser_config_version": "fruit-v1",
+  "crawl_interval_minutes": 1440,
+  "priority": 100,
+  "active": false
+}
+```
+
+`company_id`, `category_id` and `url` are required on creation/full PUT. Category
+IDs are available through `GET /api/categories/`; the narrower
+`/api/parser/categories/` catalog lists only categories already used by sources.
+`source_type` accepts `static` or `browser`; `experiment_label` is also writable.
+Create inactive sources while qualifying selectors, then PATCH `active=true` when
+ready to schedule them. Creation does not fetch the URL or launch a parser.
+
+PATCH only the fields being changed. A supplied `parser_map` replaces the entire
+stored object; `null` or `{}` on a source restores company-default inheritance.
+The response's `parser_map` retains its existing effective-configuration meaning;
+`stored_parser_map` exposes the raw source override so clients can distinguish
+inheritance. Company `parser_map` is always its stored default.
+
+Configuration writes accept JSON objects or null, bounded by
+`PARSER_MAX_CONFIG_BYTES`, with syntactically valid XPath selectors, supported
+encoding names, boolean `snapshot_complete`, and integer `max_pages` in 1–50.
+Empty objects may be saved before qualification. Validation does not establish
+that selectors match the remote site or that a snapshot is complete; preview and
+verify them in a compatible worker first. Catalog-only configurations may use a
+valid selector matching no price nodes.
+
+Unknown/read-only fields are rejected with 400. Runtime timestamps, leases,
+crawl status and counts cannot be written through this interface. Source edits
+return 409 while leased; changing a company default also returns 409 while any
+of its sources is leased. Retry after the run completes or the lease expires.
+Company/category reassignment returns 400 once a source has products or attempts;
+create a new source instead to preserve historical ownership. No schema migration
+is required. Deploy the backend before using these writes; existing Studio and
+CLI clients continue to use their existing read/run contract. This API addition
+does not add configuration-editing screens to Parser Studio.
+
+Management writes record the operator, target and changed field names in Django
+admin history in the same transaction as the mutation. Configuration values are
+not copied into the history message. A database write conflict returns 409 with
+no partial mutation. Company creation responses include `source_count=0`.
+
+API creation, reassignment, configuration edits and worker writes lock the company
+before the source; reassignment locks both companies in ID order. This prevents
+new leases or newly attached sources from bypassing a concurrent company-default
+edit. Work on different companies remains independent.
+
+Workers can cache a source before leasing it. Results that explicitly submit a
+`parser_config` different from the current effective map return 409 before product
+or observation writes. Reload the source and rerun it; the existing lease can be
+closed with a failure receipt. Successful result replays still return the original
+receipt. Legacy clients omitting `parser_config` remain accepted and cannot receive
+this stale-map check; prefer clients that submit the actual configuration snapshot.
+The version label remains worker-supplied diagnostic metadata.
 
 ## Parser Map
 

@@ -1,8 +1,11 @@
 from datetime import timedelta
 from decimal import Decimal
+from unittest.mock import patch
 
+from django.contrib.admin.models import ADDITION, CHANGE, LogEntry
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
+from django.db import IntegrityError
 from django.test import override_settings
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
@@ -39,6 +42,253 @@ class ParserWorkerAPITests(APITestCase):
         self.worker_user.user_permissions.add(permission)
         self.token = Token.objects.create(user=self.worker_user)
         self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
+
+    def grant_catalog_permissions(self, *codenames):
+        self.worker_user.user_permissions.add(
+            *Permission.objects.filter(
+                content_type__app_label="companies",
+                codename__in=codenames,
+            )
+        )
+
+    def company_payload(self, **overrides):
+        return {
+            "name": "New shop",
+            "website": "https://new.example.com",
+            "location_id": self.location.pk,
+            **overrides,
+        }
+
+    def source_payload(self, **overrides):
+        return {
+            "url": "https://new.example.com/products",
+            "company_id": self.company.pk,
+            "category_id": self.category.pk,
+            "parser_map": {"name": "//h2", "price": "//span"},
+            **overrides,
+        }
+
+    def test_catalog_write_permissions_are_separate_from_worker_access(self):
+        self.assertEqual(self.client.post("/api/parser/companies/", self.company_payload()).status_code, 403)
+        self.assertEqual(
+            self.client.post("/api/parser/sources/", self.source_payload(), format="json").status_code, 403
+        )
+        self.grant_catalog_permissions("add_company", "add_link")
+        self.assertEqual(
+            self.client.patch(
+                f"/api/parser/companies/{self.company.pk}/",
+                {"name": "Changed"},
+            ).status_code,
+            403,
+        )
+        self.assertEqual(
+            self.client.patch(
+                f"/api/parser/sources/{self.source.pk}/",
+                {"active": False},
+                format="json",
+            ).status_code,
+            403,
+        )
+
+    def test_catalog_management_requires_token_and_worker_permission(self):
+        self.grant_catalog_permissions("add_company", "change_company", "add_link", "change_link")
+        self.client.credentials()
+        self.assertEqual(self.client.post("/api/parser/companies/", self.company_payload()).status_code, 401)
+        self.assertEqual(
+            self.client.post("/api/parser/sources/", self.source_payload(), format="json").status_code, 401
+        )
+        permission = Permission.objects.get(content_type__app_label="companies", codename="use_parser_worker_api")
+        self.worker_user.user_permissions.remove(permission)
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token.key}")
+        self.assertEqual(self.client.post("/api/parser/companies/", self.company_payload()).status_code, 403)
+        self.assertEqual(
+            self.client.post("/api/parser/sources/", self.source_payload(), format="json").status_code, 403
+        )
+
+    def test_company_create_read_update_without_delete(self):
+        self.grant_catalog_permissions("add_company", "change_company")
+        config = {"name": "//h2", "price": "//span", "encoding": "windows-1251"}
+        created = self.client.post("/api/parser/companies/", self.company_payload(parser_map=config), format="json")
+        self.assertEqual(created.status_code, 201, created.data)
+        url = f'/api/parser/companies/{created.data["id"]}/'
+        detail = self.client.get(url)
+        self.assertEqual(detail.data["parser_map"], config)
+        self.assertEqual(detail.data["source_count"], 0)
+        updated = self.client.patch(url, {"description": "Updated", "active": False}, format="json")
+        self.assertEqual(updated.status_code, 200, updated.data)
+        self.assertFalse(Company.objects.get(pk=created.data["id"]).active)
+        self.assertEqual(self.client.delete(url).status_code, 405)
+        duplicate = self.client.post("/api/parser/companies/", self.company_payload(), format="json")
+        self.assertEqual(duplicate.status_code, 400, duplicate.data)
+
+    def test_source_create_update_and_inherited_configuration(self):
+        self.grant_catalog_permissions("add_link", "change_link")
+        self.company.parser_map = {"name": "//h3", "price": "//b"}
+        self.company.save()
+        created = self.client.post("/api/parser/sources/", self.source_payload(parser_map=None), format="json")
+        self.assertEqual(created.status_code, 201, created.data)
+        self.assertEqual(created.data["parser_map"], self.company.parser_map)
+        self.assertIsNone(created.data["stored_parser_map"])
+        url = f'/api/parser/sources/{created.data["id"]}/'
+        updated = self.client.patch(
+            url,
+            {
+                "parser_map": {"item": "//article", "name": ".//h2", "price": ".//b"},
+                "parser_config_version": "v2",
+                "active": False,
+            },
+            format="json",
+        )
+        self.assertEqual(updated.status_code, 200, updated.data)
+        self.assertEqual(updated.data["parser_map"], updated.data["stored_parser_map"])
+        self.assertEqual(updated.data["parser_config_version"], "v2")
+        self.assertEqual(self.client.delete(url).status_code, 405)
+
+    def test_full_updates_and_edits_after_lease_expiry(self):
+        self.grant_catalog_permissions("change_company", "change_link")
+        company_url = f"/api/parser/companies/{self.company.pk}/"
+        source_url = f"/api/parser/sources/{self.source.pk}/"
+        self.source.lease("worker")
+        Link.objects.filter(pk=self.source.pk).update(leased_until=timezone.now() - timedelta(seconds=1))
+        updated_company = self.client.put(
+            company_url,
+            self.company_payload(
+                parser_map={"name": "//h3", "price": "//b"},
+            ),
+            format="json",
+        )
+        self.assertEqual(updated_company.status_code, 200, updated_company.data)
+        updated_source = self.client.put(source_url, self.source_payload(parser_map={}), format="json")
+        self.assertEqual(updated_source.status_code, 200, updated_source.data)
+        self.assertEqual(updated_source.data["parser_map"], updated_company.data["parser_map"])
+        self.assertEqual(updated_source.data["stored_parser_map"], {})
+
+    def test_generated_slugs_are_validated_before_saving(self):
+        self.grant_catalog_permissions("add_company")
+        for name in ("Щ" * 200, "!!!"):
+            response = self.client.post("/api/parser/companies/", self.company_payload(name=name), format="json")
+            self.assertEqual(response.status_code, 400, response.data)
+            self.assertIn("slug", response.data)
+        self.assertEqual(Company.objects.count(), 1)
+
+    def test_catalog_writes_record_operator_history_and_rollback_if_audit_fails(self):
+        self.grant_catalog_permissions("add_company", "change_link")
+        response = self.client.post("/api/parser/companies/", self.company_payload(), format="json")
+        self.assertEqual(response.status_code, 201, response.data)
+        self.assertEqual(response.data["source_count"], 0)
+        entry = LogEntry.objects.get()
+        self.assertEqual(entry.user_id, self.worker_user.pk)
+        self.assertEqual(entry.action_flag, ADDITION)
+        self.assertEqual(entry.object_id, str(response.data["id"]))
+        url = f"/api/parser/sources/{self.source.pk}/"
+        response = self.client.patch(url, {"active": False}, format="json")
+        self.assertEqual(response.status_code, 200, response.data)
+        self.assertEqual(LogEntry.objects.filter(action_flag=CHANGE).count(), 1)
+        with patch("api.v1.parser.views.LogEntry.objects.log_actions", side_effect=IntegrityError("Audit unavailable")):
+            response = self.client.patch(url, {"active": True}, format="json")
+        self.assertEqual(response.status_code, 409, response.data)
+        self.source.refresh_from_db()
+        self.assertFalse(self.source.active)
+
+    def test_stale_config_results_are_rejected_without_product_writes(self):
+        self.grant_catalog_permissions("change_link")
+        cached_map = self.source.parser_map
+        response = self.client.patch(
+            f"/api/parser/sources/{self.source.pk}/",
+            {"parser_map": {"name": "//h3"}},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 200, response.data)
+        lease = self.client.post(f"/api/parser/sources/{self.source.pk}/lease/", {})
+        payload = {
+            "lease_token": lease.data["lease_token"],
+            "parser_config": cached_map,
+            "products": [{"name": "Outdated product", "price": "10"}],
+        }
+        response = self.client.post(f"/api/parser/sources/{self.source.pk}/results/", payload, format="json")
+        self.assertEqual(response.status_code, 409, response.data)
+        self.assertFalse(Product.objects.exists())
+        self.assertFalse(ParserSourceAttempt.objects.exists())
+        self.assertFalse(ProductPriceHistory.objects.exists())
+
+    def test_catalog_validation_rejects_invalid_config_and_references(self):
+        self.grant_catalog_permissions("add_link", "add_company")
+        for config in (
+            [],
+            "text",
+            {"name": "["},
+            {"encoding": "invalid-encoding"},
+            {"max_pages": 0},
+            {"max_pages": True},
+            {"snapshot_complete": "false"},
+        ):
+            with self.subTest(config=config):
+                response = self.client.post(
+                    "/api/parser/sources/", self.source_payload(parser_map=config), format="json"
+                )
+                self.assertEqual(response.status_code, 400, response.data)
+        with override_settings(PARSER_MAX_CONFIG_BYTES=5):
+            self.assertEqual(
+                self.client.post(
+                    "/api/parser/sources/",
+                    self.source_payload(),
+                    format="json",
+                ).status_code,
+                400,
+            )
+        for overrides in (
+            {"company_id": 99999999},
+            {"category_id": 99999999},
+            {"crawl_interval_minutes": 0},
+            {"leased_by": "spoofed"},
+            {"last_product_count": 99},
+        ):
+            response = self.client.post("/api/parser/sources/", self.source_payload(**overrides), format="json")
+            self.assertEqual(response.status_code, 400, response.data)
+        self.assertEqual(
+            self.client.post(
+                "/api/parser/companies/",
+                self.company_payload(location_id=99999999),
+                format="json",
+            ).status_code,
+            400,
+        )
+
+    def test_configuration_edits_cannot_change_an_active_run(self):
+        self.grant_catalog_permissions("change_link", "change_company")
+        self.source.lease("running-worker")
+        self.assertEqual(
+            self.client.patch(
+                f"/api/parser/sources/{self.source.pk}/",
+                {"active": False},
+                format="json",
+            ).status_code,
+            409,
+        )
+        self.assertEqual(
+            self.client.patch(
+                f"/api/parser/companies/{self.company.pk}/",
+                {"parser_map": {"name": "//h3"}},
+                format="json",
+            ).status_code,
+            409,
+        )
+        self.source.refresh_from_db()
+        self.company.refresh_from_db()
+        self.assertTrue(self.source.active)
+        self.assertIsNone(self.company.parser_map)
+
+    def test_cannot_reassign_source_with_existing_products_or_attempts(self):
+        self.grant_catalog_permissions("change_link")
+        category = CategoryFactory()
+        attempt = ParserSourceAttempt.objects.create(source_link=self.source, status="failure")
+        url = f"/api/parser/sources/{self.source.pk}/"
+        self.assertEqual(self.client.patch(url, {"category_id": category.pk}, format="json").status_code, 400)
+        attempt.delete()
+        Product.objects.create(company=self.company, source_link=self.source, name="Existing")
+        self.assertEqual(self.client.patch(url, {"category_id": category.pk}, format="json").status_code, 400)
+        self.source.refresh_from_db()
+        self.assertEqual(self.source.category_id, self.category.pk)
 
     def test_source_cursor_loads_more_than_one_hundred_without_skipping(self):
         for i in range(101):

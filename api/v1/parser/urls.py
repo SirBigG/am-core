@@ -2,6 +2,7 @@ from django.urls import path
 
 from api.v1.parser.views import (
     ParserCategoryListView,
+    ParserCompanyDetailView,
     ParserCompanyListView,
     ParserPriceHistoryListView,
     ParserProductListView,
@@ -15,6 +16,7 @@ from api.v1.parser.views import (
 
 urlpatterns = [
     path("parser/companies/", ParserCompanyListView.as_view(), name="parser-company-list"),
+    path("parser/companies/<int:pk>/", ParserCompanyDetailView.as_view(), name="parser-company-detail"),
     path("parser/categories/", ParserCategoryListView.as_view(), name="parser-category-list"),
     path("parser/sources/", ParserSourceListView.as_view(), name="parser-source-list"),
     path("parser/sources/<int:pk>/", ParserSourceDetailView.as_view(), name="parser-source-detail"),

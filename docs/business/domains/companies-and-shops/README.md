@@ -36,6 +36,7 @@ Companies and shops represents organizations shown in AgroMega, including compan
 - Empty complete snapshots and snapshots below the configured safe ratio of the source's active catalog are rejected before product state changes. This protects public availability when a shop changes its HTML or a parser selector stops matching.
 - Successful result submission is idempotent for the source lease token so a worker can safely retry after losing the HTTP response.
 - Failure submission is also idempotent for the source lease token so a worker can retry an uncertain failure receipt without duplicating audit attempts.
+- Trusted operators can create, read and update company profiles, default parser maps and individual source configurations through the token API. Writes require explicit model add/change permissions in addition to worker API access. Deletion is unavailable; records can be disabled instead. Running sources are protected from configuration edits, and sources with products or run history retain their company/category ownership. See [the management API contract](../../../engineering/operations/distributed-product-parser-workers.md#company-and-source-management-api).
 
 ## States And Lifecycle
 
