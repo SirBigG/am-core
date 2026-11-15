@@ -1,0 +1,30 @@
+<header class="potato-hero{% if not category.hero_image %} potato-hero--text-only{% endif %}"
+        aria-labelledby="potato-hero-title">
+    <div class="potato-hero__copy">
+        <p class="potato-hero__eyebrow">Довідник культури</p>
+        <h1 id="potato-hero-title">{{ category.meta.h1|default:category.value }}</h1>
+        <p class="potato-hero__description">{{ description }}</p>
+        <nav class="potato-hero__actions" aria-label="Основні дії">
+            {% if hub_sections.catalog_url %}
+                <a class="potato-hero__button potato-hero__button--primary"
+                   href="{{ hub_sections.catalog_url }}">
+                    Підібрати сорт <span aria-hidden="true">→</span>
+                </a>
+            {% endif %}
+            {% if hub_sections.market_url %}
+                <a class="potato-hero__button" href="{{ hub_sections.market_url }}">
+                    Де купити <span aria-hidden="true">↗</span>
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+    {% if category.hero_image %}
+        <div class="potato-hero__media">
+            <img src="{{ category.hero_image.url }}"
+                 alt=""
+                 width="{{ category.hero_image.width }}"
+                 height="{{ category.hero_image.height }}"
+                 fetchpriority="high">
+        </div>
+    {% endif %}
+</header>

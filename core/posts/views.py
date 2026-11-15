@@ -27,6 +27,7 @@ from core.posts.guide_hub import build_guide_hub_context, get_public_guide_categ
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
 from core.posts.recommendations import get_random_recommendations
+from core.posts.sectioned_hub import build_sectioned_hub_context
 from core.posts.templatetags.post_extras import default_og_image, full_url
 from core.registry.models import Variety
 from core.search.inputs import clean_query
@@ -112,6 +113,14 @@ class PlantDiaryLandingView(TemplateView):
 
 
 class CropHubCanonicalMixin:
+    def get_crop_hub_context(self, category):
+        context = build_crop_hub_context(category, config=self.crop_hub_config)
+        if self.crop_hub_config["layout"] == "sectioned":
+            context["hub_sections"] = build_sectioned_hub_context(
+                category, self.crop_hub_config, self.request.GET, context
+            )
+        return context
+
     def get(self, request, *args, **kwargs):
         slug = kwargs.get("child") or kwargs.get("parent")
         config = hub_config(slug)
@@ -142,7 +151,7 @@ class ParentRubricView(CropHubCanonicalMixin, TemplateView):
         category = context["category"]
         if hasattr(self, "crop_hub_config"):
             self.template_name = "posts/crop_hub.html"
-            context.update(build_crop_hub_context(category, config=self.crop_hub_config))
+            context.update(self.get_crop_hub_context(category))
             return context
         context["object_list"] = (
             Post.objects.select_objects().filter(rubric__parent_id=context["category"].pk).active()[:4]
@@ -190,7 +199,7 @@ class PostListView(CropHubCanonicalMixin, TemplateView):
             return {
                 "view": self,
                 "request": self.request,
-                **build_crop_hub_context(category, config=self.crop_hub_config),
+                **self.get_crop_hub_context(category),
             }
         if category.presentation_mode == CategoryPresentationMode.GUIDE_HUB:
             _validate_public_guide_category(category, self.kwargs["parent"])

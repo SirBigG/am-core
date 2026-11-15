@@ -1,0 +1,213 @@
+{% load l10n %}
+<nav class="potato-tabs" aria-label="На цій сторінці">
+    <a href="#varieties">Сорти</a>
+    <a href="#grow">Вирощування</a>
+    <a href="#protect">Хвороби й захист</a>
+    <a href="#market">Де купити</a>
+    <a href="#prices">Ціни</a>
+    <a href="#companies">Компанії</a>
+</nav>
+<div class="potato-sections">
+    <section class="potato-panel"
+             id="varieties"
+             aria-labelledby="potato-varieties-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-varieties-title">Сорти: {{ category.value }}</h2>
+                <p>Знайдіть сорт за назвою або характеристиками.</p>
+            </div>
+            {% if hub_sections.catalog_url %}<a class="potato-link" href="{{ hub_sections.catalog_url }}">Усі сорти ↗</a>{% endif %}
+        </div>
+        <form method="get"
+              action="{{ category.absolute_url }}#varieties"
+              class="potato-filters">
+            <div class="potato-search">
+                <input class="form-control"
+                       type="search"
+                       name="q"
+                       value="{{ hub_sections.variety_search }}"
+                       placeholder="Назва сорту"
+                       aria-label="Назва сорту">
+                <button class="potato-hero__button potato-hero__button--primary"
+                        type="submit">Знайти</button>
+                <button class="potato-hero__button"
+                        type="button"
+                        id="potato-filter-toggle"
+                        aria-controls="potato-filter-panel"
+                        aria-expanded="false"
+                        hidden>Фільтри</button>
+                {% if hub_sections.has_active_filters %}<a class="potato-link" href="{{ category.absolute_url }}#varieties">Скинути</a>{% endif %}
+            </div>
+            <details id="potato-filter-panel"
+                     {% if hub_sections.has_active_filters %}open{% endif %}>
+                <summary>Фільтри</summary>
+                {% include "posts/includes/category_filter_fields.html" with countries=hub_sections.countries attribute_filters=hub_sections.attribute_filters %}
+                <div class="site-form-actions">
+                    <button class="potato-hero__button potato-hero__button--primary"
+                            type="submit">Фільтрувати</button>
+                </div>
+            </details>
+        </form>
+        <div class="potato-cards">
+            {% for variety in hub_sections.latest_varieties %}
+                <article class="potato-card">
+                    <h3>{{ variety.title }}</h3>
+                    <div class="potato-card__links">
+                        <a class="potato-link" href="{{ variety.absolute_url }}">Про сорт →</a>
+                        {% if variety.has_offers %}
+                            <a class="potato-link"
+                               href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції ↗</a>
+                        {% else %}
+                            <span class="potato-muted">Пропозицій поки немає</span>
+                        {% endif %}
+                    </div>
+                </article>
+            {% empty %}
+                <p>Сортів за цими умовами не знайдено.</p>
+            {% endfor %}
+        </div>
+    </section>
+    <section class="potato-panel" id="grow" aria-labelledby="potato-grow-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-grow-title">Вирощування та догляд</h2>
+                <p>Оберіть етап і відкрийте потрібні матеріали.</p>
+            </div>
+            {% if hub_sections.guide_url %}<a class="potato-link" href="{{ hub_sections.guide_url }}">Усі матеріали ↗</a>{% endif %}
+        </div>
+        {% for section in hub_sections.guides %}
+            <details class="potato-guide"
+                     name="potato-growing"
+                     {% if forloop.first %}open{% endif %}>
+                <summary>{{ section.title }}</summary>
+                <ul>{% for article in section.articles %}<li><a class="potato-link" href="{{ article.url }}">{{ article.title }} ↗</a></li>{% endfor %}</ul>
+            </details>
+            {% empty %}<p>Матеріали посібника готуються до публікації.</p>{% endfor %}
+    </section>
+    <section class="potato-panel"
+             id="protect"
+             aria-labelledby="potato-protect-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-protect-title">Хвороби, шкідники та захист</h2>
+                <p>Знайдіть можливу причину за ознаками або відкрийте довідник засобів захисту.</p>
+            </div>
+        </div>
+        <div class="potato-cards">
+            {% for section in hub_sections.protection_sections %}
+                <article class="potato-card">
+                    <h3>{{ section.label }}</h3>
+                    <p>{{ section.description }}</p>
+                    <a class="potato-link" href="{{ section.url }}">Переглянути ↗</a>
+                </article>
+                {% empty %}<p>Матеріали про захист готуються до публікації.</p>{% endfor %}
+        </div>
+    </section>
+    <section class="potato-panel potato-panel--market"
+             id="market"
+             aria-labelledby="potato-market-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-market-title">Де купити</h2>
+                <p>Сорти з найбільшою кількістю актуальних пропозицій.</p>
+            </div>
+            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції ↗</a>{% endif %}
+        </div>
+        <div class="potato-cards">
+            {% for variety in hub_sections.popular %}
+                <article class="potato-card">
+                    <h3>{{ variety.title }}</h3>
+                    <p>Пропозицій: {{ variety.market_offer_count }} · Продавців: {{ variety.market_seller_count }}</p>
+                    <a class="potato-link"
+                       href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції сорту ↗</a>
+                </article>
+            {% empty %}
+                <p>У цій категорії поки немає актуальних пропозицій із цінами.</p>
+            {% endfor %}
+        </div>
+        {% if hub_sections.popular %}<a class="potato-hero__button" href="#prices">Порівняти ціни ↓</a>{% endif %}
+    </section>
+    <section class="potato-panel"
+             id="prices"
+             aria-labelledby="potato-prices-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-prices-title">Порівняння цін</h2>
+                <p>Перегляньте ціни продавців на один сорт.</p>
+            </div>
+            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції ↗</a>{% endif %}
+        </div>
+        {% if hub_sections.popular %}
+            <div class="potato-search potato-price-tools mb-3" hidden>
+                <label for="potato-price-variety">Сорт</label>
+                <select class="form-select w-auto" id="potato-price-variety">
+                    {% for variety in hub_sections.popular %}<option value="{{ variety.pk }}">{{ variety.title }}</option>{% endfor %}
+                </select>
+                <button class="potato-hero__button" type="button">Сортувати за ціною</button>
+            </div>
+        {% endif %}
+        {% for variety in hub_sections.popular %}
+            <details class="potato-guide"
+                     data-potato-price-group="{{ variety.pk }}"
+                     {% if forloop.first %}open{% endif %}>
+                <summary>{{ variety.title }}</summary>
+                <div class="potato-table"
+                     role="region"
+                     tabindex="0"
+                     aria-label="Ціни на сорт {{ variety.title }}">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Продавець</th>
+                                <th scope="col">Пропозиція</th>
+                                <th scope="col" data-price-heading>Заявлена ціна</th>
+                                <th scope="col">Оновлено</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offer in variety.market_offers %}
+                                <tr data-price="{{ offer.market_price_min|unlocalize }}"
+                                    data-currency="{{ offer.currency|default_if_none:"" }}">
+                                    <td><a class="potato-link" href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a></td>
+                                    <td>{{ offer.name|default:variety.title }}</td>
+                                    <td>{{ offer.market_price_min }}{% if offer.market_price_max != offer.market_price_min %} – {{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"(валюту не вказано)" }}</td>
+                                    <td>{{ offer.price_updated_at|date:"d.m.Y" }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+        {% empty %}
+            <p>Цін для порівняння поки немає.</p>
+        {% endfor %}
+        {% if hub_sections.popular %}<p class="potato-note">Діапазон заявлених цін наведено там, де продавець указав кілька цін. Сортування групує пропозиції за валютою. Фасування, призначення товару й доставку уточнюйте у продавця.</p>{% endif %}
+    </section>
+    <section class="potato-panel"
+             id="companies"
+             aria-labelledby="potato-companies-title">
+        <div class="potato-heading">
+            <div>
+                <h2 id="potato-companies-title">Компанії: {{ category.value }}</h2>
+                <p>Перегляньте профілі продавців цієї культури.</p>
+            </div>
+            {% if hub_sections.companies_url %}<a class="potato-link" href="{{ hub_sections.companies_url }}">Компанії в AgroMega ↗</a>{% endif %}
+        </div>
+        <div class="potato-cards">
+            {% for company in hub_sections.companies %}
+                <article class="potato-card">
+                    <h3>{{ company.name }}</h3>
+                    {% if company.location.region %}<p>{{ company.location.region.value }}</p>{% endif %}
+                    <a class="potato-link" href="{{ company.get_absolute_url }}">Профіль →</a>
+                </article>
+            {% empty %}
+                <p>Компаній у цій категорії поки немає.</p>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+{% if hub_sections.additional_sections %}
+    <nav class="potato-panel" aria-label="Інші розділи">
+        {% for section in hub_sections.additional_sections %}<a class="potato-link" href="{{ section.url }}">{{ section.label }} ↗</a>{% endfor %}
+    </nav>
+{% endif %}

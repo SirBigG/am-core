@@ -1,6 +1,6 @@
 # Managing category pages, Crop Hubs and Guide Hubs
 
-Updated: 2026-10-17. Audience: content editors, administrators and agents.
+Updated: 2026-11-15. Audience: content editors, administrators and agents.
 
 Use this guide to assemble landing pages from existing catalogs and articles.
 Configuration is stored in the database and managed in Django Admin or the
@@ -34,7 +34,7 @@ its major blocks are defined by the application.
 
 | Admin object | What it owns | Example |
 | --- | --- | --- |
-| Category | Taxonomy identity, category URL, image and related metadata | Картопля |
+| Category | Taxonomy identity, category URL, thumbnail, full-size hero image and related metadata | Картопля |
 | Category hub | Landing-page activation, short introduction, guide source and optional site/language restriction | Main potato landing |
 | Hub section | A reference to an existing category, with a role and optional display label/description | Сорти картоплі → existing variety catalog |
 | Guide section | A reading step with a title, optional description, order and visibility | Підготовка до посадки |
@@ -90,6 +90,7 @@ before activating production configuration.
 | `diseases` | Existing disease catalog | Knowledge count and navigation card |
 | `pests` | Existing pest catalog | Knowledge count and navigation card |
 | `growing` | Existing growing/care category | Knowledge count, primary action, navigation and additional-content browse destination |
+| `protection` | Existing plant-protection category | Protection card in the sectioned layout and navigation in the standard layout |
 | `additional` | Another relevant category | Extra knowledge count and navigation card |
 
 Each primary role can appear once. Multiple `additional` rows are allowed if
@@ -102,6 +103,41 @@ Choose a narrowly relevant variety catalog. That reference and its eligible
 descendants define the crop's marketplace scope. A broad parent containing
 carrots, potato diseases or agricultural chemicals is unsuitable as the potato
 variety reference.
+
+## Sectioned landing layout and hero images
+
+Select **Layout → sectioned landing page** on a Category hub (also available
+in the Category inline) to use the wide hero, filters, guide steps, protection
+cards, seller comparison and company sections. **Standard** retains the compact
+layout. This selection works for any crop and does not depend on its slug or URL.
+The migration preserves the previous sectioned layout for an existing potato
+hub; new hubs default to Standard. No source references are inferred or changed.
+
+On the owning **Category** form, upload **Hero image**. This separate upload
+keeps its original dimensions; the existing **Image** field remains a thumbnail.
+The hero heading uses the category H1 metadata or category name, and its text
+uses the hub introduction. Clearing the upload produces a text-only hero with
+no bundled fallback photograph. Each Agromarket category uses its own Category
+hero image, including on its variety pages. Upload one there independently when
+knowledge and market categories differ. Existing uploads need no static rebuild.
+
+All sectioned-page destinations come from existing references: the **varieties**
+Hub section (including descendants), **Guide category** or guides on the hub
+itself, and **Agromarket widget category**. With no explicit market source, the
+strict hub offer rules and `hub` URL scope still apply. An explicitly configured
+but hidden market source produces an empty market block, without falling back
+to the knowledge catalog. Disabling or changing a source works in both layouts.
+
+Configure **diseases**, **pests** and **protection** Hub sections for protection
+cards; their label overrides, descriptions, saved URLs and active states drive
+the cards. Missing cards have no fabricated links. **Additional** sections appear
+as supplementary navigation. Scheduled, draft, hidden and URL-less guide
+placements are excluded from public crop-page discovery; sectioned pages reuse
+the same eligibility rules as standard pages.
+
+Deploy the schema migration before serving the updated application. Editors
+must upload desired hero images after deployment; the old bundled photograph
+is removed and is not automatically copied into media storage.
 
 ## Optional Agromarket category widget on a crop page
 

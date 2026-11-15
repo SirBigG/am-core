@@ -61,7 +61,7 @@ class CategoryHubInline(admin.StackedInline):
     fk_name = "category"
     extra = 0
     max_num = 1
-    fields = ("is_active", "description", "guide_category", "market_category", "site", "locale")
+    fields = ("is_active", "layout", "description", "guide_category", "market_category", "site", "locale")
     autocomplete_fields = ("guide_category", "market_category", "site")
     show_change_link = True
 

@@ -23,6 +23,7 @@ SECTION_LABELS = {
     "varieties": ("Сорти", "Характеристики сортів та матеріали каталогу."),
     "diseases": ("Хвороби", "Ознаки хвороб та матеріали про захист рослин."),
     "pests": ("Шкідники", "Опис шкідників та матеріали про захист рослин."),
+    "protection": ("Засоби захисту", "Довідник засобів захисту рослин."),
     "growing": ("Вирощування та догляд", "Практичні матеріали від підготовки до зберігання."),
 }
 
@@ -46,6 +47,7 @@ def hub_config(slug, site=None, locale=None):
     # while expensive aggregates remain cached. No model instances enter cache.
     return {
         "id": hub.pk,
+        "layout": hub.layout,
         "category_slug": slug,
         "description": hub.description,
         "guide_category_id": hub.guide_category_id,

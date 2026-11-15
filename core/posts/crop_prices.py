@@ -24,20 +24,24 @@ def _ranges(queryset, *dimensions):
     )
 
 
-def build_price_overview(offers, now):
-    # A subquery preserves the legacy window/deduplication filter before GROUP BY.
-    products = Product.objects.filter(pk__in=offers.values("pk"))
-    current = list(
+def current_price_ranges(products):
+    return list(
         _ranges(products)
         .annotate(
             offer_count=Count("pk"), seller_count=Count("company_id", distinct=True), updated_at=Max("price_updated_at")
         )
         .order_by("currency_code")
     )
+
+
+def build_price_overview(offers, now, days=30):
+    # A subquery preserves the legacy window/deduplication filter before GROUP BY.
+    products = Product.objects.filter(pk__in=offers.values("pk"))
+    current = current_price_ranges(products)
     if not current:
         return []
     today = timezone.localtime(now).date()
-    start = today - timedelta(days=29)
+    start = today - timedelta(days=days - 1)
     history = (
         ProductPriceHistory.objects.filter(
             product_id__in=products.values("pk"), observed_at__date__gte=start, observed_at__lte=now
@@ -55,7 +59,7 @@ def build_price_overview(offers, now):
         group["has_chart"] = len(rows) >= 2
         group["chart_max"] = max((row["max"] for row in rows), default=0)
         for row in rows:
-            row["x"] = 20 + (row["day"] - start).days * 20
+            row["x"] = 20 + (row["day"] - start).days * 580 // (days - 1)
             row["y_min"] = 160 - int(row["min"] / group["chart_max"] * 140)
             row["y_max"] = 160 - int(row["max"] / group["chart_max"] * 140)
         group["start"] = start

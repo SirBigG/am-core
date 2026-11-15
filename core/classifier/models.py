@@ -122,6 +122,14 @@ class Category(MPTTModel):
 
     image = models.ImageField(upload_to="categories", blank=True, null=True)
 
+    hero_image = models.ImageField(
+        upload_to="categories/heroes",
+        blank=True,
+        help_text=_(
+            "Optional full-size hero for category landing and Agromarket pages. No thumbnail cropping is applied."
+        ),
+    )
+
     meta = models.OneToOneField(
         MetaData,
         on_delete=models.CASCADE,
@@ -271,6 +279,11 @@ def _validate_hub_target(category_id, target_id, *, include_self=False):
 class CategoryHub(models.Model):
     """Presentation configuration referencing the existing taxonomy."""
 
+    class Layout(models.TextChoices):
+        STANDARD = "standard", _("standard")
+        SECTIONED = "sectioned", _("sectioned landing page")
+
+    layout = models.CharField(max_length=20, choices=Layout.choices, default=Layout.STANDARD)
     category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="crop_hub")
     is_active = models.BooleanField(default=False, verbose_name=_("active"))
     description = models.TextField(blank=True, verbose_name=_("short introduction"))
@@ -333,6 +346,7 @@ class CategoryHubSection(models.Model):
         DISEASES = "diseases", _("diseases")
         PESTS = "pests", _("pests")
         GROWING = "growing", _("growing and care")
+        PROTECTION = "protection", _("plant protection")
         ADDITIONAL = "additional", _("additional section")
 
     hub = models.ForeignKey(CategoryHub, on_delete=models.CASCADE, related_name="sections")

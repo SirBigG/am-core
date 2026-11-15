@@ -1,0 +1,41 @@
+<aside class="am-market__panel" aria-labelledby="am-history-title">
+    <h2 id="am-history-title">Історія цін</h2>
+    <p class="am-market__muted">{{ variety.title }} · заявлені ціни</p>
+    <nav class="am-market__periods" aria-label="Період історії цін">
+        <a class="am-market__button" href="{% querystring period=30 %}#am-history-title" {% if period == 30 %}aria-current="true"{% endif %}>30 днів</a>
+        <a class="am-market__button" href="{% querystring period=90 %}#am-history-title" {% if period == 90 %}aria-current="true"{% endif %}>90 днів</a>
+    </nav>
+    {% for group in price_overview %}
+        <div class="am-market__history">
+            <p class="am-market__metric">{{ group.min }}{% if group.min != group.max %}–{{ group.max }}{% endif %} {{ group.currency }}</p>
+            <p class="am-market__muted">Останнє спостереження · {{ group.updated_at|date:"d.m.Y" }}</p>
+            {% if group.has_chart %}
+                <p class="am-market__muted">Денні діапазони · шкала 0–{{ group.chart_max }} {{ group.currency }}</p>
+                <svg viewBox="0 0 620 180" width="100%" role="img"
+                     aria-label="Денні діапазони цін за {{ period }} днів. Точні значення в таблиці.">
+                    <path d="M20 20V160H600 M20 90H600 M20 20H600" fill="none" stroke="currentColor" opacity="0.22" />
+                    {% for day in group.history %}
+                        <line x1="{{ day.x }}" x2="{{ day.x }}" y1="{{ day.y_min }}" y2="{{ day.y_max }}" stroke="currentColor" stroke-width="6"><title>{{ day.day|date:"d.m.Y" }} · {{ day.min }}–{{ day.max }} {{ group.currency }}</title></line>
+                        <circle cx="{{ day.x }}" cy="{{ day.y_min }}" r="5" fill="currentColor" />
+                        <circle cx="{{ day.x }}" cy="{{ day.y_max }}" r="5" fill="currentColor" />
+                    {% endfor %}
+                </svg>
+                <p class="am-market__dates"><span>{{ group.start|date:"d.m.Y" }}</span><span>{{ group.end|date:"d.m.Y" }}</span></p>
+            {% else %}
+                <p class="am-market__empty">За цей період недостатньо спостережень для графіка.</p>
+            {% endif %}
+            {% if group.history %}
+                <details class="am-market__method">
+                    <summary>Дані та методика</summary>
+                    <p>Денні мінімум і максимум серед збережених цін товарів із поточної вибірки. Пропуски відповідають дням без спостережень.</p>
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead><tr><th scope="col">Дата</th><th scope="col">Мін.</th><th scope="col">Макс.</th><th scope="col">Проп.</th></tr></thead>
+                            <tbody>{% for day in group.history %}<tr><td>{{ day.day|date:"d.m.Y" }}</td><td>{{ day.min }}</td><td>{{ day.max }}</td><td>{{ day.offer_count }}</td></tr>{% endfor %}</tbody>
+                        </table>
+                    </div>
+                </details>
+            {% endif %}
+        </div>
+    {% endfor %}
+</aside>

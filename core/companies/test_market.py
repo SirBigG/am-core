@@ -139,6 +139,24 @@ class MarketTests(TestCase):
         response = self.client.get(reverse("market:list"))
         self.assertEqual(response.context["varieties"][0].market_prices[0]["max"], Decimal(250))
 
+    def test_category_range_includes_varieties_hidden_by_search(self):
+        other = PostFactory(rubric=self.category, title="Флоріна", status=True)
+        Product.objects.create(name="Флоріна", company=self.company, category=self.category, post=other, price=220)
+        url = reverse("market:category", args=[self.category.slug])
+        response = self.client.get(url, {"q": "Гала", "sort": "price"})
+        self.assertEqual([post.pk for post in response.context["varieties"]], [self.post.pk])
+        group = response.context["market_ranges"][0]
+        self.assertEqual((group["min"], group["max"], group["offer_count"]), (100, 220, 2))
+
+    def test_picker_options_and_variety_redirect_use_catalog_identity(self):
+        response = self.client.get(reverse("market:variety-options"), {"category": self.category.slug})
+        self.assertEqual(response.json(), {"varieties": [{"id": self.post.pk, "title": self.post.title}]})
+        params = {"category": self.category.slug, "variety": self.post.pk}
+        response = self.client.get(reverse("market:list"), params)
+        self.assertRedirects(response, reverse("market:variety", args=[self.post.pk]))
+        params["category"] = CategoryFactory().slug
+        self.assertEqual(self.client.get(reverse("market:list"), params).status_code, 404)
+
     def test_market_pagination_and_root_seo(self):
         from unittest.mock import patch
 
