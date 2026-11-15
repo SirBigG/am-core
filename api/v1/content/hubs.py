@@ -139,6 +139,15 @@ class ReferenceViewSet(PrivateHubAccess, ModelViewSet):
     filter_field = None
     http_method_names = ("get", "post", "put", "patch", "delete", "head", "options")
 
+    def options(self, request, *args, **kwargs):
+        # DRF simulates PUT while describing writable fields. That permission
+        # probe must retrieve objects without the locks reserved for mutations.
+        self._metadata_request = True
+        try:
+            return super().options(request, *args, **kwargs)
+        finally:
+            self._metadata_request = False
+
     def get_queryset(self):
         queryset = super().get_queryset()
         value = self.request.query_params.get(self.filter_field) if self.filter_field else None
@@ -149,7 +158,7 @@ class ReferenceViewSet(PrivateHubAccess, ModelViewSet):
         return queryset
 
     def get_object(self):
-        if self.request.method not in ("GET", "HEAD", "OPTIONS"):
+        if not getattr(self, "_metadata_request", False) and self.request.method not in ("GET", "HEAD", "OPTIONS"):
             # Lock configuration parents before children, matching creation and
             # cascade deletion. Do not lock unrelated joined category/Post rows.
             instance = super().get_object()

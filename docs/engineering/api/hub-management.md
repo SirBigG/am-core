@@ -36,6 +36,11 @@ The four collection/detail pairs support GET/POST on collections and GET/PUT/PAT
 
 Existing `/api/content/categories/tree/`, post, country and attribute-schema endpoints retain their response contracts. Use the existing category tree to discover real category IDs and the new presentation endpoint for mode readback. OPTIONS describes fields where the account has view permission.
 
+OPTIONS metadata checks may simulate PUT to determine field permissions. They
+retrieve references without mutation locks; real create/update/delete operations
+retain their transactional parent/child locking. A transaction-level regression
+test covers all four reference-detail endpoints outside a wrapping test transaction.
+
 ## Writable contracts
 
 - **Hub:** `category` (required on create), `is_active` (defaults false), `layout` (`standard` default or `sectioned`), `description`, optional `guide_category`, `market_category`, `site`, and `locale`. `id`, `updated` and saved category `url` are read-only. One hub per category.
