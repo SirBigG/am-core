@@ -80,6 +80,7 @@ class HubSerializer(ValidatedReferenceSerializer):
             "id",
             "category",
             "is_active",
+            "layout",
             "description",
             "guide_category",
             "market_category",

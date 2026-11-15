@@ -19,14 +19,22 @@ from .hubs import (
     HubSectionViewSet,
     HubViewSet,
 )
+from .media import CategoryImagesView, ContentPhotoViewSet
+from .product_matching import ProductMatchView
+from .taxonomy import CategorySetupDetail, CategorySetupList
 
 hub_router = SimpleRouter()
 hub_router.register("hubs", HubViewSet, basename="content-hub")
 hub_router.register("hub-sections", HubSectionViewSet, basename="content-hub-section")
 hub_router.register("guide-sections", GuideSectionViewSet, basename="content-guide-section")
 hub_router.register("guide-placements", GuidePlacementViewSet, basename="content-guide-placement")
+hub_router.register("photos", ContentPhotoViewSet, basename="content-photo")
 
 urlpatterns = [
+    path("products/<int:pk>/match/", ProductMatchView.as_view(), name="content-product-match"),
+    path("categories/", CategorySetupList.as_view(), name="content-category-list"),
+    path("categories/<int:pk>/", CategorySetupDetail.as_view(), name="content-category-detail"),
+    path("categories/<int:pk>/images/", CategoryImagesView.as_view(), name="content-category-images"),
     path("categories/<int:pk>/presentation/", CategoryPresentationView.as_view(), name="content-category-presentation"),
     path("categories/<int:pk>/schema/", CategorySchemaView.as_view(), name="content-category-schema"),
     path("attribute-groups/", GroupListView.as_view(), name="content-attribute-groups"),

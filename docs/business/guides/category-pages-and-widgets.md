@@ -7,6 +7,11 @@ Configuration is stored in the database and managed in Django Admin or the
 authenticated content API. Adding another crop does not require a category list
 in application code.
 
+The [complete crop-page setup API](../../engineering/api/crop-page-setup.md)
+supports taxonomy creation/moves, category SEO, hero/thumbnail uploads, article
+photos, hub layout and manual offer-to-variety matching. Staff agents with the
+documented permissions can prepare an entire crop page without an admin session.
+
 ## Choose the page type
 
 | Page type | Use it for | How to select it |
@@ -327,7 +332,8 @@ a Hub section's hub, a Guide section's category and a placement's section cannot
 be moved by PATCH. Create the replacement under the intended parent, read it
 back, then remove the old reference only when intended and authorized.
 
-Taxonomy creation/reparenting is outside these configuration endpoints. The API
+Taxonomy creation/reparenting uses the separate category setup endpoints linked
+above. The API
 does not create credentials, grant access or deploy pages to another environment.
 Field contracts, permission names, pagination and request examples are in the
 [hub management API reference](../../engineering/api/hub-management.md).

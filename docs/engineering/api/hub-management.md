@@ -38,8 +38,8 @@ Existing `/api/content/categories/tree/`, post, country and attribute-schema end
 
 ## Writable contracts
 
-- **Hub:** `category` (required on create), `is_active` (defaults false), `description`, optional `guide_category`, `market_category`, `site`, and `locale`. `id`, `updated` and saved category `url` are read-only. One hub per category.
-- **Hub section:** `hub`, `category`, `role`, `title`, `description`, `sort_order`, `is_active`. Roles: `varieties`, `diseases`, `pests`, `growing`, `additional`. Each primary role occurs at most once per hub; multiple `additional` rows may reference different categories. A category occurs at most once per hub. `url` is the referenced category's stored canonical URL.
+- **Hub:** `category` (required on create), `is_active` (defaults false), `layout` (`standard` default or `sectioned`), `description`, optional `guide_category`, `market_category`, `site`, and `locale`. `id`, `updated` and saved category `url` are read-only. One hub per category.
+- **Hub section:** `hub`, `category`, `role`, `title`, `description`, `sort_order`, `is_active`. Roles: `varieties`, `diseases`, `pests`, `growing`, `protection`, `additional`. Each primary role occurs at most once per hub; multiple `additional` rows may reference different categories. A category occurs at most once per hub. `url` is the referenced category's stored canonical URL.
 - **Guide section:** `category`, `title`, `description`, `sort_order`, `is_active`.
 - **Guide placement:** `section`, `post`, `sort_order`. Read-only `title` and `url` come from the existing Post. Each section/Post pair is unique.
 
@@ -83,7 +83,7 @@ The corrected landing category is `2467`, `/kartoplya/`, at level 1 under plant 
 - Agent readback: `/api/content/hubs/?category=2467`, `/api/content/hub-sections/?hub=1`, `/api/content/guide-sections/?category=2466`.
 - Market destinations: `/agromarket/?hub=kartoplya`, `/companies/?hub=kartoplya`.
 
-Configure hubs on the main crop categories. Source catalogs and guide collections may live elsewhere in the legacy taxonomy; explicit category references connect them. Category creation/reparenting is still an admin operation, outside these configuration APIs. Source canonical URLs and article ownership remain independent of hub composition.
+Configure hubs on the main crop categories. Source catalogs and guide collections may live elsewhere in the legacy taxonomy; explicit category references connect them. Category creation/reparenting is outside these hub-reference endpoints and is now available through the dedicated [crop-page setup API](crop-page-setup.md), along with category SEO and media. Source canonical URLs and article ownership remain independent of hub composition.
 
 Final verification after correcting the landing level: **112/112 crop/admin/API/company tests pass**, including a main crop page backed by legacy sibling catalogs and guides, independent Guide Hub rendering, preservation of article URLs, strict market/seller scope and exclusion of unrelated root-crop records. Earlier broad verification ran 343 tests with two previously verified baseline failures (metadata alias redirect and sitemap group count). No production deployment, token provisioning or permission grant was performed.
 

@@ -175,6 +175,13 @@ class Category(MPTTModel):
         Category.objects.filter(pk=self.pk).update(absolute_url=self.get_absolute_url())
 
 
+class CategoryURLRedirect(models.Model):
+    """Previous public paths retained by token API taxonomy edits."""
+
+    old_path = models.CharField(max_length=1000, unique=True)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="previous_urls")
+
+
 class CategoryAIProfile(models.Model):
     """Private plant-care knowledge used as AI context for diary
     recommendations."""
