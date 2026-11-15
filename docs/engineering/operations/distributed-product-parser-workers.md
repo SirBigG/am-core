@@ -54,6 +54,24 @@ Preferred item-scoped configuration:
 
 Legacy maps without `item` still evaluate global field lists. If non-empty field lists return different counts, the worker stops and records a failure instead of risking incorrect product/price pairing.
 
+### Catalogs Without Prices And JSON Feeds
+
+The result API accepts catalog entries with all price fields omitted or null. These
+update product identity and last-seen state without creating price history or a
+fresh market price. A catalog entry does not establish current stock availability.
+In admin forms requiring a price XPath, `self::*[false()]` explicitly selects no
+price. Keep `snapshot_complete=false` for a qualified subset.
+
+Parser Studio additionally supports JSON object/array feeds using the same XPath
+configuration: `/json/Products/item` selects entries in a `Products` array;
+`./Title/text()` and `./Url/text()` read their title and URL. Object properties
+become elements, arrays contain `item` elements, and null has no text. This is a
+local Studio capability; older Studio versions and the bundled core CLI do not
+support these JSON feed maps. Use the updated Studio runtime for such sources and
+restart an already-open Studio process after updating its files. No core runtime
+or API deployment is needed. Studio also honors HTML `base href` for product URLs
+and pagination. The sibling `parser_studio/README.md` documents configuration.
+
 ## Running On Another Machine
 
 The machine needs the compatible AgroMega code/runtime, network access to the main site and source websites, and Firefox/geckodriver only for browser-rendered sources.

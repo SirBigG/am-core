@@ -1,10 +1,14 @@
 from html.parser import HTMLParser
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 from django.contrib.auth.models import AnonymousUser
 from django.template.loader import render_to_string
 from django.test import Client, RequestFactory, TestCase, override_settings
 from django.urls import reverse
+from social_django.models import UserSocialAuth
+
+from core.pro_auth.models import User
 
 
 class FormParser(HTMLParser):
@@ -34,6 +38,66 @@ class FormParser(HTMLParser):
     SOCIAL_AUTH_FACEBOOK_SECRET="test-facebook-secret",
 )
 class SocialLoginTests(TestCase):
+    def complete_google_callback(self):
+        response = self.client.post(
+            reverse("social:begin", args=["google-oauth2"]),
+            {
+                "next": "/forum/publications/",
+            },
+        )
+        state = parse_qs(urlparse(response["Location"]).query)["state"][0]
+        with (
+            patch(
+                "social_core.backends.google.GoogleOAuth2.request_access_token",
+                return_value={
+                    "access_token": "test-access-token",
+                    "token_type": "Bearer",
+                },
+            ),
+            patch(
+                "social_core.backends.google.GoogleOAuth2.user_data",
+                return_value={
+                    "sub": "google-user-123",
+                    "email": "google-user@example.com",
+                    "email_verified": True,
+                    "given_name": "Test",
+                    "family_name": "User",
+                },
+            ),
+        ):
+            response = self.client.get(
+                reverse("social:complete", args=["google-oauth2"]),
+                {
+                    "state": state,
+                    "code": "test-code",
+                },
+            )
+        return response
+
+    def test_google_callback_runs_custom_pipeline_and_preserves_forum_destination(self):
+        response = self.complete_google_callback()
+        self.assertRedirects(response, "/forum/publications/", fetch_redirect_response=False)
+        self.assertIn("_auth_user_id", self.client.session)
+        association = UserSocialAuth.objects.get(provider="google-oauth2", uid="google-user-123")
+        self.assertEqual(str(association.user_id), self.client.session["_auth_user_id"])
+
+    def test_google_callback_preserves_existing_email_based_association(self):
+        user = User.objects.create_user(email="google-user@example.com")
+        association = UserSocialAuth.objects.create(
+            user=user,
+            provider="google-oauth2",
+            uid=user.email,
+            id_key="email",
+            extra_data={"email": user.email},
+        )
+        response = self.complete_google_callback()
+        self.assertRedirects(response, "/forum/publications/", fetch_redirect_response=False)
+        self.assertEqual(self.client.session["_auth_user_id"], str(user.pk))
+        association.refresh_from_db()
+        self.assertEqual(association.uid, "google-user-123")
+        self.assertEqual(association.id_key, "sub")
+        self.assertEqual(UserSocialAuth.objects.filter(user=user).count(), 1)
+
     def test_login_forms_start_oauth_with_csrf_and_preserve_next(self):
         for backend in ("google-oauth2", "facebook"):
             with self.subTest(backend=backend):
