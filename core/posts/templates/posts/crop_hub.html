@@ -2,7 +2,10 @@
 {% load post_extras static %}
 {% block scripts %}
     <script async src="{% static 'posts/j-index.js' %}"></script>
-    {% if potato %}<script defer src="{% static 'posts/j-potato-sections.js' %}?v=20261115-filter-toggle"></script>{% endif %}
+    {% if hub_sections %}
+        <script defer
+                src="{% static 'posts/j-potato-sections.js' %}?v=20261115-filter-toggle"></script>
+    {% endif %}
     <link rel="stylesheet"
           href="{% static 'posts/list.css' %}?v=20261115-filter-toggle">
 {% endblock scripts %}
@@ -23,12 +26,12 @@
 {% endblock extra_meta %}
 {% block second_menu %}
 {% endblock second_menu %}
-{% block content_column_classes %}{% if category.absolute_url == "/kartoplya/" %}col-12{% else %}{{ block.super }}{% endif %}{% endblock content_column_classes %}
+{% block content_column_classes %}{% if hub_sections %}col-12{% else %}{{ block.super }}{% endif %}{% endblock content_column_classes %}
 {% block content %}
     <div class="site-catalog-shell crop-hub">
-        {% if category.absolute_url == "/kartoplya/" %}
+        {% if hub_sections %}
             <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
-            {% include "posts/includes/potato_hero.html" only %}
+            {% include "posts/includes/potato_hero.html" %}
             {% include "posts/includes/potato_sections.html" %}
         {% else %}
             <header class="site-catalog-hero">

@@ -2,26 +2,34 @@
 {% load static %}
 {% block title %}{{ market_title }}{% endblock title %}
 {% block meta_description %}{{ market_description }}{% endblock meta_description %}
-{% block page_header %}{% endblock page_header %}
+{% block page_header %}
+{% endblock page_header %}
 {% block content_column_classes %}col-12{% endblock content_column_classes %}
 {% block robots %}
-    <meta name="robots" content="{% if market_noindex %}noindex,follow{% else %}index,follow{% endif %}">
+    <meta name="robots"
+          content="{% if market_noindex %}noindex,follow{% else %}index,follow{% endif %}">
 {% endblock robots %}
 {% block scripts %}
     <script defer src="{% static 'posts/j-index.js' %}"></script>
     <script defer src="{% static 'posts/j-market.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'posts/list.css' %}?v=20261115-market">
+    <link rel="stylesheet"
+          href="{% static 'posts/list.css' %}?v=20261115-market">
 {% endblock scripts %}
 {% block content %}
     <div class="am-market">
         <div class="am-market__crumb">
-            <a href="/">Головна</a><span aria-hidden="true">›</span>
+            <a href="{% url 'index' %}">Головна</a><span aria-hidden="true">›</span>
             {% if variety or category %}<a href="{% url 'market:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}">Агромаркет</a>{% else %}<span>Агромаркет</span>{% endif %}
             {% if category %}<span aria-hidden="true">›</span><span>{{ category.value }}</span>{% endif %}
         </div>
         <header class="am-market__hero">
-            {% if category.slug == 'kartoplia-sorty' %}
-                <div class="am-market__photo" aria-hidden="true"><img src="{% static 'posts/img/potato-hero.jpg' %}" alt="" width="1300" height="866"></div>
+            {% if category.hero_image %}
+                <div class="am-market__photo" aria-hidden="true">
+                    <img src="{{ category.hero_image.url }}"
+                         alt=""
+                         width="{{ category.hero_image.width }}"
+                         height="{{ category.hero_image.height }}">
+                </div>
             {% endif %}
             <div class="am-market__intro">
                 {% if variety %}<p class="am-market__context">{{ variety.rubric.value }}</p>{% endif %}
@@ -32,7 +40,8 @@
         </header>
         {% if crop_hub_category %}<p class="am-market__context mt-3">Культура: <a href="{{ crop_hub_category.absolute_url }}">{{ crop_hub_category.value }}</a></p>{% endif %}
         <div class="am-market__results" id="market-results">
-            {% block market_content %}{% endblock market_content %}
+            {% block market_content %}
+            {% endblock market_content %}
         </div>
     </div>
 {% endblock content %}

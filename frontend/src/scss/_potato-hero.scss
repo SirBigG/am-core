@@ -8,6 +8,8 @@
   background: #f1f6ee;
   color: #236535;
 
+  &--text-only { grid-template-columns: minmax(0, 1fr); }
+
   &__copy {
     align-self: center;
     padding: 48px 46px;

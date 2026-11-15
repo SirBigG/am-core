@@ -5,7 +5,8 @@
             {% if category %}<p class="am-market__context">{{ category.value }}</p>{% endif %}
             <h2>Усі сорти</h2>
         </div>
-        <a class="am-market__button" href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% elif category %}?category={{ category.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
+        <a class="am-market__button"
+           href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% elif category %}?category={{ category.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
     </div>
     <div class="am-market__layout">
         <section class="am-market__panel" aria-labelledby="am-overview-title">
@@ -14,8 +15,16 @@
             <form method="get" class="am-market__controls">
                 {% if selected_hub %}<input type="hidden" name="hub" value="{{ selected_hub }}">{% endif %}
                 {% if selected_region %}<input type="hidden" name="region" value="{{ selected_region }}">{% endif %}
-                <label>Знайти сорт <input class="form-control" type="search" name="q" value="{{ market_search }}" placeholder="Назва сорту"></label>
-                <label>Сортувати
+                <label>
+                    Знайти сорт
+                    <input class="form-control"
+                           type="search"
+                           name="q"
+                           value="{{ market_search }}"
+                           placeholder="Назва сорту">
+                </label>
+                <label>
+                    Сортувати
                     <select class="form-select" name="sort">
                         <option value="">За назвою</option>
                         <option value="offers" {% if market_sort == "offers" %}selected{% endif %}>За кількістю пропозицій</option>
@@ -23,7 +32,8 @@
                     </select>
                 </label>
                 <button class="am-market__button" type="submit">Застосувати</button>
-                <a href="{% url 'market:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}" class="align-self-end">Скинути</a>
+                <a href="{% url 'market:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}"
+                   class="align-self-end">Скинути</a>
             </form>
             <div class="am-market__rows">
                 {% for variety in varieties %}
@@ -39,11 +49,15 @@
                                 <strong>{{ price.min }}{% if price.max != price.min %}–{{ price.max }}{% endif %} {{ price.currency }}</strong>
                             {% endfor %}
                         </div>
-                        <small>Пропозицій: {{ variety.market_offer_count }}<br>Продавців: {{ variety.market_seller_count }}</small>
-                        <a class="am-market__button" href="{{ variety_url }}{{ selection_query }}">Порівняти →</a>
+                        <small>Пропозицій: {{ variety.market_offer_count }}
+                            <br>
+                        Продавців: {{ variety.market_seller_count }}</small>
+                        <a class="am-market__button"
+                           href="{{ variety_url }}{{ selection_query }}">Порівняти →</a>
                     </article>
                 {% empty %}
-                    <p class="am-market__empty">За цими умовами пропозицій поки немає.
+                    <p class="am-market__empty">
+                        За цими умовами пропозицій поки немає.
                         <a href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% endif %}">Переглянути компанії</a>
                     </p>
                 {% endfor %}
@@ -51,7 +65,7 @@
             {% include "companies/market_pagination.html" %}
         </section>
         <aside class="am-market__panel" aria-labelledby="am-range-title">
-            <h3 id="am-range-title">{% if category.slug == "kartoplia-sorty" %}Ціни на картоплю{% else %}Діапазон цін{% endif %}</h3>
+            <h3 id="am-range-title">Діапазон цін{% if category %}: {{ category.value }}{% endif %}</h3>
             {% for group in market_ranges %}
                 <div class="am-market__range">
                     <p class="am-market__muted">Останнє спостереження · {{ group.updated_at|date:"d.m.Y" }}</p>

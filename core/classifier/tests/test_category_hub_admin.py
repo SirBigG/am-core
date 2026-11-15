@@ -77,6 +77,7 @@ class CategoryHubAdminTests(TestCase):
             "category": self.crop.pk,
             "is_active": "on",
             "description": "Admin introduction",
+            "layout": "standard",
             "guide_category": "",
             "site": "",
             "locale": "",
@@ -177,6 +178,7 @@ class CategoryHubAdminTests(TestCase):
             {
                 "crop_hub-TOTAL_FORMS": 1,
                 "crop_hub-0-description": "Prepared in category admin",
+                "crop_hub-0-layout": "standard",
                 "crop_hub-0-category": self.crop.pk,
                 "crop_hub-0-guide_category": "",
                 "crop_hub-0-site": "",

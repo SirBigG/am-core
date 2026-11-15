@@ -26,8 +26,8 @@ from core.posts.crop_hub import build_crop_hub_context, crop_scope_for_post, hub
 from core.posts.guide_hub import build_guide_hub_context, get_public_guide_categories, get_public_guide_sections
 from core.posts.metadata import resolve_publication_metadata
 from core.posts.models import Photo, Post, SearchStatistic
-from core.posts.potato_hub import POTATO_PATH, build_potato_sections
 from core.posts.recommendations import get_random_recommendations
+from core.posts.sectioned_hub import build_sectioned_hub_context
 from core.posts.templatetags.post_extras import default_og_image, full_url
 from core.registry.models import Variety
 from core.search.inputs import clean_query
@@ -115,9 +115,9 @@ class PlantDiaryLandingView(TemplateView):
 class CropHubCanonicalMixin:
     def get_crop_hub_context(self, category):
         context = build_crop_hub_context(category, config=self.crop_hub_config)
-        if category.absolute_url == POTATO_PATH:
-            context["potato"] = build_potato_sections(
-                category, self.request.GET, context["growing_guides"], context["knowledge_sections"]
+        if self.crop_hub_config["layout"] == "sectioned":
+            context["hub_sections"] = build_sectioned_hub_context(
+                category, self.crop_hub_config, self.request.GET, context
             )
         return context
 

@@ -100,6 +100,7 @@ class HubDeletionPermissionTests(TestCase):
                 "crop_hub-0-id": self.hub.pk,
                 "crop_hub-0-category": self.owner.pk,
                 "crop_hub-0-description": "",
+                "crop_hub-0-layout": "standard",
                 "crop_hub-0-guide_category": "",
                 "crop_hub-0-site": "",
                 "crop_hub-0-locale": "",
