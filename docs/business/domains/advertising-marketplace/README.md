@@ -13,7 +13,7 @@ Advertising marketplace lets AgroMega clients create items about buying or selli
 ## Core Workflows
 
 - A client creates an item for buying or selling something.
-- Users discover marketplace items.
+- Users can filter public adverts by category. The filter includes subcategories, and sectioned crop pages link to the same filtered list.
 - The item may be updated, closed, hidden, or removed.
 
 ## Business Rules

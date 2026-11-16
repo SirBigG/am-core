@@ -2676,6 +2676,11 @@ span.flatpickr-weekday {
     font-weight: 650;
 }
 
+.category-navigation-menu.dropdown-menu .dropdown-item:is(:hover, :focus, :active) {
+    color: #0b8043;
+    background-color: #eef8ef;
+}
+
 .category-navigation-menu .dropdown-item:focus-visible {
     outline: 2px solid #0b8043;
     outline-offset: -2px;

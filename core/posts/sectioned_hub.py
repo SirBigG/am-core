@@ -2,8 +2,10 @@
 
 from urllib.parse import urlencode
 
+from django.conf import settings
 from django.db.models import Count, Exists, OuterRef, Subquery
 
+from core.adverts.models import Advert
 from core.companies.market import crop_market_offers, market_offers, market_posts, summarize_offers
 from core.companies.models import Company, CompanyType, Product
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
@@ -72,6 +74,12 @@ def build_sectioned_hub_context(category, config, params, context):
             or ""
         )
     return {
+        "show_adverts": settings.ENABLE_INTERNAL_ADVERTS,
+        "adverts": (
+            Advert.active_objects.for_category(category).select_related("location").order_by("-updated", "-pk")[:4]
+            if settings.ENABLE_INTERNAL_ADVERTS
+            else []
+        ),
         "latest_varieties": latest,
         "catalog_url": varieties.absolute_url if varieties else "",
         "countries": countries,

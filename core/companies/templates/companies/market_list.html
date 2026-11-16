@@ -6,7 +6,7 @@
             <h2>Усі сорти</h2>
         </div>
         <a class="am-market__button"
-           href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% elif category %}?category={{ category.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
+           href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% elif category %}?category={{ category.slug|urlencode }}{% endif %}">Каталог компаній <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
     </div>
     <div class="am-market__layout">
         <section class="am-market__panel" aria-labelledby="am-overview-title">

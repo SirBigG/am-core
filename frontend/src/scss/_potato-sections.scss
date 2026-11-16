@@ -162,14 +162,14 @@
 
 .potato-table {
   overflow: auto;
-  margin-bottom: 12px;
   border: 1px solid #dce5db;
   border-radius: 12.8px;
 
   table { width: 100%; min-width: 470px; background: #fff; font-size: 14px; }
-  th, td { padding: 10px 14px; border-bottom: 1px solid #dce5db; }
+  th, td { padding: 10px 14px; }
   th { color: #236535; background: #eef8ef; }
-  tbody tr:last-child td { border-bottom: 0; }
+  td { border-top: 1px solid #dce5db; }
+  tr[hidden] { display: none; }
 }
 
 @media (max-width: 650px) {

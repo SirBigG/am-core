@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 from PIL import Image
 
+from core.adverts.models import Advert
 from core.classifier.models import Category, CategoryHub, CategoryHubSection
 from core.companies.models import Company, Product
 from core.posts.models import GuideSection, GuideSectionArticle, Post
@@ -72,6 +73,28 @@ class SectionedHubTests(TestCase):
         self.assertContains(response, "Introduction managed in admin")
         self.assertEqual([p.pk for p in response.context["hub_sections"]["latest_varieties"]], [self.cultivar.pk])
 
+    @override_settings(ENABLE_INTERNAL_ADVERTS=True)
+    def test_crop_adverts_link_to_matching_active_offers(self):
+        child = CategoryFactory(parent=self.crop)
+        for title, category, is_active in [
+            ("Crop advert", self.crop, True),
+            ("Subcategory advert", child, True),
+            ("Unrelated advert", self.catalog, True),
+            ("Inactive crop advert", self.crop, False),
+        ]:
+            Advert.objects.create(
+                title=title, category=category, is_active=is_active, description="Description", contact="Contact"
+            )
+
+        filtered_url = reverse("adverts:list") + "?category=" + self.crop.slug
+        hub = self.client.get(self.url)
+        self.assertContains(hub, f'href="{filtered_url}"')
+        for response in (hub, self.client.get(filtered_url)):
+            self.assertContains(response, "Crop advert")
+            self.assertContains(response, "Subcategory advert")
+            self.assertNotContains(response, "Unrelated advert")
+            self.assertNotContains(response, "Inactive crop advert")
+
     def test_renaming_catalog_and_crop_requires_no_code_changes(self):
         self.client.get(self.url)  # Populate context cache before admin edits.
         self.catalog.slug = "renamed-catalog"
@@ -101,6 +124,25 @@ class SectionedHubTests(TestCase):
         self.assertContains(response, 'href="/agromarket/category/seller-catalog/"')
         self.assertContains(response, f'href="{reverse("market:variety", args=[cultivar.pk])}"')
         self.assertNotContains(response, "?hub=")
+
+    def test_price_rows_identify_cultivars_with_identical_seller_titles(self):
+        self.hub.market_category = self.catalog
+        self.hub.save()
+        other_cultivar = self.post(self.catalog, "Another cultivar")
+        self.offer(other_cultivar)
+        seller_title = "Посадковий матеріал, 1 кг"
+        Product.objects.filter(category=self.catalog).update(name=seller_title)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        prices = response.content.decode().split('id="prices"', 1)[1].split("</section>", 1)[0]
+        self.assertInHTML('<th scope="col">Сорт</th>', prices)
+        for cultivar in (self.cultivar, other_cultivar):
+            with self.subTest(cultivar=cultivar.title):
+                row = prices.split(f'<tr data-variety="{cultivar.pk}"', 1)[1].split("</tr>", 1)[0]
+                self.assertInHTML(f"<td>{cultivar.title}</td>", row)
+                self.assertInHTML(f"<td>{seller_title}</td>", row)
 
     def test_hidden_explicit_market_never_falls_back_to_knowledge_offers(self):
         ancestor = CategoryFactory(parent=self.root)

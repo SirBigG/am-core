@@ -1,6 +1,11 @@
+from datetime import timedelta
+
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db.models import Case, F, Q, When
+from django.db.models.functions import Coalesce
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.generic import DetailView, ListView
 
 from core.classifier.models import Category, Region
@@ -64,7 +69,34 @@ class CompanyDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["products"] = Product.objects.filter(company=self.object, active=True)
+        products = Product.objects.filter(company=self.object, active=True)
+        categories = Category.objects.filter(
+            is_active=True, pk__in=products.order_by().values("category_id")
+        ).order_by("value", "pk")
+        category = self.request.GET.get("category", "")
+        sort = self.request.GET.get("sort", "")
+
+        if category:
+            products = products.filter(category__in=categories.filter(slug=category))
+
+        fresh_after = timezone.now() - timedelta(days=settings.PRODUCT_PRICE_FRESH_DAYS)
+        products = products.annotate(
+            display_price=Case(
+                When(
+                    Q(price__gt=0) | Q(price__isnull=True, min_price__gt=0),
+                    price_updated_at__gte=fresh_after,
+                    then=Coalesce("price", "min_price"),
+                )
+            )
+        )
+        if sort == "price":
+            products = products.order_by(
+                Case(When(display_price__isnull=True, then=1), default=0),
+                F("currency").asc(nulls_last=True),
+                F("display_price").asc(nulls_last=True),
+                "pk",
+            )
+        context.update(products=products, offer_categories=categories, selected_category=category, offer_sort=sort)
         return context
 
 
