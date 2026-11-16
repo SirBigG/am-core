@@ -125,6 +125,25 @@ class SectionedHubTests(TestCase):
         self.assertContains(response, f'href="{reverse("market:variety", args=[cultivar.pk])}"')
         self.assertNotContains(response, "?hub=")
 
+    def test_price_rows_identify_cultivars_with_identical_seller_titles(self):
+        self.hub.market_category = self.catalog
+        self.hub.save()
+        other_cultivar = self.post(self.catalog, "Another cultivar")
+        self.offer(other_cultivar)
+        seller_title = "Посадковий матеріал, 1 кг"
+        Product.objects.filter(category=self.catalog).update(name=seller_title)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        prices = response.content.decode().split('id="prices"', 1)[1].split("</section>", 1)[0]
+        self.assertInHTML('<th scope="col">Сорт</th>', prices)
+        for cultivar in (self.cultivar, other_cultivar):
+            with self.subTest(cultivar=cultivar.title):
+                row = prices.split(f'<tr data-variety="{cultivar.pk}"', 1)[1].split("</tr>", 1)[0]
+                self.assertInHTML(f"<td>{cultivar.title}</td>", row)
+                self.assertInHTML(f"<td>{seller_title}</td>", row)
+
     def test_hidden_explicit_market_never_falls_back_to_knowledge_offers(self):
         ancestor = CategoryFactory(parent=self.root)
         market = CategoryFactory(parent=ancestor, slug="hidden-market")

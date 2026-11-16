@@ -147,10 +147,14 @@
                 </select>
                 <button class="potato-hero__button" type="button">Сортувати за ціною</button>
             </div>
-            <div class="potato-table" role="region" tabindex="0" aria-labelledby="potato-prices-title">
+            <div class="potato-table"
+                 role="region"
+                 tabindex="0"
+                 aria-labelledby="potato-prices-title">
                 <table>
                     <thead>
                         <tr>
+                            <th scope="col">Сорт</th>
                             <th scope="col">Пропозиція</th>
                             <th scope="col" data-price-heading>Ціна</th>
                             <th scope="col">Продавець</th>
@@ -163,6 +167,7 @@
                                 <tr data-variety="{{ variety.pk }}"
                                     data-price="{{ offer.market_price_min|unlocalize }}"
                                     data-currency="{{ offer.currency|default_if_none:"" }}">
+                                    <td>{{ variety.title }}</td>
                                     <td>{{ offer.name|default:variety.title }}</td>
                                     <td>{{ offer.market_price_min }}{% if offer.market_price_max != offer.market_price_min %} – {{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"(валюту не вказано)" }}</td>
                                     <td><a class="potato-link" href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a></td>
@@ -201,10 +206,13 @@
         </div>
     </section>
     {% if hub_sections.show_adverts %}
-        <section class="potato-panel" id="adverts" aria-labelledby="crop-adverts-title">
+        <section class="potato-panel"
+                 id="adverts"
+                 aria-labelledby="crop-adverts-title">
             <div class="potato-heading">
                 <h2 id="crop-adverts-title">Оголошення</h2>
-                <a class="potato-link" href="{% url 'adverts:list' %}?category={{ category.slug|urlencode }}">Усі оголошення категорії <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
+                <a class="potato-link"
+                   href="{% url 'adverts:list' %}?category={{ category.slug|urlencode }}">Усі оголошення категорії <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
             </div>
             {% if hub_sections.adverts %}
                 <div class="potato-cards">
