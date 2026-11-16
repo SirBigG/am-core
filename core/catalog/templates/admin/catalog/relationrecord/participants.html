@@ -1,0 +1,12 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <form method="get" role="search">
+        <label for="participant-search">Name, type or category</label>
+        <input id="participant-search" name="q" value="{{ term }}">
+        <button type="submit">Search</button>
+    </form>
+    <ul>
+        {% for id, label in rows %}
+            <li><a href="{% url 'admin:catalog_relation_participant' id %}">{{ label }}</a></li>
+        {% empty %}<li>No participants found.</li>{% endfor %}</ul>
+{% endblock content %}

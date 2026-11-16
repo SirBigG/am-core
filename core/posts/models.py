@@ -62,6 +62,10 @@ class PostQuerySet(models.QuerySet):
 class Post(models.Model):
     """Posts model."""
 
+    entity = models.ForeignKey(
+        "catalog.CatalogEntity", on_delete=models.PROTECT, null=True, blank=True, editable=False, related_name="posts"
+    )
+
     title = models.CharField(
         max_length=500,
         verbose_name=_("Канонічна назва"),

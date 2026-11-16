@@ -1,0 +1,9 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <h2>Relations for this participant</h2>
+    <ul>
+        {% for record in records %}
+            <li><a href="{% url 'admin:catalog_relationrecord_change' record.pk %}">{{ record.relation_type_id }} · {{ record.pk }}</a>
+            {% if record.archived %}· Archived{% endif %}</li>
+        {% empty %}<li>No visible relations.</li>{% endfor %}</ul>
+{% endblock content %}

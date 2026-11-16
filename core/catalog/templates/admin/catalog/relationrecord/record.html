@@ -1,0 +1,71 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrahead %}
+    {{ block.super }}
+    {% if form %}
+        <script src="{% static 'admin/js/vendor/jquery/jquery.min.js' %}"></script>
+        <script src="{% static 'admin/js/jquery.init.js' %}"></script>
+        <script>window.jQuery = window.django.jQuery;</script>
+        {{ form.media }}
+    {% endif %}
+{% endblock %}
+{% block content %}
+    {% if schema %}<p>{{ schema.relation_type_id }} · schema version {{ schema.version }}</p>{% endif %}
+    {% if site_release %}<p>Published revision {{ site_release.approved_revision.number }}</p>{% endif %}
+    {% if record.archived %}<p>Archived</p>{% elif record.withdrawn %}<p>Withdrawn</p>{% endif %}
+    {% if withdrawal %}
+        <h2>Current withdrawal</h2>
+        <p>{{ withdrawal.id }} · {{ withdrawal.reason }}</p>
+        <pre>{{ withdrawal.evidence|pprint }}</pre>
+    {% endif %}
+    {% if form %}
+        <h2>Private draft</h2>
+        <form method="post">{% csrf_token %}{{ form.as_div }}<button type="submit">Save draft</button></form>
+    {% endif %}
+    {% if action %}
+        <h2>Editorial action</h2>
+        <form method="post">{% csrf_token %}{{ action.as_div }}<button type="submit">Apply</button></form>
+    {% endif %}
+    {% if history %}
+        <h2>Revision history</h2>
+        {% for revision, participants in history %}
+            <h3>{{ revision.number }} · {{ revision.get_state_display }}</h3>
+            <dl>
+                <dt>Schema</dt>
+                <dd>
+                    {{ revision.schema.relation_type_id }} · {{ revision.schema.version }}
+                </dd>
+                <dt>Created</dt>
+                <dd>
+                    {{ revision.created_at }} · {{ revision.created_by }}
+                </dd>
+                {% if revision.reviewed_at %}<dt>Reviewed</dt><dd>{{ revision.reviewed_at }} · {{ revision.reviewed_by }}</dd>{% endif %}
+                <dt>Payload</dt>
+                <dd>
+                    <pre>{{ revision.payload|pprint }}</pre>
+                </dd>
+                <dt>Source evidence</dt>
+                <dd>
+                    <pre>{{ revision.source|pprint }}</pre>
+                </dd>
+                <dt>Country</dt>
+                <dd>
+                    {{ revision.country|default:"—" }}
+                </dd>
+                <dt>Source version digest</dt>
+                <dd>
+                    <code>{{ revision.source_version_digest|default:"—" }}</code>
+                </dd>
+            </dl>
+            <ul>
+                {% for role, id, label in participants %}
+                    <li>{{ role }} · <a href="{% url 'admin:catalog_relation_participant' id %}">{{ label }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endfor %}
+    {% endif %}
+    {% if audit %}
+        <h2>Audit history</h2>
+        <ul>{% for event in audit %}<li>{{ event.occurred_at }} · {{ event.action }} · {{ event.actor }}</li>{% endfor %}</ul>
+    {% endif %}
+{% endblock %}

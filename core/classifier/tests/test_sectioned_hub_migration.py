@@ -20,11 +20,13 @@ class SectionedHubMigrationTests(TransactionTestCase):
         self.addCleanup(lambda: MigrationExecutor(connection).migrate(leaves))
         executor.migrate([("classifier", "0018_categoryhub_market_category")])
         executor = MigrationExecutor(connection)
-        executor.migrate([("classifier", "0019_category_hero_image_categoryhub_layout_and_more")])
+        target = [("classifier", "0019_category_hero_image_categoryhub_layout_and_more")]
+        executor.migrate(target)
+        apps = executor.loader.project_state(target).apps
         hub.refresh_from_db()
         other_hub.refresh_from_db()
         section.refresh_from_db()
-        potato.refresh_from_db()
+        potato = apps.get_model("classifier", "Category").objects.get(pk=potato.pk)
         self.assertEqual(hub.layout, "sectioned")
         self.assertEqual(other_hub.layout, "standard")
         self.assertFalse(potato.hero_image)

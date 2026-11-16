@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from api.v1.content.views import CategoryTreeView, CountryListView, PostListCreateView, PostUpdateView
@@ -31,6 +31,7 @@ hub_router.register("guide-placements", GuidePlacementViewSet, basename="content
 hub_router.register("photos", ContentPhotoViewSet, basename="content-photo")
 
 urlpatterns = [
+    path("catalog/", include("api.v1.content.catalog.urls")),
     path("products/<int:pk>/match/", ProductMatchView.as_view(), name="content-product-match"),
     path("categories/", CategorySetupList.as_view(), name="content-category-list"),
     path("categories/<int:pk>/", CategorySetupDetail.as_view(), name="content-category-detail"),

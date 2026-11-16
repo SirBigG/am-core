@@ -52,6 +52,11 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 
 ## Implementation Map
 
+- Proposed structured catalog relations and plant-protection application rules
+  are specified in the [AGRO-73 technical contract](../../../engineering/decisions/2026-11-15-catalog-relations-contract.md).
+  This is a design awaiting independent review; typed application records and
+  automatic related-catalog blocks are not implemented by that document.
+
 - Editorial instructions: [Managing category pages, Crop Hubs and Guide Hubs](../../guides/category-pages-and-widgets.md).
 
 - Guide Hub curation has a data foundation: categories can own ordered sections
@@ -144,3 +149,37 @@ reader scrolls two viewport heights. It clears the mobile bottom navigation and
 is hidden while cookie consent or a modal occupies the foreground. Scrolling
 respects reduced-motion preferences and can be interrupted by user input.
 These controls do not modify stored article HTML or community-app templates.
+
+`CatalogEntity` stores a UUID, catalog kind and provenance independently of a post's title, category and URL. Several posts may point to one entity through the optional `Post.entity` link. An entity referenced by a post is protected from deletion. The initial migration leaves existing posts unlinked so editorial mappings can be supplied explicitly. This is the identity portion of AGRO-4 and the foundation for the AGRO-74 relation models.
+
+### Structured relations
+
+The shared catalog storage represents a relation as a stable record with immutable revisions and typed participants. A draft revision leaves the existing site release intact until a publisher selects an approved revision. An explicit withdrawal disables the record's releases and advances its eligibility epoch. Reinstatement requires separate review and leaves releases disabled until the publisher acts.
+
+`Category.entity` accepts crop identities. A site and content locale can select an existing post or category as the presentation anchor for an entity. The selector record stores the editorial choice. The publication and visibility rules still belong to the corresponding site and content adapters.
+
+The storage migrations seed the generic symmetric relation and cultivar-to-crop relation definitions. AGRO-85 owns the plant-protection application definition and its source-specific validation. Admin, API and public readers connect to the shared service in their respective tasks. See the [accepted relations contract](../../../engineering/decisions/2026-11-15-catalog-relations-contract.md).
+
+Private relation access requires both a Django catalog permission and an explicit site grant. Each participant needs a separate grant. An optional post or category on that grant supplies the participant's label when the anchor still points to the granted identity. Private records are bound to their editorial site, and viewing or changing a record requires access to the participants in its history. Existing staff and superusers receive no site or participant grants from the migration. Private draft editing and submission use this policy; release decisions also require the publication policy.
+
+In Django Admin, **Catalog → Relation records** opens the private list. Choose **Find a participant** to search authorized post and category labels and view their relations. To create a draft, select a relation schema and choose participants for its roles. Saving an edit creates a new revision. **Submit** moves the latest draft to editorial review. **Approve** and **Reject** require a reviewer permission and site capability. **Publish** and **Unpublish** require a publisher permission and site capability. Approval and publication check the selected content language and every participant’s current eligible presentation. **Archive** requires edit access and publisher capability on every site in the release history, and disables the releases. The revision history shows each version’s payload, source evidence, country, source digest, schema, roles and creation/review actors and times. This read-only history is available to authorized viewers and reviewers. The audit section records actions. A stale form requires a reload and another review of the current revision.
+
+### Eligibility before releasing a relation
+
+A relation participant must have an approved presentation selection for the chosen site and content language. A post selection also requires an enabled site publication, matching immutable review evidence for the current full material, a current publication date and visible scoped category ancestors. A crop category selection requires visible scoped configuration for its complete ancestry.
+
+Content-language confirmation is attached to the reviewed material digest and actor/time. UI language is supplied separately by the request and does not create a content-language confirmation. Existing material with unknown language can qualify only through an explicit legacy publication on the recorded original site and a site policy allowing `und`. A changed body or source requires new approval evidence. SEO-only edits preserve that evidence.
+
+The eligibility adapter introduced for AGRO-75 reads the current Post against immutable review evidence. It adds no existing publication memberships, grants or language approvals. The broader AGRO-4 PostText pending/live renderer remains a separate delivery. This adapter rejects a changed current material during a new relation release.
+
+Publication actions for the generic `related_to` and `cultivar_of` schemas are available on the record page in Django Admin. Site grants carry separate `can_edit`, `can_review` and `can_publish` capabilities, paired with the corresponding Django permissions. A reviewer can review without draft-edit access. Shared review across released sites additionally requires `review_shared_relations` and explicit participant and review grants on each affected site. Domain-specific relation types require their own review adapter.
+
+A new draft preserves the currently published revision. Unpublish targets the current site release and remains available when a participant’s publication becomes ineligible. The material digest covers title, body, sources, source, author and publisher. SEO-only metadata stays outside that digest. Editorial relation mutations and presentation selection changes acquire one transaction-scoped PostgreSQL advisory lock to coordinate their row-lock ordering. This conservatively serializes these mutations.
+
+The private editorial API exposes authorized participant search, relation revisions, review and site release actions under `/api/content/catalog/`. It shares the Admin access policy, retains actor audit, uses record ETags for updates and durable request receipts for create/revision retries. API clients can inspect historical evidence with view access. See the [catalog relations API](../../../engineering/api/catalog-relations.md) for routes, request examples and pagination.
+
+Plant-protection applications now attach immutable formulation, source, method, target and validity evidence to the shared relation revision. Grouped targets remain literal source text. Approval requires explicit domain and country authority, and site release rechecks known country-calendar validity and participant publication. The pilot stores no doses. Bulk import, public selection and automatic page blocks remain their separately owned deliveries. See the [application domain workflow](../../../engineering/api/plant-protection-applications.md).
+
+Editors can prepare explicit catalog batches in **Relation records → Bulk operations** or the private content API. Preview shows creations, revisions, exact duplicates, status changes and errors. Apply is atomic for at most 50 items and records a durable actor/site receipt. Application source decisions use the same preview to withdraw a source version or reconcile a country quarantine. See the [bulk workflow](../../../engineering/api/catalog-batches.md).
+
+The shared related-catalog selector follows one published relation revision for all filters. It checks every participant's current site, content language, material and category ancestry before counts, facets and pagination. A preparation appears once with its distinct eligible application methods retained as details. Current source withdrawal and country-calendar expiry apply on every read. No selection result is cached. Saved automatic blocks and page presentation remain separate deliveries. See the [selection contract](../../../engineering/api/catalog-selection.md).

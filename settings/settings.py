@@ -107,6 +107,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     # project apps
+    "core.catalog",
     "core.classifier",
     "core.pro_auth",
     "core.posts",
