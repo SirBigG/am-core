@@ -29,6 +29,9 @@ class ActiveAdvertsManager(models.Manager):
             )
         )
 
+    def for_category(self, category):
+        return self.get_queryset().filter(category__in=category.get_descendants(include_self=True))
+
 
 def prepare_advert_image(image):
     im = Image.open(BytesIO(image.read()))

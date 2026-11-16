@@ -6,6 +6,7 @@
     <a href="#market">Де купити</a>
     <a href="#prices">Ціни</a>
     <a href="#companies">Компанії</a>
+    {% if hub_sections.show_adverts %}<a href="#adverts">Оголошення</a>{% endif %}
 </nav>
 <div class="potato-sections">
     <section class="potato-panel"
@@ -13,10 +14,10 @@
              aria-labelledby="potato-varieties-title">
         <div class="potato-heading">
             <div>
-                <h2 id="potato-varieties-title">Сорти: {{ category.value }}</h2>
+                <h2 id="potato-varieties-title">Сорти</h2>
                 <p>Знайдіть сорт за назвою або характеристиками.</p>
             </div>
-            {% if hub_sections.catalog_url %}<a class="potato-link" href="{{ hub_sections.catalog_url }}">Усі сорти ↗</a>{% endif %}
+            {% if hub_sections.catalog_url %}<a class="potato-link" href="{{ hub_sections.catalog_url }}">Усі сорти <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endif %}
         </div>
         <form method="get"
               action="{{ category.absolute_url }}#varieties"
@@ -56,7 +57,7 @@
                         <a class="potato-link" href="{{ variety.absolute_url }}">Про сорт →</a>
                         {% if variety.has_offers %}
                             <a class="potato-link"
-                               href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції ↗</a>
+                               href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
                         {% else %}
                             <span class="potato-muted">Пропозицій поки немає</span>
                         {% endif %}
@@ -73,14 +74,14 @@
                 <h2 id="potato-grow-title">Вирощування та догляд</h2>
                 <p>Оберіть етап і відкрийте потрібні матеріали.</p>
             </div>
-            {% if hub_sections.guide_url %}<a class="potato-link" href="{{ hub_sections.guide_url }}">Усі матеріали ↗</a>{% endif %}
+            {% if hub_sections.guide_url %}<a class="potato-link" href="{{ hub_sections.guide_url }}">Усі матеріали <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endif %}
         </div>
         {% for section in hub_sections.guides %}
             <details class="potato-guide"
                      name="potato-growing"
                      {% if forloop.first %}open{% endif %}>
                 <summary>{{ section.title }}</summary>
-                <ul>{% for article in section.articles %}<li><a class="potato-link" href="{{ article.url }}">{{ article.title }} ↗</a></li>{% endfor %}</ul>
+                <ul>{% for article in section.articles %}<li><a class="potato-link" href="{{ article.url }}">{{ article.title }} <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a></li>{% endfor %}</ul>
             </details>
             {% empty %}<p>Матеріали посібника готуються до публікації.</p>{% endfor %}
     </section>
@@ -98,7 +99,7 @@
                 <article class="potato-card">
                     <h3>{{ section.label }}</h3>
                     <p>{{ section.description }}</p>
-                    <a class="potato-link" href="{{ section.url }}">Переглянути ↗</a>
+                    <a class="potato-link" href="{{ section.url }}">Переглянути <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
                 </article>
                 {% empty %}<p>Матеріали про захист готуються до публікації.</p>{% endfor %}
         </div>
@@ -111,7 +112,7 @@
                 <h2 id="potato-market-title">Де купити</h2>
                 <p>Сорти з найбільшою кількістю актуальних пропозицій.</p>
             </div>
-            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції ↗</a>{% endif %}
+            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endif %}
         </div>
         <div class="potato-cards">
             {% for variety in hub_sections.popular %}
@@ -119,7 +120,7 @@
                     <h3>{{ variety.title }}</h3>
                     <p>Пропозицій: {{ variety.market_offer_count }} · Продавців: {{ variety.market_seller_count }}</p>
                     <a class="potato-link"
-                       href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції сорту ↗</a>
+                       href="{% url 'market:variety' variety.pk %}{{ hub_sections.market_query }}">Пропозиції сорту <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
                 </article>
             {% empty %}
                 <p>У цій категорії поки немає актуальних пропозицій із цінами.</p>
@@ -133,65 +134,59 @@
         <div class="potato-heading">
             <div>
                 <h2 id="potato-prices-title">Порівняння цін</h2>
-                <p>Перегляньте ціни продавців на один сорт.</p>
+                <p>Перегляньте ціни продавців на всі сорти в таблиці або виберіть один сорт.</p>
             </div>
-            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції ↗</a>{% endif %}
+            {% if hub_sections.market_url %}<a class="potato-link" href="{{ hub_sections.market_url }}">Побачити всі пропозиції <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endif %}
         </div>
         {% if hub_sections.popular %}
             <div class="potato-search potato-price-tools mb-3" hidden>
                 <label for="potato-price-variety">Сорт</label>
                 <select class="form-select w-auto" id="potato-price-variety">
+                    <option value="">Усі сорти</option>
                     {% for variety in hub_sections.popular %}<option value="{{ variety.pk }}">{{ variety.title }}</option>{% endfor %}
                 </select>
                 <button class="potato-hero__button" type="button">Сортувати за ціною</button>
             </div>
-        {% endif %}
-        {% for variety in hub_sections.popular %}
-            <details class="potato-guide"
-                     data-potato-price-group="{{ variety.pk }}"
-                     {% if forloop.first %}open{% endif %}>
-                <summary>{{ variety.title }}</summary>
-                <div class="potato-table"
-                     role="region"
-                     tabindex="0"
-                     aria-label="Ціни на сорт {{ variety.title }}">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th scope="col">Продавець</th>
-                                <th scope="col">Пропозиція</th>
-                                <th scope="col" data-price-heading>Заявлена ціна</th>
-                                <th scope="col">Оновлено</th>
-                            </tr>
-                        </thead>
-                        <tbody>
+            <div class="potato-table" role="region" tabindex="0" aria-labelledby="potato-prices-title">
+                <table>
+                    <thead>
+                        <tr>
+                            <th scope="col">Пропозиція</th>
+                            <th scope="col" data-price-heading>Ціна</th>
+                            <th scope="col">Продавець</th>
+                            <th scope="col">Оновлено</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for variety in hub_sections.popular %}
                             {% for offer in variety.market_offers %}
-                                <tr data-price="{{ offer.market_price_min|unlocalize }}"
+                                <tr data-variety="{{ variety.pk }}"
+                                    data-price="{{ offer.market_price_min|unlocalize }}"
                                     data-currency="{{ offer.currency|default_if_none:"" }}">
-                                    <td><a class="potato-link" href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a></td>
                                     <td>{{ offer.name|default:variety.title }}</td>
                                     <td>{{ offer.market_price_min }}{% if offer.market_price_max != offer.market_price_min %} – {{ offer.market_price_max }}{% endif %} {{ offer.get_currency_display|default:"(валюту не вказано)" }}</td>
+                                    <td><a class="potato-link" href="{{ offer.company.get_absolute_url }}">{{ offer.company.name }}</a></td>
                                     <td>{{ offer.price_updated_at|date:"d.m.Y" }}</td>
                                 </tr>
                             {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </details>
-        {% empty %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <p class="potato-note">Діапазон заявлених цін наведено там, де продавець указав кілька цін. Сортування групує пропозиції за валютою. Фасування, призначення товару й доставку уточнюйте у продавця.</p>
+        {% else %}
             <p>Цін для порівняння поки немає.</p>
-        {% endfor %}
-        {% if hub_sections.popular %}<p class="potato-note">Діапазон заявлених цін наведено там, де продавець указав кілька цін. Сортування групує пропозиції за валютою. Фасування, призначення товару й доставку уточнюйте у продавця.</p>{% endif %}
+        {% endif %}
     </section>
     <section class="potato-panel"
              id="companies"
              aria-labelledby="potato-companies-title">
         <div class="potato-heading">
             <div>
-                <h2 id="potato-companies-title">Компанії: {{ category.value }}</h2>
+                <h2 id="potato-companies-title">Компанії</h2>
                 <p>Перегляньте профілі продавців цієї культури.</p>
             </div>
-            {% if hub_sections.companies_url %}<a class="potato-link" href="{{ hub_sections.companies_url }}">Компанії в AgroMega ↗</a>{% endif %}
+            {% if hub_sections.companies_url %}<a class="potato-link" href="{{ hub_sections.companies_url }}">Компанії в AgroMega <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endif %}
         </div>
         <div class="potato-cards">
             {% for company in hub_sections.companies %}
@@ -205,9 +200,31 @@
             {% endfor %}
         </div>
     </section>
+    {% if hub_sections.show_adverts %}
+        <section class="potato-panel" id="adverts" aria-labelledby="crop-adverts-title">
+            <div class="potato-heading">
+                <h2 id="crop-adverts-title">Оголошення</h2>
+                <a class="potato-link" href="{% url 'adverts:list' %}?category={{ category.slug|urlencode }}">Усі оголошення категорії <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
+            </div>
+            {% if hub_sections.adverts %}
+                <div class="potato-cards">
+                    {% for advert in hub_sections.adverts %}
+                        <article class="potato-card">
+                            <h3>{{ advert.title }}</h3>
+                            {% if advert.price %}<p>{{ advert.price }} грн.</p>{% endif %}
+                            {% if advert.location %}<p>{{ advert.location }}</p>{% endif %}
+                            <a class="potato-link" href="{{ advert.get_absolute_url }}">Докладніше →</a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p>У цій категорії поки немає активних оголошень.</p>
+            {% endif %}
+        </section>
+    {% endif %}
 </div>
 {% if hub_sections.additional_sections %}
     <nav class="potato-panel" aria-label="Інші розділи">
-        {% for section in hub_sections.additional_sections %}<a class="potato-link" href="{{ section.url }}">{{ section.label }} ↗</a>{% endfor %}
+        {% for section in hub_sections.additional_sections %}<a class="potato-link" href="{{ section.url }}">{{ section.label }} <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>{% endfor %}
     </nav>
 {% endif %}

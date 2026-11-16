@@ -33,8 +33,38 @@
             {% endif %}
         </div>
     </div>
-    <div class="mb-3">
-        <h2 class="h5 mb-3">Пропозиції</h2>
+    <div class="mb-3" id="offers">
+        <div class="clearfix mb-3">
+            <h2 class="h5 float-start me-3 mb-0 py-2">Пропозиції</h2>
+            {% if offer_categories or products or selected_category %}
+                <details {% if selected_category or offer_sort == "price" %}open{% endif %}>
+                    <summary class="btn btn-outline-success">Фільтр</summary>
+                    <form method="get" action="#offers" class="d-flex flex-wrap align-items-end gap-3 mt-3 p-3 border rounded bg-white">
+                        {% if offer_categories %}
+                            <div>
+                                <label for="offer-category" class="site-form-label mb-1">Категорія</label>
+                                <select id="offer-category" name="category" class="form-select">
+                                    <option value="">Усі категорії</option>
+                                    {% for category in offer_categories %}
+                                        <option value="{{ category.slug }}" {% if category.slug == selected_category %}selected{% endif %}>{{ category.value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        {% endif %}
+                        <div>
+                            <label for="offer-sort" class="site-form-label mb-1">Сортування</label>
+                            <select id="offer-sort" name="sort" class="form-select">
+                                <option value="">За замовчуванням</option>
+                                <option value="price" {% if offer_sort == "price" %}selected{% endif %}>Від найнижчої ціни</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-success">Показати</button>
+                        {% if selected_category or offer_sort == "price" %}<a class="btn btn-outline-success" href="{{ request.path }}#offers">Скинути</a>{% endif %}
+                    </form>
+                </details>
+            {% endif %}
+        </div>
+        {% if offer_sort == "price" %}<p class="text-muted small">Ціни відсортовано в межах кожної валюти.</p>{% endif %}
         <div class="site-product-grid">
             {% for product in products %}
                 <article class="site-product-card">
@@ -42,9 +72,12 @@
                     {% if product.description %}
                         <p class="site-product-card__text">{{ product.description }}</p>
                     {% endif %}
-                    {% if product.has_fresh_price %}
-                        <p class="site-product-card__price">{{ product.price }} {{ product.get_currency_display }}</p>
-                    {% elif product.price %}
+                    {% if product.display_price %}
+                        <p class="site-product-card__price">
+                            {{ product.display_price }}{% if not product.price and product.max_price > product.display_price %} – {{ product.max_price }}{% endif %}
+                            {{ product.get_currency_display }}
+                        </p>
+                    {% elif product.price or product.min_price %}
                         <p class="site-product-card__text">Ціна потребує оновлення.</p>
                     {% endif %}
                     {% if product.post_id %}
@@ -53,7 +86,7 @@
                     {% endif %}
                 </article>
             {% empty %}
-                <div class="am-state">Поки немає пропозицій.</div>
+                <div class="am-state">{% if selected_category %}У цій категорії немає пропозицій.{% else %}Поки немає пропозицій.{% endif %}</div>
             {% endfor %}
         </div>
     </div>

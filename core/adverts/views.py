@@ -8,6 +8,8 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.generic import DetailView, FormView, ListView, TemplateView, UpdateView, View
 
+from core.classifier.models import Category
+
 from .forms import AdvertForm
 from .models import Advert
 
@@ -97,8 +99,26 @@ class AdvertActivateView(View):
 class AdvertListView(ListView):
     paginate_by = 25
     template_name = "adverts/list.html"
-    queryset = Advert.active_objects.prefetch_related("photos")
-    ordering = "-updated"
+    def get_queryset(self):
+        slug = self.request.GET.get("category", "")
+        self.selected_category = Category.objects.filter(slug=slug, is_active=True).first() if slug else None
+        if self.selected_category:
+            adverts = Advert.active_objects.for_category(self.selected_category)
+        elif slug:
+            adverts = Advert.active_objects.none()
+        else:
+            adverts = Advert.active_objects.all()
+        return adverts.prefetch_related("photos").order_by("-updated", "-pk")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        categories = Category.objects.filter(is_active=True)
+        choices = categories.filter(level=1)
+        if self.selected_category:
+            choices = choices | categories.filter(pk=self.selected_category.pk)
+        context["advert_categories"] = choices.order_by("value", "pk")
+        context["selected_category"] = self.selected_category
+        return context
 
     def get(self, request, *args, **kwargs):
         try:
