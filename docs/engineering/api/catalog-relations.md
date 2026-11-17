@@ -37,6 +37,25 @@ The operation atomically creates or resolves the identity, binds the anchor and 
 
 Provisioning is private. Content approval, approved presentation, application review and seller publication have their own workflows.
 
+### Provisioning reviewed publications and seller offers
+
+`POST /api/content/catalog/publications/provision/` uses the same superuser token and an existing site grant with `can_publish`. The request specifies one verified content language and only the reviewed category anchors, posts and confirmed offers to include.
+
+```json
+{
+  "site_grant_id": 1,
+  "content_locale": "uk",
+  "category_ids": [123],
+  "posts": [{"id": 456, "digest": "<SHA-256 material digest>"}],
+  "offers": [{"id": 789, "package_label": "5 л"}],
+  "review_reference": "Reference to the editorial review of the current Ukrainian material"
+}
+```
+
+Each requested anchor needs a distinct active entity covered by the site grant. The post digest uses `core.posts.publication_checks.material_digest` on current material. The operator attests to that digest and the language using the review reference. Offers must be active and manually matched to a reviewed post in the same request. Their market comes from `RELATED_CATALOG_MARKETS`.
+
+The transaction provisions the site language policy, visible category paths including their ancestors, current material approval, selected presentations and seller memberships. Existing equivalent rows are reused. An existing disabled or incompatible publication returns a conflict and rolls back the manifest. The response reports canonical paths by entity UUID and membership IDs by product. Relation release and block activation still use their normal workflow.
+
 ## Routes
 
 | Method and suffix | Representation or action |
@@ -45,6 +64,7 @@ Provisioning is private. Content approval, approved presentation, application re
 | GET `relation-types/` | Cursor-paginated versioned schemas, roles, cardinalities and identity fields |
 | GET `entities/` | Authorized active participants, label anchors and kind |
 | POST `entities/provision/` | Provision an anchored identity and an entity grant under a configured-site grant |
+| POST `publications/provision/` | Provision reviewed site presentations and seller memberships |
 | GET, POST `relations/` | Cursor-paginated records or create a draft |
 | GET `relations/{record}/` | Latest revision, state, current-site release pointer and ETag |
 | DELETE `relations/{record}/` | Archive and disable releases, preserving history |

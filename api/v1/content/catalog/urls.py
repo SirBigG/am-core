@@ -2,6 +2,7 @@ from django.urls import path
 
 from .bulk import BatchApplyView, BatchPreviewView, BatchReceiptView
 from .provisioning import EntityProvisioningView
+from .publication_provisioning import PublicationProvisioningView
 from .views import (
     AuditView,
     EntitiesView,
@@ -35,6 +36,7 @@ urlpatterns = [
     path("relation-types/", RelationTypesView.as_view(), name="catalog-relation-types"),
     path("entities/", EntitiesView.as_view(), name="catalog-entities"),
     path("entities/provision/", EntityProvisioningView.as_view(), name="catalog-provision-entity"),
+    path("publications/provision/", PublicationProvisioningView.as_view(), name="catalog-provision-publications"),
     path("relations/", RelationsView.as_view(), name="catalog-relations"),
     path("relations/<str:record_id>/", RelationDetailView.as_view(), name="catalog-relation"),
     path("relations/<str:record_id>/revisions/", RevisionsView.as_view(), name="catalog-revisions"),

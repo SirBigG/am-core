@@ -45,17 +45,14 @@ class EntityProvisioningSerializer(StrictSerializer):
         return data
 
 
-class EntityProvisioningView(PrivateCatalogView):
+class CatalogOperatorView(PrivateCatalogView):
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         if not request.user.is_superuser:
-            raise PermissionDenied("Catalog entity provisioning is unavailable.")
+            raise PermissionDenied("Catalog provisioning is unavailable.")
 
-    @transaction.atomic
-    def post(self, request):
-        serializer = EntityProvisioningSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        data = serializer.validated_data
+    @staticmethod
+    def lock_operator_scope(request, site_grant_id):
         lock_publication_graph()
         if (
             not get_user_model()
@@ -63,14 +60,23 @@ class EntityProvisioningView(PrivateCatalogView):
             .filter(pk=request.user.pk, is_active=True, is_staff=True, is_superuser=True)
             .exists()
         ):
-            raise PermissionDenied("Catalog entity provisioning is unavailable.")
-        site_grant = get_object_or_404(
+            raise PermissionDenied("Catalog provisioning is unavailable.")
+        return get_object_or_404(
             RelationSiteGrant.objects.select_for_update(of=("self",)),
-            pk=data["site_grant_id"],
+            pk=site_grant_id,
             site_id=configured_relation_site(),
             actor__is_active=True,
             actor__is_staff=True,
         )
+
+
+class EntityProvisioningView(CatalogOperatorView):
+    @transaction.atomic
+    def post(self, request):
+        serializer = EntityProvisioningSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+        site_grant = self.lock_operator_scope(request, data["site_grant_id"])
         anchor_type = data["anchor_type"]
         model = Category if anchor_type == "category" else Post
         anchor = get_object_or_404(model.objects.select_for_update(), pk=data["anchor_id"])
