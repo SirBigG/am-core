@@ -112,13 +112,8 @@ class CatalogPagination(CursorPagination):
     ordering = "id"
 
 
-class CatalogView(ContentTokenMixin, APIView):
+class PrivateCatalogView(ContentTokenMixin, APIView):
     permission_classes = (IsAdminUser,)
-
-    def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
-        self.access = RelationAccess(request.user, configured_relation_site())
-        self.access._grant()
 
     def finalize_response(self, request, response, *args, **kwargs):
         response = super().finalize_response(request, response, *args, **kwargs)
@@ -147,6 +142,13 @@ class CatalogView(ContentTokenMixin, APIView):
             }.get(response.status_code, "request_failed")
         response.data = {"version": 1, "error": {"code": code, "detail": response.data}}
         return response
+
+
+class CatalogView(PrivateCatalogView):
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        self.access = RelationAccess(request.user, configured_relation_site())
+        self.access._grant()
 
     def query(self, allowed=()):
         validate_database_text(self.request.query_params)

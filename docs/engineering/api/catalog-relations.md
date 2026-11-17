@@ -14,6 +14,29 @@ An active superuser can provision access under **Catalog**. Each save or removal
 
 The account also needs the Django model permissions for its assigned actions. The country grant authorizes review only when the site grant and review permissions allow it. Removing a site grant removes its entity and application reviewer grants.
 
+## Provisioning an entity and its grant through the API
+
+`POST /api/content/catalog/entities/provision/` requires a token belonging to an active staff superuser. Supply the primary key of an existing **Relation site grant** on the configured `SITE_ID`, and the primary key and type of an existing category or post.
+
+```json
+{
+  "site_grant_id": 1,
+  "anchor_type": "post",
+  "anchor_id": 123,
+  "kind": "preparation",
+  "provenance": {
+    "formulation_identity": "example-registration-record",
+    "reference": "https://example.org/register"
+  }
+}
+```
+
+For a category use `"anchor_type": "category"` and `"kind": "crop"`. For a new identity send a non-empty provenance object, up to 16 KiB. A preparation needs a stable `formulation_identity` that the application review can later match to its evidence. To select a known, active identity explicitly, supply its `entity_id` in place of `provenance`. Establish the identity from the source materials before creating it.
+
+The operation atomically creates or resolves the identity, binds the anchor and adds its grant. It records changes in the Django Admin log under the token's operator. The response includes `site_id`, `site_grant_id`, `entity_id`, `entity_grant_id`, `anchor_type`, `anchor_id` and `kind`. An identical retry resolves to the same IDs. Creation returns 201 and reuse returns 200. An incompatible existing identity or provenance returns 409. A site grant from another site returns 404.
+
+Provisioning is private. Content approval, approved presentation, application review and seller publication have their own workflows.
+
 ## Routes
 
 | Method and suffix | Representation or action |
@@ -21,6 +44,7 @@ The account also needs the Django model permissions for its assigned actions. Th
 | GET `entity-types/` | Entity kind codes and labels |
 | GET `relation-types/` | Cursor-paginated versioned schemas, roles, cardinalities and identity fields |
 | GET `entities/` | Authorized active participants, label anchors and kind |
+| POST `entities/provision/` | Provision an anchored identity and an entity grant under a configured-site grant |
 | GET, POST `relations/` | Cursor-paginated records or create a draft |
 | GET `relations/{record}/` | Latest revision, state, current-site release pointer and ETag |
 | DELETE `relations/{record}/` | Archive and disable releases, preserving history |
@@ -78,7 +102,7 @@ Submit and archive take `{}`. Review takes `{"action":"approve","content_locale"
 
 Error responses contain `{"version":1,"error":{"code":"...","detail":...}}`. Validation uses 400, authentication 401, denied capabilities 403, invisible scoped resources 404, stale/semantic/idempotency conflicts 409 and missing preconditions 428. Detail may contain field errors or messages. Clients should branch on status and `error.code`.
 
-The catalog routes extend the existing content namespace. Existing content ownership, parser token policies, post payloads and Product matching continue through their established endpoints. The new API does not assign grants or create real publication approvals during migration or discovery.
+The catalog routes extend the existing content namespace. Existing content ownership, parser token policies, post payloads and Product matching continue through their established endpoints.
 
 Application record withdrawal/reinstatement actions are documented with their additional domain, country and global site authority in [the application workflow](plant-protection-applications.md). Record responses expose the latest withdrawal reference, reason and evidence within the existing private record scope.
 
