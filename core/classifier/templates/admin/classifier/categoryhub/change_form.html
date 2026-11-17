@@ -1,0 +1,5 @@
+{% extends "admin/change_form.html" %}
+{% block object-tools-items %}
+{{ block.super }}
+{% if original and perms.catalog.view_blockconfiguration %}<li><a href="{% url 'admin:classifier_categoryhub_catalog_blocks' original.pk %}{% if original.locale %}?content_locale={{ original.locale|urlencode }}{% endif %}">Related catalog blocks</a></li>{% endif %}
+{% endblock %}

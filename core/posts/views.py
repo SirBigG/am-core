@@ -18,6 +18,7 @@ from django.views.decorators.http import require_GET
 from django.views.generic import DetailView, ListView, RedirectView, TemplateView
 
 from core.adverts.models import Advert
+from core.catalog.public_blocks import public_blocks
 from core.classifier.models import Category, CategoryPresentationMode
 from core.companies.market import publication_market_context
 from core.posts.category_attribute_filters import apply_category_attribute_filters, build_category_attribute_filters
@@ -115,6 +116,20 @@ class PlantDiaryLandingView(TemplateView):
 class CropHubCanonicalMixin:
     def get_crop_hub_context(self, category):
         context = build_crop_hub_context(category, config=self.crop_hub_config)
+        related = public_blocks(category, self.request.path, self.request.GET, category=True, include_offers=True)
+        context["related_catalog"] = related
+        if related["manual_ids"]:
+            guides = [
+                {
+                    **section,
+                    "articles": [
+                        article for article in section["articles"]
+                        if article.get("placement_id") not in related["manual_ids"]
+                    ],
+                }
+                for section in context["growing_guides"]
+            ]
+            context["growing_guides"] = [section for section in guides if section["articles"]]
         if self.crop_hub_config["layout"] == "sectioned":
             context["hub_sections"] = build_sectioned_hub_context(
                 category, self.crop_hub_config, self.request.GET, context
@@ -134,7 +149,10 @@ class CropHubCanonicalMixin:
                 return HttpResponsePermanentRedirect(category.absolute_url)
             self.crop_hub_category = category
             self.crop_hub_config = config
-        return super().get(request, *args, **kwargs)
+        response = super().get(request, *args, **kwargs)
+        if hasattr(self, "crop_hub_category") and self.crop_hub_category.entity_id:
+            add_never_cache_headers(response)
+        return response
 
 
 class ParentRubricView(CropHubCanonicalMixin, TemplateView):
@@ -310,7 +328,10 @@ class PostDetail(DetailView):
         if request.path != canonical_path:
             return HttpResponsePermanentRedirect(canonical_path)
         context = self.get_context_data(object=self.object)
-        return self.render_to_response(context)
+        response = self.render_to_response(context)
+        if self.object.entity_id:
+            add_never_cache_headers(response)
+        return response
 
     def get_context_data(self, **kwargs):
         """Get extra context for classifier to view."""
@@ -334,6 +355,9 @@ class PostDetail(DetailView):
             context["object"], context["registry_variety_exists"], crop_scope=crop_scope_for_post(context["object"])
         )
         context["category_attribute_groups"] = get_public_category_attribute_groups(context["object"])
+        context["related_catalog"] = public_blocks(
+            context["object"], self.request.path, self.request.GET, include_offers=True
+        )
         return context
 
 

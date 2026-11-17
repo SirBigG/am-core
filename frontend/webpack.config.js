@@ -58,7 +58,8 @@ module.exports = {
             options: {
               implementation: require("sass"),
               sassOptions: {
-                quietDeps: true
+                quietDeps: true,
+                charset: false
               }
             }
           }

@@ -37,34 +37,29 @@ filterToggle.hidden = false;
 
 const priceTools = document.querySelector('.potato-price-tools');
 if (priceTools) {
-    const groups = [...document.querySelectorAll('[data-potato-price-group]')];
+    const table = document.querySelector('#prices .potato-table');
+    const body = table.querySelector('tbody');
+    const rows = [...body.rows];
+    const heading = table.querySelector('[data-price-heading]');
     const selector = priceTools.querySelector('select');
     const sort = priceTools.querySelector('button');
     let ascending = true;
 
-    function showSelectedGroup() {
-        groups.forEach(group => {
-            group.hidden = group.dataset.potatoPriceGroup !== selector.value;
+    function filterRows() {
+        rows.forEach(row => {
+            row.hidden = Boolean(selector.value) && row.dataset.variety !== selector.value;
         });
     }
 
-    selector.addEventListener('change', showSelectedGroup);
+    selector.addEventListener('change', filterRows);
     sort.addEventListener('click', () => {
-        groups.forEach(group => {
-            const body = group.querySelector('tbody');
-            const rows = [...body.rows];
-            rows.sort((a, b) => a.dataset.currency.localeCompare(b.dataset.currency) ||
-                (Number(a.dataset.price) - Number(b.dataset.price)) * (ascending ? 1 : -1));
-            body.append(...rows);
-            group.querySelector('[data-price-heading]').setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
-        });
+        rows.sort((a, b) => a.dataset.currency.localeCompare(b.dataset.currency) ||
+            (Number(a.dataset.price) - Number(b.dataset.price)) * (ascending ? 1 : -1));
+        body.append(...rows);
+        heading.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
         sort.textContent = ascending ? 'Ціна продавця ↑' : 'Ціна продавця ↓';
         ascending = !ascending;
     });
-    groups.forEach(group => {
-        group.open = true;
-        group.querySelector('summary').hidden = true;
-    });
-    showSelectedGroup();
+    filterRows();
     priceTools.hidden = false;
 }

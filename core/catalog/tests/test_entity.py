@@ -42,7 +42,9 @@ class CatalogEntityMigrationTests(TransactionTestCase):
         leaves = executor.loader.graph.leaf_nodes()
         self.addCleanup(lambda: MigrationExecutor(connection).migrate(leaves))
         executor.migrate(before)
-        historical = [(app, name) for app, name in leaves if app in {"companies", "registry"}]
+        historical = [(app, name) for app, name in leaves if app == "registry"]
+        # The current companies leaf depends on Post.entity, absent from this baseline.
+        historical.append(("companies", "0018_marketpage"))
         historical += [("posts", "0035_guide_hub_foundation"), ("classifier", "0020_category_url_redirect")]
         apps = executor.loader.project_state(historical).apps
         Post = apps.get_model("posts", "Post")

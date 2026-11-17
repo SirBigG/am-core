@@ -110,3 +110,7 @@ the configured widget. Standard hub save timestamps/configuration cache keys
 make source changes visible on the next read; offer data retains the bounded TTL.
 
 See [widget implementation and verification](../crop-hubs/2026-10-17-category-market-widget.md).
+
+## Versioned related-catalog blocks
+
+Hub routes also expose `hubs/{id}/catalog-blocks/` with explicit `content_locale`, immutable draft revisions, public-policy preview and signed explicit activation/disable. These use separate block model permissions plus explicit site/participant grants, shared by Admin and API. Existing hub/section/guide fields and routes retain their contracts. See the [round-trip and permission contract](catalog-blocks.md). References retained by configuration history return409 on protected deletion.

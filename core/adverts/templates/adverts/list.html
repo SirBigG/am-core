@@ -20,6 +20,26 @@
        class="btn btn-success btn-sm"><i class="icon-plus"></i> Оголошення</a>
 {% endblock page_title_right %}
 {% block content %}
-    {% include "adverts/helpers/object_list.html" %}
+    <details class="mb-3">
+        <summary class="btn btn-outline-success">Фільтр{% if selected_category %} · {{ selected_category.value }}{% endif %}</summary>
+        <form method="get" action="{% url 'adverts:list' %}" class="d-flex flex-wrap align-items-end gap-2 mt-3 p-3 border rounded bg-white">
+            <div>
+                <label for="advert-category" class="site-form-label mb-1">Категорія</label>
+                <select id="advert-category" name="category" class="form-select">
+                    <option value="">Усі категорії</option>
+                    {% for category in advert_categories %}
+                        <option value="{{ category.slug }}"{% if category == selected_category %} selected{% endif %}>{{ category.value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-success">Показати</button>
+            {% if request.GET.category %}<a class="btn btn-outline-success" href="{% url 'adverts:list' %}">Скинути</a>{% endif %}
+        </form>
+    </details>
+    {% if object_list %}
+        {% include "adverts/helpers/object_list.html" %}
+    {% else %}
+        <p>{% if request.GET.category %}У цій категорії поки немає активних оголошень.{% else %}Активних оголошень поки немає.{% endif %}</p>
+    {% endif %}
     {% include "helpers/pagination_short.html" %}
 {% endblock content %}

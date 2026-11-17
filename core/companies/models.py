@@ -552,3 +552,35 @@ class MarketPage(models.Model):
 
     def __str__(self):
         return str(self.category) if self.category_id else "Агромаркет — головна"
+
+
+class RelatedOfferPublication(models.Model):
+    """Explicit permission to show an existing offer in the related catalog."""
+
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="related_publications")
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="+")
+    entity = models.ForeignKey("catalog.CatalogEntity", on_delete=models.PROTECT)
+    site = models.ForeignKey("sites.Site", on_delete=models.PROTECT)
+    content_locale = models.CharField(max_length=35)
+    country = models.CharField(max_length=2)
+    enabled = models.BooleanField(default=False)
+    package_label = models.CharField(max_length=200, blank=True)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=("product", "site", "country", "content_locale"),
+                name="company_related_offer_scope_unique",
+            ),
+        ]
+
+    def clean(self):
+        super().clean()
+        if not re.fullmatch(r"[A-Z]{2}", self.country or ""):
+            raise ValidationError({"country": "Use the market country code."})
+        if not re.fullmatch(r"[A-Za-z0-9-]{1,35}", self.content_locale or ""):
+            raise ValidationError({"content_locale": "Use the approved content language."})
+        if self.post_id and self.entity_id and self.post.entity_id != self.entity_id:
+            raise ValidationError({"entity": "Select the identity already linked to this publication."})
+        if self.product_id and self.post_id and self.product.post_id != self.post_id:
+            raise ValidationError({"post": "Select the publication already linked to this offer."})

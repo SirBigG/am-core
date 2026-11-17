@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+{% if locale_form %}<form method="get">{{ locale_form.as_p }}<button type="submit">Open scoped configuration</button></form>{% else %}
+<p><a href="{{ hub_url }}">Back to hub</a></p>
+<p>Drafts leave the active revision unchanged. Preview uses current public eligibility. Activation requires publisher permission.</p>
+{% if configuration %}<p>Configuration {{ configuration.id }} · version {{ configuration.lock_version }} · enabled {{ configuration.enabled }} · active {{ configuration.active_revision_id }}</p>{% endif %}
+{% for error in errors %}<p class="errornote">{{ error }}</p>{% endfor %}
+<h2>Ready rule templates</h2>
+{% for rule in rule_examples %}<details><summary>{{ rule.title }}</summary><pre>{{ rule.json }}</pre></details>{% endfor %}
+<h2>Save a configuration revision</h2>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit" name="action" value="save">Save draft revision</button></form>
+<h2>Preview a saved revision</h2>
+<form method="post">{% csrf_token %}{{ preview_form.as_p }}<button type="submit" name="action" value="preview">Preview public cards</button></form>
+{% if plan %}
+{% for block in plan.blocks %}<h3>{{ block.title }} · {{ block.slot }}</h3><p>Layout {{ block.presentation }} · {{ block.selection.count }} eligible cards · replacement {{ block.manual_replacement }} · manual IDs {{ block.manual_ids }}</p>
+<ul>{% for card in block.selection.results %}<li><a href="{{ card.url }}">{{ card.title }}</a></li>{% empty %}<li>Empty block will be hidden.</li>{% endfor %}</ul>{% endfor %}
+<p>Manual placement manifest {{ plan.manual_manifest }}</p>
+<form method="post">{% csrf_token %}{{ activate_form.as_p }}<button type="submit" name="action" value="activate">Activate reviewed configuration</button></form>
+{% endif %}
+{% if configuration %}<form method="post">{% csrf_token %}<input type="hidden" name="version" value="{{ configuration.lock_version }}"><button type="submit" name="action" value="disable">Disable automatic configuration</button></form>{% endif %}
+<h2>Immutable revision history</h2>
+{% for revision in revisions %}<details><summary>{{ revision.number }} · {{ revision.id }} · {{ revision.created_at }} · actor {{ revision.created_by_id }}</summary><pre>{{ revision.blocks }}</pre></details>{% endfor %}
+{% endif %}
+{% endblock %}

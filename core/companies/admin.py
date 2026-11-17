@@ -1,8 +1,10 @@
+from django import forms
 from django.conf import settings
 from django.contrib import admin, messages
 from django.core import signing
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
+from django.db import IntegrityError, transaction
+from django.http import HttpResponse
 from django.template.response import TemplateResponse
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
@@ -18,6 +20,7 @@ from .models import (
     ProductMatchAlias,
     ProductMatchRule,
     ProductPriceHistory,
+    RelatedOfferPublication,
 )
 from .parser import parse_many_links_with_same_browser
 
@@ -267,3 +270,61 @@ class ParserSourceAttemptAdmin(admin.ModelAdmin):
 class MarketPageAdmin(admin.ModelAdmin):
     list_display = ("__str__", "label", "title", "heading")
     search_fields = ("category__value", "title", "heading")
+
+
+class RelatedOfferPublicationForm(forms.ModelForm):
+    class Meta:
+        model = RelatedOfferPublication
+        fields = ("product", "post", "entity", "country", "content_locale", "enabled", "package_label")
+
+    def clean(self):
+        data = super().clean()
+        if all(data.get(field) for field in ("product", "country", "content_locale")):
+            duplicates = RelatedOfferPublication.objects.filter(
+                site_id=getattr(settings, "SITE_ID", None),
+                product=data["product"], country=data["country"], content_locale=data["content_locale"],
+            )
+            if duplicates.exclude(pk=self.instance.pk).exists():
+                raise forms.ValidationError("Для цієї пропозиції вже є дозвіл у вибраному контексті.")
+        return data
+
+
+@admin.register(RelatedOfferPublication)
+class RelatedOfferPublicationAdmin(admin.ModelAdmin):
+    form = RelatedOfferPublicationForm
+    list_display = ("product", "site", "country", "content_locale", "enabled")
+    list_filter = ("country", "content_locale", "enabled")
+    raw_id_fields = ("product", "post", "entity")
+    readonly_fields = ("site",)
+
+    def _site_access(self, request, *, publish=False):
+        from core.catalog.access_models import RelationSiteGrant
+
+        grants = RelationSiteGrant.objects.filter(actor=request.user, site_id=getattr(settings, "SITE_ID", None))
+        return (grants.filter(can_publish=True) if publish else grants).exists()
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).filter(site_id=getattr(settings, "SITE_ID", None))
+
+    def has_view_permission(self, request, obj=None):
+        return self._site_access(request) and super().has_view_permission(request, obj)
+
+    def has_add_permission(self, request):
+        return self._site_access(request, publish=True) and super().has_add_permission(request)
+
+    def has_change_permission(self, request, obj=None):
+        return self._site_access(request, publish=True) and super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        return self._site_access(request, publish=True) and super().has_delete_permission(request, obj)
+
+    def save_model(self, request, obj, form, change):
+        obj.site_id = settings.SITE_ID
+        super().save_model(request, obj, form, change)
+
+
+    def changeform_view(self, request, object_id=None, form_url="", extra_context=None):
+        try:
+            return super().changeform_view(request, object_id, form_url, extra_context)
+        except IntegrityError:
+            return HttpResponse("Дозвіл змінився. Оновіть сторінку та повторіть дію.", status=409)

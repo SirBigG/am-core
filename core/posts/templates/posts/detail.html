@@ -129,6 +129,7 @@
         {% endif %}
         {% include "companies/publication_market_link.html" with entity_name=publication_market.entity_name market_url=publication_market.market_url can_show=publication_market.can_show post_id=publication_market.post_id entity_id=publication_market.entity_id only %}
         {% include "posts/publication_actions.html" %}
+        {% include "posts/includes/related_catalog.html" %}
         <section class="site-content-section">
             <h2 class="site-content-section__title">Коментарі</h2>
             {% render_comments object request %}

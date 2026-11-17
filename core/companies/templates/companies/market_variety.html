@@ -4,7 +4,7 @@
     {% querystring region=selected_region|default:None hub=selected_hub|default:None sort=None period=None as back_query %}
     <div class="am-market__selection">
         <a class="am-market__link" href="{{ back_url }}{{ back_query }}">← Усі сорти</a>
-        <a class="am-market__button" href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% else %}?category={{ variety.rubric.slug|urlencode }}{% endif %}">Каталог компаній ↗</a>
+        <a class="am-market__button" href="{% url 'companies:list' %}{% if selected_hub %}?hub={{ selected_hub|urlencode }}{% else %}?category={{ variety.rubric.slug|urlencode }}{% endif %}">Каталог компаній <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
     </div>
     <div class="am-market__layout">
         <section class="am-market__panel" aria-labelledby="am-offers-title">
@@ -35,7 +35,7 @@
                             <small>{{ offer.name }} · {{ offer.price_updated_at|date:"d.m.Y" }}</small>
                         </div>
                         {% if offer.link %}
-                            <a class="am-market__button" href="{{ offer.link }}" target="_blank" rel="nofollow noopener">Умови ↗</a>
+                            <a class="am-market__button" href="{{ offer.link }}" target="_blank" rel="nofollow noopener">Умови <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
                         {% else %}
                             <a class="am-market__button" href="{{ offer.company.get_absolute_url }}">Контакти →</a>
                         {% endif %}
@@ -54,6 +54,6 @@
         {% empty %}
             <p class="am-market__muted">Структуровані характеристики ще доповнюються.</p>
         {% endfor %}
-        <a class="am-market__link" href="{{ variety.get_absolute_url }}">Повний опис сорту в каталозі AgroMega ↗</a>
+        <a class="am-market__link" href="{{ variety.get_absolute_url }}">Повний опис сорту в каталозі AgroMega <span class="catalog-arrow-up-right" aria-hidden="true">→</span></a>
     </section>
 {% endblock market_content %}
