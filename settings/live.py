@@ -3,6 +3,9 @@ import os
 from .settings import *  # noqa
 from .settings import INSTALLED_APPS as BASE_INSTALLED_APPS
 
+SITE_ID = 2
+RELATED_CATALOG_MARKETS = {SITE_ID: "UA"}
+
 INSTALLED_APPS = [
     *BASE_INSTALLED_APPS,
     "storages",
