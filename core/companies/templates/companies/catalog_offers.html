@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}{{ market_title }}{% endblock title %}
+{% block robots %}
+    <meta name="robots" content="noindex,follow">
+{% endblock robots %}
+{% block canonical %}
+    <link rel="canonical"
+          href="{{ publication_canonical_url|default:card.url }}">
+{% endblock canonical %}
+{% block content %}
+    <h1>{{ market_title }}</h1>
+    <p><a class="potato-link" href="{{ back }}"><span aria-hidden="true">←</span> Повернутися до добірки</a></p>
+    {% if offers %}
+        <p>Пропозицій: {{ offers.paginator.count }} · Продавців: {{ seller_count }}</p>
+        <ul class="list-unstyled">
+            {% for offer in offers %}
+                <li class="border rounded p-3 mb-3">
+                    <strong>{{ offer.company.name }}</strong>
+                    {% if offer.name %}<p>{{ offer.name }}</p>{% endif %}
+                    {% if offer.package_label %}<p>{{ offer.package_label }}</p>{% else %}<p>Фасування та одиницю уточнюйте у продавця.</p>{% endif %}
+                    <p>{% if offer.price != None %}{{ offer.price }}{% else %}{{ offer.min_price }}{% if offer.max_price and offer.max_price != offer.min_price %}–{{ offer.max_price }}{% endif %}{% endif %} {{ offer.currency }}</p>
+                    {% if offer.seller_url %}
+                        <a class="potato-link"
+                           href="{{ offer.seller_url }}"
+                           rel="nofollow noopener">Перейти до продавця <span aria-hidden="true">→</span></a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% if offers.has_previous %}
+            <a class="potato-link"
+               href="{% querystring page=offers.previous_page_number %}"><span aria-hidden="true">←</span> Попередня сторінка</a>
+        {% endif %}
+        {% if offers.has_next %}
+            <a class="potato-link"
+               href="{% querystring page=offers.next_page_number %}">Наступна сторінка <span aria-hidden="true">→</span></a>
+        {% endif %}
+    {% else %}
+        <p>Чинних пропозицій продавців поки немає.</p>
+    {% endif %}
+{% endblock content %}

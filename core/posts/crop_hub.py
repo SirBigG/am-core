@@ -193,7 +193,7 @@ def _build_context(category, config):
                 if post.pk in represented or not post.absolute_url or post.publish_date > now:
                     continue
                 represented.add(post.pk)
-                articles.append(_article(post))
+                articles.append({**_article(post), "placement_id": placement.pk})
             if articles:
                 guides.append({"title": section.title, "articles": articles})
     if guides and not any(item["role"] == "growing" for item in sections):
@@ -338,7 +338,7 @@ def build_crop_hub_context(category, site=None, locale=None, config=None):
             sort_keys=True,
         ).encode()
     ).hexdigest()
-    key = f"crop-hub:v5:{category.pk}:{digest}"
+    key = f"crop-hub:v6:{category.pk}:{digest}"
     context = cache.get(key)
     if context is None:
         context = _build_context(category, config)

@@ -102,6 +102,14 @@ class CategoryHubSectionInline(admin.TabularInline):
 
 @admin.register(CategoryHub)
 class CategoryHubAdmin(admin.ModelAdmin):
+    change_form_template = "admin/classifier/categoryhub/change_form.html"
+
+    def get_urls(self):
+        from core.catalog.block_admin import hub_blocks_view
+
+        return [path("<int:hub_id>/catalog-blocks/", self.admin_site.admin_view(
+            lambda request, hub_id: hub_blocks_view(self, request, hub_id)), name="classifier_categoryhub_catalog_blocks")] + super().get_urls()
+
     list_display = ("category", "is_active", "site", "locale", "updated")
     list_filter = ("is_active", "site", "locale")
     search_fields = ("category__value", "category__slug", "description")

@@ -92,6 +92,15 @@ class CategoryPresentationMode(models.TextChoices):
 class Category(MPTTModel):
     """Model realize tree structure for categories."""
 
+    entity = models.ForeignKey(
+        "catalog.CatalogEntity",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="categories",
+    )
+
     slug = models.CharField(max_length=250, unique=True, verbose_name=_("transliteration value"))
     value = models.CharField(max_length=250, verbose_name=_("category value"))
     icon = models.CharField(max_length=250, blank=True, null=True, verbose_name=_("category icon"))

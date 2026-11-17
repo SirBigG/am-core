@@ -3,9 +3,10 @@
 from django.contrib import admin
 from django.core.exceptions import ValidationError as ModelValidationError
 from django.db import IntegrityError, transaction
+from django.db.models.deletion import ProtectedError
 from django.utils.cache import add_never_cache_headers
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.generics import RetrieveUpdateAPIView, get_object_or_404
 from rest_framework.permissions import DjangoModelPermissions, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
@@ -185,9 +186,15 @@ class ReferenceViewSet(PrivateHubAccess, ModelViewSet):
         except IntegrityError as exc:
             raise ValidationError("Conflicting reference; read current configuration and retry.") from exc
 
-    @transaction.atomic
     def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
+        try:
+            # Deferred FK conflicts may surface only when this transaction commits.
+            with transaction.atomic():
+                return super().destroy(request, *args, **kwargs)
+        except (ProtectedError, IntegrityError) as exc:
+            error = APIException("This reference is retained by catalog configuration history.")
+            error.status_code = 409
+            raise error from exc
 
 
 class HubViewSet(ReferenceViewSet):

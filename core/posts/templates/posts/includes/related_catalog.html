@@ -1,0 +1,78 @@
+{% if related_catalog.error %}
+    <p role="status">{{ related_catalog.error }} <a class="potato-link" href="{{ related_catalog.path }}">Скинути фільтри</a></p>
+{% endif %}
+{% if related_catalog.crop_choices|length > 1 %}
+    <form method="get" action="{{ related_catalog.path }}" class="mb-3">
+        <label for="catalog-crop">Культура</label>
+        <select name="catalog_crop" id="catalog-crop" class="form-select">
+            <option value="">Оберіть культуру</option>
+            {% for crop in related_catalog.crop_choices %}
+                <option value="{{ crop.id }}"
+                        {% if crop.id == related_catalog.selected_crop %} selected{% endif %}>{{ crop.label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit"
+                class="potato-hero__button potato-hero__button--primary mt-3">Показати застосування</button>
+    </form>
+{% endif %}
+{% for block in related_catalog.blocks %}
+    <section class="site-content-section"
+             id="related-catalog-{{ block.index }}"
+             aria-labelledby="related-title-{{ block.index }}">
+        <h2 id="related-title-{{ block.index }}">{{ block.title }}</h2>
+        {% if block.fields %}
+            <form method="get"
+                  action="{{ related_catalog.path }}#related-catalog-{{ block.index }}"
+                  class="mb-3">
+                {% if related_catalog.selected_crop %}
+                    <input type="hidden"
+                           name="catalog_crop"
+                           value="{{ related_catalog.selected_crop }}">
+                {% endif %}
+                {% for name, value in block.preserved.items %}
+                    <input type="hidden" name="{{ name }}" value="{{ value }}">
+                {% endfor %}
+                <div class="site-filter-grid">
+                    {% for field in block.fields %}
+                        <div class="site-filter-field">
+                            <label for="{{ field.name }}">{{ field.label }}</label>
+                            <select name="{{ field.name }}" id="{{ field.name }}" class="form-select">
+                                <option value="">Усі</option>
+                                {% for option in field.options %}
+                                    <option value="{{ option.id }}"
+                                            {% if option.id == field.value %} selected{% endif %}>{{ option.label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit"
+                        class="potato-hero__button potato-hero__button--primary mt-3">Застосувати фільтри</button>
+            </form>
+        {% endif %}
+        {% if block.filtered %}
+            <p>
+                <a class="potato-link"
+                   href="{{ related_catalog.path }}{% if related_catalog.selected_crop %}?catalog_crop={{ related_catalog.selected_crop|urlencode }}{% endif %}#related-catalog-{{ block.index }}">Скинути фільтри</a>
+            </p>
+        {% endif %}
+        {% if block.selection.results %}
+            <ul class="{% if block.presentation == 'catalog_cards' %}row row-cols-1 row-cols-md-2 g-2 list-unstyled{% else %}site-variety-list{% endif %}">
+                {% for card in block.selection.results %}
+                    <li class="p-2">
+                        <a class="potato-link" href="{{ card.href }}">{{ card.title }} <span aria-hidden="true">→</span></a>
+                        {% if card.method_labels %}<small class="text-body-secondary">{{ card.method_labels|join:", " }}</small>{% endif %}
+                        {% if card.market.url %}
+                            <a class="potato-link d-block" href="{{ card.market.url }}">Пропозиції ({{ card.market.offers }}) · Продавці ({{ card.market.sellers }}) <span aria-hidden="true">→</span></a>
+                        {% elif card.market %}
+                            <span class="d-block">Чинних пропозицій немає.</span>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p role="status">За цими умовами застосувань не знайдено.</p>
+        {% endif %}
+        {% if block.next_url %}<a class="potato-link" href="{{ block.next_url }}">Наступна сторінка <span aria-hidden="true">→</span></a>{% endif %}
+    </section>
+{% endfor %}

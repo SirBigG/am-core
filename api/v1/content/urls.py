@@ -1,7 +1,8 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework.routers import SimpleRouter
 
 from api.v1.content.views import CategoryTreeView, CountryListView, PostListCreateView, PostUpdateView
+from core.catalog.public_views import related_catalog
 
 from .attribute_schema import (
     CategorySchemaView,
@@ -12,6 +13,7 @@ from .attribute_schema import (
     GroupDetailView,
     GroupListView,
 )
+from .block_configurations import HubBlocksView
 from .hubs import (
     CategoryPresentationView,
     GuidePlacementViewSet,
@@ -31,6 +33,10 @@ hub_router.register("guide-placements", GuidePlacementViewSet, basename="content
 hub_router.register("photos", ContentPhotoViewSet, basename="content-photo")
 
 urlpatterns = [
+    path("related-catalog/<str:anchor_type>/<int:pk>/", related_catalog, name="public-related-catalog"),
+    path("hubs/<int:hub_id>/catalog-blocks/", HubBlocksView.as_view(), name="content-hub-blocks"),
+    path("hubs/<int:hub_id>/catalog-blocks/<str:action>/", HubBlocksView.as_view(), name="content-hub-block-action"),
+    path("catalog/", include("api.v1.content.catalog.urls")),
     path("products/<int:pk>/match/", ProductMatchView.as_view(), name="content-product-match"),
     path("categories/", CategorySetupList.as_view(), name="content-category-list"),
     path("categories/<int:pk>/", CategorySetupDetail.as_view(), name="content-category-detail"),

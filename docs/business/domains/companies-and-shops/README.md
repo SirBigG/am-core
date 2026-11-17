@@ -231,3 +231,5 @@ identity. First occurrence order is retained. Studio reports the number merged
 for both preview and import. The API still rejects duplicate identities from
 other clients. Snapshot checks and result-size limits apply to the unique result;
 deduplication does not bypass those safeguards.
+
+Seller offers from related catalog blocks require an explicit publication for the offer, site, content language and market country. The publication binds the offer's existing article and catalog identity. Preparations and other non-variety offers require manual identity confirmation. A variety may also use its existing exact automatic match. Each package has its own displayed price and currency. Several packages from one company count as several offers from one seller.

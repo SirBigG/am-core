@@ -1,0 +1,11 @@
+# Related catalog blocks on public pages
+
+Set `RELATED_CATALOG_MARKETS` in deployment settings as a map from the configured Django site ID to its verified market country code. An absent entry leaves automatic blocks off. The page needs an explicit approved presentation for that site, a canonical path and current eligible content. If several content languages select the same anchor, the page adapter leaves its blocks unavailable until routing can unambiguously identify the content language.
+
+Crop Hub reads the active block revision on each request. Catalog detail pages follow approved application relations or an explicit cultivar-to-crop relation, then use the selected crop's active preparation rule. A problem shared by several cultures asks the visitor to select one. A cultivar block is labeled with its crop's name. The application method and problem filters apply to one released revision. Cards link to canonical articles and carry the selected crop where applicable.
+
+Use a versioned hub configuration to switch an explicitly listed Guide placement to an automatic slot. The Crop Hub excludes those placements while the slot is enabled, including when it has no results. Disable the configuration to restore the manual placement. Guide rows, canonical URLs and market data are retained.
+
+The anonymous read endpoint is `/api/content/related-catalog/{category|post}/{id}/`. It returns version, blocks and available crop choices. Filter names match the HTML form, such as `catalog_1_target`, `catalog_1_method` and `catalog_crop`. The next link carries a signed cursor scoped to the page, active configuration revision, filters and selected crop. Invalid inputs on an eligible page return 400 with an empty block list. A missing or ineligible anchor returns an empty projection. The response is no-store and noindex. Page query variants use the existing canonical URL without the query string and noindex,follow. Blocks and their results are read fresh after the hub context cache.
+
+Cards include scoped offers and distinct seller counts when eligible. Preparation and cultivar cards show an empty seller state when no eligible offer exists. The offer link preserves the originating card, filters and pagination, then checks eligibility again on the destination. See [Seller offers for related catalog cards](related-catalog-offers.md).

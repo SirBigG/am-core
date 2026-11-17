@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <form method="post">{% csrf_token %}{{ batch_form.as_div }}<button name="action" value="preview" type="submit">Preview</button></form>
+    {% if plan %}
+        <p>{{ plan.operation }} · {{ plan.operation_key }} · {{ plan.expires_in }} seconds</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Effect</th>
+                    <th>Before</th>
+                    <th>After</th>
+                    <th>Errors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in plan.items %}<tr><td>{{ row.key }}</td><td>{{ row.effect }}{% if row.duplicate_of %} · {{ row.duplicate_of }}{% endif %}</td><td><pre>{{ row.before|pprint }}</pre></td><td><pre>{{ row.after|pprint }}</pre></td><td>{{ row.error.detail }}</td></tr>{% endfor %}
+            </tbody>
+        </table>
+        {% if plan.can_apply %}<form method="post">{% csrf_token %}{{ apply_form.as_div }}<button name="action" value="apply" type="submit">Apply reviewed batch</button></form>{% endif %}
+    {% elif apply_form.errors %}{{ apply_form.errors }}{% endif %}
+{% endblock %}

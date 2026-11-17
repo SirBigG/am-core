@@ -126,8 +126,30 @@ of its sources is leased. Retry after the run completes or the lease expires.
 Company/category reassignment returns 400 once a source has products or attempts;
 create a new source instead to preserve historical ownership. No schema migration
 is required. Deploy the backend before using these writes; existing Studio and
-CLI clients continue to use their existing read/run contract. This API addition
-does not add configuration-editing screens to Parser Studio.
+CLI clients continue to use their existing read/run contract. Parser Studio now includes company/source create and edit forms using these
+POST/PATCH endpoints. It fetches current detail before editing, sends only changed
+fields and preserves source-map inheritance using `stored_parser_map`. A backend
+without that projection can still serve reads/runs, but source editing is blocked
+with an update message. New sources default to inactive. Operator tokens still
+need the explicit model permissions above; the desktop UI cannot grant them.
+
+Studio uses the full `/api/categories/` list for source creation, prefix location
+lookup for companies, complete paged company catalogs, and source-scoped page
+controls for attempts/products/prices. Source search and runtime filters operate
+on the complete cursor-loaded source catalog. Local previews do not acquire a
+lease or submit results. HTML/JSON runs require an active, unleased source and
+either due status or explicit on-demand mode; browser sources use an external
+worker. See the sibling `parser_studio/README.md` for the operator workflow.
+
+These Studio changes were verified on 2026-11-15 with 36 tests and Ruff, then
+checked in the native macOS application against `https://agromega.in.ua/`.
+Catalogs, company/source detail forms, location lookup, history pagination and an
+Agrico JSON preview passed. Authenticated OPTIONS exposed management methods and
+authorized write metadata for the existing token. No live management writes or
+parser submissions were made, so successful mutation acceptance remains untested.
+See `parser_studio/docs/2026-11-15-live-api-ux-check.md` in the parent workspace
+for the detailed observations and remaining UX opportunities. Restart running
+Studio processes to load updated code.
 
 Management writes record the operator, target and changed field names in Django
 admin history in the same transaction as the mutation. Configuration values are

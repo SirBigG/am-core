@@ -1,0 +1,19 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+    <p>{{ result.operation }} · {{ result.operation_key }} · {{ result.completed_at }}</p>
+    <table>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Effect</th>
+                <th>Record</th>
+                <th>Revision</th>
+                <th>Outcome</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in receipt_rows %}<tr><td>{{ row.key }}</td><td>{{ row.effect }}</td><td>{% if row.record_id %}<a href="{% url 'admin:catalog_relationrecord_change' row.record_id %}">{{ row.record_id }}</a>{% endif %}</td><td>{{ row.revision_id }}</td><td><pre>{{ row.details|pprint }}</pre></td></tr>{% endfor %}
+        </tbody>
+    </table>
+    {% if next_url %}<p><a href="{{ next_url }}">Next results</a></p>{% endif %}
+{% endblock %}
