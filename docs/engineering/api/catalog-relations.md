@@ -4,6 +4,16 @@ The private API under `/api/content/catalog/` exposes version 1 of the shared ca
 
 Draft creation additionally requires `catalog.add_relationrecord` and `can_edit`. Appending a revision, submitting and archiving require `catalog.change_relationrecord` and `can_edit`. Review requires `catalog.review_relationrecord` and `can_review`. Release and unrelease require `catalog.publish_relationrecord` and `can_publish`. Shared review and archive follow the same additional site capabilities as Django Admin. All mutations call the shared `RelationAccess` policy and relation service.
 
+## Provisioning access in Django Admin
+
+An active superuser can provision access under **Catalog**. Each save or removal uses the Django Admin log.
+
+1. Create a **Relation site grant** for the staff account. The form offers the configured site. Enable the edit, review and publish capabilities the account needs.
+2. Add a **Relation entity grant** under that site grant for each required participant. Select the existing crop category or preparation or problem post to derive its catalog entity, or enter the entity UUID directly. The form checks that a supplied UUID matches the selected anchor. An anchor without a catalog entity requires catalog identity setup first.
+3. To authorize review of plant-protection applications, select an active **Application country policy** in **Application reviewer grants** and enable **Can review**. If the policy is missing, configure its country code and verified IANA timezone under **Application country policies** first. The Ukraine policy uses `UA` and `Europe/Kyiv`.
+
+The account also needs the Django model permissions for its assigned actions. The country grant authorizes review only when the site grant and review permissions allow it. Removing a site grant removes its entity and application reviewer grants.
+
 ## Routes
 
 | Method and suffix | Representation or action |

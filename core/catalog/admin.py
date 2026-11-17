@@ -14,6 +14,7 @@ from django.urls import path, reverse
 from core.classifier.publication_checks import SiteContentPolicy
 
 from . import bulk_admin
+from . import grant_admin as grant_admin
 from .application_models import ApplicationReviewerGrant
 from .applications import APPLICATION_TYPE
 from .relation_access import RelationAccess, configured_relation_site

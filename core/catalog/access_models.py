@@ -15,6 +15,9 @@ class RelationSiteGrant(models.Model):
     can_review = models.BooleanField(default=False)
     can_publish = models.BooleanField(default=False)
 
+    def __str__(self):
+        return f"{self.actor.get_username()} · {self.site.domain}"
+
     class Meta:
         constraints = [
             models.UniqueConstraint(fields=("actor", "site"), name="catalog_site_actor_grant_unique"),
