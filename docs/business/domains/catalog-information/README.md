@@ -92,6 +92,9 @@ The confirmed lifecycle is still unknown. Likely states to clarify include draft
 
 - Django app: `core/posts`.
 - Token-authenticated integration endpoints: `/api/content/posts/` and `/api/content/posts/<id>/`.
+- Knowledge Engine can link an existing publication to a registry variety using
+  the [registry publication API](../../../engineering/api/registry-variety-publication.md).
+  The attachment preserves an existing link when the requested publication differs.
 - Some variety-style public catalog URLs, such as `/cybulevi/sorty-cybuli/`, are rendered through post/category templates even when the content behaves like registry/catalog reference information.
 - Registry-specific category and variety templates also exist in `core/registry`, especially for `/registry/` and registry browsing flows.
 - Registry import code starts in `core/registry/parser.py`, with row layout definitions in `core/registry/parser_row_types.py`.
