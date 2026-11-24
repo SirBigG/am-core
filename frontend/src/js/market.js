@@ -34,3 +34,21 @@ if (picker) {
         }
     }
 }
+
+document.querySelectorAll('[data-price-chart]').forEach(chart => {
+    const detail = chart.querySelector('[data-price-day-detail]');
+    chart.querySelectorAll('[data-price-day]').forEach(button => {
+        function showDay() {
+            detail.textContent = button.dataset.priceDay;
+        }
+        button.addEventListener('click', showDay);
+        button.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                showDay();
+            }
+        });
+        button.addEventListener('mouseenter', showDay);
+        button.addEventListener('focus', showDay);
+    });
+});

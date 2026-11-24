@@ -129,6 +129,7 @@ class CategoryMarketWidgetTests(TestCase):
         self.assertEqual([(row["min"], row["max"]) for row in group["history"]], [(25, 25), (35, 45)])
         self.assertEqual([row["offer_count"] for row in group["history"]], [1, 1])
         self.assertEqual(group["min"], 40)
+        self.assertEqual([row["median"] for row in group["history"]], [25, 45])
         self.assertContains(response, '<svg viewBox="0 0 620 180"')
         self.assertContains(response, "Історія цін у таблиці")
 

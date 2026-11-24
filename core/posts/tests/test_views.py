@@ -196,7 +196,7 @@ class PostListTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["has_active_filters"])
         self.assertContains(response, 'id="category-filters"', html=False)
-        self.assertContains(response, '<details class="site-content-section"', html=False)
+        self.assertContains(response, "<details open>", html=False)
         self.assertContains(response, "open", html=False)
 
     def test_child_list_grouped_caches_countries_per_category(self):

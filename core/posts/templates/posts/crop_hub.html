@@ -4,10 +4,10 @@
     <script async src="{% static 'posts/j-index.js' %}"></script>
     {% if hub_sections %}
         <script defer
-                src="{% static 'posts/j-potato-sections.js' %}"></script>
+                src="{% static 'posts/j-potato-sections.js' %}?v=20261123"></script>
     {% endif %}
     <link rel="stylesheet"
-          href="{% static 'posts/list.css' %}">
+          href="{% static 'posts/list.css' %}?v=20261123">
 {% endblock scripts %}
 {% block canonical %}
     <link rel="canonical" href="{% full_url category.absolute_url %}">

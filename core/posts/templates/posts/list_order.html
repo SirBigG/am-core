@@ -8,8 +8,13 @@
 {% endblock extra_meta %}
 {% block content %}
     <div class="site-catalog-shell">
-        <header class="site-catalog-hero">
-            <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
+        <header class="site-catalog-hero clearfix">
+            <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
+                <div class="site-catalog-hero__breadcrumbs">{% breadcrumbs category %}</div>
+                <ul class="site-catalog-stats ms-auto mb-0" aria-label="Огляд матеріалів">
+                    <li class="site-catalog-stats__item">{{ post_count }} позицій</li>
+                </ul>
+            </div>
             <p class="site-catalog-hero__eyebrow">Алфавітний каталог</p>
             <h1 class="site-catalog-hero__title">
                 {% if category.meta and category.meta.h1 %}
@@ -23,24 +28,19 @@
             {% else %}
                 <p class="site-catalog-hero__text">Швидко знайдіть матеріал за першою літерою або відфільтруйте записи за країною.</p>
             {% endif %}
-            <ul class="site-catalog-stats" aria-label="Огляд матеріалів">
-                <li class="site-catalog-stats__item">{{ post_count }} позицій</li>
-                <li class="site-catalog-stats__item">{{ group_count }} груп за алфавітом</li>
-            </ul>
+            <details {% if has_active_filters %}open{% endif %}>
+                <summary class="btn btn-outline-success btn-sm">Фільтри</summary>
+                <form class="mt-3"
+                      id="category-filters"
+                      method="get"
+                      action="{{ request.path }}">
+                    {% include "posts/includes/category_filter_fields.html" %}
+                    <div class="site-form-actions">
+                        <input type="submit" class="btn btn-success" value="Фільтрувати">
+                    </div>
+                </form>
+            </details>
         </header>
-        <details class="site-content-section"
-                 {% if has_active_filters %}open{% endif %}>
-            <summary class="btn btn-outline-success">Фільтри</summary>
-            <form class="mt-3"
-                  id="category-filters"
-                  method="get"
-                  action="{{ request.path }}">
-                {% include "posts/includes/category_filter_fields.html" %}
-                <div class="site-form-actions">
-                    <input type="submit" class="btn btn-success" value="Фільтрувати">
-                </div>
-            </form>
-        </details>
         {% if posts %}
             <nav class="site-alpha-nav" aria-label="Перейти до літери">
                 {% for group in posts %}

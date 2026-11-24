@@ -2,6 +2,8 @@
 cohort."""
 
 from datetime import timedelta
+from decimal import Decimal
+from statistics import median
 
 from django.db.models import Case, Count, F, Max, Min, Q, Value, When
 from django.db.models.functions import Coalesce, Greatest, NullIf, TruncDate
@@ -50,6 +52,15 @@ def build_price_overview(offers, now, days=30):
         .annotate(day=TruncDate("observed_at"))
     )
     daily = list(_ranges(history, "day").annotate(offer_count=Count("product_id", distinct=True)).order_by("day"))
+    seller_prices = {}
+    observations = history.order_by("observed_at", "pk").values(
+        "day", "currency", "price", "min_price", "max_price", "product__company_id"
+    )
+    for observation in observations:
+        key = (observation["currency"] or "", observation["day"])
+        lower = observation["price"] if observation["price"] is not None else observation["min_price"]
+        upper = lower if observation["price"] is not None else max(lower, observation["max_price"] or lower)
+        seller_prices.setdefault(key, {})[observation["product__company_id"]] = (lower + upper) / Decimal(2)
     labels = dict(CurrencyChoices.choices)
     for group in current:
         code = group["currency_code"]
@@ -62,6 +73,24 @@ def build_price_overview(offers, now, days=30):
             row["x"] = 20 + (row["day"] - start).days * 580 // (days - 1)
             row["y_min"] = 160 - int(row["min"] / group["chart_max"] * 140)
             row["y_max"] = 160 - int(row["max"] / group["chart_max"] * 140)
+        for row in rows:
+            prices = seller_prices[(code, row["day"])]
+            row["median"] = median(prices.values())
+            row["seller_count"] = len(prices)
+            row["chart_x"] = 80 + (row["day"] - start).days * 500 // (days - 1)
+            row["chart_low"] = 180 - int(row["min"] / group["chart_max"] * 150)
+            row["chart_high"] = 180 - int(row["max"] / group["chart_max"] * 150)
+            row["chart_median"] = 180 - int(row["median"] / group["chart_max"] * 150)
+        group["median_points"] = " ".join(f'{row["chart_x"]},{row["chart_median"]}' for row in rows)
+        group["range_points"] = " ".join(
+            [f'{row["chart_x"]},{row["chart_high"]}' for row in rows]
+            + [f'{row["chart_x"]},{row["chart_low"]}' for row in reversed(rows)]
+        )
+        group["chart_ticks"] = [
+            {"y": 30, "value": group["chart_max"]},
+            {"y": 105, "value": group["chart_max"] / 2},
+            {"y": 180, "value": 0},
+        ]
         group["start"] = start
         group["end"] = today
     return current

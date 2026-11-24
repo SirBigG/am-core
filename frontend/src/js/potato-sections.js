@@ -43,15 +43,28 @@ if (priceTools) {
     const heading = table.querySelector('[data-price-heading]');
     const selector = priceTools.querySelector('select');
     const sort = priceTools.querySelector('button');
+    const more = document.querySelector('#potato-price-more');
+    let expanded = false;
     let ascending = true;
 
     function filterRows() {
-        rows.forEach(row => {
-            row.hidden = Boolean(selector.value) && row.dataset.variety !== selector.value;
-        });
+        const matching = rows.filter(row => !selector.value || row.dataset.variety === selector.value);
+        const visible = new Set(expanded ? matching : matching.slice(0, 7));
+        rows.forEach(row => { row.hidden = !visible.has(row); });
+        more.hidden = matching.length <= 7;
+        more.setAttribute('aria-expanded', String(expanded));
+        more.querySelector('[data-price-more-label]').textContent = expanded ? 'Згорнути' : 'Побачити більше';
+        more.querySelector('[data-price-more-arrow]').textContent = expanded ? '↑' : '↓';
     }
 
-    selector.addEventListener('change', filterRows);
+    selector.addEventListener('change', () => {
+        expanded = false;
+        filterRows();
+    });
+    more.addEventListener('click', () => {
+        expanded = !expanded;
+        filterRows();
+    });
     sort.addEventListener('click', () => {
         rows.sort((a, b) => a.dataset.currency.localeCompare(b.dataset.currency) ||
             (Number(a.dataset.price) - Number(b.dataset.price)) * (ascending ? 1 : -1));
@@ -59,6 +72,7 @@ if (priceTools) {
         heading.setAttribute('aria-sort', ascending ? 'ascending' : 'descending');
         sort.textContent = ascending ? 'Ціна продавця ↑' : 'Ціна продавця ↓';
         ascending = !ascending;
+        filterRows();
     });
     filterRows();
     priceTools.hidden = false;

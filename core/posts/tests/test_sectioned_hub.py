@@ -67,7 +67,7 @@ class SectionedHubTests(TestCase):
         self.assertContains(response, f'href="{self.cultivar.absolute_url}"')
         self.assertContains(response, f'href="{reverse("market:variety", args=[self.cultivar.pk])}?hub=custom-crop"')
         self.assertContains(response, 'href="/agromarket/?hub=custom-crop"')
-        self.assertContains(response, 'Побачити всі пропозиції <span aria-hidden="true">→</span>', count=2)
+        self.assertContains(response, 'Побачити всі пропозиції <span class="catalog-arrow-up-right" aria-hidden="true">→</span>', count=2)
         self.assertNotContains(response, "kartoplya")
         self.assertNotContains(response, "kartoplia-sorty")
         self.assertNotContains(response, "potato-hero.jpg")

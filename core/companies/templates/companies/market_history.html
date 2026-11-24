@@ -1,41 +1,63 @@
+{% load l10n %}
 <aside class="am-market__panel" aria-labelledby="am-history-title">
-    <h2 id="am-history-title">Історія цін</h2>
-    <p class="am-market__muted">{{ variety.title }} · заявлені ціни</p>
-    <nav class="am-market__periods" aria-label="Період історії цін">
-        <a class="am-market__button" href="{% querystring period=30 %}#am-history-title" {% if period == 30 %}aria-current="true"{% endif %}>30 днів</a>
-        <a class="am-market__button" href="{% querystring period=90 %}#am-history-title" {% if period == 90 %}aria-current="true"{% endif %}>90 днів</a>
-    </nav>
+    <h2 id="am-history-title">Діапазон цін · {{ variety.title }}</h2>
+    <p class="am-market__muted">Заявлені ціни пропозицій · фасування уточнюйте у продавця</p>
     {% for group in price_overview %}
         <div class="am-market__history">
-            <p class="am-market__metric">{{ group.min }}{% if group.min != group.max %}–{{ group.max }}{% endif %} {{ group.currency }}</p>
             <p class="am-market__muted">Останнє спостереження · {{ group.updated_at|date:"d.m.Y" }}</p>
-            {% if group.has_chart %}
-                <p class="am-market__muted">Денні діапазони · шкала 0–{{ group.chart_max }} {{ group.currency }}</p>
-                <svg viewBox="0 0 620 180" width="100%" role="img"
-                     aria-label="Денні діапазони цін за {{ period }} днів. Точні значення в таблиці.">
-                    <path d="M20 20V160H600 M20 90H600 M20 20H600" fill="none" stroke="currentColor" opacity="0.22" />
-                    {% for day in group.history %}
-                        <line x1="{{ day.x }}" x2="{{ day.x }}" y1="{{ day.y_min }}" y2="{{ day.y_max }}" stroke="currentColor" stroke-width="6"><title>{{ day.day|date:"d.m.Y" }} · {{ day.min }}–{{ day.max }} {{ group.currency }}</title></line>
-                        <circle cx="{{ day.x }}" cy="{{ day.y_min }}" r="5" fill="currentColor" />
-                        <circle cx="{{ day.x }}" cy="{{ day.y_max }}" r="5" fill="currentColor" />
-                    {% endfor %}
-                </svg>
-                <p class="am-market__dates"><span>{{ group.start|date:"d.m.Y" }}</span><span>{{ group.end|date:"d.m.Y" }}</span></p>
+            <div class="am-market__range-values">
+                <div><small>Найнижча ціна</small><strong>{{ group.min }} {{ group.currency }}</strong></div>
+                <div><small>Найвища ціна</small><strong>{{ group.max }} {{ group.currency }}</strong></div>
+            </div>
+            <div class="am-market__range-line" aria-hidden="true"></div>
+            <p class="am-market__muted">Пропозицій {{ group.offer_count }} · продавців {{ group.seller_count }}</p>
+            <nav class="am-market__periods" aria-label="Період історії цін">
+                <a class="am-market__button" href="{% querystring period=30 %}#am-history-title" {% if period == 30 %}aria-current="true"{% endif %}>30 днів</a>
+                <a class="am-market__button" href="{% querystring period=90 %}#am-history-title" {% if period == 90 %}aria-current="true"{% endif %}>90 днів</a>
+            </nav>
+            {% if group.history %}
+                <div data-price-chart>
+                    <svg viewBox="-40 0 660 220" width="100%" role="img" aria-label="Медіанна ціна та діапазон у {{ group.currency }}. Точні значення доступні під графіком.">
+                        {% for tick in group.chart_ticks %}
+                            <line x1="80" x2="580" y1="{{ tick.y }}" y2="{{ tick.y }}" stroke="currentColor" opacity=".15" />
+                            <text x="68" y="{{ tick.y }}" dy="4" text-anchor="end" fill="currentColor" font-size="16">{{ tick.value|floatformat:0 }} {{ group.currency }}</text>
+                        {% endfor %}
+                        <polygon points="{{ group.range_points }}" fill="currentColor" opacity=".12" />
+                        <polyline points="{{ group.median_points }}" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" />
+                        {% for day in group.history %}
+                            <g tabindex="0" role="button" class="am-market__chart-point"
+                               aria-label="{{ day.day|date:'d.m.Y' }} · медіана {{ day.median|floatformat:2 }} {{ group.currency }} · діапазон {{ day.min }}–{{ day.max }} {{ group.currency }} · продавців {{ day.seller_count }}"
+                               data-price-day="{{ day.day|date:'d.m.Y' }} · медіана {{ day.median|floatformat:2 }} {{ group.currency }} · діапазон {{ day.min }}–{{ day.max }} {{ group.currency }} · продавців {{ day.seller_count }}">
+                                <line x1="{{ day.chart_x }}" x2="{{ day.chart_x }}" y1="{{ day.chart_high }}" y2="{{ day.chart_low }}" stroke="currentColor" stroke-width="2" opacity=".5" />
+                                <circle cx="{{ day.chart_x }}" cy="{{ day.chart_median }}" r="7" fill="currentColor" stroke="white" stroke-width="2" />
+                                <circle cx="{{ day.chart_x }}" cy="{{ day.chart_median }}" r="20" fill="transparent" />
+                                <title>{{ day.day|date:"d.m.Y" }} · {{ day.min }}–{{ day.max }} {{ group.currency }}</title>
+                            </g>
+                        {% endfor %}
+                        <text x="80" y="210" fill="currentColor" font-size="16">{{ group.start|date:"d.m" }}</text>
+                        <text x="580" y="210" text-anchor="end" fill="currentColor" font-size="16">{{ group.end|date:"d.m" }}</text>
+                    </svg>
+                    <p class="am-market__muted">Натисніть точку, щоб побачити ціни за дату. Лінія з’єднує наявні записи.</p>
+                    <p class="am-market__empty" data-price-day-detail aria-live="polite">{% with day=group.history|last %}{{ day.day|date:"d.m.Y" }} · медіана {{ day.median|floatformat:2 }} {{ group.currency }} · діапазон {{ day.min }}–{{ day.max }} {{ group.currency }} · продавців {{ day.seller_count }}{% endwith %}</p>
+                </div>
             {% else %}
-                <p class="am-market__empty">За цей період недостатньо спостережень для графіка.</p>
+                <p class="am-market__empty">За цей період збережених цін поки немає.</p>
             {% endif %}
             {% if group.history %}
+                <p class="am-market__muted">Останній запис історії · {% with last=group.history|last %}{{ last.day|date:"d.m.Y" }}{% endwith %}</p>
                 <details class="am-market__method">
                     <summary>Дані та методика</summary>
-                    <p>Денні мінімум і максимум серед збережених цін товарів із поточної вибірки. Пропуски відповідають дням без спостережень.</p>
+                    <p>Історія охоплює товари з поточної вибірки. Діапазон — мінімум і максимум збережених цін за день. Медіана розрахована за останньою збереженою пропозицією кожного продавця за день. Для ціни-діапазону використовується його середина. Фасування не приведене до спільної одиниці.</p>
                     <div class="table-responsive">
                         <table class="table table-sm">
-                            <thead><tr><th scope="col">Дата</th><th scope="col">Мін.</th><th scope="col">Макс.</th><th scope="col">Проп.</th></tr></thead>
-                            <tbody>{% for day in group.history %}<tr><td>{{ day.day|date:"d.m.Y" }}</td><td>{{ day.min }}</td><td>{{ day.max }}</td><td>{{ day.offer_count }}</td></tr>{% endfor %}</tbody>
+                            <thead><tr><th scope="col">Дата</th><th scope="col">Медіана</th><th scope="col">Мін.</th><th scope="col">Макс.</th><th scope="col">Продавців</th></tr></thead>
+                            <tbody>{% for day in group.history %}<tr><td>{{ day.day|date:"d.m.Y" }}</td><td>{{ day.median|floatformat:2 }}</td><td>{{ day.min }}</td><td>{{ day.max }}</td><td>{{ day.seller_count }}</td></tr>{% endfor %}</tbody>
                         </table>
                     </div>
                 </details>
             {% endif %}
         </div>
+    {% empty %}
+        <p class="am-market__empty">Актуальних цін поки немає.</p>
     {% endfor %}
 </aside>
